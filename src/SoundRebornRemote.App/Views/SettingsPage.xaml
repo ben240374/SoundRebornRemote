@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SoundRebornRemote.App.ViewModels"
+             xmlns:models="clr-namespace:SoundReborn.Core.Models;assembly=SoundReborn.Core"
+             x:Class="SoundRebornRemote.App.Views.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Title="{DynamicResource L_TabSettings}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12,16,24" Spacing="14">
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="{DynamicResource L_ActiveSpeaker}" Style="{StaticResource SectionLabel}" />
+                    <Label Text="{Binding CurrentSpeakerLabel}" Style="{StaticResource SubtitleLabel}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Apparence -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{DynamicResource L_Language}" Style="{StaticResource SectionLabel}" />
+
+                    <!-- Le Picker travaille sur des chaînes et un index : rien à
+                         résoudre pour le compilateur de liaisons. -->
+                    <Picker ItemsSource="{Binding LanguageNames}"
+                            SelectedIndex="{Binding SelectedLanguageIndex, Mode=TwoWay}" />
+
+                    <Label Text="{DynamicResource L_LanguageNote}" Style="{StaticResource CaptionLabel}" />
+
+                    <Label Text="{DynamicResource L_Theme}" Style="{StaticResource SectionLabel}" Margin="0,6,0,0" />
+
+                    <Picker ItemsSource="{Binding ThemeNames}"
+                            SelectedIndex="{Binding SelectedThemeIndex, Mode=TwoWay}" />
+
+                    <Label Text="{DynamicResource L_ThemeNote}" Style="{StaticResource CaptionLabel}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{DynamicResource L_Search}" Style="{StaticResource SectionLabel}" />
+
+                    <Button Text="{DynamicResource L_ScanButton}" Style="{StaticResource AccentButton}"
+                            Command="{Binding ScanCommand}"
+                            IsEnabled="{Binding IsScanning, Converter={StaticResource InvertedBool}}" />
+
+                    <ActivityIndicator IsRunning="{Binding IsScanning}" IsVisible="{Binding IsScanning}" />
+
+                    <Label Text="{DynamicResource L_ScanNote}" Style="{StaticResource CaptionLabel}" />
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <!-- Clavier par défaut : le pavé numérique d'Android n'offre pas le point. -->
+                        <Entry Grid.Column="0" Text="{Binding ManualHost}" Placeholder="192.168.1.42" />
+                        <Button Grid.Column="1" Text="{DynamicResource L_Add}" Command="{Binding AddManualCommand}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{DynamicResource L_KnownSpeakers}" Style="{StaticResource SectionLabel}" />
+
+                    <CollectionView ItemsSource="{Binding KnownSpeakers}" HeightRequest="260">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:SpeakerEndpoint">
+                                <Grid Padding="0,10" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="1" VerticalOptions="Center">
+                                        <Label Text="{Binding DisplayName}" FontSize="15" />
+                                        <Label Text="{Binding Summary}" Style="{StaticResource CaptionLabel}" />
+
+                                        <!--
+                                            Le balayage sait déjà si l'agent STR répond : on le dit
+                                            plutôt que de laisser deviner pourquoi cette enceinte
+                                            offre moins que l'autre.
+                                        -->
+                                        <Label Text="{DynamicResource L_ReadyForStr}"
+                                               IsVisible="{Binding NeedsStr}"
+                                               FontSize="12"
+                                               TextColor="{StaticResource Warning}" />
+                                    </VerticalStackLayout>
+
+                                    <Button Grid.Column="1" Text="{DynamicResource L_Use}" FontSize="13" Padding="10,6"
+                                            MinimumHeightRequest="36"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, Path=SelectCommand}"
+                                            CommandParameter="{Binding .}" />
+
+                                    <Button Grid.Column="2" Text="✕" FontSize="13" Padding="10,6"
+                                            MinimumHeightRequest="36"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SettingsViewModel}}, Path=ForgetCommand}"
+                                            CommandParameter="{Binding .}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+
+                        <CollectionView.EmptyView>
+                            <Label Text="{DynamicResource L_NoKnownSpeakers}" Style="{StaticResource CaptionLabel}" />
+                        </CollectionView.EmptyView>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!--
+                Bloc d'information, pas d'action : l'installation de l'agent ouvre un
+                accès système sur l'enceinte et la redémarre. Cela reste le travail de
+                l'outil STR sur ordinateur, qui porte aussi toute la logique de
+                récupération. On se contente de signaler et de renvoyer.
+            -->
+            <Border Style="{StaticResource Card}" IsVisible="{Binding HasSpeakersWithoutStr}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{DynamicResource L_StrMissingTitle}" Style="{StaticResource SectionLabel}"
+                           TextColor="{StaticResource Warning}" />
+
+                    <Label Text="{Binding StrMissingSummary}" FontAttributes="Bold" FontSize="14" />
+
+                    <Label Text="{DynamicResource L_StrMissingBody}" Style="{StaticResource CaptionLabel}" />
+
+                    <Button Text="{DynamicResource L_StrMissingOpen}"
+                            Command="{Binding OpenUrlCommand}"
+                            CommandParameter="{Binding StrWebsite}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{DynamicResource L_Diagnostics}" Style="{StaticResource SectionLabel}" />
+                    <Button Text="{DynamicResource L_DiagnoseButton}" Command="{Binding DiagnoseCommand}" />
+
+                    <Label Text="{Binding Diagnostics}" FontSize="12" FontFamily="Monospace"
+                           IsVisible="{Binding HasDiagnostics}"
+                           TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+
+                    <Button Text="{DynamicResource L_ClearArtCache}" Command="{Binding ClearArtCacheCommand}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="{Binding StatusMessage}"
+                   TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                   FontSize="13"
+                   IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+
+            <!-- ================================================= À propos -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{DynamicResource L_About}" Style="{StaticResource SectionLabel}" />
+
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="{Binding AppVersion}" FontAttributes="Bold" FontSize="15" />
+                        <Label Text="{DynamicResource L_AppTagline}" Style="{StaticResource CaptionLabel}" />
+                    </VerticalStackLayout>
+
+                    <BoxView HeightRequest="1" Margin="0,4"
+                             Color="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}" />
+
+                    <Label Text="{DynamicResource L_ThanksTitle}" FontAttributes="Bold" FontSize="15"
+                           TextColor="{StaticResource Accent}" />
+
+                    <Label Text="{DynamicResource L_ThanksBody}" Style="{StaticResource SubtitleLabel}" />
+
+                    <Label Text="{DynamicResource L_ThanksLicense}" Style="{StaticResource CaptionLabel}" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Button Grid.Column="0" Text="{DynamicResource L_OpenWebsite}"
+                                Style="{StaticResource AccentButton}" FontSize="13"
+                                Command="{Binding OpenUrlCommand}" CommandParameter="{Binding StrWebsite}" />
+                        <Button Grid.Column="1" Text="{DynamicResource L_OpenSource}" FontSize="13"
+                                Command="{Binding OpenUrlCommand}"
+                                CommandParameter="https://github.com/JRpersonal/streborn" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Margin="0,4"
+                             Color="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}" />
+
+                    <Label Text="{DynamicResource L_RadioCredit}" Style="{StaticResource CaptionLabel}" />
+                    <Label Text="{DynamicResource L_ClaudeCredit}" Style="{StaticResource CaptionLabel}" />
+
+                    <!--
+                        Citer une marque pour dire avec quoi l'application est compatible
+                        est licite ; laisser croire à une application officielle ne l'est
+                        pas. Cette ligne est ce qui distingue les deux.
+                    -->
+                    <BoxView HeightRequest="1" Margin="0,4"
+                             Color="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}" />
+
+                    <Label Text="{DynamicResource L_TrademarkNotice}" FontSize="11"
+                           TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

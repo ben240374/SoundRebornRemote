@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:SoundRebornRemote.App.Views"
+       x:Class="SoundRebornRemote.App.AppShell"
+       Title="SoundReborn Remote"
+       FlyoutBehavior="Disabled">
+
+    <TabBar>
+        <ShellContent Title="{DynamicResource L_TabPlayer}"
+                      Icon="tab_player.png"
+                      Route="player"
+                      ContentTemplate="{DataTemplate views:PlayerPage}" />
+
+        <ShellContent Title="{DynamicResource L_TabPresets}"
+                      Icon="tab_presets.png"
+                      Route="presets"
+                      ContentTemplate="{DataTemplate views:PresetsPage}" />
+
+        <ShellContent Title="{DynamicResource L_TabSources}"
+                      Icon="tab_sources.png"
+                      Route="sources"
+                      ContentTemplate="{DataTemplate views:SourcesPage}" />
+
+        <ShellContent Title="{DynamicResource L_TabMultiroom}"
+                      Icon="tab_multiroom.png"
+                      Route="multiroom"
+                      ContentTemplate="{DataTemplate views:MultiroomPage}" />
+
+        <ShellContent Title="{DynamicResource L_TabSettings}"
+                      Icon="tab_settings.png"
+                      Route="settings"
+                      ContentTemplate="{DataTemplate views:SettingsPage}" />
+    </TabBar>
+
+</Shell>

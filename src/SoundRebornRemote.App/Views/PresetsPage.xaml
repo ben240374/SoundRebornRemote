@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SoundRebornRemote.App.ViewModels"
+             x:Class="SoundRebornRemote.App.Views.PresetsPage"
+             x:DataType="vm:PresetsViewModel"
+             Title="{DynamicResource L_TabPresets}">
+
+    <!--
+        Toute la page défile d'un seul bloc. Les résultats de recherche sont posés
+        par un BindableLayout et non par une CollectionView : une liste défilante
+        imbriquée dans un ScrollView se dispute le geste de l'utilisateur et se
+        retrouve écrasée sur quelques pixels, ce qui masquait les résultats.
+    -->
+    <ScrollView>
+        <VerticalStackLayout Padding="14,10,14,28" Spacing="12">
+
+            <!-- ================================================= Les six touches -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="{DynamicResource L_Presets}" Style="{StaticResource SectionLabel}"
+                               VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="{DynamicResource L_Refresh}" Style="{StaticResource QuietButton}"
+                                Command="{Binding RefreshCommand}" />
+                    </Grid>
+
+                    <CollectionView ItemsSource="{Binding Presets}" HeightRequest="268">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical" Span="3"
+                                             HorizontalItemSpacing="8" VerticalItemSpacing="8" />
+                        </CollectionView.ItemsLayout>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:PresetTile">
+                                <Border Style="{StaticResource TileCard}" HeightRequest="126">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PresetsViewModel}}, Path=RecallCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+
+                                    <Grid RowDefinitions="*,Auto">
+                                        <Image Grid.Row="0" Source="{Binding ArtSource}" Aspect="AspectFit"
+                                               Margin="10,10,10,2" IsVisible="{Binding HasArt}" />
+
+                                        <Label Grid.Row="0" Text="{Binding Glyph}" FontSize="30"
+                                               HorizontalOptions="Center" VerticalOptions="Center"
+                                               IsVisible="{Binding HasArt, Converter={StaticResource InvertedBool}}"
+                                               TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
+
+                                        <VerticalStackLayout Grid.Row="1" Padding="6,5" Spacing="0">
+                                            <Label Text="{Binding Name}" FontSize="12" FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation" MaxLines="1"
+                                                   HorizontalTextAlignment="Center" />
+                                            <Label Text="{Binding Detail}" Style="{StaticResource CaptionLabel}"
+                                                   LineBreakMode="TailTruncation" MaxLines="1"
+                                                   HorizontalTextAlignment="Center" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsActive}" Value="True">
+                                            <Setter Property="Stroke" Value="{StaticResource Success}" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ================================================= Recherche -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="{DynamicResource L_RadioSearch}" Style="{StaticResource SectionLabel}"
+                               VerticalOptions="Center" />
+                        <ActivityIndicator Grid.Column="1" WidthRequest="18" HeightRequest="18"
+                                           IsRunning="{Binding IsSearching}" IsVisible="{Binding IsSearching}" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Grid.Column="0" Text="{Binding Query}"
+                               Placeholder="{DynamicResource L_RadioPlaceholder}"
+                               ReturnType="Search" ReturnCommand="{Binding SearchCommand}" />
+                        <Button Grid.Column="1" Text="{DynamicResource L_SearchButton}"
+                                Style="{StaticResource AccentButton}" Command="{Binding SearchCommand}" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Picker Grid.Column="0" ItemsSource="{Binding CountryLabels}"
+                                SelectedIndex="{Binding CountryIndex, Mode=TwoWay}"
+                                Title="{DynamicResource L_Country}" />
+                        <Picker Grid.Column="1" ItemsSource="{Binding LanguageLabels}"
+                                SelectedIndex="{Binding LanguageIndex, Mode=TwoWay}"
+                                Title="{DynamicResource L_LanguageFilter}" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="4">
+                        <CheckBox Grid.Column="0" IsChecked="{Binding BoseCompatibleOnly, Mode=TwoWay}"
+                                  VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{DynamicResource L_BoseOnly}" Style="{StaticResource SubtitleLabel}"
+                               VerticalOptions="Center" />
+                        <Button Grid.Column="2" Text="{DynamicResource L_TopStations}"
+                                Style="{StaticResource QuietButton}" Command="{Binding TopCommand}" />
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ================================================= Résultats -->
+            <Border Style="{StaticResource Card}" IsVisible="{Binding HasResults}">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{Binding ResultsHeader}" Style="{StaticResource SectionLabel}" />
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Results}" Spacing="0">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:RadioResult">
+                                <Grid Padding="2,10" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PresetsViewModel}}, Path=StationActionCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Grid.GestureRecognizers>
+
+                                    <Border Grid.Column="0" Style="{StaticResource TileCard}"
+                                            WidthRequest="46" HeightRequest="46">
+                                        <Grid>
+                                            <Image Source="{Binding Logo}" Aspect="AspectFit" Margin="5"
+                                                   IsVisible="{Binding HasLogo}" />
+                                            <Label Text="♪" FontSize="17" HorizontalOptions="Center"
+                                                   VerticalOptions="Center"
+                                                   IsVisible="{Binding HasLogo, Converter={StaticResource InvertedBool}}"
+                                                   TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
+                                        </Grid>
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                        <Label Text="{Binding Name}" FontSize="15"
+                                               LineBreakMode="TailTruncation" MaxLines="1" />
+                                        <Label Text="{Binding Summary}" Style="{StaticResource CaptionLabel}"
+                                               LineBreakMode="TailTruncation" MaxLines="1" />
+                                    </VerticalStackLayout>
+
+                                    <Label Grid.Column="2" Text="›" FontSize="22" VerticalOptions="Center"
+                                           TextColor="{StaticResource Accent}" />
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="{DynamicResource L_PresetsHint}" Style="{StaticResource CaptionLabel}"
+                   IsVisible="{Binding HasResults, Converter={StaticResource InvertedBool}}" />
+
+            <Label Text="{DynamicResource L_RadioSource}" Style="{StaticResource CaptionLabel}" />
+
+            <Label Text="{Binding StatusMessage}"
+                   TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                   FontSize="13"
+                   IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

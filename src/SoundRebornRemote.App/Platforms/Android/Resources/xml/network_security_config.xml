@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Autorise le HTTP en clair uniquement vers les plages d'adresses privées.
+  Le reste du trafic reste soumis aux règles habituelles d'Android.
+-->
+<network-security-config>
+  <domain-config cleartextTrafficPermitted="true">
+    <domain includeSubdomains="true">192.168.0.0</domain>
+    <domain includeSubdomains="true">10.0.0.0</domain>
+    <domain includeSubdomains="true">172.16.0.0</domain>
+    <domain includeSubdomains="true">localhost</domain>
+  </domain-config>
+
+  <!-- Repli : les adresses IP littérales ne correspondent pas toujours aux
+       domain-config ci-dessus selon la version d'Android. -->
+  <base-config cleartextTrafficPermitted="true">
+    <trust-anchors>
+      <certificates src="system" />
+    </trust-anchors>
+  </base-config>
+</network-security-config>

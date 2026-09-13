@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SoundRebornRemote.App.ViewModels"
+             xmlns:models="clr-namespace:SoundReborn.Core.Models;assembly=SoundReborn.Core"
+             x:Class="SoundRebornRemote.App.Views.SourcesPage"
+             x:DataType="vm:SourcesViewModel"
+             Title="{DynamicResource L_TabSources}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12,16,24" Spacing="14">
+
+            <!-- Raccourcis -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                <Button Grid.Column="0" Text="{DynamicResource L_Bluetooth}" Command="{Binding BluetoothCommand}" />
+                <Button Grid.Column="1" Text="{DynamicResource L_Aux}" Command="{Binding AuxCommand}" />
+                <Button Grid.Column="2" Text="{DynamicResource L_StandbyButton}" Command="{Binding StandbyCommand}" />
+            </Grid>
+
+            <!-- Spotify -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{DynamicResource L_Spotify}" Style="{StaticResource SectionLabel}" />
+                    <Label Text="{DynamicResource L_SpotifyHint}" Style="{StaticResource SubtitleLabel}" />
+                    <Label Style="{StaticResource CaptionLabel}"
+                           IsVisible="{Binding HasStrAgent, Converter={StaticResource InvertedBool}}"
+                           Text="{DynamicResource L_SpotifyNoAgent}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Sources déclarées par le firmware -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{DynamicResource L_SpeakerSources}" Style="{StaticResource SectionLabel}" />
+
+                    <CollectionView ItemsSource="{Binding Sources}" HeightRequest="220">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:SourceItem">
+                                <Grid Padding="0,8" ColumnDefinitions="*,Auto"
+                                      Opacity="{Binding IsReady, Converter={StaticResource ReadyOpacity}}">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SourcesViewModel}}, Path=SelectSourceCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Grid.GestureRecognizers>
+
+                                    <VerticalStackLayout Grid.Column="0" Spacing="1">
+                                        <Label Text="{Binding DisplayName}" FontSize="15" />
+                                        <Label Text="{Binding Source}" Style="{StaticResource CaptionLabel}" />
+                                    </VerticalStackLayout>
+
+                                    <Label Grid.Column="1" Text="{Binding Status}" Style="{StaticResource CaptionLabel}"
+                                           VerticalOptions="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+
+                        <CollectionView.EmptyView>
+                            <Label Text="{DynamicResource L_NoSources}" Style="{StaticResource CaptionLabel}" />
+                        </CollectionView.EmptyView>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Jouer une URL -->
+            <Border Style="{StaticResource Card}" IsVisible="{Binding HasStrAgent}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{DynamicResource L_PlayStream}" Style="{StaticResource SectionLabel}" />
+                    <Entry Text="{Binding StreamUrl}" Placeholder="http://.../stream.mp3" Keyboard="Url" />
+                    <Button Text="{DynamicResource L_PlayStreamButton}" Style="{StaticResource AccentButton}" Command="{Binding PlayStreamCommand}" />
+                    <Label Style="{StaticResource CaptionLabel}"
+                           Text="{DynamicResource L_PlayStreamNote}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Historique -->
+            <Border Style="{StaticResource Card}" IsVisible="{Binding HasStrAgent}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{DynamicResource L_Recent}" Style="{StaticResource SectionLabel}" />
+
+                    <CollectionView ItemsSource="{Binding Recent}" HeightRequest="260">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:RecentResult">
+                                <Grid Padding="0,8" ColumnDefinitions="Auto,*">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SourcesViewModel}}, Path=ReplayCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Grid.GestureRecognizers>
+
+                                    <Border Grid.Column="0" Style="{StaticResource TileCard}"
+                                            WidthRequest="44" HeightRequest="44" Margin="0,0,10,0">
+                                        <Grid>
+                                            <Image Source="{Binding Logo}" Aspect="AspectFit" Margin="4"
+                                                   IsVisible="{Binding HasLogo}" />
+                                            <Label Text="♪" FontSize="17" HorizontalOptions="Center"
+                                                   VerticalOptions="Center"
+                                                   IsVisible="{Binding HasLogo, Converter={StaticResource InvertedBool}}" />
+                                        </Grid>
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                        <Label Text="{Binding DisplayTitle}" FontSize="15" LineBreakMode="TailTruncation" MaxLines="1" />
+                                        <Label Text="{Binding DisplaySubtitle}" Style="{StaticResource CaptionLabel}"
+                                               LineBreakMode="TailTruncation" MaxLines="1" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+
+                        <CollectionView.EmptyView>
+                            <Label Text="{DynamicResource L_NoRecent}" Style="{StaticResource CaptionLabel}" />
+                        </CollectionView.EmptyView>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <Button Text="{DynamicResource L_Refresh}" Command="{Binding RefreshCommand}" />
+
+            <Label Text="{Binding StatusMessage}"
+                   TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                   FontSize="13"
+                   IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

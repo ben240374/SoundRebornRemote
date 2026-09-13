@@ -1,0 +1,66 @@
+## Fichiers de compilation .NET / MAUI
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.rsuser
+*.VC.db
+*.VC.VC.opendb
+*.psess
+*.vsp
+*.vspx
+*.sap
+*.tmp
+*.cache
+*.ide/
+.idea/
+*.swp
+*~
+
+## Résultats de publication et paquets Android
+[Pp]ublish/
+*.publishsettings
+*.apk
+*.aab
+*.aapt2
+*.dex
+*.ap_
+
+## Signature Android — ne JAMAIS publier une clé de signature.
+## Perdre cette clé empêche toute mise à jour d'une application déjà installée ;
+## la divulguer permet à un tiers de signer une fausse mise à jour à ta place.
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.snk
+keystore.properties
+
+## Secrets divers
+appsettings.*.local.json
+secrets.json
+*.env
+.env.*
+
+## NuGet
+*.nupkg
+*.snupkg
+packages/
+!packages/build/
+project.lock.json
+project.fragment.lock.json
+
+## Divers
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
