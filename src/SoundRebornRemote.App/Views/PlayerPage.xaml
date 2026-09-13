@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SoundRebornRemote.App.ViewModels"
+             x:Class="SoundRebornRemote.App.Views.PlayerPage"
+             x:DataType="vm:PlayerViewModel"
+             Title="{DynamicResource L_TabPlayer}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="14,10,14,28" Spacing="12">
+
+            <!-- ================================================= Enceintes -->
+            <Border Style="{StaticResource Card}" Padding="12,12,12,8">
+                <VerticalStackLayout Spacing="10">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="{DynamicResource L_Speaker}" Style="{StaticResource SectionLabel}"
+                               VerticalOptions="Center" />
+
+                        <HorizontalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                            <Ellipse WidthRequest="8" HeightRequest="8" VerticalOptions="Center"
+                                     Fill="{StaticResource SuccessBrush}" IsVisible="{Binding IsLive}" />
+                            <Ellipse WidthRequest="8" HeightRequest="8" VerticalOptions="Center"
+                                     IsVisible="{Binding IsLive, Converter={StaticResource InvertedBool}}"
+                                     Fill="{AppThemeBinding Light={StaticResource MutedBrushLight}, Dark={StaticResource MutedBrushDark}}" />
+                            <Label Text="{Binding LiveLabel}" Style="{StaticResource CaptionLabel}" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Grid>
+
+                    <!--
+                        Disposition souple plutôt qu'une liste horizontale à largeur
+                        fixe : chaque carte occupe la moitié de la place disponible et
+                        passe d'elle-même à la ligne suivante. Plus rien ne dépasse,
+                        quelle que soit la largeur de l'écran ou le nombre d'enceintes.
+                    -->
+                    <FlexLayout BindableLayout.ItemsSource="{Binding SpeakerChoices}"
+                                Wrap="Wrap" Direction="Row" JustifyContent="SpaceBetween" AlignItems="Stretch">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SpeakerChoice">
+                                <!-- 48 % laisse l'écart entre les deux colonnes ; avec une
+                                     marge horizontale, deux cartes dépasseraient 100 %. -->
+                                <Border Style="{StaticResource TileCard}" Padding="10,8"
+                                        FlexLayout.Basis="48%" Margin="0,0,0,8">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlayerViewModel}}, Path=SelectSpeakerCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                        <Path Grid.Column="0" Style="{StaticResource IconPath}"
+                                              WidthRequest="18" HeightRequest="18" VerticalOptions="Start"
+                                              Margin="0,2,0,0"
+                                              Data="M4,9 H7.5 L12.5,5 V19 L7.5,15 H4 Z" />
+
+                                        <VerticalStackLayout Grid.Column="1" Spacing="0">
+                                            <Label Text="{Binding Name}" FontSize="14" FontAttributes="Bold"
+                                                   LineBreakMode="WordWrap" MaxLines="2" />
+                                            <Label Text="{Binding Model}" Style="{StaticResource CaptionLabel}"
+                                                   LineBreakMode="WordWrap" MaxLines="2" />
+                                            <Label Text="{Binding AgentVersion}" Style="{StaticResource CaptionLabel}"
+                                                   IsVisible="{Binding HasAgent}" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsActive}" Value="True">
+                                            <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ================================================= En ce moment -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{DynamicResource L_RightNow}" Style="{StaticResource SectionLabel}" />
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+
+                        <Border Grid.Column="0" Style="{StaticResource TileCard}" WidthRequest="72" HeightRequest="72"
+                                VerticalOptions="Start">
+                            <Grid>
+                                <Image Source="{Binding ArtSource}" Aspect="AspectFit" Margin="6"
+                                       IsVisible="{Binding HasArt}" />
+                                <Label Text="{Binding ArtGlyph}" FontSize="26"
+                                       HorizontalOptions="Center" VerticalOptions="Center"
+                                       IsVisible="{Binding HasArt, Converter={StaticResource InvertedBool}}" />
+                            </Grid>
+                        </Border>
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="{Binding Title}" Style="{StaticResource TitleLabel}"
+                                   LineBreakMode="TailTruncation" MaxLines="1" />
+                            <Label Text="{Binding Subtitle}" Style="{StaticResource SubtitleLabel}"
+                                   LineBreakMode="TailTruncation" MaxLines="1"
+                                   IsVisible="{Binding Subtitle, Converter={StaticResource StringNotEmpty}}" />
+                            <Label Text="{Binding SourceLabel}" Style="{StaticResource CaptionLabel}"
+                                   LineBreakMode="TailTruncation" MaxLines="1" />
+                        </VerticalStackLayout>
+
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ================================================= Commandes -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="{DynamicResource L_Controls}" Style="{StaticResource SectionLabel}" />
+
+                    <HorizontalStackLayout Spacing="14" HorizontalOptions="Center">
+
+                        <!-- Arrêt -->
+                        <Border Style="{StaticResource IconCircle}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding StopCommand}" />
+                            </Border.GestureRecognizers>
+                            <Path Style="{StaticResource IconPath}" Data="M6,6 H18 V18 H6 Z" />
+                        </Border>
+
+                        <!-- Précédent -->
+                        <Border Style="{StaticResource IconCircle}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PreviousCommand}" />
+                            </Border.GestureRecognizers>
+                            <Path Style="{StaticResource IconPath}" Data="M7,5 H9.5 V19 H7 Z M18,5 L10,12 L18,19 Z" />
+                        </Border>
+
+                        <!-- Lecture / pause : deux tracés, un seul visible à la fois -->
+                        <Border Style="{StaticResource IconCircleAccent}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlayPauseCommand}" />
+                            </Border.GestureRecognizers>
+                            <Grid>
+                                <Path Style="{StaticResource IconPathOnAccent}" Data="M8,5 L19,12 L8,19 Z"
+                                      IsVisible="{Binding IsPlaying, Converter={StaticResource InvertedBool}}" />
+                                <Path Style="{StaticResource IconPathOnAccent}"
+                                      Data="M7,5 H11 V19 H7 Z M13,5 H17 V19 H13 Z"
+                                      IsVisible="{Binding IsPlaying}" />
+                            </Grid>
+                        </Border>
+
+                        <!-- Suivant -->
+                        <Border Style="{StaticResource IconCircle}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding NextCommand}" />
+                            </Border.GestureRecognizers>
+                            <Path Style="{StaticResource IconPath}" Data="M17,5 H14.5 V19 H17 Z M6,5 L14,12 L6,19 Z" />
+                        </Border>
+
+                    </HorizontalStackLayout>
+
+                    <!-- Marche / arrêt : vert quand l'enceinte joue, gris en veille -->
+                    <Border Style="{StaticResource PowerPill}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding PowerCommand}" />
+                        </Border.GestureRecognizers>
+
+                        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                            <Path Style="{StaticResource IconStrokeOnAccent}"
+                                  Data="M12,3 L12,11 M7.05,6.05 A 7,7 0 1 0 16.95,6.05" />
+                            <Label Text="{Binding PowerLabel}" TextColor="{StaticResource OnAccent}"
+                                   FontAttributes="Bold" FontSize="15" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsStandby}" Value="False">
+                                <Setter Property="BackgroundColor" Value="{StaticResource PowerOn}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                    </Border>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ================================================= Volume -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="{DynamicResource L_Volume}" Style="{StaticResource SectionLabel}"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{Binding VolumeLabel}" Style="{StaticResource ValueLabel}" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8">
+
+                        <!-- Sourdine : haut-parleur, barré quand le son est coupé -->
+                        <Border Grid.Column="0" Style="{StaticResource IconSquare}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleMuteCommand}" />
+                            </Border.GestureRecognizers>
+                            <Grid>
+                                <Path Style="{StaticResource IconPath}" Data="M4,9 H7.5 L12.5,5 V19 L7.5,15 H4 Z" />
+                                <Path Aspect="Uniform" WidthRequest="21" HeightRequest="21"
+                                      HorizontalOptions="Center" VerticalOptions="Center"
+                                      StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                      Stroke="{AppThemeBinding Light={StaticResource IconBrushLight}, Dark={StaticResource IconBrushDark}}"
+                                      Data="M15.5,9 A 4,4 0 0 1 15.5,15"
+                                      IsVisible="{Binding IsMuted, Converter={StaticResource InvertedBool}}" />
+                                <Path Aspect="Uniform" WidthRequest="21" HeightRequest="21"
+                                      HorizontalOptions="Center" VerticalOptions="Center"
+                                      StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                      Stroke="{StaticResource DangerBrush}"
+                                      Data="M15.5,9.5 L20,14.5 M20,9.5 L15.5,14.5"
+                                      IsVisible="{Binding IsMuted}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Column="1" Style="{StaticResource IconSquare}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding VolumeStepCommand}" CommandParameter="-1" />
+                            </Border.GestureRecognizers>
+                            <Path Style="{StaticResource IconPath}" Data="M5,11 H19 V13 H5 Z" />
+                        </Border>
+
+                        <Slider Grid.Column="2" Minimum="0" Maximum="100" Value="{Binding Volume, Mode=TwoWay}"
+                                VerticalOptions="Center" />
+
+                        <Border Grid.Column="3" Style="{StaticResource IconSquare}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding VolumeStepCommand}" CommandParameter="1" />
+                            </Border.GestureRecognizers>
+                            <Path Style="{StaticResource IconPath}" Data="M11,5 H13 V11 H19 V13 H13 V19 H11 V13 H5 V11 H11 Z" />
+                        </Border>
+
+                    </Grid>
+
+                    <!-- En groupe, le curseur ci-dessus règle TOUT le groupe. -->
+                    <Label Text="{DynamicResource L_VolumeOfGroup}" Style="{StaticResource CaptionLabel}"
+                           IsVisible="{Binding HasGroupVolume}" />
+
+                    <!-- ===== Réglage enceinte par enceinte ===== -->
+                    <VerticalStackLayout Spacing="10" IsVisible="{Binding HasGroupVolume}">
+
+                        <BoxView HeightRequest="1" Margin="0,4"
+                                 Color="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}" />
+
+                        <Label Text="{DynamicResource L_PerSpeaker}" Style="{StaticResource SectionLabel}" />
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding GroupMembers}" Spacing="4">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:MemberVolume">
+                                    <VerticalStackLayout Spacing="0" Padding="0,2"
+                                                         Opacity="{Binding IsReachable, Converter={StaticResource ReadyOpacity}}">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Grid.Column="0" Text="{Binding Name}" FontSize="13"
+                                                   LineBreakMode="TailTruncation" MaxLines="1" />
+                                            <Label Grid.Column="1" Text="{Binding VolumeLabel}"
+                                                   Style="{StaticResource CaptionLabel}" />
+                                        </Grid>
+                                        <Slider Minimum="0" Maximum="100" Value="{Binding Volume, Mode=TwoWay}" />
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ================================================= Graves -->
+            <Border Style="{StaticResource Card}" IsVisible="{Binding BassAvailable}">
+                <VerticalStackLayout Spacing="10">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="{DynamicResource L_Bass}" Style="{StaticResource SectionLabel}"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{Binding BassLabel}" Style="{StaticResource ValueLabel}" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                        <Border Grid.Column="0" Style="{StaticResource IconSquare}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BassStepCommand}" CommandParameter="-1" />
+                            </Border.GestureRecognizers>
+                            <Path Style="{StaticResource IconPath}" Data="M5,11 H19 V13 H5 Z" />
+                        </Border>
+
+                        <Slider Grid.Column="1" Minimum="{Binding BassMinimum}" Maximum="{Binding BassMaximum}"
+                                Value="{Binding Bass, Mode=TwoWay}" VerticalOptions="Center" />
+
+                        <Border Grid.Column="2" Style="{StaticResource IconSquare}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BassStepCommand}" CommandParameter="1" />
+                            </Border.GestureRecognizers>
+                            <Path Style="{StaticResource IconPath}" Data="M11,5 H13 V11 H19 V13 H13 V19 H11 V13 H5 V11 H11 Z" />
+                        </Border>
+                    </Grid>
+
+                    <Label Style="{StaticResource CaptionLabel}" Text="{DynamicResource L_BassNote}" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ================================================= Présélections -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{DynamicResource L_Presets}" Style="{StaticResource SectionLabel}" />
+
+                    <CollectionView ItemsSource="{Binding Presets}" HeightRequest="252">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical" Span="3"
+                                             HorizontalItemSpacing="8" VerticalItemSpacing="8" />
+                        </CollectionView.ItemsLayout>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:PresetTile">
+                                <Border Style="{StaticResource TileCard}" HeightRequest="118">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlayerViewModel}}, Path=RecallPresetCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+
+                                    <Grid RowDefinitions="*,Auto">
+                                        <Image Grid.Row="0" Source="{Binding ArtSource}" Aspect="AspectFit"
+                                               Margin="10,10,10,2" IsVisible="{Binding HasArt}" />
+
+                                        <Label Grid.Row="0" Text="{Binding Glyph}" FontSize="30"
+                                               HorizontalOptions="Center" VerticalOptions="Center"
+                                               IsVisible="{Binding HasArt, Converter={StaticResource InvertedBool}}"
+                                               TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
+
+                                        <Label Grid.Row="1" Text="{Binding Name}" FontSize="12"
+                                               Padding="6,6" LineBreakMode="TailTruncation" MaxLines="1"
+                                               HorizontalTextAlignment="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsActive}" Value="True">
+                                                    <Setter Property="TextColor" Value="{StaticResource Success}" />
+                                                    <Setter Property="FontAttributes" Value="Bold" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </Grid>
+
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsActive}" Value="True">
+                                            <Setter Property="Stroke" Value="{StaticResource Success}" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ================================================= Groupement rapide -->
+            <Border Style="{StaticResource Card}" IsVisible="{Binding HasSeveralSpeakers}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{DynamicResource L_GroupWith}" Style="{StaticResource SectionLabel}" />
+
+                    <FlexLayout BindableLayout.ItemsSource="{Binding GroupCandidates}"
+                                Wrap="Wrap" Direction="Row" JustifyContent="Start" AlignItems="Center">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SpeakerChoice">
+                                <Border Style="{StaticResource Chip}" Margin="0,0,8,8">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlayerViewModel}}, Path=ToggleGroupCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+
+                                    <HorizontalStackLayout Spacing="8">
+                                        <!-- Coche visible seulement quand l'enceinte suit le groupe -->
+                                        <Path Style="{StaticResource IconPath}" WidthRequest="16" HeightRequest="16"
+                                              Fill="{StaticResource SuccessBrush}"
+                                              Data="M5,12.5 L9.5,17 L19,7.5 L17.5,6 L9.5,14 L6.5,11 Z"
+                                              IsVisible="{Binding IsGrouped}" />
+                                        <Label Text="{Binding Name}" FontSize="14" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsGrouped}" Value="True">
+                                            <Setter Property="Stroke" Value="{StaticResource Success}" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+
+                    <Label Text="{DynamicResource L_TapToUngroup}" Style="{StaticResource CaptionLabel}"
+                           IsVisible="{Binding IsGroupActive}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ================================================= Pied -->
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Label Grid.Column="0" Text="{Binding SpeakerDetail}" Style="{StaticResource CaptionLabel}"
+                       VerticalOptions="Center" LineBreakMode="TailTruncation" />
+
+                <HorizontalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                    <ActivityIndicator WidthRequest="16" HeightRequest="16"
+                                       IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+                    <Button Text="{DynamicResource L_Refresh}" Style="{StaticResource QuietButton}"
+                            Command="{Binding RefreshAllCommand}" />
+                </HorizontalStackLayout>
+            </Grid>
+
+            <Label Text="{Binding StatusMessage}"
+                   TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                   FontSize="13"
+                   IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

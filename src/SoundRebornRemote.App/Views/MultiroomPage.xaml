@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SoundRebornRemote.App.ViewModels"
+             xmlns:models="clr-namespace:SoundReborn.Core.Models;assembly=SoundReborn.Core"
+             x:Class="SoundRebornRemote.App.Views.MultiroomPage"
+             x:DataType="vm:MultiroomViewModel"
+             Title="{DynamicResource L_TabMultiroom}">
+
+    <!--
+        Les listes sont posées par un BindableLayout : une CollectionView à hauteur
+        fixe réservait la place de plusieurs lignes même avec une seule enceinte,
+        d'où le grand vide au milieu de la page.
+    -->
+    <ScrollView>
+        <VerticalStackLayout Padding="14,10,14,24" Spacing="12">
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="{DynamicResource L_Master}" Style="{StaticResource SectionLabel}" />
+                    <Label Text="{Binding MasterName}" Style="{StaticResource TitleLabel}" />
+                    <Label Style="{StaticResource CaptionLabel}" Text="{DynamicResource L_MasterNote}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{DynamicResource L_SpeakersToGroup}" Style="{StaticResource SectionLabel}" />
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Candidates}" Spacing="2">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:GroupCandidate">
+                                <Grid Padding="0,6" ColumnDefinitions="Auto,*" ColumnSpacing="6">
+                                    <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                              VerticalOptions="Center" />
+
+                                    <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                        <Label Text="{Binding Name}" FontSize="15" />
+                                        <Label Text="{Binding State}" Style="{StaticResource CaptionLabel}"
+                                               LineBreakMode="TailTruncation" MaxLines="1" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                    <Label Text="{DynamicResource L_NoOtherSpeakers}" Style="{StaticResource CaptionLabel}"
+                           IsVisible="{Binding HasCandidates, Converter={StaticResource InvertedBool}}" />
+
+                    <!-- Grille et non pile horizontale : le libellé peut s'étaler sur
+                         deux lignes au lieu d'être coupé à droite. -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="6">
+                        <CheckBox Grid.Column="0" IsChecked="{Binding MakePermanent, Mode=TwoWay}"
+                                  VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{DynamicResource L_PermanentGroup}"
+                               Style="{StaticResource SubtitleLabel}" VerticalOptions="Center"
+                               LineBreakMode="WordWrap" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Button Grid.Column="0" Text="{DynamicResource L_FormGroup}"
+                                Style="{StaticResource AccentButton}" Command="{Binding FormGroupCommand}" />
+                        <Button Grid.Column="1" Text="{DynamicResource L_Dissolve}"
+                                Command="{Binding DissolveGroupCommand}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource Card}" IsVisible="{Binding CanUseGroupVolume}">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="{DynamicResource L_GroupVolume}"
+                               Style="{StaticResource SectionLabel}" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{Binding GroupVolumeLabel}" Style="{StaticResource ValueLabel}" />
+                    </Grid>
+
+                    <Slider Minimum="0" Maximum="100" Value="{Binding GroupVolume, Mode=TwoWay}" />
+                    <Button Text="{DynamicResource L_ApplyToGroup}" Command="{Binding ApplyGroupVolumeCommand}" />
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding GroupVolumes}" Spacing="0">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:StrZoneMemberVolume">
+                                <Grid Padding="0,7" ColumnDefinitions="*,Auto"
+                                      Opacity="{Binding IsReachable, Converter={StaticResource ReadyOpacity}}">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="1">
+                                        <Label Text="{Binding DisplayName}" FontSize="15" />
+                                        <Label Text="{Binding Ip}" Style="{StaticResource CaptionLabel}" />
+                                    </VerticalStackLayout>
+
+                                    <HorizontalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                        <Label Text="{Binding Volume}" Style="{StaticResource SubtitleLabel}" />
+                                        <Label Text="%" Style="{StaticResource SubtitleLabel}" />
+                                    </HorizontalStackLayout>
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                    <Label Text="{DynamicResource L_NoActiveGroup}" Style="{StaticResource CaptionLabel}"
+                           IsVisible="{Binding IsGrouped, Converter={StaticResource InvertedBool}}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Button Grid.Column="1" Text="{DynamicResource L_Refresh}" Style="{StaticResource QuietButton}"
+                        Command="{Binding RefreshCommand}" />
+            </Grid>
+
+            <Label Text="{Binding StatusMessage}"
+                   TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                   FontSize="13"
+                   IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

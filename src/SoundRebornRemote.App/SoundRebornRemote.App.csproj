@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Android seul. Ajoute net10.0-windows10.0.19041.0 si tu veux aussi une version bureau. -->
+    <TargetFrameworks>net10.0-android</TargetFrameworks>
+
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SoundRebornRemote.App</RootNamespace>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+
+    <ApplicationTitle>SoundReborn Remote</ApplicationTitle>
+    <ApplicationId>be.barbaix.soundrebornremote</ApplicationId>
+    <!-- ApplicationDisplayVersion est le numéro affiché ; ApplicationVersion est le
+         code de version Android, qui doit rester un entier croissant. L'identifiant
+         de paquet a changé avec le nom : Android voit une nouvelle application, donc
+         le code de version repart à 1. -->
+    <ApplicationDisplayVersion>0.9.79</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Icône et écran de démarrage, générés à partir des SVG du dossier Resources. -->
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#101418" />
+    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#101418" BaseSize="128,128" />
+
+    <MauiImage Include="Resources\Images\*" />
+
+    <!-- Pas de <MauiXaml Include="..."> ici : le SDK MAUI récupère déjà tous les
+         fichiers .xaml du projet. Les déclarer une seconde fois provoque un
+         CS1508 (identificateur de ressource dupliqué) sur chaque page. -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Depuis .NET 8, <UseMaui>true</UseMaui> n'ajoute plus les paquets MAUI
+         automatiquement : ils doivent être référencés explicitement. -->
+    <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.20" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SoundReborn.Core\SoundReborn.Core.csproj" />
+  </ItemGroup>
+
+</Project>

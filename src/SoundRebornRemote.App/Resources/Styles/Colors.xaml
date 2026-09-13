@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!--
+        Deux palettes complètes. Rien dans les vues ne référence directement une
+        couleur : tout passe par les styles ou par un AppThemeBinding, ce qui rend
+        la bascule clair/sombre immédiate.
+    -->
+
+    <!-- Sombre -->
+    <Color x:Key="BackgroundDark">#0E1218</Color>
+    <Color x:Key="SurfaceDark">#171D25</Color>
+    <Color x:Key="SurfaceRaisedDark">#212A34</Color>
+    <Color x:Key="BorderDark">#2E3945</Color>
+    <Color x:Key="TextPrimaryDark">#F3F6F9</Color>
+    <Color x:Key="TextSecondaryDark">#9DAAB8</Color>
+    <Color x:Key="TextMutedDark">#6B7886</Color>
+
+    <!-- Clair -->
+    <Color x:Key="BackgroundLight">#F4F6F9</Color>
+    <Color x:Key="SurfaceLight">#FFFFFF</Color>
+    <Color x:Key="SurfaceRaisedLight">#EDF1F6</Color>
+    <Color x:Key="BorderLight">#D6DEE8</Color>
+    <Color x:Key="TextPrimaryLight">#141A21</Color>
+    <Color x:Key="TextSecondaryLight">#53616F</Color>
+    <Color x:Key="TextMutedLight">#7C8A99</Color>
+
+    <!-- Communes aux deux thèmes -->
+    <Color x:Key="Accent">#2F7FF0</Color>
+    <Color x:Key="AccentSoft">#5B9BF5</Color>
+    <Color x:Key="OnAccent">#FFFFFF</Color>
+    <Color x:Key="PowerOn">#2FA36B</Color>
+    <Color x:Key="PowerOff">#7C8A99</Color>
+    <Color x:Key="Success">#2FA36B</Color>
+    <Color x:Key="Warning">#D79A2B</Color>
+    <Color x:Key="Danger">#D24B4B</Color>
+
+    <!-- Les formes (Ellipse, Rectangle) attendent un Brush, pas une Color. -->
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource Accent}" />
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource Success}" />
+    <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource Danger}" />
+    <SolidColorBrush x:Key="MutedBrushDark" Color="{StaticResource TextMutedDark}" />
+    <SolidColorBrush x:Key="MutedBrushLight" Color="{StaticResource TextMutedLight}" />
+    <SolidColorBrush x:Key="OnAccentBrush" Color="{StaticResource OnAccent}" />
+    <SolidColorBrush x:Key="IconBrushDark" Color="{StaticResource TextPrimaryDark}" />
+    <SolidColorBrush x:Key="IconBrushLight" Color="{StaticResource TextPrimaryLight}" />
+
+</ResourceDictionary>
