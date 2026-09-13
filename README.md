@@ -19,6 +19,20 @@ L'agent n'est pas redistribué ici, et cette application ne l'installe pas — l
 se fait avec l'outil STR pour PC ou Mac. Elle signale simplement les enceintes qui ne
 l'ont pas encore.
 
+## Aperçu
+
+<p align="center">
+  <img src="docs/images/01-lecture.jpg" width="30%" alt="Page Lecture" />
+  <img src="docs/images/03-preselections.jpg" width="30%" alt="Page Présélections" />
+  <img src="docs/images/05-groupes.jpg" width="30%" alt="Page Groupes" />
+</p>
+<p align="center">
+  <img src="docs/images/02-lecture-graves.jpg" width="30%" alt="Graves et présélections" />
+  <img src="docs/images/04-sources.jpg" width="30%" alt="Page Sources" />
+  <img src="docs/images/06-reglages.jpg" width="30%" alt="Page Réglages" />
+</p>
+<p align="center"><em>Adresses IP et noms de comptes remplacés par des valeurs d'exemple.</em></p>
+
 ## Ce que l'application pilote
 
 | Fonction | Où | Comment c'est obtenu |
@@ -37,10 +51,12 @@ l'ont pas encore.
 | Bascule d'une enceinte à l'autre | onglet Lecture | cartes en haut de l'écran, avec modèle et version de l'agent |
 | Marche / veille | onglet Lecture | `POST :8888/api/box/power`, repli sur la touche `POWER` |
 | Version de l'agent STR | onglet Lecture | `GET :8888/api/agent/version` |
-| Recherche de stations | onglet Touches | radio-browser.info, interrogé directement par l'application |
-| Affectation à une touche | onglet Touches | `PUT :8888/api/presets/{slot}` |
+| Recherche de stations | onglet Présélections | radio-browser.info, interrogé directement par l'application |
+| Affectation à une touche | onglet Présélections | `PUT :8888/api/presets/{slot}` |
 | Langue de l'interface | onglet Réglages | FR, EN, DE, NL, ES — changement immédiat, sans redémarrage |
 | Thème clair ou foncé | onglet Réglages | Système, Clair ou Foncé — bascule immédiate |
+| Navigation par balayage | partout | geste horizontal reconnu dans `MainActivity`, sans toucher au défilement |
+| Enceintes sans agent STR | onglet Réglages | signalées, avec renvoi vers l'outil d'installation officiel |
 
 Deux API sont utilisées, et l'application choisit toute seule :
 
