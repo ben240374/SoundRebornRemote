@@ -64,3 +64,6 @@ project.fragment.lock.json
 Thumbs.db
 desktop.ini
 *.log
+
+## Les captures du README doivent être versionnées : on ne les exclut pas.
+!docs/images/*.jpg

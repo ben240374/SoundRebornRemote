@@ -19,20 +19,6 @@ L'agent n'est pas redistribué ici, et cette application ne l'installe pas — l
 se fait avec l'outil STR pour PC ou Mac. Elle signale simplement les enceintes qui ne
 l'ont pas encore.
 
-## Aperçu
-
-<p align="center">
-  <img src="docs/images/01-lecture.jpg" width="30%" alt="Page Lecture" />
-  <img src="docs/images/03-preselections.jpg" width="30%" alt="Page Présélections" />
-  <img src="docs/images/05-groupes.jpg" width="30%" alt="Page Groupes" />
-</p>
-<p align="center">
-  <img src="docs/images/02-lecture-graves.jpg" width="30%" alt="Graves et présélections" />
-  <img src="docs/images/04-sources.jpg" width="30%" alt="Page Sources" />
-  <img src="docs/images/06-reglages.jpg" width="30%" alt="Page Réglages" />
-</p>
-<p align="center"><em>Adresses IP et noms de comptes remplacés par des valeurs d'exemple.</em></p>
-
 ## Ce que l'application pilote
 
 | Fonction | Où | Comment c'est obtenu |
