@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SoundReborn Remote — User manual</title>
+<meta name="description" content="User manual — SoundReborn Remote, télécommande Android pour enceintes Bose SoundTouch.">
+<style>
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --raised: #edf1f6; --border: #d6dee8;
+  --text: #141a21; --muted: #53616f; --faint: #7c8a99; --accent: #2f7ff0;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1218; --surface: #171d25; --raised: #212a34; --border: #2e3945;
+    --text: #f3f6f9; --muted: #9daab8; --faint: #6b7886; --accent: #5b9bf5;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 72px; }
+header.top {
+  border-bottom: 1px solid var(--border); background: var(--surface);
+  padding: 14px 0; margin-bottom: 40px;
+}
+header.top .wrap { padding-bottom: 0; display: flex; gap: 16px;
+  align-items: baseline; flex-wrap: wrap; }
+header.top a { color: var(--muted); text-decoration: none; font-size: 14px; }
+header.top a:hover { color: var(--accent); }
+header.top .name { color: var(--text); font-weight: 600; font-size: 15px; }
+
+h1 { font-size: 30px; line-height: 1.22; margin: 0 0 6px; letter-spacing: -0.4px; }
+h2 { font-size: 21px; margin: 44px 0 10px; padding-bottom: 7px;
+     border-bottom: 1px solid var(--border); }
+h3 { font-size: 16.5px; margin: 26px 0 6px; color: var(--accent); }
+p { margin: 0 0 14px; }
+ul, ol { margin: 0 0 16px; padding-left: 22px; }
+li { margin-bottom: 6px; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+/* Les URL nues des manuels sont plus larges qu'un écran de téléphone. */
+p, li, td, th, blockquote { overflow-wrap: break-word; }
+code { background: var(--raised); padding: 2px 5px; border-radius: 4px;
+       font-size: 13.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--border);
+             color: var(--muted); font-size: 15px; background: var(--surface);
+             border-radius: 0 6px 6px 0; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
+img { display: block; margin: 22px auto; max-width: 260px; width: 100%;
+      border: 1px solid var(--border); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; margin: 0 0 18px; font-size: 14.5px;
+        display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left;
+         vertical-align: top; }
+th { background: var(--raised); }
+.sub { color: var(--muted); margin-bottom: 30px; }
+
+.langbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 34px; padding: 0;
+           list-style: none; }
+.langbar a {
+  display: inline-block; padding: 6px 13px; border: 1px solid var(--border);
+  border-radius: 999px; background: var(--surface); text-decoration: none;
+  font-size: 14px; color: var(--muted);
+}
+.langbar a:hover { border-color: var(--accent); color: var(--accent); }
+.langbar a[aria-current] { background: var(--accent); border-color: var(--accent);
+                           color: #fff; }
+
+.cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+         margin: 0 0 32px; padding: 0; list-style: none; }
+.cards a {
+  display: block; padding: 15px 17px; background: var(--surface); text-decoration: none;
+  border: 1px solid var(--border); border-radius: 11px; color: var(--text);
+}
+.cards a:hover { border-color: var(--accent); }
+.cards strong { display: block; font-size: 16px; margin-bottom: 2px; }
+.cards span { color: var(--muted); font-size: 14px; }
+
+.shots { display: flex; gap: 12px; overflow-x: auto; margin: 0 0 32px; padding-bottom: 6px; }
+.shots img { margin: 0; flex: 0 0 auto; width: 190px; max-width: 45vw; }
+
+.cta {
+  display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+  padding: 11px 20px; border-radius: 9px; font-weight: 600; margin: 0 10px 12px 0;
+}
+.cta.ghost { background: transparent; color: var(--accent);
+             border: 1px solid var(--accent); }
+.note { background: var(--surface); border: 1px solid var(--border);
+        border-left: 3px solid var(--accent); border-radius: 0 9px 9px 0;
+        padding: 13px 16px; margin: 0 0 28px; font-size: 15px; }
+footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--border);
+         color: var(--faint); font-size: 13.5px; }
+footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="name" href="./index.html">SoundReborn Remote</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote">GitHub</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote/releases">Téléchargement</a>
+  <a href="https://st-reborn.de">STR</a>
+</div></header>
+<div class="wrap">
+<h1 id="soundreborn-remote-user-manual">SoundReborn Remote — User manual</h1>
+<p>Version 0.9.79 · Android 7 and later</p>
+<ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html" aria-current="page">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
+<h2 id="contents">Contents</h2>
+<ol>
+<li><a href="#1-what-you-need-first">What you need first</a></li>
+<li><a href="#2-installing">Installing</a></li>
+<li><a href="#3-first-run">First run</a></li>
+<li><a href="#4-the-play-tab">The Play tab</a></li>
+<li><a href="#5-the-presets-tab">The Presets tab</a></li>
+<li><a href="#6-the-sources-tab">The Sources tab</a></li>
+<li><a href="#7-the-groups-tab">The Groups tab</a></li>
+<li><a href="#8-the-settings-tab">The Settings tab</a></li>
+<li><a href="#9-gestures">Gestures</a></li>
+<li><a href="#10-what-to-do-if">What to do if…</a></li>
+<li><a href="#11-known-limits">Known limits</a></li>
+<li><a href="#12-notices">Notices</a></li>
+</ol>
+<hr />
+<h2 id="1-what-you-need-first">1. What you need first</h2>
+<p>SoundReborn Remote controls <strong>Bose SoundTouch</strong> speakers from an Android phone or
+tablet. Everything happens on your local network: no account, no online service, no data
+leaving your home.</p>
+<p>Three conditions:</p>
+<ul>
+<li><strong>Phone and speakers on the same Wi-Fi.</strong> Beware of guest networks and routers that
+  isolate devices from each other — nothing will be found in that case.</li>
+<li><strong>The STR agent installed on the speakers.</strong> It replaces what the Bose cloud provided
+  until it was shut down on 6 May 2026. Without it the app still works, but is reduced
+  to what the firmware alone exposes: volume, bass, presets already stored. Station
+  search, assigning presets and reliable grouping all go through the agent.
+  Installation is done with the STR tool for PC or Mac — <a href="https://st-reborn.de">https://st-reborn.de</a>.
+  <strong>This app does not install it</strong>; it only flags the speakers that lack it.</li>
+<li><strong>Android 7 or later.</strong></li>
+</ul>
+<hr />
+<h2 id="2-installing">2. Installing</h2>
+<p>The app is not distributed through the Play Store. Download it from the project's
+<em>Releases</em> page: <a href="https://github.com/ben240374/SoundRebornRemote/releases">https://github.com/ben240374/SoundRebornRemote/releases</a></p>
+<ol>
+<li>Download the <code>.apk</code> onto the phone.</li>
+<li>Open it. Android will ask permission to install from an unknown source — grant it to
+   whichever app did the downloading, usually the browser.</li>
+<li>Install, then open.</li>
+</ol>
+<p>No special permission is requested on first launch: the app touches neither contacts,
+nor location, nor storage.</p>
+<hr />
+<h2 id="3-first-run">3. First run</h2>
+<p>The app starts in the phone's language when it knows it — French, English, German,
+Dutch, Spanish — and in English otherwise. You can change this at any time.</p>
+<p>On first launch no speaker is known. Go to <strong>Settings</strong>, then <strong>Scan the local network</strong>.</p>
+<p><img alt="Settings" src="../images/06-reglages.jpg" /></p>
+<p>The search works in two stages. It first asks devices to announce themselves (mDNS),
+which is the fast path, two or three seconds. If nobody answers, it queries all 254
+addresses of the subnet on port 8090 one by one — a few seconds longer, but it works
+even where multicast is filtered.</p>
+<p>Speakers found appear under <strong>KNOWN SPEAKERS</strong>. Tap <strong>Use</strong> on the one you want to
+control. It is remembered: on the next launch the app reconnects to it on its own.</p>
+<p>If the scan finds nothing but you know the speaker's IP address, type it in the field
+provided and tap <strong>Add</strong>.</p>
+<hr />
+<h2 id="4-the-play-tab">4. The Play tab</h2>
+<p>The main screen, the one you open to act quickly.</p>
+<p><img alt="Play" src="../images/01-lecture.jpg" /></p>
+<h3 id="choosing-the-speaker">Choosing the speaker</h3>
+<p>At the top, one card per known speaker, with its model and STR agent version. The card
+outlined in blue is the one being controlled; tap another card to switch, without going
+through the settings.</p>
+<p>The small dot on the right shows the link: <strong>live</strong> means the speaker pushes its changes
+in real time, <strong>polling</strong> that the app re-reads them at intervals. While polling, a
+change made from another remote takes a second or two to appear.</p>
+<h3 id="now-playing">Now playing</h3>
+<p>The artwork, title and source of what is playing. For a radio station, its logo and
+name; for Spotify, the album cover.</p>
+<h3 id="controls">Controls</h3>
+<p>Four keys: stop, previous, play/pause, next. Depending on the source some have no
+effect — a live radio stream cannot be rewound.</p>
+<p>The green <strong>Standby</strong> bar turns the speaker off; once off, it reads <strong>Turn on</strong>.</p>
+<h3 id="volume">Volume</h3>
+<p>Mute, minus, slider, plus. The percentage is shown on the right.</p>
+<p>When the speaker is part of a group, this slider becomes <strong>the volume of the whole
+group</strong>: moving it shifts every speaker by the same amount, which preserves the balance
+you set between them. Individual volumes remain available in the Groups tab.</p>
+<h3 id="bass-and-presets">Bass and presets</h3>
+<p><img alt="Bass and presets" src="../images/02-lecture-graves.jpg" /></p>
+<p>Bass ranges from -10 to +10 depending on the model. <strong>There is no treble control</strong>: the
+speaker's API exposes none — this is not an omission in the app.</p>
+<p>The six presets are repeated here to save a tab change. The tile outlined in green is
+the one playing.</p>
+<h3 id="group-with">Group with</h3>
+<p>One chip per other speaker. Tap it to add that speaker to the group; a tick appears. Tap
+again to remove it. The controlled speaker is the <strong>master</strong>: it streams, the others
+follow.</p>
+<p>The <strong>Refresh</strong> link at the bottom re-reads everything: current title, artwork, volume,
+group state.</p>
+<hr />
+<h2 id="5-the-presets-tab">5. The Presets tab</h2>
+<p><img alt="Presets" src="../images/03-preselections.jpg" /></p>
+<h3 id="the-six-keys">The six keys</h3>
+<p>The same six as the physical keys on the speaker. Each tile shows the station logo and
+its bitrate. Tap to start playback; the green outline marks the one playing.</p>
+<p>Logos are downloaded and then kept locally. When one is missing, the station publishes no
+usable image, or its server is not answering.</p>
+<h3 id="find-a-station">Find a station</h3>
+<p>The search box queries <strong>radio-browser.info</strong>, an open directory maintained by
+volunteers. Two drop-downs narrow the search to a country and a language, and <strong>Top
+list</strong> shows the most-listened stations without typing anything.</p>
+<p>The <strong>Bose-compatible only</strong> box is ticked by default, and is best left that way: it
+filters out the formats SoundTouch speakers cannot decode (Ogg, Opus, FLAC), which would
+produce silence with no error message.</p>
+<p>Tap a result and an action sheet opens with</p>
+<ul>
+<li><strong>Listen</strong> — plays the station straight away, storing nothing;</li>
+<li><strong>① Assign to this key</strong> if the key is free, or <strong>① Replace Bel RTL</strong> if it is taken —
+  the name of the station already there is shown, so you do not overwrite one you cared
+  about.</li>
+</ul>
+<p><strong>Assigning requires the STR agent.</strong> Without it only immediate listening is possible;
+storing is then done by holding the key on the speaker itself, or from the STR desktop
+app.</p>
+<hr />
+<h2 id="6-the-sources-tab">6. The Sources tab</h2>
+<p><img alt="Sources" src="../images/04-sources.jpg" /></p>
+<p><strong>Bluetooth</strong>, <strong>AUX</strong> and <strong>Standby</strong> at the top: three direct shortcuts.</p>
+<p><strong>Spotify</strong> is not driven from this app. Open Spotify on your phone and pick the speaker
+in the device selector (Spotify Connect): it appears there as soon as the STR agent is
+running.</p>
+<p><strong>Speaker sources</strong> lists what the speaker declares, with its state: <code>READY</code> means
+available, <code>UNAVAILABLE</code> that the source exists but cannot be used — typically a
+streaming service whose account is no longer reachable since the cloud shutdown.</p>
+<p><strong>Play a stream</strong> accepts the address of a direct audio stream — an <code>.mp3</code> or an
+<code>.m3u8</code> — and starts it on the speaker. Useful for a web radio missing from the
+directory. This needs the STR agent.</p>
+<p><strong>Recently played</strong> shows the history kept by the agent: tap a line to start it again.</p>
+<hr />
+<h2 id="7-the-groups-tab">7. The Groups tab</h2>
+<p><img alt="Groups" src="../images/05-groupes.jpg" /></p>
+<p><strong>Master speaker</strong> states which one streams. To change master, change the active speaker
+in the Play tab.</p>
+<p><strong>Speakers to group</strong>: tick those that should follow, then <strong>Group</strong>. <strong>Dissolve</strong>
+breaks up the whole group.</p>
+<p>The <strong>Sticky group</strong> option asks the agent to re-form the group at the next playback,
+rather than letting it fall apart when the music stops.</p>
+<p><strong>Group volume</strong> acts on every speaker at once. Below that slider, each speaker in the
+group has its own, so you can turn the kitchen down without touching the living room.
+<strong>Apply to the whole group</strong> sets everyone to the same value.</p>
+<p>One behaviour is worth knowing: the group slider <strong>shifts</strong> volumes while keeping the
+gaps. If the kitchen is at 60 and the living room at 30, raising the group by 10 gives 70
+and 40 — not 70 and 35.</p>
+<hr />
+<h2 id="8-the-settings-tab">8. The Settings tab</h2>
+<p><img alt="Known speakers" src="../images/07-reglages-enceintes.jpg" /></p>
+<p><strong>Active speaker</strong>: name, address, model and agent version.</p>
+<p><strong>Language</strong>: French, English, German, Dutch, Spanish. The change is immediate, with no
+restart, and is remembered.</p>
+<p><strong>Theme</strong>: System, Light or Dark. "System" follows the phone's display setting,
+including its automatic switch in the evening.</p>
+<p><strong>Search</strong>: the network scan, and manual entry by IP address.</p>
+<p><strong>Known speakers</strong>: the remembered list. <strong>Use</strong> switches to one, <strong>✕</strong> forgets it. A
+speaker marked <strong>"No STR — ready for installation"</strong> answers fine but has no agent; an
+explanatory block then appears further down, with a link to the STR project site.</p>
+<p><strong>Diagnostics</strong>: <em>Query the active speaker</em> shows what the speaker actually declares —
+name, model, device ID, firmware version, presence of the agent, state of notifications,
+bass range, list of recognised API endpoints. This is the information to attach to a
+problem report. <em>Clear the logo cache</em> forces station images to be downloaded again.</p>
+<p><strong>About</strong>: the version, credit to the STR project with a link to its site in the chosen
+language, and the legal notices.</p>
+<hr />
+<h2 id="9-gestures">9. Gestures</h2>
+<p><strong>Swiping horizontally</strong> moves to the next or previous tab: Play → Presets → Sources →
+Groups → Settings. The gesture must be brisk; a slow drag is not read as a tab change.</p>
+<p>A swipe that starts <strong>on a slider</strong> is taken by the slider: that is deliberate, otherwise
+the volume would become impossible to set. Start the gesture on a neutral area.</p>
+<hr />
+<h2 id="10-what-to-do-if">10. What to do if…</h2>
+<p><strong>The scan finds no speaker.</strong>
+Check that the phone is on the same Wi-Fi as the speakers, not on the guest network nor
+on mobile data. Some routers isolate devices from one another — the setting is usually
+called <em>AP isolation</em> or <em>client mode</em>. If you know the IP address, enter it by hand in
+Settings.</p>
+<p><strong>The speaker appears but nothing responds.</strong>
+It is probably in deep standby. Wake it with the power button on the Play tab, or press a
+physical key on the speaker.</p>
+<p><strong>A preset does nothing.</strong>
+An empty key has nothing to start. Check too that the speaker is not switched off.</p>
+<p><strong>No station logos are shown.</strong>
+Clear the logo cache in the diagnostics. If it persists for one particular station, its
+own image server is the cause.</p>
+<p><strong>The agent version is missing on a speaker.</strong>
+Either the agent is not installed there, or it is too old to publish its version number.
+Run the scan again.</p>
+<p><strong>The group will not form.</strong>
+Both speakers must be on and reachable. If one of them has no STR agent, grouping falls
+back to the firmware, which is less reliable and sometimes refuses without a message.</p>
+<p><strong>The app is in the wrong language.</strong>
+Settings → Language. Your choice overrides the phone's language.</p>
+<hr />
+<h2 id="11-known-limits">11. Known limits</h2>
+<ul>
+<li><strong>No treble control.</strong> The speaker's API exposes none.</li>
+<li><strong>The app does not install the STR agent.</strong> That requires system access to the speaker
+  and a reboot; it is the job of the STR tool for PC or Mac.</li>
+<li><strong>Spotify is driven from Spotify</strong>, through Spotify Connect.</li>
+<li><strong>No DLNA library browsing</strong> at this stage.</li>
+<li><strong>Android only.</strong> There is no iOS version.</li>
+</ul>
+<hr />
+<h2 id="12-notices">12. Notices</h2>
+<p>SoundReborn Remote is a personal project, released under the MIT licence.</p>
+<p>It is <strong>neither produced nor endorsed by Bose Corporation</strong>. "Bose" and "SoundTouch" are
+trademarks of Bose Corporation, named here only to indicate compatibility.</p>
+<p>It is <strong>independent of the STR project</strong>: not built, maintained or supported by it.
+Problems with this app should be reported
+<a href="https://github.com/ben240374/SoundRebornRemote/issues">on its own repository</a>, not to
+the STR project.</p>
+<p>The <strong>STR (SoundTouch Reborn)</strong> agent is the work of Jens Roggenfelder
+(<a href="https://github.com/JRpersonal/streborn">JRpersonal</a>) — <a href="https://st-reborn.de">https://st-reborn.de</a>. Without
+it, this app would have nothing to control.</p>
+<p>The station directory is provided by <a href="https://www.radio-browser.info">radio-browser.info</a>.</p>
+<p>The code was written with Claude (Anthropic).</p>
+<footer>
+  <p>SoundReborn Remote — licence MIT. Projet personnel, sans lien avec Bose Corporation.
+  « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer
+  la compatibilité. Indépendant du projet
+  <a href="https://st-reborn.de">STR</a>, qui n'en assure pas le support.</p>
+</footer>
+</div>
+</body>
+</html>

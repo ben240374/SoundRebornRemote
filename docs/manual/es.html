@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SoundReborn Remote — Manual de uso</title>
+<meta name="description" content="Manual de uso — SoundReborn Remote, télécommande Android pour enceintes Bose SoundTouch.">
+<style>
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --raised: #edf1f6; --border: #d6dee8;
+  --text: #141a21; --muted: #53616f; --faint: #7c8a99; --accent: #2f7ff0;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1218; --surface: #171d25; --raised: #212a34; --border: #2e3945;
+    --text: #f3f6f9; --muted: #9daab8; --faint: #6b7886; --accent: #5b9bf5;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 72px; }
+header.top {
+  border-bottom: 1px solid var(--border); background: var(--surface);
+  padding: 14px 0; margin-bottom: 40px;
+}
+header.top .wrap { padding-bottom: 0; display: flex; gap: 16px;
+  align-items: baseline; flex-wrap: wrap; }
+header.top a { color: var(--muted); text-decoration: none; font-size: 14px; }
+header.top a:hover { color: var(--accent); }
+header.top .name { color: var(--text); font-weight: 600; font-size: 15px; }
+
+h1 { font-size: 30px; line-height: 1.22; margin: 0 0 6px; letter-spacing: -0.4px; }
+h2 { font-size: 21px; margin: 44px 0 10px; padding-bottom: 7px;
+     border-bottom: 1px solid var(--border); }
+h3 { font-size: 16.5px; margin: 26px 0 6px; color: var(--accent); }
+p { margin: 0 0 14px; }
+ul, ol { margin: 0 0 16px; padding-left: 22px; }
+li { margin-bottom: 6px; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+/* Les URL nues des manuels sont plus larges qu'un écran de téléphone. */
+p, li, td, th, blockquote { overflow-wrap: break-word; }
+code { background: var(--raised); padding: 2px 5px; border-radius: 4px;
+       font-size: 13.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--border);
+             color: var(--muted); font-size: 15px; background: var(--surface);
+             border-radius: 0 6px 6px 0; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
+img { display: block; margin: 22px auto; max-width: 260px; width: 100%;
+      border: 1px solid var(--border); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; margin: 0 0 18px; font-size: 14.5px;
+        display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left;
+         vertical-align: top; }
+th { background: var(--raised); }
+.sub { color: var(--muted); margin-bottom: 30px; }
+
+.langbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 34px; padding: 0;
+           list-style: none; }
+.langbar a {
+  display: inline-block; padding: 6px 13px; border: 1px solid var(--border);
+  border-radius: 999px; background: var(--surface); text-decoration: none;
+  font-size: 14px; color: var(--muted);
+}
+.langbar a:hover { border-color: var(--accent); color: var(--accent); }
+.langbar a[aria-current] { background: var(--accent); border-color: var(--accent);
+                           color: #fff; }
+
+.cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+         margin: 0 0 32px; padding: 0; list-style: none; }
+.cards a {
+  display: block; padding: 15px 17px; background: var(--surface); text-decoration: none;
+  border: 1px solid var(--border); border-radius: 11px; color: var(--text);
+}
+.cards a:hover { border-color: var(--accent); }
+.cards strong { display: block; font-size: 16px; margin-bottom: 2px; }
+.cards span { color: var(--muted); font-size: 14px; }
+
+.shots { display: flex; gap: 12px; overflow-x: auto; margin: 0 0 32px; padding-bottom: 6px; }
+.shots img { margin: 0; flex: 0 0 auto; width: 190px; max-width: 45vw; }
+
+.cta {
+  display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+  padding: 11px 20px; border-radius: 9px; font-weight: 600; margin: 0 10px 12px 0;
+}
+.cta.ghost { background: transparent; color: var(--accent);
+             border: 1px solid var(--accent); }
+.note { background: var(--surface); border: 1px solid var(--border);
+        border-left: 3px solid var(--accent); border-radius: 0 9px 9px 0;
+        padding: 13px 16px; margin: 0 0 28px; font-size: 15px; }
+footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--border);
+         color: var(--faint); font-size: 13.5px; }
+footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="name" href="./index.html">SoundReborn Remote</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote">GitHub</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote/releases">Téléchargement</a>
+  <a href="https://st-reborn.de">STR</a>
+</div></header>
+<div class="wrap">
+<h1 id="soundreborn-remote-manual-de-uso">SoundReborn Remote — Manual de uso</h1>
+<p>Versión 0.9.79 · Android 7 y posteriores</p>
+<ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html" aria-current="page">Español</a></li></ul><hr />
+<h2 id="indice">Índice</h2>
+<ol>
+<li><a href="#1-lo-que-hace-falta-antes-de-empezar">Lo que hace falta antes de empezar</a></li>
+<li><a href="#2-instalación">Instalación</a></li>
+<li><a href="#3-primer-arranque">Primer arranque</a></li>
+<li><a href="#4-la-pestaña-reproducción">La pestaña Reproducción</a></li>
+<li><a href="#5-la-pestaña-presintonías">La pestaña Presintonías</a></li>
+<li><a href="#6-la-pestaña-fuentes">La pestaña Fuentes</a></li>
+<li><a href="#7-la-pestaña-grupos">La pestaña Grupos</a></li>
+<li><a href="#8-la-pestaña-ajustes">La pestaña Ajustes</a></li>
+<li><a href="#9-gestos">Gestos</a></li>
+<li><a href="#10-qué-hacer-si">Qué hacer si…</a></li>
+<li><a href="#11-límites-conocidos">Límites conocidos</a></li>
+<li><a href="#12-avisos">Avisos</a></li>
+</ol>
+<hr />
+<h2 id="1-lo-que-hace-falta-antes-de-empezar">1. Lo que hace falta antes de empezar</h2>
+<p>SoundReborn Remote controla altavoces <strong>Bose SoundTouch</strong> desde un teléfono o una tableta
+Android. Todo ocurre en tu red local: sin cuenta, sin servicio en línea, sin datos que
+salgan de casa.</p>
+<p>Tres condiciones:</p>
+<ul>
+<li><strong>El teléfono y los altavoces en la misma wifi.</strong> Cuidado con las redes de invitados y
+  con los routers que aíslan los aparatos entre sí: en ese caso no se encontrará nada.</li>
+<li><strong>El agente STR instalado en los altavoces.</strong> Es lo que sustituye a la nube de Bose
+  desde que se apagó, el 6 de mayo de 2026. Sin él la aplicación sigue funcionando, pero
+  limitada a lo que expone el firmware por sí solo: volumen, graves, teclas ya guardadas.
+  La búsqueda de emisoras, la asignación de teclas y la agrupación fiable pasan todas por
+  el agente.
+  La instalación se hace con la herramienta STR para PC o Mac — <a href="https://st-reborn.de">https://st-reborn.de</a>.
+  <strong>Esta aplicación no lo instala</strong>; solo señala los altavoces que no lo tienen.</li>
+<li><strong>Android 7 o posterior.</strong></li>
+</ul>
+<hr />
+<h2 id="2-instalacion">2. Instalación</h2>
+<p>La aplicación no se distribuye por Play Store. Se descarga en la página <em>Releases</em> del
+proyecto: <a href="https://github.com/ben240374/SoundRebornRemote/releases">https://github.com/ben240374/SoundRebornRemote/releases</a></p>
+<ol>
+<li>Descarga el archivo <code>.apk</code> en el teléfono.</li>
+<li>Ábrelo. Android pedirá permiso para instalar desde un origen desconocido: concédeselo a
+   la aplicación que ha descargado, normalmente el navegador.</li>
+<li>Instala y abre.</li>
+</ol>
+<p>En el primer arranque no se pide ningún permiso especial: la aplicación no accede ni a los
+contactos, ni a la ubicación, ni al almacenamiento.</p>
+<hr />
+<h2 id="3-primer-arranque">3. Primer arranque</h2>
+<p>La aplicación se abre en el idioma del teléfono si lo conoce — francés, inglés, alemán,
+neerlandés, español — y en inglés en caso contrario. Podrás cambiarlo cuando quieras.</p>
+<p>En el primer arranque no hay ningún altavoz conocido. Ve a <strong>Ajustes</strong> y luego a
+<strong>Escanear la red local</strong>.</p>
+<p><img alt="Ajustes" src="../images/06-reglages.jpg" /></p>
+<p>La búsqueda se hace en dos tiempos. Primero pide a los aparatos que se anuncien (mDNS):
+es la vía rápida, dos o tres segundos. Si nadie responde, consulta una por una las 254
+direcciones de la subred en el puerto 8090, lo que tarda unos segundos más pero funciona
+incluso donde se filtra el multicast.</p>
+<p>Los altavoces encontrados aparecen bajo <strong>ALTAVOCES CONOCIDOS</strong>. Toca <strong>Usar</strong> en el que
+quieras controlar. Queda memorizado: en el siguiente arranque la aplicación se reconecta
+sola.</p>
+<p>Si el escaneo no encuentra nada pero conoces la dirección IP del altavoz, escríbela en el
+campo previsto y toca <strong>Añadir</strong>.</p>
+<hr />
+<h2 id="4-la-pestana-reproduccion">4. La pestaña Reproducción</h2>
+<p>La pantalla principal, la que se abre para actuar deprisa.</p>
+<p><img alt="Reproducción" src="../images/01-lecture.jpg" /></p>
+<h3 id="elegir-el-altavoz">Elegir el altavoz</h3>
+<p>Arriba, una tarjeta por altavoz conocido, con su modelo y la versión de su agente STR. La
+tarjeta con borde azul es el altavoz que se controla; toca otra tarjeta para cambiar, sin
+pasar por los ajustes.</p>
+<p>El puntito de la derecha indica el enlace: <strong>directo</strong> significa que el altavoz envía sus
+cambios en tiempo real, <strong>sondeo</strong> que la aplicación los vuelve a leer a intervalos. En
+modo sondeo, un cambio hecho desde otro mando tarda uno o dos segundos en aparecer.</p>
+<h3 id="en-este-momento">En este momento</h3>
+<p>La carátula, el título y la fuente de lo que suena. Para una emisora, su logotipo y su
+nombre; para Spotify, la portada del álbum.</p>
+<h3 id="mandos">Mandos</h3>
+<p>Cuatro teclas: parar, anterior, reproducir/pausar, siguiente. Según la fuente, algunas no
+tienen efecto: una radio en directo no se rebobina.</p>
+<p>La banda verde <strong>Reposo</strong> apaga el altavoz; una vez apagado, pasa a leerse <strong>Encender</strong>.</p>
+<h3 id="volumen">Volumen</h3>
+<p>Silencio, menos, control deslizante, más. El porcentaje aparece a la derecha.</p>
+<p>Cuando el altavoz forma parte de un grupo, este control pasa a ser <strong>el volumen de todo el
+grupo</strong>: moverlo desplaza todos los altavoces la misma cantidad, lo que conserva el
+equilibrio que hayas fijado entre ellos. Los volúmenes individuales siguen disponibles en
+la pestaña Grupos.</p>
+<h3 id="graves-y-presintonias">Graves y presintonías</h3>
+<p><img alt="Graves y presintonías" src="../images/02-lecture-graves.jpg" /></p>
+<p>Los graves van de -10 a +10 según el modelo. <strong>No hay control de agudos</strong>: la API del
+altavoz no ofrece ninguno; no es un olvido de la aplicación.</p>
+<p>Las seis presintonías se repiten aquí para ahorrar un cambio de pestaña. La tarjeta con
+borde verde es la que suena.</p>
+<h3 id="agrupar-con">Agrupar con</h3>
+<p>Un botón por cada uno de los demás altavoces. Tócalo para sumarlo al grupo; aparece una
+marca de verificación. Tócalo de nuevo para sacarlo. El altavoz controlado es el
+<strong>maestro</strong>: es el que emite, los demás lo siguen.</p>
+<p>El enlace <strong>Actualizar</strong>, abajo, vuelve a leerlo todo: título en curso, carátula, volumen,
+estado del grupo.</p>
+<hr />
+<h2 id="5-la-pestana-presintonias">5. La pestaña Presintonías</h2>
+<p><img alt="Presintonías" src="../images/03-preselections.jpg" /></p>
+<h3 id="las-seis-teclas">Las seis teclas</h3>
+<p>Las mismas que las teclas físicas del altavoz. Cada tarjeta muestra el logotipo de la
+emisora y su tasa de bits. Tócala para empezar la reproducción; el borde verde marca la
+que suena.</p>
+<p>Los logotipos se descargan y luego se conservan localmente. Si falta alguno, la emisora no
+publica una imagen utilizable o su servidor no responde.</p>
+<h3 id="encontrar-una-emisora">Encontrar una emisora</h3>
+<p>El campo de búsqueda consulta <strong>radio-browser.info</strong>, un directorio abierto mantenido por
+voluntarios. Dos listas desplegables acotan la búsqueda a un país y a un idioma, y <strong>Top
+lista</strong> muestra las emisoras más escuchadas sin escribir nada.</p>
+<p>La casilla <strong>Solo compatibles con Bose</strong> viene marcada y conviene dejarla así: descarta
+los formatos que los altavoces SoundTouch no saben decodificar (Ogg, Opus, FLAC), que
+producirían silencio sin mensaje de error.</p>
+<p>Toca un resultado y se abre una hoja de acciones con</p>
+<ul>
+<li><strong>Escuchar</strong> — lanza la emisora al instante, sin guardar nada;</li>
+<li><strong>① Asignar a esta tecla</strong> si la tecla está libre, o <strong>① Sustituir Bel RTL</strong> si está
+  ocupada: se muestra el nombre de la emisora que ya hay, para que no sobrescribas una a
+  la que tenías aprecio.</li>
+</ul>
+<p><strong>La asignación exige el agente STR.</strong> Sin él solo es posible la escucha inmediata; el
+guardado se hace entonces manteniendo pulsada la tecla en el propio altavoz, o desde la
+aplicación STR de escritorio.</p>
+<hr />
+<h2 id="6-la-pestana-fuentes">6. La pestaña Fuentes</h2>
+<p><img alt="Fuentes" src="../images/04-sources.jpg" /></p>
+<p><strong>Bluetooth</strong>, <strong>AUX</strong> y <strong>Reposo</strong> arriba: tres atajos directos.</p>
+<p><strong>Spotify</strong> no se controla desde esta aplicación. Abre Spotify en el teléfono y elige el
+altavoz en el selector de dispositivos (Spotify Connect): aparece allí en cuanto el agente
+STR está en marcha.</p>
+<p><strong>Fuentes del altavoz</strong> enumera lo que el altavoz declara, con su estado: <code>READY</code> significa
+disponible, <code>UNAVAILABLE</code> que la fuente existe pero no es utilizable — normalmente un
+servicio de streaming cuya cuenta ya no es accesible desde el cierre de la nube.</p>
+<p><strong>Reproducir un flujo</strong> acepta la dirección de un flujo de audio directo — un <code>.mp3</code> o un
+<code>.m3u8</code> — y lo lanza en el altavoz. Útil para una radio en línea ausente del directorio.
+Requiere el agente STR.</p>
+<p><strong>Escuchado recientemente</strong> recoge el historial que lleva el agente: toca una línea para
+volver a empezar.</p>
+<hr />
+<h2 id="7-la-pestana-grupos">7. La pestaña Grupos</h2>
+<p><img alt="Grupos" src="../images/05-groupes.jpg" /></p>
+<p><strong>Altavoz maestro</strong> indica cuál emite. Para cambiar de maestro, cambia de altavoz activo
+en la pestaña Reproducción.</p>
+<p><strong>Altavoces a agrupar</strong>: marca los que deben seguir y luego <strong>Agrupar</strong>. <strong>Disolver</strong>
+deshace el grupo entero.</p>
+<p>La opción <strong>Grupo permanente</strong> pide al agente que rehaga el grupo en la siguiente
+reproducción, en lugar de dejar que se deshaga cuando la música se detiene.</p>
+<p><strong>Volumen del grupo</strong> actúa sobre todos los altavoces a la vez. Bajo ese control, cada
+altavoz del grupo tiene el suyo, lo que permite bajar la cocina sin tocar el salón.
+<strong>Aplicar a todo el grupo</strong> iguala a todos en el mismo valor.</p>
+<p>Conviene conocer un comportamiento: el control de conjunto <strong>desplaza</strong> los volúmenes
+conservando las diferencias. Si la cocina está a 60 y el salón a 30, subir el conjunto 10
+da 70 y 40, no 70 y 35.</p>
+<hr />
+<h2 id="8-la-pestana-ajustes">8. La pestaña Ajustes</h2>
+<p><img alt="Altavoces conocidos" src="../images/07-reglages-enceintes.jpg" /></p>
+<p><strong>Altavoz activo</strong>: nombre, dirección, modelo y versión del agente.</p>
+<p><strong>Idioma</strong>: francés, inglés, alemán, neerlandés, español. El cambio es inmediato, sin
+reiniciar, y se recuerda.</p>
+<p><strong>Tema</strong>: Sistema, Claro u Oscuro. «Sistema» sigue el ajuste de pantalla del teléfono,
+incluido su cambio automático por la noche.</p>
+<p><strong>Búsqueda</strong>: el escaneo y la adición manual por dirección IP.</p>
+<p><strong>Altavoces conocidos</strong>: la lista memorizada. <strong>Usar</strong> cambia a ese altavoz, <strong>✕</strong> lo
+olvida. Un altavoz marcado <strong>«Sin STR — listo para instalar»</strong> responde correctamente pero
+no tiene agente; más abajo aparece entonces un bloque explicativo con un enlace al sitio
+del proyecto STR.</p>
+<p><strong>Diagnóstico</strong>: <em>Consultar el altavoz activo</em> muestra lo que el altavoz declara realmente
+— nombre, modelo, identificador, versión del firmware, presencia del agente, estado de las
+notificaciones, rango de graves, lista de puntos de API reconocidos. Es la información que
+conviene adjuntar a un informe de problema. <em>Vaciar la caché de logotipos</em> obliga a
+descargar de nuevo las imágenes de las emisoras.</p>
+<p><strong>Acerca de</strong>: la versión, el crédito al proyecto STR con el enlace a su sitio en el idioma
+elegido, y los avisos legales.</p>
+<hr />
+<h2 id="9-gestos">9. Gestos</h2>
+<p><strong>Deslizar horizontalmente</strong> pasa a la pestaña siguiente o anterior: Reproducción →
+Presintonías → Fuentes → Grupos → Ajustes. El gesto debe ser franco y rápido; un arrastre
+lento no se interpreta como cambio de pestaña.</p>
+<p>Un deslizamiento que empieza <strong>sobre un control deslizante</strong> lo capta ese control: es
+deliberado, de lo contrario el volumen sería imposible de ajustar. Empieza el gesto en una
+zona libre.</p>
+<hr />
+<h2 id="10-que-hacer-si">10. Qué hacer si…</h2>
+<p><strong>El escaneo no encuentra ningún altavoz.</strong>
+Comprueba que el teléfono está en la misma wifi que los altavoces, y no en la red de
+invitados ni en datos móviles. Algunos routers aíslan los aparatos entre sí: ese ajuste
+suele llamarse <em>aislamiento AP</em> o <em>modo cliente</em>. Si conoces la dirección IP, escríbela a
+mano en Ajustes.</p>
+<p><strong>El altavoz aparece pero no responde a nada.</strong>
+Probablemente está en reposo profundo. Despiértalo con el botón de encendido de la pestaña
+Reproducción, o pulsa una tecla física del altavoz.</p>
+<p><strong>Una presintonía no hace nada.</strong>
+Una tecla vacía no tiene nada que lanzar. Comprueba también que el altavoz no esté
+apagado.</p>
+<p><strong>No se muestra ningún logotipo de emisora.</strong>
+Vacía la caché de logotipos en el diagnóstico. Si persiste con una emisora concreta, la
+causa es su propio servidor de imágenes.</p>
+<p><strong>Falta la versión del agente en un altavoz.</strong>
+O bien el agente no está instalado, o bien es demasiado antiguo para publicar su número de
+versión. Repite el escaneo.</p>
+<p><strong>El grupo no se forma.</strong>
+Los dos altavoces deben estar encendidos y accesibles. Si a uno le falta el agente STR, la
+agrupación pasa por el firmware: menos fiable y a veces rechazada sin mensaje.</p>
+<p><strong>La aplicación está en el idioma equivocado.</strong>
+Ajustes → Idioma. Tu elección prevalece sobre el idioma del teléfono.</p>
+<hr />
+<h2 id="11-limites-conocidos">11. Límites conocidos</h2>
+<ul>
+<li><strong>Sin control de agudos.</strong> La API del altavoz no ofrece ninguno.</li>
+<li><strong>La aplicación no instala el agente STR.</strong> Eso exige acceso de sistema al altavoz y un
+  reinicio; es el trabajo de la herramienta STR para PC o Mac.</li>
+<li><strong>Spotify se controla desde Spotify</strong>, mediante Spotify Connect.</li>
+<li><strong>Sin exploración de biblioteca DLNA</strong>, por ahora.</li>
+<li><strong>Solo Android.</strong> No existe versión para iOS.</li>
+</ul>
+<hr />
+<h2 id="12-avisos">12. Avisos</h2>
+<p>SoundReborn Remote es un proyecto personal, publicado bajo licencia MIT.</p>
+<p><strong>No está producido ni respaldado por Bose Corporation.</strong> «Bose» y «SoundTouch» son marcas
+de Bose Corporation, citadas aquí únicamente para indicar la compatibilidad.</p>
+<p>Es <strong>independiente del proyecto STR</strong>: ni desarrollado, ni mantenido, ni respaldado por
+él. Los problemas con esta aplicación deben comunicarse
+<a href="https://github.com/ben240374/SoundRebornRemote/issues">en su propio repositorio</a>, no al
+proyecto STR.</p>
+<p>El agente <strong>STR (SoundTouch Reborn)</strong> es obra de Jens Roggenfelder
+(<a href="https://github.com/JRpersonal/streborn">JRpersonal</a>) — <a href="https://st-reborn.de">https://st-reborn.de</a>. Sin él,
+esta aplicación no tendría nada que controlar.</p>
+<p>El directorio de emisoras lo proporciona
+<a href="https://www.radio-browser.info">radio-browser.info</a>.</p>
+<p>El código se escribió con Claude (Anthropic).</p>
+<footer>
+  <p>SoundReborn Remote — licence MIT. Projet personnel, sans lien avec Bose Corporation.
+  « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer
+  la compatibilité. Indépendant du projet
+  <a href="https://st-reborn.de">STR</a>, qui n'en assure pas le support.</p>
+</footer>
+</div>
+</body>
+</html>

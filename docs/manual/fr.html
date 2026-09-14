@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SoundReborn Remote — Manuel d'utilisation</title>
+<meta name="description" content="Manuel d'utilisation — SoundReborn Remote, télécommande Android pour enceintes Bose SoundTouch.">
+<style>
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --raised: #edf1f6; --border: #d6dee8;
+  --text: #141a21; --muted: #53616f; --faint: #7c8a99; --accent: #2f7ff0;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1218; --surface: #171d25; --raised: #212a34; --border: #2e3945;
+    --text: #f3f6f9; --muted: #9daab8; --faint: #6b7886; --accent: #5b9bf5;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 72px; }
+header.top {
+  border-bottom: 1px solid var(--border); background: var(--surface);
+  padding: 14px 0; margin-bottom: 40px;
+}
+header.top .wrap { padding-bottom: 0; display: flex; gap: 16px;
+  align-items: baseline; flex-wrap: wrap; }
+header.top a { color: var(--muted); text-decoration: none; font-size: 14px; }
+header.top a:hover { color: var(--accent); }
+header.top .name { color: var(--text); font-weight: 600; font-size: 15px; }
+
+h1 { font-size: 30px; line-height: 1.22; margin: 0 0 6px; letter-spacing: -0.4px; }
+h2 { font-size: 21px; margin: 44px 0 10px; padding-bottom: 7px;
+     border-bottom: 1px solid var(--border); }
+h3 { font-size: 16.5px; margin: 26px 0 6px; color: var(--accent); }
+p { margin: 0 0 14px; }
+ul, ol { margin: 0 0 16px; padding-left: 22px; }
+li { margin-bottom: 6px; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+/* Les URL nues des manuels sont plus larges qu'un écran de téléphone. */
+p, li, td, th, blockquote { overflow-wrap: break-word; }
+code { background: var(--raised); padding: 2px 5px; border-radius: 4px;
+       font-size: 13.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--border);
+             color: var(--muted); font-size: 15px; background: var(--surface);
+             border-radius: 0 6px 6px 0; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
+img { display: block; margin: 22px auto; max-width: 260px; width: 100%;
+      border: 1px solid var(--border); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; margin: 0 0 18px; font-size: 14.5px;
+        display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left;
+         vertical-align: top; }
+th { background: var(--raised); }
+.sub { color: var(--muted); margin-bottom: 30px; }
+
+.langbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 34px; padding: 0;
+           list-style: none; }
+.langbar a {
+  display: inline-block; padding: 6px 13px; border: 1px solid var(--border);
+  border-radius: 999px; background: var(--surface); text-decoration: none;
+  font-size: 14px; color: var(--muted);
+}
+.langbar a:hover { border-color: var(--accent); color: var(--accent); }
+.langbar a[aria-current] { background: var(--accent); border-color: var(--accent);
+                           color: #fff; }
+
+.cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+         margin: 0 0 32px; padding: 0; list-style: none; }
+.cards a {
+  display: block; padding: 15px 17px; background: var(--surface); text-decoration: none;
+  border: 1px solid var(--border); border-radius: 11px; color: var(--text);
+}
+.cards a:hover { border-color: var(--accent); }
+.cards strong { display: block; font-size: 16px; margin-bottom: 2px; }
+.cards span { color: var(--muted); font-size: 14px; }
+
+.shots { display: flex; gap: 12px; overflow-x: auto; margin: 0 0 32px; padding-bottom: 6px; }
+.shots img { margin: 0; flex: 0 0 auto; width: 190px; max-width: 45vw; }
+
+.cta {
+  display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+  padding: 11px 20px; border-radius: 9px; font-weight: 600; margin: 0 10px 12px 0;
+}
+.cta.ghost { background: transparent; color: var(--accent);
+             border: 1px solid var(--accent); }
+.note { background: var(--surface); border: 1px solid var(--border);
+        border-left: 3px solid var(--accent); border-radius: 0 9px 9px 0;
+        padding: 13px 16px; margin: 0 0 28px; font-size: 15px; }
+footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--border);
+         color: var(--faint); font-size: 13.5px; }
+footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="name" href="./index.html">SoundReborn Remote</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote">GitHub</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote/releases">Téléchargement</a>
+  <a href="https://st-reborn.de">STR</a>
+</div></header>
+<div class="wrap">
+<h1 id="soundreborn-remote-manuel-dutilisation">SoundReborn Remote — Manuel d'utilisation</h1>
+<p>Version 0.9.79 · Android 7 et suivants</p>
+<ul class="langbar"><li><a href="fr.html" aria-current="page">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
+<h2 id="sommaire">Sommaire</h2>
+<ol>
+<li><a href="#1-ce-quil-faut-avant-de-commencer">Ce qu'il faut avant de commencer</a></li>
+<li><a href="#2-installation">Installation</a></li>
+<li><a href="#3-premier-démarrage">Premier démarrage</a></li>
+<li><a href="#4-longlet-lecture">L'onglet Lecture</a></li>
+<li><a href="#5-longlet-présélections">L'onglet Présélections</a></li>
+<li><a href="#6-longlet-sources">L'onglet Sources</a></li>
+<li><a href="#7-longlet-groupes">L'onglet Groupes</a></li>
+<li><a href="#8-longlet-réglages">L'onglet Réglages</a></li>
+<li><a href="#9-gestes">Gestes</a></li>
+<li><a href="#10-que-faire-si">Que faire si…</a></li>
+<li><a href="#11-limites-connues">Limites connues</a></li>
+<li><a href="#12-mentions">Mentions</a></li>
+</ol>
+<hr />
+<h2 id="1-ce-quil-faut-avant-de-commencer">1. Ce qu'il faut avant de commencer</h2>
+<p>SoundReborn Remote pilote des enceintes <strong>Bose SoundTouch</strong> depuis un téléphone ou une
+tablette Android. Tout se passe sur ton réseau local : aucun compte, aucun service en
+ligne, aucune donnée qui sort de chez toi.</p>
+<p>Trois conditions :</p>
+<ul>
+<li><strong>Le téléphone et les enceintes sur le même Wi-Fi.</strong> Attention aux réseaux invités
+  et aux box qui isolent les appareils entre eux : dans ce cas, rien ne se verra.</li>
+<li><strong>L'agent STR installé sur les enceintes.</strong> C'est lui qui remplace ce que le cloud
+  Bose assurait avant son arrêt, le 6 mai 2026. Sans lui, l'application fonctionne
+  encore, mais réduite à ce que le firmware seul expose : volume, graves, touches déjà
+  enregistrées. La recherche de stations, l'affectation des touches et le groupage
+  fiable passent tous par l'agent.
+  L'installation se fait avec l'outil STR pour PC ou Mac — <a href="https://st-reborn.de">https://st-reborn.de</a>.
+  <strong>Cette application ne l'installe pas</strong> ; elle se contente de signaler les enceintes
+  qui ne l'ont pas.</li>
+<li><strong>Android 7 ou plus récent.</strong></li>
+</ul>
+<hr />
+<h2 id="2-installation">2. Installation</h2>
+<p>L'application n'est pas distribuée par le Play Store. Elle se télécharge depuis la page
+du projet, section <em>Releases</em> :
+<a href="https://github.com/ben240374/SoundRebornRemote/releases">https://github.com/ben240374/SoundRebornRemote/releases</a></p>
+<ol>
+<li>Télécharge le fichier <code>.apk</code> sur le téléphone.</li>
+<li>Ouvre-le. Android demandera l'autorisation d'installer depuis une source inconnue —
+   accepte pour l'application qui a servi au téléchargement (le navigateur, en général).</li>
+<li>Installe, puis ouvre.</li>
+</ol>
+<p>Aucune autorisation particulière n'est demandée au premier lancement : l'application
+n'accède ni aux contacts, ni à la position, ni au stockage.</p>
+<hr />
+<h2 id="3-premier-demarrage">3. Premier démarrage</h2>
+<p>L'application s'ouvre dans la langue du téléphone si elle la connaît — français,
+anglais, allemand, néerlandais, espagnol — et en anglais sinon. Tu pourras en changer à
+tout moment.</p>
+<p>Au premier lancement, aucune enceinte n'est connue. Va dans <strong>Réglages</strong>, puis
+<strong>Balayer le réseau local</strong>.</p>
+<p><img alt="Réglages" src="../images/06-reglages.jpg" /></p>
+<p>La recherche procède en deux temps. Elle commence par demander aux appareils de
+s'annoncer (mDNS) — c'est la voie rapide, deux à trois secondes. Si personne ne répond,
+elle interroge une à une les 254 adresses du sous-réseau sur le port 8090, ce qui prend
+quelques secondes de plus mais fonctionne même là où le multicast est filtré.</p>
+<p>Les enceintes trouvées apparaissent sous <strong>ENCEINTES CONNUES</strong>. Touche <strong>Utiliser</strong> sur
+celle que tu veux piloter. Elle est mémorisée : au prochain lancement, l'application s'y
+reconnecte seule.</p>
+<p>Si le balayage ne trouve rien alors que tu connais l'adresse IP de l'enceinte, saisis-la
+dans le champ prévu et touche <strong>Ajouter</strong>.</p>
+<hr />
+<h2 id="4-longlet-lecture">4. L'onglet Lecture</h2>
+<p>C'est l'écran principal, celui qu'on ouvre pour agir vite.</p>
+<p><img alt="Lecture" src="../images/01-lecture.jpg" /></p>
+<h3 id="le-choix-de-lenceinte">Le choix de l'enceinte</h3>
+<p>En haut, une carte par enceinte connue, avec son modèle et la version de son agent STR.
+La carte encadrée de bleu est l'enceinte pilotée ; touche une autre carte pour basculer,
+sans passer par les réglages.</p>
+<p>Le petit point à droite indique la liaison : <strong>direct</strong> signifie que l'enceinte pousse
+ses changements en temps réel, <strong>sondage</strong> que l'application les relit à intervalle
+régulier. En mode sondage, un changement fait depuis une autre télécommande met une
+seconde ou deux à apparaître.</p>
+<h3 id="en-ce-moment">En ce moment</h3>
+<p>La pochette, le titre et la source de ce qui joue. Pour une radio, le logo de la station
+et son nom ; pour Spotify, la pochette de l'album.</p>
+<h3 id="commandes">Commandes</h3>
+<p>Quatre touches : arrêt, précédent, lecture/pause, suivant. Selon la source, certaines
+n'ont pas d'effet — une radio en direct ne se rembobine pas.</p>
+<p>Le bandeau vert <strong>Veille</strong> éteint l'enceinte ; une fois éteinte, il devient <strong>Allumer</strong>.</p>
+<h3 id="volume">Volume</h3>
+<p>Sourdine, moins, curseur, plus. Le pourcentage s'affiche à droite.</p>
+<p>Quand l'enceinte fait partie d'un groupe, ce curseur devient <strong>le volume de l'ensemble
+du groupe</strong> : le déplacer décale toutes les enceintes du même écart, ce qui préserve
+l'équilibre que tu as réglé entre elles. Les volumes individuels restent accessibles
+dans l'onglet Groupes.</p>
+<h3 id="graves-et-preselections">Graves et présélections</h3>
+<p><img alt="Graves et présélections" src="../images/02-lecture-graves.jpg" /></p>
+<p>Le réglage des graves va de -10 à +10 selon les modèles. <strong>Il n'y a pas de réglage
+d'aigus</strong> : l'API de l'enceinte n'en expose aucun, ce n'est pas un oubli de
+l'application.</p>
+<p>Les six présélections sont reprises ici pour éviter un changement d'onglet. La tuile
+encadrée de vert est celle qui joue.</p>
+<h3 id="grouper-avec">Grouper avec</h3>
+<p>Une pastille par autre enceinte. Touche-la pour la joindre au groupe ; une coche
+apparaît. Touche-la de nouveau pour l'en retirer. L'enceinte pilotée est le <strong>maître</strong> :
+c'est elle qui diffuse, les autres suivent.</p>
+<p>Le lien <strong>Rafraîchir</strong>, en bas, relit tout : titre en cours, pochette, volume, état du
+groupe.</p>
+<hr />
+<h2 id="5-longlet-preselections">5. L'onglet Présélections</h2>
+<p><img alt="Présélections" src="../images/03-preselections.jpg" /></p>
+<h3 id="les-six-touches">Les six touches</h3>
+<p>Les mêmes que les touches physiques de l'enceinte. Chaque tuile montre le logo de la
+station et son débit. Touche-la pour lancer la lecture ; le cadre vert indique celle qui
+joue.</p>
+<p>Les logos sont téléchargés puis conservés localement. S'ils manquent, la station ne
+publie pas d'image exploitable, ou son serveur ne répond pas.</p>
+<h3 id="trouver-une-station">Trouver une station</h3>
+<p>Le champ de recherche interroge <strong>radio-browser.info</strong>, un annuaire ouvert tenu par des
+bénévoles. Deux listes déroulantes limitent la recherche à un pays et à une langue, et
+<strong>Top liste</strong> affiche les stations les plus écoutées sans rien saisir.</p>
+<p>La case <strong>Compatibles Bose uniquement</strong> est cochée par défaut, et il vaut mieux la
+laisser ainsi : elle écarte les formats que les enceintes SoundTouch ne savent pas lire
+(Ogg, Opus, FLAC), qui produiraient un silence sans message d'erreur.</p>
+<p>Touche un résultat : une feuille d'actions s'ouvre, avec</p>
+<ul>
+<li><strong>Écouter</strong> — lance la station tout de suite, sans rien enregistrer ;</li>
+<li><strong>① Affecter à cette touche</strong> si la touche est libre, ou <strong>① Remplacer Bel RTL</strong> si
+  elle est occupée — le nom de la station déjà présente est affiché, pour éviter
+  d'écraser celle à laquelle on tenait.</li>
+</ul>
+<p><strong>L'affectation exige l'agent STR.</strong> Sans lui, seule l'écoute immédiate est possible ;
+l'enregistrement se fait alors en maintenant la touche appuyée sur l'enceinte elle-même,
+ou depuis l'application STR de bureau.</p>
+<hr />
+<h2 id="6-longlet-sources">6. L'onglet Sources</h2>
+<p><img alt="Sources" src="../images/04-sources.jpg" /></p>
+<p><strong>Bluetooth</strong>, <strong>AUX</strong> et <strong>Veille</strong> en haut : trois raccourcis directs.</p>
+<p><strong>Spotify</strong> ne se pilote pas depuis cette application. Ouvre Spotify sur ton téléphone et
+choisis l'enceinte dans le sélecteur d'appareils (Spotify Connect) : elle y apparaît dès
+que l'agent STR tourne.</p>
+<p><strong>Sources de l'enceinte</strong> liste ce que l'enceinte déclare, avec son état : <code>READY</code>
+signifie disponible, <code>UNAVAILABLE</code> que la source existe mais n'est pas utilisable —
+typiquement un service de streaming dont le compte n'est plus joignable depuis l'arrêt
+du cloud.</p>
+<p><strong>Jouer un flux</strong> accepte l'adresse d'un flux audio direct — un <code>.mp3</code> ou un <code>.m3u8</code> —
+et le lance sur l'enceinte. Utile pour une webradio absente de l'annuaire. Cette
+fonction demande l'agent STR.</p>
+<p><strong>Écouté récemment</strong> reprend l'historique tenu par l'agent : touche une ligne pour
+relancer.</p>
+<hr />
+<h2 id="7-longlet-groupes">7. L'onglet Groupes</h2>
+<p><img alt="Groupes" src="../images/05-groupes.jpg" /></p>
+<p><strong>Enceinte maître</strong> rappelle laquelle diffuse. Pour changer de maître, change d'enceinte
+active dans l'onglet Lecture.</p>
+<p><strong>Enceintes à grouper</strong> : coche celles qui doivent suivre, puis <strong>Grouper</strong>.
+<strong>Dissoudre</strong> défait le groupe entier.</p>
+<p>L'option <strong>Groupe permanent</strong> demande à l'agent de reformer le groupe à la prochaine
+lecture, au lieu de le laisser se défaire quand la musique s'arrête.</p>
+<p><strong>Volume du groupe</strong> agit sur toutes les enceintes à la fois. Sous ce curseur, chaque
+enceinte du groupe a le sien, ce qui permet de baisser la cuisine sans toucher au salon.
+<strong>Appliquer à tout le groupe</strong> aligne tout le monde sur la même valeur.</p>
+<p>Le comportement mérite d'être connu : le curseur d'ensemble <strong>décale</strong> les volumes en
+conservant les écarts. Si la cuisine est à 60 et le salon à 30, monter l'ensemble de 10
+donne 70 et 40 — et non 70 et 35.</p>
+<hr />
+<h2 id="8-longlet-reglages">8. L'onglet Réglages</h2>
+<p><img alt="Enceintes connues" src="../images/07-reglages-enceintes.jpg" /></p>
+<p><strong>Enceinte active</strong> : nom, adresse, modèle et version de l'agent.</p>
+<p><strong>Langue</strong> : français, anglais, allemand, néerlandais, espagnol. Le changement est
+immédiat, sans redémarrage, et retenu.</p>
+<p><strong>Thème</strong> : Système, Clair ou Foncé. « Système » suit le réglage d'affichage du
+téléphone, y compris sa bascule automatique le soir.</p>
+<p><strong>Recherche</strong> : le balayage, et l'ajout manuel par adresse IP.</p>
+<p><strong>Enceintes connues</strong> : la liste mémorisée. <strong>Utiliser</strong> bascule dessus, <strong>✕</strong> l'oublie.
+Une enceinte marquée <strong>« Sans STR — prête pour l'installation »</strong> répond bien, mais sans
+agent : un bloc d'explication apparaît alors plus bas, avec un lien vers le site du
+projet STR.</p>
+<p><strong>Diagnostic</strong> : <em>Interroger l'enceinte active</em> affiche ce que l'enceinte déclare
+réellement — nom, modèle, identifiant, version du firmware, présence de l'agent, état des
+notifications, plage de graves, liste des points d'API reconnus. C'est l'information à
+joindre à un rapport de problème. <em>Vider le cache des logos</em> force le retéléchargement
+des images de stations.</p>
+<p><strong>À propos</strong> : la version, le crédit au projet STR avec le lien vers son site dans la
+langue choisie, et les mentions légales.</p>
+<hr />
+<h2 id="9-gestes">9. Gestes</h2>
+<p><strong>Balayer horizontalement</strong> fait passer d'un onglet au suivant ou au précédent :
+Lecture → Présélections → Sources → Groupes → Réglages. Le geste doit être franc et
+rapide ; un glissement lent n'est pas interprété comme un changement d'onglet.</p>
+<p>Un balayage qui commence <strong>sur un curseur</strong> est capté par le curseur : c'est voulu, sans
+quoi le volume deviendrait impossible à régler. Commence le geste sur une zone neutre.</p>
+<hr />
+<h2 id="10-que-faire-si">10. Que faire si…</h2>
+<p><strong>Le balayage ne trouve aucune enceinte.</strong>
+Vérifie que le téléphone est sur le même Wi-Fi que les enceintes, et non sur le réseau
+invité ni sur les données mobiles. Certaines box isolent les appareils entre eux : ce
+réglage porte souvent le nom d'<em>isolation AP</em> ou de <em>mode client</em>. Si tu connais
+l'adresse IP, saisis-la à la main dans Réglages.</p>
+<p><strong>L'enceinte apparaît, mais rien ne répond.</strong>
+Elle est probablement en veille profonde. Réveille-la avec le bouton d'alimentation de
+l'onglet Lecture, ou touche une touche physique de l'enceinte.</p>
+<p><strong>Une présélection ne fait rien.</strong>
+Une touche vide n'a rien à lancer. Vérifie aussi que l'enceinte n'est pas éteinte.</p>
+<p><strong>Aucun logo de station ne s'affiche.</strong>
+Vide le cache des logos dans le diagnostic. Si le problème persiste pour une station
+précise, c'est son propre serveur d'images qui est en cause.</p>
+<p><strong>La version de l'agent est absente sur une enceinte.</strong>
+Soit l'agent n'y est pas installé, soit il est trop ancien pour publier son numéro de
+version. Relance un balayage.</p>
+<p><strong>Le groupe ne se forme pas.</strong>
+Les deux enceintes doivent être allumées et joignables. Si l'une d'elles n'a pas l'agent
+STR, le groupage passe par le firmware, moins fiable et parfois refusé sans message.</p>
+<p><strong>L'application est dans la mauvaise langue.</strong>
+Réglages → Langue. Le choix prime sur la langue du téléphone.</p>
+<hr />
+<h2 id="11-limites-connues">11. Limites connues</h2>
+<ul>
+<li><strong>Pas de réglage des aigus.</strong> L'API de l'enceinte n'en expose aucun.</li>
+<li><strong>L'application n'installe pas l'agent STR.</strong> Cela demande un accès système à
+  l'enceinte et un redémarrage ; c'est le travail de l'outil STR pour PC ou Mac.</li>
+<li><strong>Spotify se pilote depuis Spotify</strong>, par Spotify Connect.</li>
+<li><strong>Pas de parcours de bibliothèque DLNA</strong> pour le moment.</li>
+<li><strong>Android uniquement.</strong> Il n'existe pas de version iOS.</li>
+</ul>
+<hr />
+<h2 id="12-mentions">12. Mentions</h2>
+<p>SoundReborn Remote est un projet personnel, publié sous licence MIT.</p>
+<p>Il n'est <strong>ni produit ni approuvé par Bose Corporation</strong>. « Bose » et « SoundTouch » sont
+des marques de Bose Corporation, citées ici uniquement pour indiquer la compatibilité.</p>
+<p>Il est <strong>indépendant du projet STR</strong> : ni développé, ni maintenu, ni pris en charge par
+lui. Les problèmes rencontrés avec cette application sont à signaler
+<a href="https://github.com/ben240374/SoundRebornRemote/issues">sur son dépôt</a>, et non au projet
+STR.</p>
+<p>L'agent <strong>STR (SoundTouch Reborn)</strong> est l'œuvre de Jens Roggenfelder
+(<a href="https://github.com/JRpersonal/streborn">JRpersonal</a>) — <a href="https://st-reborn.de">https://st-reborn.de</a>. Sans
+lui, cette application n'aurait rien à piloter.</p>
+<p>L'annuaire de stations est fourni par <a href="https://www.radio-browser.info">radio-browser.info</a>.</p>
+<p>Le code a été écrit avec Claude (Anthropic).</p>
+<footer>
+  <p>SoundReborn Remote — licence MIT. Projet personnel, sans lien avec Bose Corporation.
+  « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer
+  la compatibilité. Indépendant du projet
+  <a href="https://st-reborn.de">STR</a>, qui n'en assure pas le support.</p>
+</footer>
+</div>
+</body>
+</html>

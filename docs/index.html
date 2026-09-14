@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SoundReborn Remote — télécommande Android pour Bose SoundTouch</title>
+<meta name="description" content="Télécommande Android locale pour enceintes Bose SoundTouch, basée sur l'agent STR. Manuel en cinq langues et APK à télécharger.">
+<style>
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --raised: #edf1f6; --border: #d6dee8;
+  --text: #141a21; --muted: #53616f; --faint: #7c8a99; --accent: #2f7ff0;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1218; --surface: #171d25; --raised: #212a34; --border: #2e3945;
+    --text: #f3f6f9; --muted: #9daab8; --faint: #6b7886; --accent: #5b9bf5;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 72px; }
+header.top {
+  border-bottom: 1px solid var(--border); background: var(--surface);
+  padding: 14px 0; margin-bottom: 40px;
+}
+header.top .wrap { padding-bottom: 0; display: flex; gap: 16px;
+  align-items: baseline; flex-wrap: wrap; }
+header.top a { color: var(--muted); text-decoration: none; font-size: 14px; }
+header.top a:hover { color: var(--accent); }
+header.top .name { color: var(--text); font-weight: 600; font-size: 15px; }
+
+h1 { font-size: 30px; line-height: 1.22; margin: 0 0 6px; letter-spacing: -0.4px; }
+h2 { font-size: 21px; margin: 44px 0 10px; padding-bottom: 7px;
+     border-bottom: 1px solid var(--border); }
+h3 { font-size: 16.5px; margin: 26px 0 6px; color: var(--accent); }
+p { margin: 0 0 14px; }
+ul, ol { margin: 0 0 16px; padding-left: 22px; }
+li { margin-bottom: 6px; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+/* Les URL nues des manuels sont plus larges qu'un écran de téléphone. */
+p, li, td, th, blockquote { overflow-wrap: break-word; }
+code { background: var(--raised); padding: 2px 5px; border-radius: 4px;
+       font-size: 13.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--border);
+             color: var(--muted); font-size: 15px; background: var(--surface);
+             border-radius: 0 6px 6px 0; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
+img { display: block; margin: 22px auto; max-width: 260px; width: 100%;
+      border: 1px solid var(--border); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; margin: 0 0 18px; font-size: 14.5px;
+        display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left;
+         vertical-align: top; }
+th { background: var(--raised); }
+.sub { color: var(--muted); margin-bottom: 30px; }
+
+.langbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 34px; padding: 0;
+           list-style: none; }
+.langbar a {
+  display: inline-block; padding: 6px 13px; border: 1px solid var(--border);
+  border-radius: 999px; background: var(--surface); text-decoration: none;
+  font-size: 14px; color: var(--muted);
+}
+.langbar a:hover { border-color: var(--accent); color: var(--accent); }
+.langbar a[aria-current] { background: var(--accent); border-color: var(--accent);
+                           color: #fff; }
+
+.cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+         margin: 0 0 32px; padding: 0; list-style: none; }
+.cards a {
+  display: block; padding: 15px 17px; background: var(--surface); text-decoration: none;
+  border: 1px solid var(--border); border-radius: 11px; color: var(--text);
+}
+.cards a:hover { border-color: var(--accent); }
+.cards strong { display: block; font-size: 16px; margin-bottom: 2px; }
+.cards span { color: var(--muted); font-size: 14px; }
+
+.shots { display: flex; gap: 12px; overflow-x: auto; margin: 0 0 32px; padding-bottom: 6px; }
+.shots img { margin: 0; flex: 0 0 auto; width: 190px; max-width: 45vw; }
+
+.cta {
+  display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+  padding: 11px 20px; border-radius: 9px; font-weight: 600; margin: 0 10px 12px 0;
+}
+.cta.ghost { background: transparent; color: var(--accent);
+             border: 1px solid var(--accent); }
+.note { background: var(--surface); border: 1px solid var(--border);
+        border-left: 3px solid var(--accent); border-radius: 0 9px 9px 0;
+        padding: 13px 16px; margin: 0 0 28px; font-size: 15px; }
+footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--border);
+         color: var(--faint); font-size: 13.5px; }
+footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="name" href="./index.html">SoundReborn Remote</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote">GitHub</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote/releases">Téléchargement</a>
+  <a href="https://st-reborn.de">STR</a>
+</div></header>
+<div class="wrap">
+
+<h1>SoundReborn Remote</h1>
+<p class="sub">Télécommande Android pour enceintes Bose SoundTouch. Tout se passe sur
+le réseau local : aucun compte, aucun cloud, aucun service intermédiaire.</p>
+
+<p>
+  <a class="cta" href="https://github.com/ben240374/SoundRebornRemote/releases">Télécharger l'APK</a>
+  <a class="cta ghost" href="https://github.com/ben240374/SoundRebornRemote">Code source</a>
+</p>
+
+<div class="note">
+  <strong>Il faut l'agent STR sur l'enceinte.</strong> C'est lui qui rend aux SoundTouch
+  ce que le cloud Bose assurait avant son arrêt, le 6 mai 2026. Son installation se fait
+  avec l'outil STR pour PC ou Mac — <a href="https://st-reborn.de">st-reborn.de</a>.
+  Cette application ne l'installe pas ; elle signale les enceintes qui ne l'ont pas.
+</div>
+
+<div class="shots"><img src="images/01-lecture.jpg" alt=""><img src="images/03-preselections.jpg" alt=""><img src="images/05-groupes.jpg" alt=""><img src="images/04-sources.jpg" alt=""><img src="images/06-reglages.jpg" alt=""></div>
+
+<h2>Manuel d'utilisation</h2>
+<p>Installation, écran par écran, gestes, dépannage et limites connues.
+Les versions PDF sont jointes à chaque
+<a href="https://github.com/ben240374/SoundRebornRemote/releases">release</a>.</p>
+<ul class="cards"><li><a href="manual/fr.html"><strong>Français</strong><span>Manuel d'utilisation</span></a></li><li><a href="manual/en.html"><strong>English</strong><span>User manual</span></a></li><li><a href="manual/de.html"><strong>Deutsch</strong><span>Handbuch</span></a></li><li><a href="manual/nl.html"><strong>Nederlands</strong><span>Handleiding</span></a></li><li><a href="manual/es.html"><strong>Español</strong><span>Manual de uso</span></a></li></ul>
+
+<h2>Ce que l'application pilote</h2>
+<ul>
+  <li>Volume, sourdine, marche/veille, graves</li>
+  <li>Lecture, pause, piste suivante et précédente</li>
+  <li>Les six présélections, avec le logo des stations</li>
+  <li>Recherche de stations internet et affectation aux touches</li>
+  <li>Sources de l'enceinte, Bluetooth, AUX, lecture d'un flux quelconque</li>
+  <li>Groupes multi-pièces, avec volume d'ensemble et volume par enceinte</li>
+  <li>Découverte des enceintes par mDNS, avec repli sur le balayage du réseau</li>
+  <li>Interface en français, anglais, allemand, néerlandais et espagnol, thème clair ou foncé</li>
+</ul>
+
+<h2>Grâce à STR</h2>
+<p>Quand Bose a coupé son cloud, les enceintes SoundTouch ont perdu l'essentiel de leur
+usage. <a href="https://st-reborn.de">STR — SoundTouch Reborn</a>, de Jens Roggenfelder
+(<a href="https://github.com/JRpersonal/streborn">JRpersonal</a>), est l'agent qui tourne
+sur l'enceinte elle-même et lui rend ce que le cloud assurait. Cette application ne fait
+que lui parler : sans son travail, elle n'aurait rien à piloter.</p>
+
+<footer>
+  <p>SoundReborn Remote — licence MIT. Projet personnel, sans lien avec Bose Corporation.
+  « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer
+  la compatibilité. Indépendant du projet
+  <a href="https://st-reborn.de">STR</a>, qui n'en assure pas le support.</p>
+</footer>
+</div>
+</body>
+</html>

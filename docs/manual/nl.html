@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SoundReborn Remote — Handleiding</title>
+<meta name="description" content="Handleiding — SoundReborn Remote, télécommande Android pour enceintes Bose SoundTouch.">
+<style>
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --raised: #edf1f6; --border: #d6dee8;
+  --text: #141a21; --muted: #53616f; --faint: #7c8a99; --accent: #2f7ff0;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1218; --surface: #171d25; --raised: #212a34; --border: #2e3945;
+    --text: #f3f6f9; --muted: #9daab8; --faint: #6b7886; --accent: #5b9bf5;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 72px; }
+header.top {
+  border-bottom: 1px solid var(--border); background: var(--surface);
+  padding: 14px 0; margin-bottom: 40px;
+}
+header.top .wrap { padding-bottom: 0; display: flex; gap: 16px;
+  align-items: baseline; flex-wrap: wrap; }
+header.top a { color: var(--muted); text-decoration: none; font-size: 14px; }
+header.top a:hover { color: var(--accent); }
+header.top .name { color: var(--text); font-weight: 600; font-size: 15px; }
+
+h1 { font-size: 30px; line-height: 1.22; margin: 0 0 6px; letter-spacing: -0.4px; }
+h2 { font-size: 21px; margin: 44px 0 10px; padding-bottom: 7px;
+     border-bottom: 1px solid var(--border); }
+h3 { font-size: 16.5px; margin: 26px 0 6px; color: var(--accent); }
+p { margin: 0 0 14px; }
+ul, ol { margin: 0 0 16px; padding-left: 22px; }
+li { margin-bottom: 6px; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+/* Les URL nues des manuels sont plus larges qu'un écran de téléphone. */
+p, li, td, th, blockquote { overflow-wrap: break-word; }
+code { background: var(--raised); padding: 2px 5px; border-radius: 4px;
+       font-size: 13.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--border);
+             color: var(--muted); font-size: 15px; background: var(--surface);
+             border-radius: 0 6px 6px 0; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
+img { display: block; margin: 22px auto; max-width: 260px; width: 100%;
+      border: 1px solid var(--border); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; margin: 0 0 18px; font-size: 14.5px;
+        display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left;
+         vertical-align: top; }
+th { background: var(--raised); }
+.sub { color: var(--muted); margin-bottom: 30px; }
+
+.langbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 34px; padding: 0;
+           list-style: none; }
+.langbar a {
+  display: inline-block; padding: 6px 13px; border: 1px solid var(--border);
+  border-radius: 999px; background: var(--surface); text-decoration: none;
+  font-size: 14px; color: var(--muted);
+}
+.langbar a:hover { border-color: var(--accent); color: var(--accent); }
+.langbar a[aria-current] { background: var(--accent); border-color: var(--accent);
+                           color: #fff; }
+
+.cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+         margin: 0 0 32px; padding: 0; list-style: none; }
+.cards a {
+  display: block; padding: 15px 17px; background: var(--surface); text-decoration: none;
+  border: 1px solid var(--border); border-radius: 11px; color: var(--text);
+}
+.cards a:hover { border-color: var(--accent); }
+.cards strong { display: block; font-size: 16px; margin-bottom: 2px; }
+.cards span { color: var(--muted); font-size: 14px; }
+
+.shots { display: flex; gap: 12px; overflow-x: auto; margin: 0 0 32px; padding-bottom: 6px; }
+.shots img { margin: 0; flex: 0 0 auto; width: 190px; max-width: 45vw; }
+
+.cta {
+  display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+  padding: 11px 20px; border-radius: 9px; font-weight: 600; margin: 0 10px 12px 0;
+}
+.cta.ghost { background: transparent; color: var(--accent);
+             border: 1px solid var(--accent); }
+.note { background: var(--surface); border: 1px solid var(--border);
+        border-left: 3px solid var(--accent); border-radius: 0 9px 9px 0;
+        padding: 13px 16px; margin: 0 0 28px; font-size: 15px; }
+footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--border);
+         color: var(--faint); font-size: 13.5px; }
+footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="name" href="./index.html">SoundReborn Remote</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote">GitHub</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote/releases">Téléchargement</a>
+  <a href="https://st-reborn.de">STR</a>
+</div></header>
+<div class="wrap">
+<h1 id="soundreborn-remote-handleiding">SoundReborn Remote — Handleiding</h1>
+<p>Versie 0.9.79 · Android 7 en hoger</p>
+<ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html" aria-current="page">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
+<h2 id="inhoud">Inhoud</h2>
+<ol>
+<li><a href="#1-wat-je-vooraf-nodig-hebt">Wat je vooraf nodig hebt</a></li>
+<li><a href="#2-installeren">Installeren</a></li>
+<li><a href="#3-eerste-start">Eerste start</a></li>
+<li><a href="#4-het-tabblad-afspelen">Het tabblad Afspelen</a></li>
+<li><a href="#5-het-tabblad-presets">Het tabblad Presets</a></li>
+<li><a href="#6-het-tabblad-bronnen">Het tabblad Bronnen</a></li>
+<li><a href="#7-het-tabblad-groepen">Het tabblad Groepen</a></li>
+<li><a href="#8-het-tabblad-instellingen">Het tabblad Instellingen</a></li>
+<li><a href="#9-gebaren">Gebaren</a></li>
+<li><a href="#10-wat-te-doen-als">Wat te doen als…</a></li>
+<li><a href="#11-bekende-beperkingen">Bekende beperkingen</a></li>
+<li><a href="#12-vermeldingen">Vermeldingen</a></li>
+</ol>
+<hr />
+<h2 id="1-wat-je-vooraf-nodig-hebt">1. Wat je vooraf nodig hebt</h2>
+<p>SoundReborn Remote bedient <strong>Bose SoundTouch</strong>-speakers vanaf een Android-telefoon of
+-tablet. Alles gebeurt op je eigen netwerk: geen account, geen onlinedienst, geen
+gegevens die het huis verlaten.</p>
+<p>Drie voorwaarden:</p>
+<ul>
+<li><strong>Telefoon en speakers op dezelfde wifi.</strong> Let op gastnetwerken en modems die apparaten
+  van elkaar afschermen — dan wordt er niets gevonden.</li>
+<li><strong>De STR-agent op de speakers.</strong> Die vervangt wat de Bose-cloud deed tot ze op
+  6 mei 2026 werd uitgezet. Zonder de agent werkt de app nog wel, maar beperkt tot wat de
+  firmware alleen biedt: volume, bass, al opgeslagen toetsen. Zenders zoeken, toetsen
+  toewijzen en betrouwbaar groeperen lopen allemaal via de agent.
+  Installeren gebeurt met het STR-programma voor pc of Mac — <a href="https://st-reborn.de">https://st-reborn.de</a>.
+  <strong>Deze app installeert hem niet</strong>; ze wijst alleen de speakers aan die hem missen.</li>
+<li><strong>Android 7 of hoger.</strong></li>
+</ul>
+<hr />
+<h2 id="2-installeren">2. Installeren</h2>
+<p>De app wordt niet via de Play Store verspreid. Je downloadt ze op de <em>Releases</em>-pagina van
+het project: <a href="https://github.com/ben240374/SoundRebornRemote/releases">https://github.com/ben240374/SoundRebornRemote/releases</a></p>
+<ol>
+<li>Download het <code>.apk</code>-bestand op de telefoon.</li>
+<li>Open het. Android vraagt toestemming om uit een onbekende bron te installeren — geef
+   die aan de app die gedownload heeft, meestal de browser.</li>
+<li>Installeren, daarna openen.</li>
+</ol>
+<p>Bij de eerste start wordt geen bijzondere toestemming gevraagd: de app raakt contacten,
+locatie noch opslag aan.</p>
+<hr />
+<h2 id="3-eerste-start">3. Eerste start</h2>
+<p>De app start in de taal van de telefoon als ze die kent — Frans, Engels, Duits,
+Nederlands, Spaans — en anders in het Engels. Je kunt dit altijd wijzigen.</p>
+<p>Bij de eerste start is er nog geen speaker bekend. Ga naar <strong>Instellingen</strong> en dan
+<strong>Lokaal netwerk scannen</strong>.</p>
+<p><img alt="Instellingen" src="../images/06-reglages.jpg" /></p>
+<p>De zoekactie verloopt in twee stappen. Eerst vraagt ze apparaten zich aan te melden
+(mDNS) — de snelle weg, twee tot drie seconden. Antwoordt niemand, dan bevraagt ze alle
+254 adressen van het subnet één voor één op poort 8090: enkele seconden trager, maar het
+werkt ook waar multicast wordt gefilterd.</p>
+<p>Gevonden speakers verschijnen onder <strong>BEKENDE SPEAKERS</strong>. Tik bij de gewenste op
+<strong>Gebruiken</strong>. Hij wordt onthouden: bij de volgende start verbindt de app zich er vanzelf
+weer mee.</p>
+<p>Vindt de scan niets terwijl je het IP-adres van de speaker kent, typ het dan in het
+daarvoor bestemde veld en tik op <strong>Toevoegen</strong>.</p>
+<hr />
+<h2 id="4-het-tabblad-afspelen">4. Het tabblad Afspelen</h2>
+<p>Het hoofdscherm, dat je opent om snel iets te doen.</p>
+<p><img alt="Afspelen" src="../images/01-lecture.jpg" /></p>
+<h3 id="de-speaker-kiezen">De speaker kiezen</h3>
+<p>Bovenaan één kaart per bekende speaker, met model en versie van de STR-agent. De blauw
+omlijnde kaart is de bediende speaker; tik op een andere kaart om te wisselen, zonder
+langs de instellingen te gaan.</p>
+<p>Het puntje rechts toont de verbinding: <strong>live</strong> betekent dat de speaker zijn wijzigingen
+meteen doorgeeft, <strong>peiling</strong> dat de app ze met tussenpozen opnieuw uitleest. Bij peiling
+duurt het een seconde of twee voor een wijziging van een andere afstandsbediening
+zichtbaar wordt.</p>
+<h3 id="nu-aan-het-spelen">Nu aan het spelen</h3>
+<p>De hoes, de titel en de bron van wat er speelt. Bij een radiozender diens logo en naam,
+bij Spotify de albumhoes.</p>
+<h3 id="bediening">Bediening</h3>
+<p>Vier toetsen: stoppen, vorige, afspelen/pauzeren, volgende. Afhankelijk van de bron doen
+sommige niets — een live radiostream laat zich niet terugspoelen.</p>
+<p>De groene balk <strong>Stand-by</strong> schakelt de speaker uit; is hij uit, dan staat er
+<strong>Inschakelen</strong>.</p>
+<h3 id="volume">Volume</h3>
+<p>Dempen, min, schuifregelaar, plus. Het percentage staat rechts.</p>
+<p>Zit de speaker in een groep, dan wordt deze regelaar <strong>het volume van de hele groep</strong>:
+verschuiven verplaatst alle speakers met hetzelfde bedrag, zodat de verhouding die je
+tussen hen hebt ingesteld bewaard blijft. De afzonderlijke volumes blijven bereikbaar in
+het tabblad Groepen.</p>
+<h3 id="bass-en-presets">Bass en presets</h3>
+<p><img alt="Bass en presets" src="../images/02-lecture-graves.jpg" /></p>
+<p>De bass loopt van -10 tot +10, afhankelijk van het model. <strong>Een regeling voor hoge tonen
+is er niet</strong>: de API van de speaker biedt die niet — het is geen vergetelheid van de app.</p>
+<p>De zes presets staan hier ook, om een tabbladwissel te besparen. De groen omlijnde tegel
+is degene die speelt.</p>
+<h3 id="groeperen-met">Groeperen met</h3>
+<p>Eén knopje per andere speaker. Tikken voegt die aan de groep toe; er verschijnt een vink.
+Nogmaals tikken haalt hem eruit. De bediende speaker is de <strong>master</strong>: hij zendt uit, de
+andere volgen.</p>
+<p>De link <strong>Vernieuwen</strong> onderaan leest alles opnieuw: titel, hoes, volume, toestand van de
+groep.</p>
+<hr />
+<h2 id="5-het-tabblad-presets">5. Het tabblad Presets</h2>
+<p><img alt="Presets" src="../images/03-preselections.jpg" /></p>
+<h3 id="de-zes-toetsen">De zes toetsen</h3>
+<p>Dezelfde als de fysieke toetsen op de speaker. Elke tegel toont het zenderlogo en de
+bitrate. Tikken start het afspelen; de groene omlijning markeert wat er speelt.</p>
+<p>Logo's worden gedownload en daarna lokaal bewaard. Ontbreekt er een, dan publiceert de
+zender geen bruikbare afbeelding, of antwoordt zijn server niet.</p>
+<h3 id="een-zender-vinden">Een zender vinden</h3>
+<p>Het zoekveld bevraagt <strong>radio-browser.info</strong>, een open gids die door vrijwilligers wordt
+bijgehouden. Twee keuzelijsten beperken de zoekactie tot een land en een taal, en
+<strong>Toplijst</strong> toont de meest beluisterde zenders zonder dat je iets typt.</p>
+<p>Het vakje <strong>Alleen Bose-compatibel</strong> staat standaard aan en dat kun je beter zo laten: het
+filtert de formaten weg die SoundTouch-speakers niet kunnen decoderen (Ogg, Opus, FLAC) en
+die stilte zonder foutmelding zouden opleveren.</p>
+<p>Tik op een resultaat en er opent een actieblad met</p>
+<ul>
+<li><strong>Beluisteren</strong> — start de zender meteen, zonder iets op te slaan;</li>
+<li><strong>① Aan deze toets toewijzen</strong> als de toets vrij is, of <strong>① Bel RTL vervangen</strong> als hij
+  bezet is — de naam van de zender die er al staat wordt getoond, zodat je er geen
+  overschrijft waar je aan hechtte.</li>
+</ul>
+<p><strong>Toewijzen vereist de STR-agent.</strong> Zonder hem kun je alleen meteen luisteren; opslaan
+gebeurt dan door de toets op de speaker zelf ingedrukt te houden, of via de
+STR-desktopapp.</p>
+<hr />
+<h2 id="6-het-tabblad-bronnen">6. Het tabblad Bronnen</h2>
+<p><img alt="Bronnen" src="../images/04-sources.jpg" /></p>
+<p><strong>Bluetooth</strong>, <strong>AUX</strong> en <strong>Stand-by</strong> bovenaan: drie rechtstreekse snelkoppelingen.</p>
+<p><strong>Spotify</strong> wordt niet vanuit deze app bediend. Open Spotify op je telefoon en kies de
+speaker in de apparaatkiezer (Spotify Connect): hij verschijnt daar zodra de STR-agent
+draait.</p>
+<p><strong>Bronnen van de speaker</strong> toont wat de speaker opgeeft, met de toestand: <code>READY</code> betekent
+beschikbaar, <code>UNAVAILABLE</code> dat de bron wel bestaat maar niet bruikbaar is — doorgaans een
+streamingdienst waarvan het account sinds de cloud-afsluiting onbereikbaar is.</p>
+<p><strong>Een stream afspelen</strong> aanvaardt het adres van een rechtstreekse audiostream — een
+<code>.mp3</code> of een <code>.m3u8</code> — en start die op de speaker. Handig voor een webradio die in de
+gids ontbreekt. Hiervoor is de STR-agent nodig.</p>
+<p><strong>Onlangs afgespeeld</strong> toont de geschiedenis die de agent bijhoudt: tik op een regel om
+opnieuw te starten.</p>
+<hr />
+<h2 id="7-het-tabblad-groepen">7. Het tabblad Groepen</h2>
+<p><img alt="Groepen" src="../images/05-groupes.jpg" /></p>
+<p><strong>Masterspeaker</strong> geeft aan welke uitzendt. Wil je van master wisselen, wissel dan van
+actieve speaker in het tabblad Afspelen.</p>
+<p><strong>Te groeperen speakers</strong>: vink aan wie moet volgen, dan <strong>Groeperen</strong>. <strong>Ontbinden</strong>
+verbreekt de hele groep.</p>
+<p>De optie <strong>Vaste groep</strong> vraagt de agent de groep bij het volgende afspelen opnieuw te
+vormen, in plaats van hem te laten wegvallen als de muziek stopt.</p>
+<p><strong>Groepsvolume</strong> werkt op alle speakers tegelijk. Onder die regelaar heeft elke speaker
+van de groep zijn eigen volume, zodat je de keuken zachter kunt zetten zonder de
+woonkamer aan te raken. <strong>Op hele groep toepassen</strong> zet iedereen op dezelfde waarde.</p>
+<p>Eén gedrag is goed om te weten: de groepsregelaar <strong>verschuift</strong> de volumes met behoud van
+de onderlinge verschillen. Staat de keuken op 60 en de woonkamer op 30, dan geeft tien
+erbij 70 en 40 — niet 70 en 35.</p>
+<hr />
+<h2 id="8-het-tabblad-instellingen">8. Het tabblad Instellingen</h2>
+<p><img alt="Bekende speakers" src="../images/07-reglages-enceintes.jpg" /></p>
+<p><strong>Actieve speaker</strong>: naam, adres, model en versie van de agent.</p>
+<p><strong>Taal</strong>: Frans, Engels, Duits, Nederlands, Spaans. De wijziging is meteen van kracht,
+zonder herstart, en wordt onthouden.</p>
+<p><strong>Thema</strong>: Systeem, Licht of Donker. "Systeem" volgt de weergave-instelling van de
+telefoon, inclusief het automatisch omschakelen 's avonds.</p>
+<p><strong>Zoeken</strong>: de netwerkscan en het handmatig toevoegen via IP-adres.</p>
+<p><strong>Bekende speakers</strong>: de onthouden lijst. <strong>Gebruiken</strong> schakelt over, <strong>✕</strong> vergeet de
+speaker. Een speaker met de vermelding <strong>"Zonder STR — klaar voor installatie"</strong> antwoordt
+prima maar heeft geen agent; verderop verschijnt dan een uitlegblok met een link naar de
+site van het STR-project.</p>
+<p><strong>Diagnose</strong>: <em>Actieve speaker bevragen</em> toont wat de speaker werkelijk opgeeft — naam,
+model, apparaat-ID, firmwareversie, aanwezigheid van de agent, toestand van de meldingen,
+bassbereik, lijst van herkende API-eindpunten. Dat is de informatie die je bij een
+probleemmelding voegt. <em>Logocache legen</em> dwingt zenderafbeeldingen opnieuw te downloaden.</p>
+<p><strong>Over</strong>: de versie, de vermelding van het STR-project met een link naar zijn site in de
+gekozen taal, en de juridische vermeldingen.</p>
+<hr />
+<h2 id="9-gebaren">9. Gebaren</h2>
+<p><strong>Horizontaal vegen</strong> gaat naar het volgende of vorige tabblad: Afspelen → Presets →
+Bronnen → Groepen → Instellingen. Het gebaar moet vlot zijn; langzaam slepen wordt niet
+als tabbladwissel gelezen.</p>
+<p>Een veeg die <strong>op een schuifregelaar</strong> begint, wordt door die regelaar opgevangen: dat is
+bewust, anders zou het volume niet meer in te stellen zijn. Begin het gebaar op een vrij
+stuk.</p>
+<hr />
+<h2 id="10-wat-te-doen-als">10. Wat te doen als…</h2>
+<p><strong>De scan vindt geen enkele speaker.</strong>
+Controleer of de telefoon op dezelfde wifi zit als de speakers, en niet op het gastnetwerk
+of op mobiele data. Sommige modems schermen apparaten van elkaar af — die instelling heet
+meestal <em>AP-isolatie</em> of <em>clientmodus</em>. Ken je het IP-adres, voer het dan handmatig in bij
+Instellingen.</p>
+<p><strong>De speaker verschijnt maar reageert nergens op.</strong>
+Waarschijnlijk staat hij in diepe slaapstand. Wek hem met de aan-uitknop op het tabblad
+Afspelen, of druk op een toets op de speaker zelf.</p>
+<p><strong>Een preset doet niets.</strong>
+Een lege toets heeft niets te starten. Kijk ook of de speaker niet uitstaat.</p>
+<p><strong>Er worden geen zenderlogo's getoond.</strong>
+Leeg de logocache bij de diagnose. Blijft het bij één bepaalde zender, dan ligt het aan
+diens eigen afbeeldingsserver.</p>
+<p><strong>Bij een speaker ontbreekt de agentversie.</strong>
+Ofwel is de agent er niet geïnstalleerd, ofwel is hij te oud om zijn versienummer te
+publiceren. Voer de scan opnieuw uit.</p>
+<p><strong>De groep komt niet tot stand.</strong>
+Beide speakers moeten aanstaan en bereikbaar zijn. Mist er één de STR-agent, dan verloopt
+het groeperen via de firmware: minder betrouwbaar, en soms zonder melding geweigerd.</p>
+<p><strong>De app staat in de verkeerde taal.</strong>
+Instellingen → Taal. Jouw keuze gaat voor op de taal van de telefoon.</p>
+<hr />
+<h2 id="11-bekende-beperkingen">11. Bekende beperkingen</h2>
+<ul>
+<li><strong>Geen regeling voor hoge tonen.</strong> De API van de speaker biedt die niet.</li>
+<li><strong>De app installeert de STR-agent niet.</strong> Dat vergt systeemtoegang tot de speaker en een
+  herstart; dat is het werk van het STR-programma voor pc of Mac.</li>
+<li><strong>Spotify wordt vanuit Spotify bediend</strong>, via Spotify Connect.</li>
+<li><strong>Geen DLNA-bibliotheek doorbladeren</strong>, vooralsnog.</li>
+<li><strong>Alleen Android.</strong> Er is geen iOS-versie.</li>
+</ul>
+<hr />
+<h2 id="12-vermeldingen">12. Vermeldingen</h2>
+<p>SoundReborn Remote is een persoonlijk project onder MIT-licentie.</p>
+<p>Het wordt <strong>niet geproduceerd of goedgekeurd door Bose Corporation</strong>. "Bose" en
+"SoundTouch" zijn merken van Bose Corporation, hier uitsluitend genoemd om de
+compatibiliteit aan te geven.</p>
+<p>Het staat <strong>los van het STR-project</strong>: daardoor niet gebouwd, onderhouden of ondersteund.
+Problemen met deze app meld je
+<a href="https://github.com/ben240374/SoundRebornRemote/issues">in de eigen repository</a>, niet bij
+het STR-project.</p>
+<p>De agent <strong>STR (SoundTouch Reborn)</strong> is het werk van Jens Roggenfelder
+(<a href="https://github.com/JRpersonal/streborn">JRpersonal</a>) — <a href="https://st-reborn.de">https://st-reborn.de</a>. Zonder
+hem zou deze app niets te besturen hebben.</p>
+<p>De zendergids komt van <a href="https://www.radio-browser.info">radio-browser.info</a>.</p>
+<p>De code is geschreven met Claude (Anthropic).</p>
+<footer>
+  <p>SoundReborn Remote — licence MIT. Projet personnel, sans lien avec Bose Corporation.
+  « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer
+  la compatibilité. Indépendant du projet
+  <a href="https://st-reborn.de">STR</a>, qui n'en assure pas le support.</p>
+</footer>
+</div>
+</body>
+</html>
