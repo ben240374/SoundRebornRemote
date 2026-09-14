@@ -37,6 +37,17 @@ l'ont pas encore.
 </p>
 <p align="center"><em>Adresses IP et noms de comptes remplacés par des valeurs d'exemple.</em></p>
 
+## Manuel d'utilisation
+
+**[Site du projet →](https://ben240374.github.io/SoundRebornRemote/)** — le manuel s'y lit
+plus confortablement.
+
+Dans le dépôt : [Français](docs/manual/fr.md) · [English](docs/manual/en.md) ·
+[Deutsch](docs/manual/de.md) · [Nederlands](docs/manual/nl.md) · [Español](docs/manual/es.md)
+
+Installation, écran par écran, gestes, dépannage et limites connues. Les versions PDF
+sont jointes à chaque [release](https://github.com/ben240374/SoundRebornRemote/releases).
+
 ## Ce que l'application pilote
 
 | Fonction | Où | Comment c'est obtenu |

@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SoundReborn Remote — Handbuch</title>
+<meta name="description" content="Handbuch — SoundReborn Remote, télécommande Android pour enceintes Bose SoundTouch.">
+<style>
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --raised: #edf1f6; --border: #d6dee8;
+  --text: #141a21; --muted: #53616f; --faint: #7c8a99; --accent: #2f7ff0;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1218; --surface: #171d25; --raised: #212a34; --border: #2e3945;
+    --text: #f3f6f9; --muted: #9daab8; --faint: #6b7886; --accent: #5b9bf5;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 72px; }
+header.top {
+  border-bottom: 1px solid var(--border); background: var(--surface);
+  padding: 14px 0; margin-bottom: 40px;
+}
+header.top .wrap { padding-bottom: 0; display: flex; gap: 16px;
+  align-items: baseline; flex-wrap: wrap; }
+header.top a { color: var(--muted); text-decoration: none; font-size: 14px; }
+header.top a:hover { color: var(--accent); }
+header.top .name { color: var(--text); font-weight: 600; font-size: 15px; }
+
+h1 { font-size: 30px; line-height: 1.22; margin: 0 0 6px; letter-spacing: -0.4px; }
+h2 { font-size: 21px; margin: 44px 0 10px; padding-bottom: 7px;
+     border-bottom: 1px solid var(--border); }
+h3 { font-size: 16.5px; margin: 26px 0 6px; color: var(--accent); }
+p { margin: 0 0 14px; }
+ul, ol { margin: 0 0 16px; padding-left: 22px; }
+li { margin-bottom: 6px; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+/* Les URL nues des manuels sont plus larges qu'un écran de téléphone. */
+p, li, td, th, blockquote { overflow-wrap: break-word; }
+code { background: var(--raised); padding: 2px 5px; border-radius: 4px;
+       font-size: 13.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--border);
+             color: var(--muted); font-size: 15px; background: var(--surface);
+             border-radius: 0 6px 6px 0; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
+img { display: block; margin: 22px auto; max-width: 260px; width: 100%;
+      border: 1px solid var(--border); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; margin: 0 0 18px; font-size: 14.5px;
+        display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left;
+         vertical-align: top; }
+th { background: var(--raised); }
+.sub { color: var(--muted); margin-bottom: 30px; }
+
+.langbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 34px; padding: 0;
+           list-style: none; }
+.langbar a {
+  display: inline-block; padding: 6px 13px; border: 1px solid var(--border);
+  border-radius: 999px; background: var(--surface); text-decoration: none;
+  font-size: 14px; color: var(--muted);
+}
+.langbar a:hover { border-color: var(--accent); color: var(--accent); }
+.langbar a[aria-current] { background: var(--accent); border-color: var(--accent);
+                           color: #fff; }
+
+.cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+         margin: 0 0 32px; padding: 0; list-style: none; }
+.cards a {
+  display: block; padding: 15px 17px; background: var(--surface); text-decoration: none;
+  border: 1px solid var(--border); border-radius: 11px; color: var(--text);
+}
+.cards a:hover { border-color: var(--accent); }
+.cards strong { display: block; font-size: 16px; margin-bottom: 2px; }
+.cards span { color: var(--muted); font-size: 14px; }
+
+.shots { display: flex; gap: 12px; overflow-x: auto; margin: 0 0 32px; padding-bottom: 6px; }
+.shots img { margin: 0; flex: 0 0 auto; width: 190px; max-width: 45vw; }
+
+.cta {
+  display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+  padding: 11px 20px; border-radius: 9px; font-weight: 600; margin: 0 10px 12px 0;
+}
+.cta.ghost { background: transparent; color: var(--accent);
+             border: 1px solid var(--accent); }
+.note { background: var(--surface); border: 1px solid var(--border);
+        border-left: 3px solid var(--accent); border-radius: 0 9px 9px 0;
+        padding: 13px 16px; margin: 0 0 28px; font-size: 15px; }
+footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--border);
+         color: var(--faint); font-size: 13.5px; }
+footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="name" href="./index.html">SoundReborn Remote</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote">GitHub</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote/releases">Téléchargement</a>
+  <a href="https://st-reborn.de">STR</a>
+</div></header>
+<div class="wrap">
+<h1 id="soundreborn-remote-handbuch">SoundReborn Remote — Handbuch</h1>
+<p>Version 0.9.79 · Android 7 und neuer</p>
+<ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html" aria-current="page">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
+<h2 id="inhalt">Inhalt</h2>
+<ol>
+<li><a href="#1-was-vorher-da-sein-muss">Was vorher da sein muss</a></li>
+<li><a href="#2-installation">Installation</a></li>
+<li><a href="#3-erster-start">Erster Start</a></li>
+<li><a href="#4-der-reiter-wiedergabe">Der Reiter Wiedergabe</a></li>
+<li><a href="#5-der-reiter-presets">Der Reiter Presets</a></li>
+<li><a href="#6-der-reiter-quellen">Der Reiter Quellen</a></li>
+<li><a href="#7-der-reiter-gruppen">Der Reiter Gruppen</a></li>
+<li><a href="#8-der-reiter-einstellungen">Der Reiter Einstellungen</a></li>
+<li><a href="#9-gesten">Gesten</a></li>
+<li><a href="#10-was-tun-wenn">Was tun, wenn…</a></li>
+<li><a href="#11-bekannte-grenzen">Bekannte Grenzen</a></li>
+<li><a href="#12-hinweise">Hinweise</a></li>
+</ol>
+<hr />
+<h2 id="1-was-vorher-da-sein-muss">1. Was vorher da sein muss</h2>
+<p>SoundReborn Remote steuert <strong>Bose-SoundTouch-Lautsprecher</strong> von einem Android-Telefon
+oder -Tablet aus. Alles läuft im lokalen Netz: kein Konto, kein Onlinedienst, keine Daten,
+die das Haus verlassen.</p>
+<p>Drei Voraussetzungen:</p>
+<ul>
+<li><strong>Telefon und Lautsprecher im selben WLAN.</strong> Vorsicht bei Gastnetzen und Routern, die
+  Geräte voneinander abschotten — dann wird nichts gefunden.</li>
+<li><strong>Der STR-Agent auf den Lautsprechern.</strong> Er ersetzt das, was die Bose-Cloud bis zu
+  ihrer Abschaltung am 6. Mai 2026 geleistet hat. Ohne ihn funktioniert die App zwar
+  weiter, aber beschränkt auf das, was allein die Firmware bietet: Lautstärke, Bass,
+  bereits gespeicherte Tasten. Sendersuche, Tastenbelegung und zuverlässige Gruppen
+  laufen alle über den Agenten.
+  Installiert wird er mit dem STR-Werkzeug für PC oder Mac — <a href="https://st-reborn.de">https://st-reborn.de</a>.
+  <strong>Diese App installiert ihn nicht</strong>; sie weist lediglich auf Lautsprecher hin, denen er
+  fehlt.</li>
+<li><strong>Android 7 oder neuer.</strong></li>
+</ul>
+<hr />
+<h2 id="2-installation">2. Installation</h2>
+<p>Die App wird nicht über den Play Store verteilt. Sie steht auf der <em>Releases</em>-Seite des
+Projekts: <a href="https://github.com/ben240374/SoundRebornRemote/releases">https://github.com/ben240374/SoundRebornRemote/releases</a></p>
+<ol>
+<li>Lade die <code>.apk</code> auf das Telefon.</li>
+<li>Öffne sie. Android fragt nach der Erlaubnis, aus einer unbekannten Quelle zu
+   installieren — erteile sie der App, die heruntergeladen hat, meist dem Browser.</li>
+<li>Installieren, dann öffnen.</li>
+</ol>
+<p>Beim ersten Start wird keine besondere Berechtigung verlangt: Die App greift weder auf
+Kontakte noch auf Standort noch auf Speicher zu.</p>
+<hr />
+<h2 id="3-erster-start">3. Erster Start</h2>
+<p>Die App startet in der Sprache des Telefons, sofern sie sie kennt — Französisch,
+Englisch, Deutsch, Niederländisch, Spanisch — sonst auf Englisch. Ändern lässt sich das
+jederzeit.</p>
+<p>Beim ersten Start ist kein Lautsprecher bekannt. Gehe zu <strong>Einstellungen</strong> und dann auf
+<strong>Lokales Netzwerk durchsuchen</strong>.</p>
+<p><img alt="Einstellungen" src="../images/06-reglages.jpg" /></p>
+<p>Die Suche läuft in zwei Stufen. Zuerst bittet sie die Geräte, sich zu melden (mDNS) — der
+schnelle Weg, zwei bis drei Sekunden. Antwortet niemand, fragt sie alle 254 Adressen des
+Subnetzes einzeln auf Port 8090 ab: einige Sekunden länger, funktioniert aber auch dort,
+wo Multicast gefiltert wird.</p>
+<p>Gefundene Lautsprecher erscheinen unter <strong>BEKANNTE LAUTSPRECHER</strong>. Tippe bei dem
+gewünschten auf <strong>Verwenden</strong>. Er wird gemerkt: Beim nächsten Start verbindet sich die
+App von selbst wieder.</p>
+<p>Findet der Suchlauf nichts, du kennst aber die IP-Adresse des Lautsprechers, trage sie in
+das vorgesehene Feld ein und tippe auf <strong>Hinzufügen</strong>.</p>
+<hr />
+<h2 id="4-der-reiter-wiedergabe">4. Der Reiter Wiedergabe</h2>
+<p>Der Hauptbildschirm, den man öffnet, um schnell etwas zu tun.</p>
+<p><img alt="Wiedergabe" src="../images/01-lecture.jpg" /></p>
+<h3 id="die-wahl-des-lautsprechers">Die Wahl des Lautsprechers</h3>
+<p>Oben je eine Karte pro bekanntem Lautsprecher, mit Modell und Version des STR-Agenten.
+Die blau umrandete Karte ist der gesteuerte Lautsprecher; tippe auf eine andere Karte, um
+zu wechseln, ohne den Umweg über die Einstellungen.</p>
+<p>Der kleine Punkt rechts zeigt die Verbindung: <strong>direkt</strong> heißt, der Lautsprecher meldet
+Änderungen in Echtzeit, <strong>Abfrage</strong>, dass die App sie in Abständen neu liest. Im
+Abfragemodus erscheint eine Änderung von einer anderen Fernbedienung erst nach ein, zwei
+Sekunden.</p>
+<h3 id="gerade-lauft">Gerade läuft</h3>
+<p>Cover, Titel und Quelle des Laufenden. Bei einem Radiosender dessen Logo und Name, bei
+Spotify das Albumcover.</p>
+<h3 id="steuerung">Steuerung</h3>
+<p>Vier Tasten: Stopp, zurück, Wiedergabe/Pause, vor. Je nach Quelle bleiben manche ohne
+Wirkung — ein Livestream lässt sich nicht zurückspulen.</p>
+<p>Der grüne Balken <strong>Standby</strong> schaltet den Lautsprecher aus; ist er aus, heißt er
+<strong>Einschalten</strong>.</p>
+<h3 id="lautstarke">Lautstärke</h3>
+<p>Stumm, minus, Regler, plus. Der Prozentwert steht rechts.</p>
+<p>Gehört der Lautsprecher zu einer Gruppe, wird dieser Regler zur <strong>Lautstärke der ganzen
+Gruppe</strong>: Er verschiebt alle Lautsprecher um denselben Betrag und erhält damit das
+Verhältnis, das du zwischen ihnen eingestellt hast. Die einzelnen Lautstärken bleiben im
+Reiter Gruppen zugänglich.</p>
+<h3 id="bass-und-presets">Bass und Presets</h3>
+<p><img alt="Bass und Presets" src="../images/02-lecture-graves.jpg" /></p>
+<p>Der Bass reicht je nach Modell von -10 bis +10. <strong>Eine Höhenregelung gibt es nicht</strong>: Die
+API des Lautsprechers bietet keine — das ist kein Versäumnis der App.</p>
+<p>Die sechs Presets stehen hier noch einmal, um einen Reiterwechsel zu sparen. Die grün
+umrandete Kachel ist die laufende.</p>
+<h3 id="gruppieren-mit">Gruppieren mit</h3>
+<p>Eine Schaltfläche je weiterem Lautsprecher. Tippen fügt ihn der Gruppe hinzu, ein Haken
+erscheint. Erneut tippen nimmt ihn wieder heraus. Der gesteuerte Lautsprecher ist der
+<strong>Master</strong>: Er sendet, die anderen folgen.</p>
+<p>Der Link <strong>Aktualisieren</strong> unten liest alles neu: laufenden Titel, Cover, Lautstärke,
+Zustand der Gruppe.</p>
+<hr />
+<h2 id="5-der-reiter-presets">5. Der Reiter Presets</h2>
+<p><img alt="Presets" src="../images/03-preselections.jpg" /></p>
+<h3 id="die-sechs-tasten">Die sechs Tasten</h3>
+<p>Dieselben wie die physischen Tasten am Lautsprecher. Jede Kachel zeigt Senderlogo und
+Bitrate. Tippen startet die Wiedergabe; der grüne Rahmen markiert die laufende.</p>
+<p>Logos werden heruntergeladen und danach lokal behalten. Fehlt eines, veröffentlicht der
+Sender kein brauchbares Bild, oder sein Server antwortet nicht.</p>
+<h3 id="einen-sender-finden">Einen Sender finden</h3>
+<p>Das Suchfeld fragt <strong>radio-browser.info</strong> ab, ein offenes, von Freiwilligen gepflegtes
+Verzeichnis. Zwei Auswahllisten grenzen auf Land und Sprache ein, und <strong>Top-Liste</strong> zeigt
+die meistgehörten Sender, ohne etwas einzutippen.</p>
+<p>Das Kästchen <strong>Nur Bose-kompatible</strong> ist standardmäßig gesetzt und sollte es bleiben: Es
+filtert die Formate heraus, die SoundTouch-Lautsprecher nicht decodieren (Ogg, Opus,
+FLAC) und die zu Stille ohne Fehlermeldung führen würden.</p>
+<p>Tippe auf ein Ergebnis, dann öffnet sich ein Auswahlblatt mit</p>
+<ul>
+<li><strong>Anhören</strong> — startet den Sender sofort, ohne etwas zu speichern;</li>
+<li><strong>① Dieser Taste zuweisen</strong>, wenn die Taste frei ist, oder <strong>① Bel RTL ersetzen</strong>, wenn
+  sie belegt ist — der Name des bereits gespeicherten Senders wird angezeigt, damit du
+  keinen überschreibst, an dem dir lag.</li>
+</ul>
+<p><strong>Das Zuweisen setzt den STR-Agenten voraus.</strong> Ohne ihn ist nur sofortiges Anhören
+möglich; gespeichert wird dann durch Gedrückthalten der Taste am Lautsprecher selbst oder
+über die STR-Desktop-App.</p>
+<hr />
+<h2 id="6-der-reiter-quellen">6. Der Reiter Quellen</h2>
+<p><img alt="Quellen" src="../images/04-sources.jpg" /></p>
+<p><strong>Bluetooth</strong>, <strong>AUX</strong> und <strong>Standby</strong> oben: drei direkte Verknüpfungen.</p>
+<p><strong>Spotify</strong> wird nicht aus dieser App gesteuert. Öffne Spotify auf dem Telefon und wähle
+den Lautsprecher in der Geräteauswahl (Spotify Connect): Er erscheint dort, sobald der
+STR-Agent läuft.</p>
+<p><strong>Quellen des Lautsprechers</strong> listet auf, was der Lautsprecher meldet, mit Zustand:
+<code>READY</code> heißt verfügbar, <code>UNAVAILABLE</code>, dass die Quelle zwar existiert, aber nicht nutzbar
+ist — typischerweise ein Streamingdienst, dessen Konto seit der Cloud-Abschaltung nicht
+mehr erreichbar ist.</p>
+<p><strong>Einen Stream abspielen</strong> nimmt die Adresse eines direkten Audiostreams entgegen — eine
+<code>.mp3</code> oder eine <code>.m3u8</code> — und startet ihn auf dem Lautsprecher. Nützlich für ein
+Webradio, das im Verzeichnis fehlt. Dafür ist der STR-Agent nötig.</p>
+<p><strong>Zuletzt gehört</strong> zeigt den vom Agenten geführten Verlauf: Tippe auf eine Zeile, um
+erneut zu starten.</p>
+<hr />
+<h2 id="7-der-reiter-gruppen">7. Der Reiter Gruppen</h2>
+<p><img alt="Gruppen" src="../images/05-groupes.jpg" /></p>
+<p><strong>Master-Lautsprecher</strong> nennt den sendenden. Um den Master zu wechseln, wechsle im Reiter
+Wiedergabe den aktiven Lautsprecher.</p>
+<p><strong>Zu gruppierende Lautsprecher</strong>: Hake die an, die folgen sollen, dann <strong>Gruppieren</strong>.
+<strong>Auflösen</strong> löst die ganze Gruppe auf.</p>
+<p>Die Option <strong>Dauerhafte Gruppe</strong> bittet den Agenten, die Gruppe bei der nächsten
+Wiedergabe wiederherzustellen, statt sie zerfallen zu lassen, wenn die Musik endet.</p>
+<p><strong>Gruppenlautstärke</strong> wirkt auf alle Lautsprecher zugleich. Unter diesem Regler hat jeder
+Lautsprecher der Gruppe seinen eigenen, sodass sich die Küche leiser stellen lässt, ohne
+das Wohnzimmer anzurühren. <strong>Auf ganze Gruppe anwenden</strong> setzt alle auf denselben Wert.</p>
+<p>Ein Verhalten sollte man kennen: Der Gruppenregler <strong>verschiebt</strong> die Lautstärken und
+erhält dabei die Abstände. Steht die Küche auf 60 und das Wohnzimmer auf 30, ergibt ein
+Anheben um 10 die Werte 70 und 40 — nicht 70 und 35.</p>
+<hr />
+<h2 id="8-der-reiter-einstellungen">8. Der Reiter Einstellungen</h2>
+<p><img alt="Bekannte Lautsprecher" src="../images/07-reglages-enceintes.jpg" /></p>
+<p><strong>Aktiver Lautsprecher</strong>: Name, Adresse, Modell und Version des Agenten.</p>
+<p><strong>Sprache</strong>: Französisch, Englisch, Deutsch, Niederländisch, Spanisch. Die Änderung wirkt
+sofort, ohne Neustart, und wird behalten.</p>
+<p><strong>Design</strong>: System, Hell oder Dunkel. „System" folgt der Anzeigeeinstellung des Telefons,
+einschließlich der automatischen Umschaltung am Abend.</p>
+<p><strong>Suche</strong>: der Suchlauf und die manuelle Eingabe per IP-Adresse.</p>
+<p><strong>Bekannte Lautsprecher</strong>: die gemerkte Liste. <strong>Verwenden</strong> wechselt dorthin, <strong>✕</strong>
+vergisst den Eintrag. Ein Lautsprecher mit dem Hinweis <strong>„Ohne STR — bereit zur
+Installation"</strong> antwortet einwandfrei, hat aber keinen Agenten; weiter unten erscheint
+dann ein Erklärungsblock mit einem Link zur Seite des STR-Projekts.</p>
+<p><strong>Diagnose</strong>: <em>Aktiven Lautsprecher abfragen</em> zeigt, was der Lautsprecher tatsächlich
+meldet — Name, Modell, Geräte-ID, Firmwareversion, Vorhandensein des Agenten, Zustand der
+Benachrichtigungen, Bassbereich, Liste der erkannten API-Endpunkte. Das ist die Angabe,
+die man einer Fehlermeldung beilegt. <em>Logo-Cache leeren</em> erzwingt das erneute
+Herunterladen der Senderbilder.</p>
+<p><strong>Über</strong>: die Version, der Dank an das STR-Projekt mit einem Link zu dessen Seite in der
+gewählten Sprache, und die rechtlichen Hinweise.</p>
+<hr />
+<h2 id="9-gesten">9. Gesten</h2>
+<p><strong>Waagerechtes Wischen</strong> wechselt zum nächsten oder vorherigen Reiter: Wiedergabe →
+Presets → Quellen → Gruppen → Einstellungen. Die Geste muss zügig sein; ein langsames
+Ziehen wird nicht als Reiterwechsel gelesen.</p>
+<p>Ein Wischen, das <strong>auf einem Regler</strong> beginnt, gehört dem Regler: Das ist gewollt, sonst
+ließe sich die Lautstärke nicht mehr einstellen. Beginne die Geste auf einer freien
+Fläche.</p>
+<hr />
+<h2 id="10-was-tun-wenn">10. Was tun, wenn…</h2>
+<p><strong>Der Suchlauf findet keinen Lautsprecher.</strong>
+Prüfe, ob das Telefon im selben WLAN ist wie die Lautsprecher und nicht im Gastnetz oder
+im Mobilfunk. Manche Router schotten Geräte voneinander ab — die Einstellung heißt
+meist <em>AP-Isolation</em> oder <em>Client-Modus</em>. Kennst du die IP-Adresse, trage sie in den
+Einstellungen von Hand ein.</p>
+<p><strong>Der Lautsprecher erscheint, reagiert aber nicht.</strong>
+Wahrscheinlich ist er im Tiefschlaf. Wecke ihn mit der Ein-/Aus-Schaltfläche im Reiter
+Wiedergabe oder drücke eine Taste am Gerät.</p>
+<p><strong>Ein Preset bewirkt nichts.</strong>
+Eine leere Taste hat nichts zu starten. Prüfe außerdem, ob der Lautsprecher aus ist.</p>
+<p><strong>Es werden keine Senderlogos angezeigt.</strong>
+Leere den Logo-Cache in der Diagnose. Bleibt es bei einem bestimmten Sender, liegt es an
+dessen eigenem Bildserver.</p>
+<p><strong>Bei einem Lautsprecher fehlt die Agentenversion.</strong>
+Entweder ist der Agent dort nicht installiert, oder er ist zu alt, um seine Versionsnummer
+zu veröffentlichen. Starte den Suchlauf erneut.</p>
+<p><strong>Die Gruppe bildet sich nicht.</strong>
+Beide Lautsprecher müssen eingeschaltet und erreichbar sein. Fehlt einem der STR-Agent,
+läuft das Gruppieren über die Firmware — weniger zuverlässig und mitunter ohne Meldung
+abgelehnt.</p>
+<p><strong>Die App ist in der falschen Sprache.</strong>
+Einstellungen → Sprache. Die Wahl hat Vorrang vor der Sprache des Telefons.</p>
+<hr />
+<h2 id="11-bekannte-grenzen">11. Bekannte Grenzen</h2>
+<ul>
+<li><strong>Keine Höhenregelung.</strong> Die API des Lautsprechers bietet keine.</li>
+<li><strong>Die App installiert den STR-Agenten nicht.</strong> Das verlangt Systemzugriff auf den
+  Lautsprecher und einen Neustart; dafür ist das STR-Werkzeug für PC oder Mac da.</li>
+<li><strong>Spotify wird aus Spotify gesteuert</strong>, über Spotify Connect.</li>
+<li><strong>Kein Durchsuchen einer DLNA-Bibliothek</strong>, bislang.</li>
+<li><strong>Nur Android.</strong> Eine iOS-Fassung gibt es nicht.</li>
+</ul>
+<hr />
+<h2 id="12-hinweise">12. Hinweise</h2>
+<p>SoundReborn Remote ist ein privates Projekt unter MIT-Lizenz.</p>
+<p>Es wird <strong>weder von der Bose Corporation hergestellt noch von ihr unterstützt</strong>. „Bose"
+und „SoundTouch" sind Marken der Bose Corporation und werden hier nur genannt, um die
+Kompatibilität anzugeben.</p>
+<p>Es ist <strong>unabhängig vom STR-Projekt</strong>: von ihm weder entwickelt noch gepflegt noch
+unterstützt. Probleme mit dieser App bitte
+<a href="https://github.com/ben240374/SoundRebornRemote/issues">im eigenen Repository</a> melden,
+nicht beim STR-Projekt.</p>
+<p>Der Agent <strong>STR (SoundTouch Reborn)</strong> stammt von Jens Roggenfelder
+(<a href="https://github.com/JRpersonal/streborn">JRpersonal</a>) — <a href="https://st-reborn.de">https://st-reborn.de</a>. Ohne ihn
+hätte diese App nichts zu steuern.</p>
+<p>Das Senderverzeichnis stellt <a href="https://www.radio-browser.info">radio-browser.info</a> bereit.</p>
+<p>Der Code wurde mit Claude (Anthropic) geschrieben.</p>
+<footer>
+  <p>SoundReborn Remote — licence MIT. Projet personnel, sans lien avec Bose Corporation.
+  « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer
+  la compatibilité. Indépendant du projet
+  <a href="https://st-reborn.de">STR</a>, qui n'en assure pas le support.</p>
+</footer>
+</div>
+</body>
+</html>
