@@ -19,13 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Ce projet n'est ni produit ni approuvé par Bose Corporation. « Bose » et
-« SoundTouch » sont des marques de Bose Corporation.
-
-Il s'appuie sur STR (SoundTouch Reborn) de Jens Roggenfelder (JRpersonal),
-publié sous licence MIT : https://github.com/JRpersonal/streborn
-Le code de STR n'est pas redistribué ici ; l'application dialogue avec l'agent
-par le réseau.

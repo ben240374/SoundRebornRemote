@@ -225,7 +225,10 @@ public sealed partial class SettingsViewModel : BaseViewModel
 
         try
         {
-            var found = await _discovery.ScanAsync(speaker => OnMainThread(() =>
+            // DiscoverAsync interroge le mDNS en premier et ne balaie le /24 que si
+            // personne ne s'est annoncé : sur un réseau ordinaire, la liste arrive en
+            // une seconde ou deux au lieu de 254 requêtes HTTP.
+            var found = await _discovery.DiscoverAsync(speaker => OnMainThread(() =>
             {
                 Speakers.Remember(speaker);
 

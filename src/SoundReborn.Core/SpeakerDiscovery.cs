@@ -8,13 +8,16 @@ using SoundReborn.Core.Models;
 namespace SoundReborn.Core;
 
 /// <summary>
-/// Recherche des enceintes sur le réseau local.
+/// Recherche des enceintes sur le réseau local, en deux temps.
 ///
-/// Le mDNS (_soundtouch._tcp / _streborn._tcp) serait plus élégant, mais sur Android
-/// il exige un MulticastLock, il est filtré par beaucoup de box opérateur et il reste
-/// muet quand l'enceinte est en veille profonde. Le balayage direct du /24 sur le port
-/// 8090 est plus lourd mais il marche partout, et il est rapide en parallèle : 254
-/// adresses avec un délai d'attente court tiennent en quelques secondes.
+/// D'abord le mDNS (voir <see cref="MdnsProbe"/>) : les enceintes publient
+/// <c>_soundtouch._tcp</c> et l'agent STR <c>_streborn._tcp</c>, donc une question
+/// suffit le plus souvent à obtenir la liste en une seconde ou deux.
+///
+/// Le balayage du /24 sur le port 8090 reste en repli, et il n'est pas près de
+/// disparaître : beaucoup de box filtrent le multicast, un réseau invité l'isole, et
+/// une enceinte en veille profonde ne publie plus rien alors qu'elle répond encore en
+/// HTTP. 254 adresses avec un délai d'attente court tiennent en quelques secondes.
 /// </summary>
 public sealed class SpeakerDiscovery
 {
@@ -30,6 +33,82 @@ public sealed class SpeakerDiscovery
 
     /// <summary>Délai d'attente pour la détection de l'agent STR, une fois l'enceinte trouvée.</summary>
     public TimeSpan StrProbeTimeout { get; set; } = TimeSpan.FromMilliseconds(1200);
+
+    /// <summary>Durée d'écoute des réponses mDNS avant de se rabattre sur le balayage.</summary>
+    public TimeSpan MdnsWindow { get; set; } = TimeSpan.FromMilliseconds(1800);
+
+    /// <summary>
+    /// La recherche telle que l'interface l'appelle : mDNS d'abord, balayage ensuite
+    /// si le mDNS n'a rien donné. Les adresses annoncées sont confirmées par
+    /// <c>GET :8090/info</c> comme n'importe quelle autre : une annonce mDNS venue
+    /// d'un autre appareil ne peut donc pas se glisser dans la liste.
+    /// </summary>
+    public async Task<IReadOnlyList<SpeakerEndpoint>> DiscoverAsync(
+        Action<SpeakerEndpoint>? onFound = null,
+        CancellationToken ct = default)
+    {
+        IReadOnlyList<string> announced;
+
+        try
+        {
+            announced = await MdnsProbe.FindHostsAsync(MdnsWindow, ct).ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            announced = Array.Empty<string>();
+        }
+
+        if (announced.Count > 0)
+        {
+            var quick = await ProbeManyAsync(announced, onFound, ct).ConfigureAwait(false);
+
+            if (quick.Count > 0)
+            {
+                return quick;
+            }
+        }
+
+        return await ScanAsync(onFound, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>Sonde une liste d'adresses en parallèle et renvoie celles qui sont des enceintes.</summary>
+    private async Task<IReadOnlyList<SpeakerEndpoint>> ProbeManyAsync(
+        IEnumerable<string> hosts,
+        Action<SpeakerEndpoint>? onFound,
+        CancellationToken ct)
+    {
+        var found = new List<SpeakerEndpoint>();
+        var sync = new object();
+
+        var tasks = hosts.Select(async host =>
+        {
+            var speaker = await ProbeAsync(host, ct).ConfigureAwait(false);
+
+            if (speaker is null)
+            {
+                return;
+            }
+
+            lock (sync)
+            {
+                if (found.Contains(speaker))
+                {
+                    return;
+                }
+
+                found.Add(speaker);
+            }
+
+            onFound?.Invoke(speaker);
+        });
+
+        await Task.WhenAll(tasks).ConfigureAwait(false);
+
+        lock (sync)
+        {
+            return found.OrderBy(s => s.DisplayName, StringComparer.CurrentCultureIgnoreCase).ToList();
+        }
+    }
 
     /// <summary>
     /// Balaie les sous-réseaux /24 des interfaces actives et renvoie les enceintes trouvées.
