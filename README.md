@@ -6,10 +6,14 @@ aucun service intermédiaire.
 
 > Projet personnel, sans lien avec Bose Corporation. « Bose » et « SoundTouch » sont des
 > marques de Bose Corporation, citées ici uniquement pour indiquer la compatibilité.
+>
+> **Cette application est indépendante du projet STR** : elle n'est ni développée, ni
+> maintenue, ni prise en charge par lui. Signalez les problèmes rencontrés avec elle
+> [ici](https://github.com/ben240374/SoundRebornRemote/issues), pas au projet STR.
 
 ## Grâce à STR
 
-Quand Bose a coupé son cloud en février 2026, les enceintes SoundTouch ont perdu
+Quand Bose a coupé son cloud le 6 mai 2026, les enceintes SoundTouch ont perdu
 l'essentiel de leur usage. **[STR — SoundTouch Reborn](https://st-reborn.de/fr/)**, de
 **Jens Roggenfelder ([JRpersonal](https://github.com/JRpersonal/streborn))**, est l'agent
 qui tourne sur l'enceinte elle-même et lui rend ce que le cloud assurait. Cette
@@ -47,7 +51,7 @@ l'ont pas encore.
 | Historique d'écoute | onglet Sources | `GET :8888/api/recent` |
 | Groupes multi-pièces | onglet Multi-pièces | `POST :8888/api/box/zone`, repli sur `POST :8090/setZone` |
 | Volume par enceinte du groupe | onglet Multi-pièces | `GET/POST :8888/api/box/zone/volume` |
-| Découverte des enceintes | onglet Réglages | balayage du `/24` sur `GET :8090/info` |
+| Découverte des enceintes | onglet Réglages | mDNS (`_streborn._tcp`, `_soundtouch._tcp`), repli sur le balayage du `/24` sur `GET :8090/info` |
 | Bascule d'une enceinte à l'autre | onglet Lecture | cartes en haut de l'écran, avec modèle et version de l'agent |
 | Marche / veille | onglet Lecture | `POST :8888/api/box/power`, repli sur la touche `POWER` |
 | Version de l'agent STR | onglet Lecture | `GET :8888/api/agent/version` |
@@ -65,7 +69,7 @@ Deux API sont utilisées, et l'application choisit toute seule :
 - **L'API de l'agent STR (SoundTouch Reborn), port 8888 ou 17008, en JSON.** Présente
   seulement si tu as installé l'agent. Elle est préférée quand elle répond : elle gère
   le réveil de l'enceinte, elle sait jouer une URL arbitraire, et elle remplace ce que
-  le cloud Bose faisait avant son arrêt de février 2026.
+  le cloud Bose faisait avant son arrêt le 6 mai 2026.
 
 Le port 17008 est testé en premier : sur les châssis BCO (SoundTouch Portable, certaines
 ST20), le chipset réseau n'accepte de connexion entrante que sur ce port, redirigé vers
@@ -237,8 +241,6 @@ le changement de langue est donc immédiat. Le code passe par `Localization.Get(
 ## Pistes d'extension
 
 - Widget Android et contrôles sur l'écran de verrouillage (`MediaSession`).
-- Découverte mDNS (`_soundtouch._tcp` et `_streborn._tcp`) via `NsdManager`, en complément
-  du balayage — plus rapide, mais il faut prendre un `MulticastLock`.
 - Parcours de la bibliothèque DLNA via `GET /api/library/browse` de l'agent.
 - Enregistrement d'une présélection depuis le téléphone (`POST :8090/storePreset`).
 - Annonces avec reprise de la lecture (`POST :17008/api/announce` de l'agent).
@@ -254,8 +256,5 @@ le changement de langue est donc immédiat. Le code passe par `Localization.Get(
 
 MIT — voir [LICENSE](LICENSE).
 
-Projet personnel, ni produit ni approuvé par Bose Corporation. « Bose » et
-« SoundTouch » sont des marques de Bose Corporation. STR est publié sous licence MIT par
-son auteur.
-
-Le code a été écrit avec Claude (Anthropic).
+Les mentions de marques, le crédit à STR et le périmètre de support sont dans
+[NOTICE.md](NOTICE.md).

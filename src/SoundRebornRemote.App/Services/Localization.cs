@@ -608,11 +608,11 @@ public static class Localization
             "Mando local para altavoces Bose SoundTouch.");
         Add("L_ThanksTitle", "STR — SoundTouch Reborn", "STR — SoundTouch Reborn", "STR — SoundTouch Reborn", "STR — SoundTouch Reborn", "STR — SoundTouch Reborn");
         Add("L_ThanksBody",
-            "Quand Bose a coupé son cloud en février 2026, les enceintes SoundTouch perdaient l'essentiel de leur usage. Jens Roggenfelder (JRpersonal) a écrit STR, l'agent qui tourne sur l'enceinte elle-même et lui rend tout ce que le cloud assurait. Cette application ne fait que lui parler : sans son travail, elle n'aurait rien à piloter.",
-            "When Bose shut its cloud down in February 2026, SoundTouch speakers lost most of what made them useful. Jens Roggenfelder (JRpersonal) wrote STR, the agent that runs on the speaker itself and gives back everything the cloud used to provide. This app only talks to it: without his work, it would have nothing to control.",
-            "Als Bose im Februar 2026 seine Cloud abschaltete, verloren die SoundTouch-Lautsprecher fast ihren gesamten Nutzen. Jens Roggenfelder (JRpersonal) schrieb STR, den Agenten, der auf dem Lautsprecher selbst läuft und zurückgibt, was die Cloud leistete. Diese App spricht nur mit ihm: ohne seine Arbeit hätte sie nichts zu steuern.",
-            "Toen Bose in februari 2026 zijn cloud uitzette, verloren de SoundTouch-speakers vrijwel hun hele nut. Jens Roggenfelder (JRpersonal) schreef STR, de agent die op de speaker zelf draait en teruggeeft wat de cloud deed. Deze app praat er alleen mee: zonder zijn werk zou ze niets te besturen hebben.",
-            "Cuando Bose apagó su nube en febrero de 2026, los altavoces SoundTouch perdieron casi toda su utilidad. Jens Roggenfelder (JRpersonal) escribió STR, el agente que corre en el propio altavoz y devuelve lo que la nube aportaba. Esta aplicación solo habla con él: sin su trabajo, no tendría nada que controlar.");
+            "Quand Bose a coupé son cloud le 6 mai 2026, les enceintes SoundTouch perdaient l'essentiel de leur usage. Jens Roggenfelder (JRpersonal) a écrit STR, l'agent qui tourne sur l'enceinte elle-même et lui rend tout ce que le cloud assurait. Cette application ne fait que lui parler : sans son travail, elle n'aurait rien à piloter.",
+            "When Bose shut its cloud down on 6 May 2026, SoundTouch speakers lost most of what made them useful. Jens Roggenfelder (JRpersonal) wrote STR, the agent that runs on the speaker itself and gives back everything the cloud used to provide. This app only talks to it: without his work, it would have nothing to control.",
+            "Als Bose am 6. Mai 2026 seine Cloud abschaltete, verloren die SoundTouch-Lautsprecher fast ihren gesamten Nutzen. Jens Roggenfelder (JRpersonal) schrieb STR, den Agenten, der auf dem Lautsprecher selbst läuft und zurückgibt, was die Cloud leistete. Diese App spricht nur mit ihm: ohne seine Arbeit hätte sie nichts zu steuern.",
+            "Toen Bose op 6 mei 2026 zijn cloud uitzette, verloren de SoundTouch-speakers vrijwel hun hele nut. Jens Roggenfelder (JRpersonal) schreef STR, de agent die op de speaker zelf draait en teruggeeft wat de cloud deed. Deze app praat er alleen mee: zonder zijn werk zou ze niets te besturen hebben.",
+            "Cuando Bose apagó su nube el 6 de mayo de 2026, los altavoces SoundTouch perdieron casi toda su utilidad. Jens Roggenfelder (JRpersonal) escribió STR, el agente que corre en el propio altavoz y devuelve lo que la nube aportaba. Esta aplicación solo habla con él: sin su trabajo, no tendría nada que controlar.");
         Add("L_ThanksLicense",
             "STR est publié sous licence MIT.",
             "STR is released under the MIT licence.",
@@ -627,6 +627,12 @@ public static class Localization
             "Senderverzeichnis: radio-browser.info, eine offene, von Freiwilligen gepflegte Datenbank.",
             "Zendergids: radio-browser.info, een open database bijgehouden door vrijwilligers.",
             "Directorio de emisoras: radio-browser.info, una base abierta mantenida por voluntarios.");
+        Add("L_IndependenceNotice",
+            "Application indépendante du projet STR : ni développée, ni maintenue, ni prise en charge par lui. Les problèmes rencontrés avec elle sont à signaler à son auteur.",
+            "This app is independent of the STR project: not built, maintained or supported by it. Report problems with the app to its author.",
+            "Diese App ist unabhängig vom STR-Projekt: sie wird von ihm weder entwickelt noch gepflegt noch unterstützt. Probleme mit der App bitte an ihren Autor melden.",
+            "Deze app staat los van het STR-project: niet erdoor gebouwd, onderhouden of ondersteund. Meld problemen met de app bij de auteur ervan.",
+            "Aplicación independiente del proyecto STR: ni desarrollada, ni mantenida, ni respaldada por él. Informa de los problemas con la aplicación a su autor.");
         Add("L_TrademarkNotice",
             "Projet personnel, sans lien avec Bose Corporation. « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer la compatibilité.",
             "Personal project, not affiliated with Bose Corporation. “Bose” and “SoundTouch” are trademarks of Bose Corporation, named here to indicate compatibility.",

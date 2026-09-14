@@ -183,6 +183,9 @@
                     <BoxView HeightRequest="1" Margin="0,4"
                              Color="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}" />
 
+                    <Label Text="{DynamicResource L_IndependenceNotice}" FontSize="11"
+                           TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
+
                     <Label Text="{DynamicResource L_TrademarkNotice}" FontSize="11"
                            TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
                 </VerticalStackLayout>

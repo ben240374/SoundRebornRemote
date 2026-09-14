@@ -24,7 +24,10 @@
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
-  <!-- Utile seulement si tu ajoutes plus tard une découverte mDNS. -->
+  <!-- La découverte mDNS pose sa question en multicast mais reçoit les réponses en
+       unicast (requête héritée, RFC 6762 §6.7). Aucun MulticastLock n'est donc pris.
+       L'autorisation reste déclarée : elle ne coûte rien, n'apparaît pas à
+       l'utilisateur, et servira si la réception multicast devient nécessaire. -->
   <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 
 </manifest>
