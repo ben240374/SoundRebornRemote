@@ -33,8 +33,11 @@ public sealed partial class GroupCandidate : ObservableObject
 /// </summary>
 public sealed partial class MultiroomViewModel : BaseViewModel
 {
-    public MultiroomViewModel(SpeakerManager speakers) : base(speakers)
+    private readonly ZoneLocator _zones;
+
+    public MultiroomViewModel(SpeakerManager speakers, ZoneLocator zones) : base(speakers)
     {
+        _zones = zones;
         Speakers.DeviceChanged += (_, _) => OnMainThread(() => _ = RefreshAsync());
     }
 
@@ -47,6 +50,17 @@ public sealed partial class MultiroomViewModel : BaseViewModel
 
     [ObservableProperty]
     private string _masterName = "—";
+
+    /// <summary>
+    /// Faux quand l'enceinte pilotée est un esclave du groupe. L'écran s'en sert pour
+    /// dire qui diffuse réellement, au lieu de laisser croire que c'est celle-ci.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSlaveSpeaker))]
+    private bool _isMasterSpeaker = true;
+
+    /// <summary>L'inverse, pour l'affichage : le projet n'a pas de convertisseur de négation.</summary>
+    public bool IsSlaveSpeaker => !IsMasterSpeaker;
 
     [ObservableProperty]
     private bool _isGrouped;
@@ -78,22 +92,37 @@ public sealed partial class MultiroomViewModel : BaseViewModel
         if (device is null)
         {
             MasterName = "—";
+            IsMasterSpeaker = true;
             IsGrouped = false;
             CanUseGroupVolume = false;
             HasCandidates = false;
             return;
         }
 
+        // Point de départ de chaque relecture : sans groupe, l'enceinte pilotée est
+        // à elle-même son propre maître. La lecture de la zone, plus bas, corrigera
+        // si un vrai maître existe. Sans cette remise à zéro, la mention ambre
+        // « ce n'est pas le maître » survit à la dissolution du groupe.
         MasterName = device.Endpoint.DisplayName;
+        IsMasterSpeaker = true;
         CanUseGroupVolume = device.HasStr;
         IsRefreshing = true;
 
         try
         {
-            var zone = await device.GetZoneAsync().ConfigureAwait(true);
-            var memberIps = zone.Members.Select(m => m.IpAddress).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            // Le groupe est cherché là où il est réellement décrit : l'enceinte
+            // pilotée d'abord, puis les autres si elle ne déclare rien. Une esclave
+            // ne sait pas toujours qu'elle suit quelqu'un ; le maître, lui, le sait.
+            var zone = await _zones.LocateAsync(device.Host, Speakers.KnownSpeakers).ConfigureAwait(true);
+            var memberIps = zone.MemberIps.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-            IsGrouped = zone.Members.Count > 1;
+            IsGrouped = zone.Grouped;
+
+            if (zone.Grouped)
+            {
+                MasterName = zone.MasterName;
+                IsMasterSpeaker = zone.IsMaster(device.Host);
+            }
 
             foreach (var endpoint in Speakers.KnownSpeakers)
             {
@@ -165,7 +194,30 @@ public sealed partial class MultiroomViewModel : BaseViewModel
             }
 
             GroupVolume = state.Average;
-            IsGrouped = state.Grouped;
+
+            // L'agent ne voit la zone que depuis le maître : vu d'une esclave, il la
+            // dit parfois absente. Le relevé du firmware, fait juste avant, prime donc
+            // quand il a trouvé un groupe. L'inverse serait une régression.
+            IsGrouped = IsGrouped || state.Grouped;
+
+            // Le maître est celui que la zone déclare, pas l'enceinte qu'on regarde.
+            // Basculer sur un esclave ne doit pas donner l'impression que la diffusion
+            // a changé de pièce.
+            var master = state.Members.FirstOrDefault(m => m.IsMaster);
+
+            if (master is not null && state.Grouped)
+            {
+                MasterName = master.DisplayName;
+                IsMasterSpeaker = string.Equals(master.Ip, device.Host, StringComparison.OrdinalIgnoreCase);
+            }
+            else if (!IsGrouped)
+            {
+                // Plus de zone du tout : l'enceinte pilotée redevient la référence,
+                // et la mention ambre disparaît. Si le firmware, lui, voit encore un
+                // groupe, on garde ce qu'il a désigné.
+                MasterName = device.Endpoint.DisplayName;
+                IsMasterSpeaker = true;
+            }
         }
         catch (Exception)
         {
@@ -177,6 +229,15 @@ public sealed partial class MultiroomViewModel : BaseViewModel
     [RelayCommand]
     private async Task FormGroupAsync()
     {
+        // Une enceinte n'appartient qu'à un groupe à la fois, et seul le maître le
+        // compose. Depuis une esclave, former un groupe reviendrait à en créer un
+        // second qui défait le premier : on renvoie vers le maître.
+        if (IsSlaveSpeaker)
+        {
+            ShowInfo(Localization.Get("S_SlaveCannotForm", MasterName));
+            return;
+        }
+
         var selected = Candidates.Where(c => c.IsSelected).ToList();
 
         if (selected.Count == 0)

@@ -1,6 +1,6 @@
 # SoundReborn Remote — User manual
 
-Version 0.9.79 · Android 7 and later
+Version 0.9.81 · Android 7 and later
 
 > Languages: [Français](fr.md) · **English** · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md)
 

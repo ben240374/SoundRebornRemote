@@ -14,19 +14,49 @@ public sealed class SpeakerManager
     private const string KnownSpeakersKey = "known_speakers";
     private const string SelectedHostKey = "selected_speaker_host";
 
+    /// <summary>Budget par port sondé pour retrouver l'agent d'une enceinte.</summary>
+    private static readonly TimeSpan AgentProbeTimeout = TimeSpan.FromSeconds(3);
+
     private readonly HttpClient _http;
+    private readonly ZoneLocator _zones;
     private readonly SemaphoreSlim _switchGate = new(1, 1);
 
-    public SpeakerManager(HttpClient http)
+    public SpeakerManager(HttpClient http, ZoneLocator zones)
     {
         _http = http;
+        _zones = zones;
         KnownSpeakers = LoadKnownSpeakers();
     }
 
     /// <summary>Déclenché après chaque changement d'enceinte active (y compris la déconnexion).</summary>
     public event EventHandler<SpeakerDevice?>? DeviceChanged;
 
+    /// <summary>
+    /// Déclenché quand la liste des enceintes connues change : ajout par un balayage,
+    /// ou retrait depuis les réglages. Les écrans qui affichent cette liste s'y
+    /// abonnent, sinon ils gardent l'ancienne jusqu'à leur prochaine apparition —
+    /// une enceinte oubliée resterait affichée, et une enceinte retrouvée manquerait.
+    /// </summary>
+    public event EventHandler? KnownSpeakersChanged;
+
+    /// <summary>
+    /// L'enceinte qui reçoit les commandes. Ce n'est pas forcément celle que
+    /// l'utilisateur a désignée : dans un groupe, c'est le maître qui diffuse, et
+    /// c'est donc lui qu'il faut commander.
+    /// </summary>
     public SpeakerDevice? Current { get; private set; }
+
+    /// <summary>
+    /// L'enceinte que l'utilisateur a désignée. Elle ne sert qu'à l'affichage des
+    /// réglages : toucher une enceinte d'un groupe ne doit rien changer à ce qui
+    /// joue, seulement dire par où l'on regarde.
+    /// </summary>
+    public SpeakerEndpoint? SelectedEndpoint { get; private set; }
+
+    /// <summary>Vrai quand les commandes partent ailleurs que vers l'enceinte désignée.</summary>
+    public bool IsRedirected =>
+        Current is not null && SelectedEndpoint is not null &&
+        !string.Equals(Current.Host, SelectedEndpoint.Host, StringComparison.OrdinalIgnoreCase);
 
     public List<SpeakerEndpoint> KnownSpeakers { get; }
 
@@ -60,21 +90,97 @@ public sealed class SpeakerManager
     /// </summary>
     public async Task<SpeakerDevice> SelectAsync(SpeakerEndpoint endpoint, CancellationToken ct = default)
     {
+        SelectedEndpoint = endpoint;
+        LastSelectedHost = endpoint.Host;
+        Remember(endpoint);
+
+        return await ConnectToTargetAsync(await ResolveTargetAsync(endpoint, ct).ConfigureAwait(false), ct)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Relit la zone et, si besoin, redirige les commandes. Appelée quand un groupe
+    /// se forme ou se défait : l'enceinte à commander change alors sans que
+    /// l'utilisateur ait touché à sa sélection.
+    ///
+    /// Renvoie vrai quand la cible a effectivement changé.
+    /// </summary>
+    public async Task<bool> RetargetAsync(CancellationToken ct = default)
+    {
+        var selected = SelectedEndpoint;
+
+        if (selected is null || Current is null)
+        {
+            return false;
+        }
+
+        var target = await ResolveTargetAsync(selected, ct).ConfigureAwait(false);
+
+        if (string.Equals(target.Host, Current.Host, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        await ConnectToTargetAsync(target, ct).ConfigureAwait(false);
+        return true;
+    }
+
+    /// <summary>
+    /// Qui commander pour cette sélection : le maître du groupe si l'enceinte
+    /// désignée ne fait que suivre, sinon elle-même.
+    /// </summary>
+    private async Task<SpeakerEndpoint> ResolveTargetAsync(SpeakerEndpoint selected, CancellationToken ct)
+    {
+        try
+        {
+            var zone = await _zones.LocateAsync(selected.Host, KnownSpeakers, ct).ConfigureAwait(false);
+
+            if (!zone.Grouped || zone.IsMaster(selected.Host) || string.IsNullOrWhiteSpace(zone.MasterIp))
+            {
+                return selected;
+            }
+
+            // Le maître doit être une enceinte connue : se brancher sur une adresse
+            // qu'on n'a jamais balayée ferait perdre son nom, son modèle et son port
+            // d'agent, et l'écran n'afficherait plus qu'une IP.
+            return KnownSpeakers.FirstOrDefault(s =>
+                string.Equals(s.Host, zone.MasterIp, StringComparison.OrdinalIgnoreCase)) ?? selected;
+        }
+        catch (Exception)
+        {
+            // Zone illisible : on commande ce qui a été désigné, faute de mieux.
+            return selected;
+        }
+    }
+
+    private async Task<SpeakerDevice> ConnectToTargetAsync(SpeakerEndpoint target, CancellationToken ct)
+    {
         await _switchGate.WaitAsync(ct).ConfigureAwait(false);
 
         try
         {
+            // Déjà branché sur cette enceinte : on ne coupe pas pour rebrancher
+            // aussitôt. Le faire arrêtait le WebSocket et faisait échouer les
+            // lectures en cours — les six touches revenaient vides parce que leur
+            // relecture tombait dans ce trou. Seule la sélection a changé, donc on
+            // se contente de l'annoncer.
+            if (Current is not null &&
+                string.Equals(Current.Host, target.Host, StringComparison.OrdinalIgnoreCase))
+            {
+                DeviceChanged?.Invoke(this, Current);
+                return Current;
+            }
+
             if (Current is not null)
             {
                 await Current.DisposeAsync().ConfigureAwait(false);
                 Current = null;
             }
 
-            var device = await SpeakerDevice.ConnectAsync(endpoint, _http, startNotifications: true, ct).ConfigureAwait(false);
+            var device = await SpeakerDevice.ConnectAsync(target, _http, startNotifications: true, ct).ConfigureAwait(false);
 
             Current = device;
-            LastSelectedHost = endpoint.Host;
-            Remember(endpoint);
+            Remember(target);
 
             DeviceChanged?.Invoke(this, device);
             return device;
@@ -110,16 +216,19 @@ public sealed class SpeakerManager
     }
 
     /// <summary>
-    /// Complète la version de l'agent des enceintes connues qui ne l'ont pas encore.
-    /// Une enceinte ajoutée par une version antérieure de l'application, ou trouvée
-    /// avant que cette lecture n'existe, n'a rien d'enregistré ; c'est ici qu'elle
-    /// le récupère, en tâche de fond et sans bloquer l'affichage.
+    /// Relit la version de l'agent de chaque enceinte qui en a un.
+    ///
+    /// Toutes, pas seulement celles dont la version manque : un agent se met à jour
+    /// sur l'enceinte, sans que l'application en sache rien. Ne relire que les
+    /// versions absentes gravait la première valeur lue pour toujours, et l'écran
+    /// annonçait une version périmée des mois durant.
+    ///
+    /// Renvoie vrai quand au moins une version a changé — l'appelant rafraîchit
+    /// alors son affichage.
     /// </summary>
     public async Task<bool> EnsureAgentVersionsAsync(CancellationToken ct = default)
     {
-        var pending = KnownSpeakers
-            .Where(s => s.HasStr && string.IsNullOrWhiteSpace(s.AgentVersion))
-            .ToList();
+        var pending = KnownSpeakers.Where(s => s.HasStr).ToList();
 
         if (pending.Count == 0)
         {
@@ -132,24 +241,38 @@ public sealed class SpeakerManager
         {
             try
             {
-                var client = new StrApiClient(speaker.Host, speaker.StrPort!.Value, _http);
-                var agent = await client.GetAgentInfoAsync(ct).ConfigureAwait(false);
+                // Sonde des deux ports plutôt qu'appel sur le port enregistré : une
+                // réinstallation de l'agent peut le déplacer de 8888 à 17008, et
+                // l'application serait restée à interroger une porte fermée.
+                var found = await StrApiClient
+                    .ProbeAsync(speaker.Host, _http, AgentProbeTimeout, ct)
+                    .ConfigureAwait(false);
 
-                if (!string.IsNullOrWhiteSpace(agent?.DisplayVersion))
+                if (found is null)
                 {
-                    speaker.AgentVersion = agent!.DisplayVersion;
+                    continue;
+                }
+
+                if (speaker.StrPort != found.Value.Port ||
+                    !string.Equals(speaker.AgentVersion, found.Value.Version, StringComparison.Ordinal))
+                {
+                    speaker.StrPort = found.Value.Port;
+                    speaker.AgentVersion = found.Value.Version;
                     changed = true;
                 }
             }
             catch (Exception)
             {
                 // Enceinte éteinte ou agent muet : on réessaiera au prochain passage.
+                // Surtout, on ne vide pas la version connue : une enceinte
+                // momentanément injoignable n'a pas perdu son agent.
             }
         }
 
         if (changed)
         {
             SaveKnownSpeakers();
+            KnownSpeakersChanged?.Invoke(this, EventArgs.Empty);
         }
 
         return changed;
@@ -159,6 +282,7 @@ public sealed class SpeakerManager
     public void Remember(SpeakerEndpoint endpoint)
     {
         var existing = KnownSpeakers.FirstOrDefault(s => string.Equals(s.Host, endpoint.Host, StringComparison.OrdinalIgnoreCase));
+        var added = existing is null;
 
         if (existing is null)
         {
@@ -176,11 +300,16 @@ public sealed class SpeakerManager
         }
 
         SaveKnownSpeakers();
+
+        if (added)
+        {
+            KnownSpeakersChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     public void Forget(SpeakerEndpoint endpoint)
     {
-        KnownSpeakers.RemoveAll(s => string.Equals(s.Host, endpoint.Host, StringComparison.OrdinalIgnoreCase));
+        var removed = KnownSpeakers.RemoveAll(s => string.Equals(s.Host, endpoint.Host, StringComparison.OrdinalIgnoreCase));
 
         if (string.Equals(LastSelectedHost, endpoint.Host, StringComparison.OrdinalIgnoreCase))
         {
@@ -188,6 +317,11 @@ public sealed class SpeakerManager
         }
 
         SaveKnownSpeakers();
+
+        if (removed > 0)
+        {
+            KnownSpeakersChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     public void SaveKnownSpeakers()

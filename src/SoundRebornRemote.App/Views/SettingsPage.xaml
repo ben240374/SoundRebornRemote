@@ -14,6 +14,11 @@
                 <VerticalStackLayout Spacing="4">
                     <Label Text="{DynamicResource L_ActiveSpeaker}" Style="{StaticResource SectionLabel}" />
                     <Label Text="{Binding CurrentSpeakerLabel}" Style="{StaticResource SubtitleLabel}" />
+
+                    <!-- Dans un groupe, les commandes partent vers le maître : on le dit. -->
+                    <Label Text="{Binding RedirectNote}" Style="{StaticResource CaptionLabel}"
+                           TextColor="{StaticResource Warning}" LineBreakMode="WordWrap"
+                           IsVisible="{Binding IsRedirected}" />
                 </VerticalStackLayout>
             </Border>
 

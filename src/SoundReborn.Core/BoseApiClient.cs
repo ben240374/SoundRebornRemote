@@ -138,19 +138,34 @@ public sealed class BoseApiClient
 
     // ---------------------------------------------------------------- Transport
 
+    /// <summary>
+    /// Budget d'un appel au firmware. L'HttpClient partagé n'en impose plus :
+    /// c'est ici que la limite est posée pour tout ce qui passe par le port 8090.
+    /// </summary>
+    public static TimeSpan CallTimeout { get; set; } = TimeSpan.FromSeconds(8);
+
+    private static CancellationTokenSource Budget(CancellationToken ct)
+    {
+        var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        cts.CancelAfter(CallTimeout);
+        return cts;
+    }
+
     private async Task<XElement> GetXmlAsync(string path, CancellationToken ct)
     {
-        using var response = await _http.GetAsync(BaseUrl + path, ct).ConfigureAwait(false);
-        return await ReadXmlAsync(response, path, ct).ConfigureAwait(false);
+        using var cts = Budget(ct);
+        using var response = await _http.GetAsync(BaseUrl + path, cts.Token).ConfigureAwait(false);
+        return await ReadXmlAsync(response, path, cts.Token).ConfigureAwait(false);
     }
 
     private async Task<XElement> PostXmlAsync(string path, string body, CancellationToken ct)
     {
+        using var cts = Budget(ct);
         using var content = new StringContent(body, Encoding.UTF8);
         content.Headers.ContentType = new MediaTypeHeaderValue("text/xml") { CharSet = "utf-8" };
 
-        using var response = await _http.PostAsync(BaseUrl + path, content, ct).ConfigureAwait(false);
-        return await ReadXmlAsync(response, path, ct).ConfigureAwait(false);
+        using var response = await _http.PostAsync(BaseUrl + path, content, cts.Token).ConfigureAwait(false);
+        return await ReadXmlAsync(response, path, cts.Token).ConfigureAwait(false);
     }
 
     private static async Task<XElement> ReadXmlAsync(HttpResponseMessage response, string path, CancellationToken ct)

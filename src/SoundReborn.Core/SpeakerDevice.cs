@@ -52,9 +52,19 @@ public sealed class SpeakerDevice : IAsyncDisposable
 
         if (endpoint.StrPort is null)
         {
-            endpoint.StrPort = await StrApiClient
+            var probe = await StrApiClient
                 .ProbeAsync(endpoint.Host, http, TimeSpan.FromSeconds(2), ct)
                 .ConfigureAwait(false);
+
+            if (probe is { } found)
+            {
+                endpoint.StrPort = found.Port;
+
+                if (!string.IsNullOrWhiteSpace(found.Version))
+                {
+                    endpoint.AgentVersion = found.Version;
+                }
+            }
         }
 
         var str = endpoint.StrPort is { } port ? new StrApiClient(endpoint.Host, port, http) : null;
@@ -102,9 +112,9 @@ public sealed class SpeakerDevice : IAsyncDisposable
                 // de figer un BoseApp fragile quand plusieurs clients interrogent.
                 return await Str.GetStatusAsync(ct).ConfigureAwait(false);
             }
-            catch (Exception)
+            catch (Exception ex) when (IsDefiniteRefusal(ex))
             {
-                // On retombe sur le firmware.
+                // Refus net de l'agent : on retombe sur le firmware.
             }
         }
 
@@ -124,9 +134,9 @@ public sealed class SpeakerDevice : IAsyncDisposable
                     return new VolumeState(volume.Target, volume.Value, volume.Muted);
                 }
             }
-            catch (Exception)
+            catch (Exception ex) when (IsDefiniteRefusal(ex))
             {
-                // On retombe sur le firmware.
+                // Refus net de l'agent : on retombe sur le firmware.
             }
         }
 
@@ -154,9 +164,9 @@ public sealed class SpeakerDevice : IAsyncDisposable
                 await Str.SetVolumeAsync(volume, ct).ConfigureAwait(false);
                 return;
             }
-            catch (Exception)
+            catch (Exception ex) when (IsDefiniteRefusal(ex))
             {
-                // On retombe sur le firmware.
+                // Refus net de l'agent : on retombe sur le firmware.
             }
         }
 
@@ -183,9 +193,9 @@ public sealed class SpeakerDevice : IAsyncDisposable
 
                 return;
             }
-            catch (Exception)
+            catch (Exception ex) when (IsDefiniteRefusal(ex))
             {
-                // On retombe sur le firmware.
+                // Refus net de l'agent : on retombe sur le firmware.
             }
         }
 
@@ -201,9 +211,9 @@ public sealed class SpeakerDevice : IAsyncDisposable
                 await Str.NextAsync(ct).ConfigureAwait(false);
                 return;
             }
-            catch (Exception)
+            catch (Exception ex) when (IsDefiniteRefusal(ex))
             {
-                // On retombe sur le firmware.
+                // Refus net de l'agent : on retombe sur le firmware.
             }
         }
 
@@ -219,9 +229,9 @@ public sealed class SpeakerDevice : IAsyncDisposable
                 await Str.PreviousAsync(ct).ConfigureAwait(false);
                 return;
             }
-            catch (Exception)
+            catch (Exception ex) when (IsDefiniteRefusal(ex))
             {
-                // On retombe sur le firmware.
+                // Refus net de l'agent : on retombe sur le firmware.
             }
         }
 
@@ -242,9 +252,9 @@ public sealed class SpeakerDevice : IAsyncDisposable
                 await Str.PlaySlotAsync(slot, ct).ConfigureAwait(false);
                 return;
             }
-            catch (Exception)
+            catch (Exception ex) when (IsDefiniteRefusal(ex))
             {
-                // On retombe sur la touche matérielle.
+                // Refus net de l'agent : la touche matérielle reste une option.
             }
         }
 
@@ -265,9 +275,9 @@ public sealed class SpeakerDevice : IAsyncDisposable
                 await Str.SetBassAsync(value, ct).ConfigureAwait(false);
                 return;
             }
-            catch (Exception)
+            catch (Exception ex) when (IsDefiniteRefusal(ex))
             {
-                // On retombe sur le firmware.
+                // Refus net de l'agent : on retombe sur le firmware.
             }
         }
 
@@ -284,9 +294,9 @@ public sealed class SpeakerDevice : IAsyncDisposable
                 await Str.SetPowerAsync(on, ct).ConfigureAwait(false);
                 return;
             }
-            catch (Exception)
+            catch (Exception ex) when (IsDefiniteRefusal(ex))
             {
-                // On retombe sur le firmware.
+                // Refus net de l'agent : on retombe sur le firmware.
             }
         }
 
@@ -308,13 +318,9 @@ public sealed class SpeakerDevice : IAsyncDisposable
             throw new InvalidOperationException("Jouer une station demande l'agent STR.");
         }
 
-        var mime = (station.Codec ?? "").ToUpperInvariant() switch
-        {
-            "AAC" or "AAC+" or "AACP" => "audio/aac",
-            _ => "audio/mpeg",
-        };
-
-        return Str.PlayUrlAsync(station.PlayableUrl, station.Name, mime, station.Favicon, ct);
+        // Le codec part tel que l'annuaire le donne : c'est ce que l'agent attend.
+        // Y mettre un type MIME le ferait basculer en mode « fichier local ».
+        return Str.PlayUrlAsync(station.PlayableUrl, station.Name, station.Codec, station.Favicon, ct);
     }
 
     /// <summary>Enregistre une station sur une touche de présélection (1 à 6).</summary>
@@ -327,6 +333,20 @@ public sealed class SpeakerDevice : IAsyncDisposable
 
         return Str.SavePresetAsync(station.ToPreset(slot), ct);
     }
+
+
+    /// <summary>
+    /// Décide si l'échec d'un appel à l'agent autorise le repli sur la touche
+    /// matérielle.
+    ///
+    /// Une réponse d'erreur ou une connexion refusée sont des refus : l'agent a
+    /// tranché, le repli est légitime. Un délai dépassé ne dit rien — la commande
+    /// est peut-être arrivée et c'est la réponse qui s'est perdue. Or POWER et
+    /// PLAY_PAUSE sont des bascules : rejouer la commande éteindrait l'enceinte
+    /// qu'on voulait allumer. Dans le doute, on ne fait rien.
+    /// </summary>
+    private static bool IsDefiniteRefusal(Exception ex)
+        => ex is SpeakerException || ex is HttpRequestException;
 
     public async ValueTask DisposeAsync() => await Notifications.DisposeAsync().ConfigureAwait(false);
 }

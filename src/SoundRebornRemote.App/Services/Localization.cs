@@ -299,6 +299,12 @@ public static class Localization
             "Er sendet den Stream; die anderen folgen ihm. Wechsle den aktiven Lautsprecher, um den Hauptlautsprecher zu ändern.",
             "Deze speaker zendt de stream uit; de andere volgen. Wissel van actieve speaker om de hoofdspeaker te wijzigen.",
             "Es el que difunde el flujo; los demás lo siguen. Cambia de altavoz activo para cambiar de principal.");
+        Add("L_NotMasterNote",
+            "L'enceinte pilotée suit ce groupe, elle ne le diffuse pas. Les commandes de groupe s'adressent au maître ci-dessus.",
+            "The controlled speaker follows this group, it does not broadcast it. Group commands are addressed to the master above.",
+            "Der gesteuerte Lautsprecher folgt dieser Gruppe, er sendet sie nicht. Gruppenbefehle gehen an den Master oben.",
+            "De bediende speaker volgt deze groep, hij zendt ze niet uit. Groepsopdrachten gaan naar de master hierboven.",
+            "El altavoz controlado sigue este grupo, no lo emite. Los mandos de grupo se dirigen al maestro de arriba.");
         Add("L_SpeakersToGroup", "ENCEINTES À GROUPER", "SPEAKERS TO GROUP", "ZU GRUPPIERENDE LAUTSPRECHER", "SPEAKERS OM TE GROEPEREN", "ALTAVOCES A AGRUPAR");
         Add("L_NoOtherSpeakers",
             "Aucune autre enceinte connue. Lance un balayage dans Réglages.",
@@ -319,7 +325,15 @@ public static class Localization
         Add("L_NoActiveGroup", "Pas de groupe actif.", "No active group.", "Keine aktive Gruppe.", "Geen actieve groep.", "Sin grupo activo.");
 
         // ---------------------------------------------------------- Page Réglages
-        Add("L_ActiveSpeaker", "ENCEINTE ACTIVE", "ACTIVE SPEAKER", "AKTIVER LAUTSPRECHER", "ACTIEVE SPEAKER", "ALTAVOZ ACTIVO");
+        // « Sélectionnée » et non « active » : dans un groupe, l'enceinte désignée
+        // n'est pas celle qui reçoit les commandes.
+        Add("L_ActiveSpeaker", "ENCEINTE SÉLECTIONNÉE", "SELECTED SPEAKER", "AUSGEWÄHLTER LAUTSPRECHER", "GEKOZEN SPEAKER", "ALTAVOZ SELECCIONADO");
+        Add("L_CommandsGoTo",
+            "Elle suit un groupe : les commandes vont à {0}, qui diffuse.",
+            "It follows a group: commands go to {0}, which does the playing.",
+            "Er folgt einer Gruppe: Befehle gehen an {0}, der wiedergibt.",
+            "Hij volgt een groep: opdrachten gaan naar {0}, die afspeelt.",
+            "Sigue a un grupo: los comandos van a {0}, que reproduce.");
         Add("L_NoSpeakerSelected", "Aucune enceinte sélectionnée", "No speaker selected", "Kein Lautsprecher ausgewählt", "Geen speaker geselecteerd", "Ningún altavoz seleccionado");
         Add("L_Search", "RECHERCHE", "SEARCH", "SUCHE", "ZOEKEN", "BÚSQUEDA");
         Add("L_ScanButton", "Balayer le réseau local", "Scan the local network", "Lokales Netzwerk durchsuchen", "Lokaal netwerk scannen", "Escanear la red local");
@@ -394,6 +408,12 @@ public static class Localization
             "Der Lautsprecher hat nicht rechtzeitig geantwortet.",
             "De speaker antwoordde niet op tijd.",
             "El altavoz no respondió a tiempo.");
+        Add("S_PowerOnRefused",
+            "L'enceinte n'a pas répondu à l'allumage. Si elle fait partie d'un groupe, elle suit l'enceinte maître : allume plutôt celle-ci, ou dissous le groupe.",
+            "The speaker did not come on. If it belongs to a group it follows the master speaker: turn that one on instead, or dissolve the group.",
+            "Der Lautsprecher ist nicht angegangen. Gehört er zu einer Gruppe, folgt er dem Master: schalte stattdessen diesen ein oder löse die Gruppe auf.",
+            "De speaker ging niet aan. Hoort hij bij een groep, dan volgt hij de masterspeaker: zet die aan of ontbind de groep.",
+            "El altavoz no se ha encendido. Si pertenece a un grupo, sigue al altavoz maestro: enciende ese, o disuelve el grupo.");
         Add("S_Unreachable",
             "Enceinte injoignable. Même réseau Wi-Fi ?",
             "Speaker unreachable. Same Wi-Fi network?",
@@ -589,6 +609,36 @@ public static class Localization
             "Lautstärke der ganzen Gruppe",
             "Volume van de hele groep",
             "Volumen de todo el grupo");
+        Add("L_LevelGroup",
+            "Égaliser",
+            "Level all",
+            "Angleichen",
+            "Gelijkzetten",
+            "Igualar");
+        Add("L_LevelGroupHint",
+            "La touche « = » met toutes les enceintes à cette valeur.",
+            "The “=” key sets every speaker to this value.",
+            "Die Taste „=“ setzt alle Lautsprecher auf diesen Wert.",
+            "De toets “=” zet alle speakers op deze waarde.",
+            "La tecla «=» pone todos los altavoces en este valor.");
+        Add("S_SlaveCannotForm",
+            "Cette enceinte suit {0}. Sélectionne {0} pour modifier le groupe.",
+            "This speaker follows {0}. Select {0} to change the group.",
+            "Dieser Lautsprecher folgt {0}. Wähle {0}, um die Gruppe zu ändern.",
+            "Deze speaker volgt {0}. Kies {0} om de groep te wijzigen.",
+            "Este altavoz sigue a {0}. Selecciona {0} para cambiar el grupo.");
+        Add("L_SlaveOfGroup",
+            "Cette enceinte suit le groupe. Touche l'enceinte cochée pour l'en retirer.",
+            "This speaker follows the group. Tap the ticked speaker to leave it.",
+            "Dieser Lautsprecher folgt der Gruppe. Tippe auf den angehakten Lautsprecher, um ihn zu verlassen.",
+            "Deze speaker volgt de groep. Tik op de aangevinkte speaker om hem te verlaten.",
+            "Este altavoz sigue al grupo. Toca el altavoz marcado para salir.");
+        Add("S_GroupLevelled",
+            "Toutes les enceintes à {0} %",
+            "All speakers at {0}%",
+            "Alle Lautsprecher auf {0} %",
+            "Alle speakers op {0} %",
+            "Todos los altavoces al {0} %");
         Add("L_PerSpeaker", "PAR ENCEINTE", "PER SPEAKER", "PRO LAUTSPRECHER", "PER SPEAKER", "POR ALTAVOZ");
         Add("L_GroupedBadge", "groupé", "grouped", "gruppiert", "gegroepeerd", "agrupado");
         Add("L_TapToUngroup",
@@ -654,12 +704,31 @@ public static class Localization
         Add("D_Agent", "Agent STR", "STR agent", "STR-Agent", "STR-agent", "Agente STR");
         Add("D_AgentYes", "oui, port {0}", "yes, port {0}", "ja, Port {0}", "ja, poort {0}", "sí, puerto {0}");
         Add("D_AgentNo", "non détecté", "not detected", "nicht erkannt", "niet gevonden", "no detectado");
+        Add("D_AgentSilent",
+            "ne répond pas (ports 17008 et 8888 essayés)",
+            "no answer (ports 17008 and 8888 tried)",
+            "keine Antwort (Ports 17008 und 8888 versucht)",
+            "geen antwoord (poorten 17008 en 8888 geprobeerd)",
+            "sin respuesta (puertos 17008 y 8888 probados)");
+        Add("D_AgentStored",
+            "dernière version connue : {0}",
+            "last known version: {0}",
+            "zuletzt bekannte Version: {0}",
+            "laatst bekende versie: {0}",
+            "última versión conocida: {0}");
         Add("D_Notifications", "Notifications", "Notifications", "Benachrichtigungen", "Meldingen", "Notificaciones");
         Add("D_WsUp", "WebSocket 8080 connecté", "WebSocket 8080 connected", "WebSocket 8080 verbunden", "WebSocket 8080 verbonden", "WebSocket 8080 conectado");
         Add("D_WsDown", "hors ligne", "offline", "offline", "offline", "sin conexión");
         Add("D_BassRange", "{0} à {1} (défaut {2})", "{0} to {1} (default {2})", "{0} bis {1} (Standard {2})", "{0} tot {1} (standaard {2})", "{0} a {1} (por defecto {2})");
         Add("D_BassNone", "non réglables sur ce modèle", "not adjustable on this model", "bei diesem Modell nicht einstellbar", "niet instelbaar op dit model", "no ajustables en este modelo");
         Add("D_Endpoints", "Points exposés", "Exposed endpoints", "Verfügbare Endpunkte", "Beschikbare eindpunten", "Endpoints expuestos");
+        Add("S_PresetsUnread",
+            "Touches non relues — l'enceinte n'a pas répondu.",
+            "Presets not re-read — the speaker did not answer.",
+            "Tasten nicht neu gelesen — der Lautsprecher hat nicht geantwortet.",
+            "Toetsen niet opnieuw gelezen — de speaker antwoordde niet.",
+            "Teclas no releídas — el altavoz no respondió.");
+        Add("D_Zone", "Zone vue par chaque enceinte", "Zone as each speaker sees it", "Zone aus Sicht jedes Lautsprechers", "Zone zoals elke speaker die ziet", "Zona según cada altavoz");
         Add("D_EndpointsNone",
             "/supportedURLs non disponible.",
             "/supportedURLs not available.",

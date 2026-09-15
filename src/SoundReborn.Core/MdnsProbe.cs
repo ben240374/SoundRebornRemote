@@ -11,14 +11,17 @@ namespace SoundReborn.Core;
 /// <c>_streborn._tcp</c>. Une seule question suffit donc à obtenir la liste, au lieu
 /// des 254 requêtes HTTP du balayage.
 ///
-/// Le protocole complet (RFC 6762) n'est pas implémenté, et ce n'est pas utile ici :
-/// on envoie une question PTR depuis un port éphémère, ce qui en fait une
-/// « requête unicast héritée » au sens du §6.7 — les répondeurs y répondent alors
-/// directement à ce port, et non au groupe multicast. Deux conséquences heureuses :
-/// aucun MulticastLock n'est nécessaire sous Android, puisqu'on ne reçoit pas de
-/// multicast ; et il suffit de relever l'adresse source des réponses, sans avoir à
-/// décoder les enregistrements. L'identité de l'appareil sera de toute façon
-/// confirmée juste après par <c>GET :8090/info</c>.
+/// Le protocole complet (RFC 6762) n'est pas implémenté, et ce n'est pas utile ici.
+/// La question PTR réclame une réponse unicast de deux façons, qui se cumulent :
+/// elle part d'un port éphémère, ce qui en fait une « requête unicast héritée » au
+/// sens du §6.7 ; et elle pose le bit QU du §18.12. Les deux sont nécessaires —
+/// certains répondeurs, dont celui de l'agent STR (grandcat/zeroconf), ne regardent
+/// que le bit et ignorent le port source.
+///
+/// Deux conséquences heureuses : aucun MulticastLock n'est nécessaire sous Android,
+/// puisqu'on ne reçoit pas de multicast ; et il suffit de relever l'adresse source
+/// des réponses, sans avoir à décoder les enregistrements. L'identité de l'appareil
+/// sera de toute façon confirmée juste après par <c>GET :8090/info</c>.
 ///
 /// Reste les cas où le mDNS ne donne rien : box qui filtre le multicast, enceinte en
 /// veille profonde, réseau invité. D'où le balayage conservé en repli.
@@ -142,7 +145,14 @@ public static class MdnsProbe
 
         buffer.Add(0x00);              // fin du nom
         buffer.AddRange(new byte[] { 0x00, 0x0C });   // QTYPE = PTR
-        buffer.AddRange(new byte[] { 0x00, 0x01 });   // QCLASS = IN
+
+        // QCLASS = IN, bit de poids fort à 1 : « réponds-moi en unicast » (RFC 6762
+        // §18.12). Le port éphémère ne suffit pas partout — les répondeurs bâtis sur
+        // grandcat/zeroconf, dont l'agent STR, ne regardent que ce bit et n'ont pas
+        // de chemin pour les requêtes héritées. Sans lui, la réponse part en
+        // multicast vers un socket qui ne l'écoute pas, et la découverte retombe
+        // systématiquement sur le balayage. Les deux mécanismes se cumulent.
+        buffer.AddRange(new byte[] { 0x80, 0x01 });   // QCLASS = IN + unicast
 
         return buffer.ToArray();
     }
@@ -163,6 +173,10 @@ public static class MdnsProbe
         var isResponse = (data[2] & 0x80) != 0;
         var answers = (data[6] << 8) | data[7];
 
-        return responseId == id && isResponse && answers > 0;
+        // Une réponse héritée renvoie notre identifiant ; une réponse mDNS ordinaire
+        // envoyée en unicast porte l'identifiant 0, comme le veut le §18.1. Exiger
+        // l'un des deux ferait silencieusement rater la moitié des répondeurs — et
+        // sur un port éphémère, seules nos propres réponses arrivent de toute façon.
+        return isResponse && answers > 0 && (responseId == id || responseId == 0);
     }
 }

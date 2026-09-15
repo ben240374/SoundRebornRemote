@@ -138,7 +138,10 @@ public sealed partial class SourcesViewModel : BaseViewModel
                 throw new InvalidOperationException(Localization.Get("S_NeedAgentReplay"));
             }
 
-            await d.Str.PlayUrlAsync(entry.CardUrl!, entry.CardName, entry.Mime).ConfigureAwait(false);
+            // On ne transmet pas entry.Mime : c'est un type MIME, et le champ attendu
+            // est le codec. Un type MIME y ferait basculer l'agent en mode « fichier
+            // de bibliothèque locale ». Sans rien, il détermine le format lui-même.
+            await d.Str.PlayUrlAsync(entry.CardUrl!, entry.CardName).ConfigureAwait(false);
         }, Localization.Get("S_Replaying", entry.DisplayTitle));
     }
 

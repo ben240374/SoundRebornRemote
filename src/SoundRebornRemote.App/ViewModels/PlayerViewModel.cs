@@ -46,6 +46,13 @@ public sealed partial class MemberVolume : ObservableObject
 
     public required bool IsMaster { get; init; }
 
+    /// <summary>
+    /// Identifiant Bose du membre. Nécessaire pour retirer une enceinte d'une zone
+    /// dont elle n'est pas le maître : le firmware veut l'identité du maître, et
+    /// l'enceinte pilotée n'est pas toujours celle-là.
+    /// </summary>
+    public string DeviceId { get; init; } = "";
+
     [ObservableProperty]
     private bool _isReachable = true;
 
@@ -73,6 +80,23 @@ public sealed partial class MemberVolume : ObservableObject
             Push?.Invoke(this);
         }
     }
+
+    /// <summary>
+    /// Les touches « − » et « + » de la ligne. On pose la valeur comme le ferait le
+    /// curseur : OnVolumeChanged se charge de l'envoyer, et les deux chemins restent
+    /// identiques. Une enceinte injoignable ne se règle pas — la commande partirait
+    /// pour rien et attendrait le budget entier.
+    /// </summary>
+    [RelayCommand]
+    private void Step(string? amount)
+    {
+        if (!IsReachable || !int.TryParse(amount, out var step))
+        {
+            return;
+        }
+
+        Volume = Math.Clamp((int)Math.Round(Volume) + step, 0, 100);
+    }
 }
 
 /// <summary>
@@ -86,11 +110,110 @@ public sealed partial class PlayerViewModel : BaseViewModel
 {
     private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(5);
 
+    /// <summary>
+    /// Cadence de relecture de la zone quand le WebSocket est debout.
+    ///
+    /// Une enceinte membre qu'on éteint ou qu'on rallume ne produit aucun
+    /// zoneUpdated sur le maître : la composition du groupe n'a pas changé de son
+    /// point de vue, seule la joignabilité d'un membre a bougé. Sans cette
+    /// relecture, la ligne de l'enceinte éteinte reste affichée avec son dernier
+    /// volume, et le volume d'ensemble ne revient pas quand elle se rallume.
+    /// </summary>
+    /// <summary>
+    /// Temps laissé à l'enceinte pour appliquer un allumage ou une mise en veille.
+    ///
+    /// Le réveil n'est pas instantané : le firmware continue d'annoncer STANDBY
+    /// pendant plusieurs secondes après avoir accepté la commande. Sans ce sursis,
+    /// la première relecture reprend la main et le bouton « Allumer » réapparaît
+    /// aussitôt, ce qui laisse croire que rien ne s'est passé.
+    /// </summary>
+    private static readonly TimeSpan PowerGrace = TimeSpan.FromSeconds(8);
+
+    /// <summary>Nom du maître du groupe, pour l'affichage.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(GroupedWithLabel))]
+    private string _groupMasterName = "";
+
+    /// <summary>
+    /// Faux quand l'enceinte pilotée est un esclave. L'interface s'en sert pour ne pas
+    /// proposer des actions que cette enceinte n'a pas le pouvoir d'exécuter.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSlaveSpeaker))]
+    [NotifyPropertyChangedFor(nameof(ShowUngroupHint))]
+    [NotifyPropertyChangedFor(nameof(ShowGroupedBanner))]
+    private bool _isMasterSpeaker = true;
+
+    /// <summary>
+    /// Vrai quand les commandes sont adressées au maître alors que l'utilisateur a
+    /// désigné une autre enceinte du groupe.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowGroupedBanner))]
+    [NotifyPropertyChangedFor(nameof(ShowUngroupHint))]
+    private bool _isFollowingMaster;
+
+    /// <summary>
+    /// Le bandeau « Groupé avec … » sert dans les deux cas : tant que la redirection
+    /// n'a pas eu lieu, et une fois qu'elle a eu lieu — l'enceinte désignée reste
+    /// alors une suivante, même si les commandes partent ailleurs.
+    /// </summary>
+    public bool ShowGroupedBanner => IsSlaveSpeaker || IsFollowingMaster;
+
+    /// <summary>L'inverse, pour l'affichage : le projet n'a pas de convertisseur de négation.</summary>
+    public bool IsSlaveSpeaker => !IsMasterSpeaker;
+
+    /// <summary>
+    /// L'invite « touche une enceinte cochée pour la retirer » ne s'adresse qu'au
+    /// maître : sur une esclave, le bandeau au-dessus dit déjà quoi faire.
+    /// </summary>
+    public bool ShowUngroupHint => IsGroupActive && IsMasterSpeaker && !IsFollowingMaster;
+
+    /// <summary>« Groupé avec Bose Cuisine », affiché sur l'enceinte qui suit.</summary>
+    public string GroupedWithLabel => Localization.Get("S_GroupedWith", GroupMasterName);
+
+    /// <summary>
+    /// Maître retrouvé par ZoneLocator quand l'agent n'a rien su dire de la zone.
+    /// Nom d'affichage et adresse, rien de plus : on ne connaît pas les volumes
+    /// des autres membres par cette voie.
+    /// </summary>
+    private (string Name, string Ip)? _locatedMaster;
+
+    private DateTime _powerRequestedAt = DateTime.MinValue;
+    private bool _powerRequestedOn;
+
+    private static readonly TimeSpan ZonePollInterval = TimeSpan.FromSeconds(10);
+
+    /// <summary>
+    /// Cadence quand aucun groupe n'est connu. Elle existe parce qu'un groupe peut
+    /// naître sans nous : un groupe permanent que l'agent reforme au démarrage de la
+    /// lecture, ou un groupe créé depuis l'application STR de bureau. Se fier au seul
+    /// état connu rendrait l'application aveugle à ces cas — deux enceintes jouant
+    /// ensemble sans que rien ne l'indique à l'écran.
+    /// </summary>
+    private static readonly TimeSpan IdleZonePollInterval = TimeSpan.FromSeconds(30);
+
+    private DateTime _zonePolledAt = DateTime.MinValue;
+
+    /// <summary>
+    /// Le maître réel de la zone, tel que les enceintes le déclarent.
+    ///
+    /// L'application supposait jusqu'ici que l'enceinte pilotée était le maître. C'est
+    /// vrai du groupe qu'on vient de former soi-même, et faux dès qu'on bascule sur un
+    /// esclave, ou qu'un groupe a été formé ailleurs — depuis l'application STR de
+    /// bureau, ou reformé tout seul parce qu'il est permanent. Toutes les commandes de
+    /// zone réclamant l'identité du maître, s'en remettre à l'enceinte active donnait
+    /// des ordres à un appareil qui n'avait pas autorité, et un affichage qui changeait
+    /// selon l'enceinte regardée.
+    /// </summary>
+    private MemberVolume? _zoneMaster;
+
     /// <summary>Pendant ce délai après une action locale, les mises à jour entrantes sont ignorées.</summary>
     private static readonly TimeSpan EchoSuppression = TimeSpan.FromMilliseconds(1500);
 
     private readonly PresetsViewModel _presetsViewModel;
     private readonly ArtworkCache _artwork;
+    private readonly ZoneLocator _zones;
     private readonly Debouncer _volumeDebouncer = new(TimeSpan.FromMilliseconds(220));
     private readonly Debouncer _bassDebouncer = new(TimeSpan.FromMilliseconds(320));
     private readonly Debouncer _zoneRefreshDebouncer = new(TimeSpan.FromMilliseconds(1200));
@@ -116,10 +239,12 @@ public sealed partial class PlayerViewModel : BaseViewModel
 
     private double _groupBaseline;
 
-    public PlayerViewModel(SpeakerManager speakers, PresetsViewModel presets, ArtworkCache artwork) : base(speakers)
+    public PlayerViewModel(SpeakerManager speakers, PresetsViewModel presets, ArtworkCache artwork, ZoneLocator zones)
+        : base(speakers)
     {
         _presetsViewModel = presets;
         _artwork = artwork;
+        _zones = zones;
 
         Speakers.DeviceChanged += (_, device) => OnMainThread(() =>
         {
@@ -127,6 +252,10 @@ public sealed partial class PlayerViewModel : BaseViewModel
             ReloadSpeakerList();
             _ = RefreshAsync();
         });
+
+        // Une enceinte oubliée ou retrouvée dans les réglages doit se voir ici
+        // tout de suite, sans attendre un retour sur l'onglet.
+        Speakers.KnownSpeakersChanged += (_, _) => OnMainThread(ReloadSpeakerList);
 
         Localization.LanguageChanged += (_, _) => OnMainThread(ApplyLanguage);
 
@@ -148,6 +277,17 @@ public sealed partial class PlayerViewModel : BaseViewModel
     [ObservableProperty]
     private bool _hasSeveralSpeakers;
 
+    /// <summary>
+    /// Vrai quand il n'y a vraiment aucune carte à afficher : aucune enceinte
+    /// retenue et aucune connexion. La carte montre alors l'invite au lieu d'un
+    /// cadre vide, qui ne dit pas s'il faut attendre ou agir.
+    ///
+    /// Distinct de HasNoSpeaker de la classe de base, qui ne regarde que l'enceinte
+    /// pilotée : porter le même nom masquerait le membre hérité.
+    /// </summary>
+    [ObservableProperty]
+    private bool _speakerListEmpty = true;
+
     [RelayCommand]
     private async Task SelectSpeakerAsync(SpeakerChoice? choice)
     {
@@ -156,8 +296,12 @@ public sealed partial class PlayerViewModel : BaseViewModel
             return;
         }
 
-        // Rien à faire si c'est déjà l'enceinte active.
-        if (Device is not null && string.Equals(Device.Host, choice.Endpoint.Host, StringComparison.OrdinalIgnoreCase))
+        // Rien à faire si c'est déjà l'enceinte désignée. On compare à la sélection,
+        // pas à l'enceinte commandée : dans un groupe, c'est le maître qui reçoit les
+        // commandes, et toucher une suivante doit rester possible.
+        var already = Speakers.SelectedEndpoint?.Host ?? Device?.Host;
+
+        if (already is not null && string.Equals(already, choice.Endpoint.Host, StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
@@ -193,11 +337,22 @@ public sealed partial class PlayerViewModel : BaseViewModel
 
         var wasGrouped = choice.IsGrouped;
 
+        // Une enceinte n'appartient qu'à un groupe à la fois, et c'est le maître qui
+        // le compose. Étendre le groupe depuis une enceinte qui ne fait que suivre
+        // reviendrait à en republier un autre autour d'elle, donc à déplacer la
+        // diffusion de pièce. On renvoie vers le maître.
+        if (!wasGrouped && IsSlaveSpeaker)
+        {
+            ShowInfo(Localization.Get("S_SlaveCannotForm", GroupMasterName));
+            return;
+        }
+
         await RunAsync(async device =>
         {
             if (wasGrouped)
             {
-                await UngroupAsync(device, choice).ConfigureAwait(false);
+                var self = Speakers.SelectedEndpoint ?? device.Endpoint;
+                await UngroupAsync(device, self, choice, MasterIdentity(device)).ConfigureAwait(false);
                 return;
             }
 
@@ -208,11 +363,35 @@ public sealed partial class PlayerViewModel : BaseViewModel
                     .Select(c => new StrZoneMemberRef { DeviceId = c.Endpoint.DeviceId, Ip = c.Endpoint.Host })
                     .ToList();
 
+                // L'agent enregistre le document tel qu'il le reçoit : omettre
+                // « permanent » sur un groupe qui l'était le rétrograde en groupe
+                // ordinaire, qui cesse de se reformer et qu'une dissolution efface
+                // définitivement. On relit donc le drapeau avant de republier.
+                var permanent = await device.Str.GetZonePermanentAsync().ConfigureAwait(false);
+
+                // Le maître est celui de la zone existante, pas l'enceinte qu'on
+                // regarde : republier avec un autre maître déplacerait la diffusion
+                // d'une pièce à l'autre sans que personne ne l'ait demandé.
+                var identity = MasterIdentity(device);
+                var master = new StrZoneMemberRef { DeviceId = identity.DeviceId, Ip = identity.Ip };
+
+                // L'enceinte pilotée doit figurer parmi les suivantes si elle n'est
+                // pas le maître : sinon republier la zone l'en exclurait.
+                if (!string.Equals(identity.Ip, device.Host, StringComparison.OrdinalIgnoreCase) &&
+                    !slaves.Any(s => string.Equals(s.Ip, device.Host, StringComparison.OrdinalIgnoreCase)))
+                {
+                    slaves.Add(new StrZoneMemberRef { DeviceId = device.Endpoint.DeviceId, Ip = device.Host });
+                }
+
+                // Le maître ne doit pas figurer parmi ses propres suivantes.
+                slaves.RemoveAll(s => string.Equals(s.Ip, identity.Ip, StringComparison.OrdinalIgnoreCase));
+
                 await device.Str.FormZoneAsync(new StrZoneFormRequest
                 {
-                    Master = new StrZoneMemberRef { DeviceId = device.Endpoint.DeviceId, Ip = device.Host },
+                    Master = master,
                     Slaves = slaves,
                     Mode = "native",
+                    Permanent = permanent,
                 }).ConfigureAwait(false);
 
                 return;
@@ -235,18 +414,56 @@ public sealed partial class PlayerViewModel : BaseViewModel
         await LoadZoneAsync().ConfigureAwait(true);
     }
 
-    private static async Task UngroupAsync(SpeakerDevice device, SpeakerChoice choice)
+    /// <summary>
+    /// Qui mène la zone, du plus sûr au moins sûr : ce que l'agent a décrit, puis ce
+    /// que ZoneLocator a retrouvé, et à défaut l'enceinte pilotée — qui est alors
+    /// seule, donc maître d'elle-même.
+    /// </summary>
+    private (string DeviceId, string Ip) MasterIdentity(SpeakerDevice device)
+    {
+        if (_zoneMaster is { DeviceId.Length: > 0 })
+        {
+            return (_zoneMaster.DeviceId, _zoneMaster.Ip);
+        }
+
+        if (_locatedMaster is { } located)
+        {
+            var known = Speakers.KnownSpeakers.FirstOrDefault(s =>
+                string.Equals(s.Host, located.Ip, StringComparison.OrdinalIgnoreCase));
+
+            if (known is not null && !string.IsNullOrWhiteSpace(known.DeviceId))
+            {
+                return (known.DeviceId, located.Ip);
+            }
+        }
+
+        return (device.Endpoint.DeviceId, device.Host);
+    }
+
+    private static async Task UngroupAsync(
+        SpeakerDevice device, SpeakerEndpoint self, SpeakerChoice choice, (string DeviceId, string Ip) master)
     {
         // Retirer un seul membre n'existe pas côté agent : on passe par le firmware,
-        // et on dissout quand il ne resterait plus personne à suivre.
-        if (!string.IsNullOrWhiteSpace(choice.Endpoint.DeviceId))
+        // qui exige l'identité du MAÎTRE de la zone. Ce n'est pas forcément l'enceinte
+        // pilotée : on peut très bien regarder un esclave.
+        var tappedTheMaster = string.Equals(choice.Host, master.Ip, StringComparison.OrdinalIgnoreCase);
+
+        // Toucher la pastille du maître depuis une enceinte qui le suit ne veut pas
+        // dire « retirer le maître » — une zone sans maître n'existe pas. Cela veut
+        // dire « quitter le groupe » : c'est l'enceinte DÉSIGNÉE qu'on retire, pas
+        // celle qui reçoit les commandes, qui est justement le maître dans ce cas.
+        // L'ordre, lui, s'adresse toujours au maître.
+        var removedId = tappedTheMaster ? self.DeviceId : choice.Endpoint.DeviceId;
+        var removedIp = tappedTheMaster ? self.Host : choice.Endpoint.Host;
+
+        if (!string.IsNullOrWhiteSpace(removedId) && !string.IsNullOrWhiteSpace(master.DeviceId))
         {
             try
             {
                 await device.Bose.RemoveZoneSlaveAsync(
-                    device.Endpoint.DeviceId,
-                    device.Host,
-                    new[] { new ZoneMember { DeviceId = choice.Endpoint.DeviceId, IpAddress = choice.Endpoint.Host } })
+                    master.DeviceId,
+                    master.Ip,
+                    new[] { new ZoneMember { DeviceId = removedId, IpAddress = removedIp } })
                     .ConfigureAwait(false);
 
                 return;
@@ -263,13 +480,18 @@ public sealed partial class PlayerViewModel : BaseViewModel
             return;
         }
 
-        await device.Bose.DissolveZoneAsync(device.Endpoint.DeviceId, device.Host).ConfigureAwait(false);
+        await device.Bose.DissolveZoneAsync(master.DeviceId, master.Ip).ConfigureAwait(false);
     }
 
     /// <summary>Recharge les cartes d'enceintes et marque celle qui est active.</summary>
     public void ReloadSpeakerList()
     {
-        var host = Device?.Host;
+        var device = Device;
+
+        // La carte mise en avant est celle que l'utilisateur a DÉSIGNÉE, pas celle qui
+        // reçoit les commandes. Dans un groupe les deux diffèrent, et voir la sélection
+        // sauter sur une autre enceinte laisserait croire que la touche a raté.
+        var host = Speakers.SelectedEndpoint?.Host ?? device?.Host;
         var grouped = GroupCandidates
             .Where(c => c.IsGrouped)
             .Select(c => c.Host)
@@ -278,9 +500,37 @@ public sealed partial class PlayerViewModel : BaseViewModel
         SpeakerChoices.Clear();
         GroupCandidates.Clear();
 
-        foreach (var speaker in Speakers.KnownSpeakers)
+        // L'enceinte désignée puis celle qui reçoit les commandes, qu'elles figurent
+        // ou non dans la liste retenue : l'une d'elles peut en être sortie sans que la
+        // connexion tombe — un « Oublier » depuis les réglages, par exemple, ou une
+        // réinstallation de l'agent — et la page de lecture se retrouvait alors sans
+        // aucune carte alors qu'une enceinte répondait. Le jeu d'adresses déjà posées
+        // évite qu'une enceinte apparaisse deux fois.
+        var endpoints = new List<SpeakerEndpoint>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        var ordered = new List<SpeakerEndpoint?> { Speakers.SelectedEndpoint, device?.Endpoint };
+        ordered.AddRange(Speakers.KnownSpeakers);
+
+        foreach (var speaker in ordered)
         {
+            if (speaker is not null && seen.Add(speaker.Host))
+            {
+                endpoints.Add(speaker);
+            }
+        }
+
+        foreach (var speaker in endpoints)
+        {
+            // Deux critères distincts, et c'est voulu :
+            //   – la carte mise en avant est celle que l'utilisateur a DÉSIGNÉE ;
+            //   – la pastille de groupement s'adresse à toutes les enceintes sauf
+            //     celle qui reçoit les commandes, car c'est elle qui compose le
+            //     groupe. Les confondre proposait de grouper le maître avec
+            //     lui-même dès que la sélection portait sur une suivante.
             var isActive = host is not null && string.Equals(speaker.Host, host, StringComparison.OrdinalIgnoreCase);
+            var isTarget = device is not null &&
+                string.Equals(speaker.Host, device.Host, StringComparison.OrdinalIgnoreCase);
 
             var choice = new SpeakerChoice
             {
@@ -294,13 +544,14 @@ public sealed partial class PlayerViewModel : BaseViewModel
 
             SpeakerChoices.Add(choice);
 
-            if (!isActive)
+            if (!isTarget)
             {
                 GroupCandidates.Add(choice);
             }
         }
 
         HasSeveralSpeakers = SpeakerChoices.Count > 1;
+        SpeakerListEmpty = SpeakerChoices.Count == 0;
     }
 
     // ================================================================ État affiché
@@ -386,6 +637,14 @@ public sealed partial class PlayerViewModel : BaseViewModel
 
             foreach (var row in GroupMembers)
             {
+                // Une enceinte éteinte ne se règle pas : lui envoyer la commande
+                // ferait attendre le budget entier pour rien, et le curseur du
+                // groupe resterait bloqué le temps de l'échec.
+                if (!row.IsReachable)
+                {
+                    continue;
+                }
+
                 var reference = _memberBaseline.TryGetValue(row.Ip, out var saved) ? saved : row.Volume;
                 var next = (int)Math.Clamp(Math.Round(reference + delta), 0, 100);
 
@@ -466,6 +725,7 @@ public sealed partial class PlayerViewModel : BaseViewModel
     public ObservableCollection<MemberVolume> GroupMembers { get; } = new();
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowUngroupHint))]
     private bool _isGroupActive;
 
     /// <summary>
@@ -475,6 +735,47 @@ public sealed partial class PlayerViewModel : BaseViewModel
     /// </summary>
     [ObservableProperty]
     private bool _hasGroupVolume;
+
+    /// <summary>
+    /// Aligne toutes les enceintes du groupe sur le volume d'ensemble affiché.
+    ///
+    /// C'est l'inverse du curseur du haut, qui déplace tout le monde du même écart
+    /// pour préserver l'équilibre réglé à la main : ici on efface cet équilibre.
+    /// Groupe à 25 %, tout le monde à 25 %. Une enceinte éteinte est laissée de
+    /// côté — la commande partirait pour rien et bloquerait le temps du budget.
+    /// </summary>
+    [RelayCommand]
+    private void LevelGroup()
+    {
+        if (!HasGroupVolume || GroupMembers.Count == 0)
+        {
+            return;
+        }
+
+        var target = (int)Math.Clamp(Math.Round(Volume), 0, 100);
+
+        foreach (var row in GroupMembers)
+        {
+            if (!row.IsReachable)
+            {
+                continue;
+            }
+
+            row.SetQuietly(target);
+            SendMemberVolume(row.Ip, target);
+        }
+
+        // La moyenne vaut désormais la cible : on refige la référence, sinon le
+        // prochain déplacement d'ensemble repartirait de l'ancien écart.
+        _suppressVolumePush = true;
+        Volume = target;
+        _suppressVolumePush = false;
+
+        CaptureGroupBaseline();
+        ScheduleZoneRefresh();
+
+        ShowInfo(Localization.Get("S_GroupLevelled", target));
+    }
 
     /// <summary>Curseur d'une enceinte déplacé à la main.</summary>
     private void PushMemberVolume(MemberVolume member)
@@ -572,7 +873,130 @@ public sealed partial class PlayerViewModel : BaseViewModel
 
     /// <summary>Allume ou met en veille, selon l'état courant.</summary>
     [RelayCommand]
-    private Task PowerAsync() => RunAsync(d => d.SetPowerAsync(IsStandby));
+    private async Task PowerAsync()
+    {
+        var wanted = IsStandby;   // en veille : on veut allumer, et inversement
+
+        // Une enceinte qu'on éteint doit d'abord quitter le groupe. Sans ça, la zone
+        // garde un membre injoignable : le maître continue de lui diffuser, l'agent
+        // s'épuise à le joindre, et au rallumage l'enceinte se retrouve prisonnière
+        // d'un groupe qu'elle ne peut plus quitter. Elle sort donc du groupe, et si
+        // elle en était le dernier membre utile, le groupe est dissous.
+        if (!wanted)
+        {
+            await LeaveGroupBeforeStandbyAsync().ConfigureAwait(true);
+        }
+
+        _powerRequestedAt = DateTime.UtcNow;
+        _powerRequestedOn = wanted;
+        IsStandby = !wanted;      // le bouton reflète tout de suite l'intention
+
+        await RunAsync(d => d.SetPowerAsync(wanted)).ConfigureAwait(true);
+
+        if (IsError)
+        {
+            // La commande a été refusée : on ne garde pas un affichage optimiste.
+            _powerRequestedAt = DateTime.MinValue;
+            return;
+        }
+
+        // Allumer ou éteindre une enceinte change sa joignabilité au sein du groupe,
+        // ce dont le maître ne prévient pas. On relit la zone après coup.
+        ScheduleZoneRefresh();
+
+        await VerifyPowerAsync(wanted).ConfigureAwait(true);
+    }
+
+    /// <summary>
+    /// Retire l'enceinte pilotée du groupe avant sa mise en veille.
+    ///
+    /// Trois cas : elle est le maître, et le groupe entier n'a plus de raison
+    /// d'exister ; elle est le dernier esclave, même conclusion ; sinon on ne retire
+    /// qu'elle. L'échec n'est jamais bloquant — la mise en veille reste l'action
+    /// demandée, et un groupe mal défait se rattrape à la relecture suivante.
+    /// </summary>
+    private async Task LeaveGroupBeforeStandbyAsync()
+    {
+        var device = Device;
+
+        if (device is null || !(IsGroupActive || HasGroupVolume) || GroupMembers.Count == 0)
+        {
+            return;
+        }
+
+        var self = GroupMembers.FirstOrDefault(
+            m => string.Equals(m.Ip, device.Host, StringComparison.OrdinalIgnoreCase));
+
+        var master = GroupMembers.FirstOrDefault(m => m.IsMaster);
+        var slaves = GroupMembers.Count(m => !m.IsMaster);
+
+        try
+        {
+            if (self is null || self.IsMaster || slaves <= 1)
+            {
+                if (device.Str is not null)
+                {
+                    await device.Str.DissolveZoneAsync().ConfigureAwait(true);
+                }
+                else
+                {
+                    await device.Bose.SetZoneAsync(
+                        device.Endpoint.DeviceId, device.Host, Array.Empty<ZoneMember>()).ConfigureAwait(true);
+                }
+            }
+            else if (master is not null && !string.IsNullOrWhiteSpace(master.DeviceId))
+            {
+                // Le retrait passe par le firmware et réclame l'identité du MAÎTRE,
+                // qui n'est pas forcément l'enceinte pilotée.
+                await device.Bose.RemoveZoneSlaveAsync(
+                    master.DeviceId,
+                    master.Ip,
+                    new[] { new ZoneMember { DeviceId = self.DeviceId, IpAddress = self.Ip } })
+                    .ConfigureAwait(true);
+            }
+
+            await LoadZoneAsync().ConfigureAwait(true);
+        }
+        catch (Exception)
+        {
+            // On met quand même l'enceinte en veille : c'est ce qui a été demandé.
+        }
+    }
+
+    /// <summary>
+    /// Relit l'état après le sursis. Si l'enceinte est toujours dans l'état
+    /// contraire, on le dit : mieux vaut un message franc qu'un bouton qui bascule
+    /// tout seul sans explication.
+    /// </summary>
+    private async Task VerifyPowerAsync(bool wantedOn)
+    {
+        await Task.Delay(PowerGrace).ConfigureAwait(true);
+
+        _powerRequestedAt = DateTime.MinValue;
+
+        var device = Device;
+
+        if (device is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var nowPlaying = await device.GetNowPlayingAsync().ConfigureAwait(true);
+            await ApplyNowPlayingAsync(nowPlaying).ConfigureAwait(true);
+
+            if (wantedOn && IsStandby)
+            {
+                IsError = true;
+                StatusMessage = Localization.Get("S_PowerOnRefused");
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
 
     [RelayCommand]
     private void VolumeStep(string? amount)
@@ -717,6 +1141,9 @@ public sealed partial class PlayerViewModel : BaseViewModel
             IsGroupActive = false;
             HasGroupVolume = false;
             GroupMembers.Clear();
+            _zoneMaster = null;
+            GroupMasterName = "";
+            IsMasterSpeaker = true;
             return;
         }
 
@@ -725,6 +1152,8 @@ public sealed partial class PlayerViewModel : BaseViewModel
         // Sert à détecter la dissolution du groupe : le curseur du haut doit alors
         // revenir au volume propre de l'enceinte pilotée.
         var wasGroupVolume = HasGroupVolume;
+
+        _locatedMaster = null;
 
         try
         {
@@ -772,6 +1201,7 @@ public sealed partial class PlayerViewModel : BaseViewModel
                                 Ip = member.Ip!,
                                 Name = member.DisplayName,
                                 IsMaster = member.IsMaster,
+                                DeviceId = member.DeviceId ?? "",
                                 IsReachable = member.IsReachable,
                             };
 
@@ -816,19 +1246,104 @@ public sealed partial class PlayerViewModel : BaseViewModel
             GroupMembers.Clear();
         }
 
+        // L'agent d'une enceinte qui SUIT un groupe ne le décrit pas toujours : il
+        // voit la zone depuis le maître, et le firmware d'une esclave n'est pas plus
+        // bavard selon le modèle. On va donc chercher le groupe là où il est connu à
+        // coup sûr — chez le maître. Sans ce recours, une enceinte esclave paraissait
+        // libre : l'écran proposait de former un groupe où elle se trouvait déjà.
+        if (!IsGroupActive)
+        {
+            var snapshot = await _zones.LocateAsync(device.Host, Speakers.KnownSpeakers).ConfigureAwait(true);
+
+            if (snapshot.Grouped)
+            {
+                IsGroupActive = true;
+
+                foreach (var ip in snapshot.MemberIps)
+                {
+                    memberIps.Add(ip);
+                }
+
+                _locatedMaster = (snapshot.MasterName, snapshot.MasterIp);
+            }
+        }
+
         foreach (var candidate in GroupCandidates)
         {
             candidate.IsGrouped = memberIps.Contains(candidate.Host);
         }
 
+        // Vidage AVANT de désigner le maître : sans groupe, il n'y a pas de maître
+        // à désigner. L'agent continue parfois d'annoncer un membre unique marqué
+        // « master » juste après une dissolution ; le lire ici laisserait la mention
+        // « ce n'est pas le maître » à l'écran alors que le groupe n'existe plus.
         if (!IsGroupActive)
         {
             GroupMembers.Clear();
         }
 
+        _zoneMaster = IsGroupActive ? GroupMembers.FirstOrDefault(m => m.IsMaster) : null;
+
+        if (_zoneMaster is not null)
+        {
+            GroupMasterName = _zoneMaster.Name;
+            IsMasterSpeaker = Device is null ||
+                string.Equals(_zoneMaster.Ip, Device.Host, StringComparison.OrdinalIgnoreCase);
+        }
+        else if (IsGroupActive && _locatedMaster is not null)
+        {
+            GroupMasterName = _locatedMaster.Value.Name;
+            IsMasterSpeaker = Device is null ||
+                string.Equals(_locatedMaster.Value.Ip, Device.Host, StringComparison.OrdinalIgnoreCase);
+        }
+        else
+        {
+            GroupMasterName = Device?.Endpoint.DisplayName ?? "";
+            IsMasterSpeaker = true;
+        }
+
         if (wasGroupVolume && !HasGroupVolume)
         {
             await ReloadOwnVolumeAsync().ConfigureAwait(true);
+        }
+
+        IsFollowingMaster = Speakers.IsRedirected;
+
+        await FollowMasterAsync().ConfigureAwait(true);
+    }
+
+    /// <summary>
+    /// Fait suivre les commandes au maître du groupe.
+    ///
+    /// Dans un groupe, tout est joué par le maître : ce qu'on entend, les touches de
+    /// transport, les présélections, le volume d'ensemble. Commander une enceinte qui
+    /// ne fait que suivre n'a donc pas de sens — et lui demander son volume propre
+    /// faisait disparaître le réglage de groupe dès qu'on la regardait.
+    ///
+    /// Deux moments seulement : quand l'enceinte commandée s'avère être une suivante,
+    /// et quand le groupe a disparu alors que les commandes partaient encore ailleurs.
+    /// Hors de ces deux cas, rien n'est relu et rien ne coûte.
+    /// </summary>
+    private async Task FollowMasterAsync()
+    {
+        var needsRedirect = !IsMasterSpeaker;
+        var needsReturn = Speakers.IsRedirected && !IsGroupActive;
+
+        if (!needsRedirect && !needsReturn)
+        {
+            return;
+        }
+
+        try
+        {
+            // Un changement d'enceinte commandée déclenche DeviceChanged, donc une
+            // relecture complète : on ne poursuit pas celle-ci.
+            await Speakers.RetargetAsync().ConfigureAwait(true);
+        }
+        catch (Exception)
+        {
+            // Maître injoignable : on garde l'enceinte en place plutôt que de
+            // laisser l'écran sans rien.
         }
     }
 
@@ -930,6 +1445,18 @@ public sealed partial class PlayerViewModel : BaseViewModel
             if (!device.Notifications.IsConnected)
             {
                 _ = RefreshAsync();
+                return;
+            }
+
+            // La zone fait exception : elle change sans que personne ne l'annonce,
+            // et elle peut même se former sans nous. On la relit donc dans les deux
+            // cas, simplement plus souvent quand un groupe est déjà connu.
+            var due = IsGroupActive || HasGroupVolume ? ZonePollInterval : IdleZonePollInterval;
+
+            if (DateTime.UtcNow - _zonePolledAt >= due)
+            {
+                _zonePolledAt = DateTime.UtcNow;
+                _ = LoadZoneAsync();
             }
         };
 
@@ -946,6 +1473,7 @@ public sealed partial class PlayerViewModel : BaseViewModel
         if (_subscribedTo is not null)
         {
             _subscribedTo.Notifications.VolumeChanged -= OnVolumeNotification;
+            _subscribedTo.Notifications.VolumeStale -= OnVolumeStaleNotification;
             _subscribedTo.Notifications.NowPlayingChanged -= OnNowPlayingNotification;
             _subscribedTo.Notifications.ConnectionChanged -= OnConnectionNotification;
             _subscribedTo.Notifications.ZoneChanged -= OnZoneNotification;
@@ -956,6 +1484,7 @@ public sealed partial class PlayerViewModel : BaseViewModel
         if (device is not null)
         {
             device.Notifications.VolumeChanged += OnVolumeNotification;
+            device.Notifications.VolumeStale += OnVolumeStaleNotification;
             device.Notifications.NowPlayingChanged += OnNowPlayingNotification;
             device.Notifications.ConnectionChanged += OnConnectionNotification;
             device.Notifications.ZoneChanged += OnZoneNotification;
@@ -965,6 +1494,31 @@ public sealed partial class PlayerViewModel : BaseViewModel
     }
 
     private void OnVolumeNotification(object? sender, VolumeState state) => OnMainThread(() => ApplyVolume(state));
+
+    /// <summary>
+    /// Trame volumeUpdated sans contenu : l'enceinte signale le changement sans le
+    /// décrire. On relit la valeur au lieu de l'ignorer.
+    /// </summary>
+    private void OnVolumeStaleNotification(object? sender, EventArgs e) => OnMainThread(() => _ = RereadVolumeAsync());
+
+    private async Task RereadVolumeAsync()
+    {
+        var device = Device;
+
+        if (device is null)
+        {
+            return;
+        }
+
+        try
+        {
+            ApplyVolume(await device.GetVolumeAsync().ConfigureAwait(true));
+        }
+        catch (Exception)
+        {
+            // Le sondage périodique repassera.
+        }
+    }
 
     private void OnNowPlayingNotification(object? sender, NowPlaying nowPlaying)
         => OnMainThread(() => _ = ApplyNowPlayingAsync(nowPlaying));
@@ -993,6 +1547,7 @@ public sealed partial class PlayerViewModel : BaseViewModel
     {
         SetLive(IsLive);
         OnPropertyChanged(nameof(PowerLabel));
+        OnPropertyChanged(nameof(GroupedWithLabel));
         _artKey = "";
         _ = ApplyNowPlayingAsync(_lastNowPlaying);
 
@@ -1014,7 +1569,11 @@ public sealed partial class PlayerViewModel : BaseViewModel
         Subtitle = nowPlaying.DisplaySubtitle;
         ArtGlyph = GlyphFor(nowPlaying.Source);
         IsPlaying = nowPlaying.IsPlaying;
-        IsStandby = nowPlaying.IsIdle;
+        // Pendant le sursis, l'état demandé prime sur celui que l'enceinte annonce
+        // encore : elle n'a pas fini de se réveiller, elle ne ment pas.
+        var pendingPower = DateTime.UtcNow - _powerRequestedAt < PowerGrace;
+
+        IsStandby = pendingPower ? !_powerRequestedOn : nowPlaying.IsIdle;
         SourceLabel = nowPlaying.IsIdle ? Localization.Get("L_Standby") : FriendlySource(nowPlaying.Source);
 
         // La touche correspondant à ce qui joue est mise en avant ; si rien ne
