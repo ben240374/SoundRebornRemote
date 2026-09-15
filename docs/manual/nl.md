@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handleiding
 
-Versie 0.9.79 · Android 7 en hoger
+Versie 0.9.81 · Android 7 en hoger
 
 > Talen: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · **Nederlands** · [Español](es.md)
 

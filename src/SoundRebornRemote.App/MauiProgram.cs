@@ -23,13 +23,16 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
-        // Un seul HttpClient pour toute l'application. Le délai d'attente est court :
-        // sur le LAN, une enceinte qui ne répond pas en 8 s ne répondra pas.
+        // Un seul HttpClient pour toute l'application, sans délai d'attente propre :
+        // chaque appel pose le sien. Un plafond global unique ne peut pas convenir à
+        // la fois à une commande ordinaire (8 s) et à celles qui réveillent
+        // l'enceinte (25 s), et le plus court des deux l'emporterait toujours.
+        // Voir StrApiClient.NormalTimeout / WakeTimeout et BoseApiClient.CallTimeout.
         builder.Services.AddSingleton(_ =>
         {
             var http = new HttpClient
             {
-                Timeout = TimeSpan.FromSeconds(8),
+                Timeout = Timeout.InfiniteTimeSpan,
             };
 
             http.DefaultRequestHeaders.ExpectContinue = false;
@@ -40,6 +43,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<SpeakerManager>();
         builder.Services.AddSingleton<ArtworkCache>();
         builder.Services.AddSingleton<RadioBrowserClient>();
+        builder.Services.AddSingleton<ZoneLocator>();
 
         builder.Services.AddSingleton<PlayerViewModel>();
         builder.Services.AddSingleton<PresetsViewModel>();

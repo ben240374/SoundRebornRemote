@@ -164,6 +164,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
         {
             // Le firmware d'abord : il dit ce que les touches physiques déclenchent.
             var hardware = new Dictionary<int, PresetInfo>();
+            var hardwareRead = false;
 
             try
             {
@@ -171,6 +172,8 @@ public sealed partial class PresetsViewModel : BaseViewModel
                 {
                     hardware[preset.Id] = preset;
                 }
+
+                hardwareRead = true;
             }
             catch (Exception)
             {
@@ -178,6 +181,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
             }
 
             var store = new Dictionary<int, StrPreset>();
+            var storeRead = false;
 
             if (device.Str is not null)
             {
@@ -187,11 +191,24 @@ public sealed partial class PresetsViewModel : BaseViewModel
                     {
                         store[preset.Slot] = preset;
                     }
+
+                    storeRead = true;
                 }
                 catch (Exception)
                 {
                     // Agent trop ancien, appel expiré, ou magasin vide.
                 }
+            }
+
+            // Une lecture QUI ÉCHOUE n'est pas une lecture QUI NE RAMÈNE RIEN.
+            // Les deux échecs étant absorbés juste au-dessus, la suite prenait le
+            // silence pour une grille vide et effaçait les six touches — ce qui
+            // arrivait chaque fois qu'une commande tombait pendant une reconnexion.
+            // Tant qu'aucune des deux sources n'a répondu, on garde l'affichage.
+            if (!hardwareRead && !storeRead)
+            {
+                ShowInfo(Localization.Get("S_PresetsUnread"));
+                return;
             }
 
             foreach (var tile in Presets)

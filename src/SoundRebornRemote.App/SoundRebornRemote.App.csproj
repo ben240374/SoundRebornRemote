@@ -18,10 +18,23 @@
          code de version Android, qui doit rester un entier croissant. L'identifiant
          de paquet a changé avec le nom : Android voit une nouvelle application, donc
          le code de version repart à 1. -->
-    <ApplicationDisplayVersion>0.9.79</ApplicationDisplayVersion>
-    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>0.9.81</ApplicationDisplayVersion>
+    <ApplicationVersion>18</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <!--
+      Android en Release : la compilation AOT est guidée par un profil de démarrage.
+      MonoAOTCompiler échoue (IndexOutOfRangeException sur chaque assemblage, puis
+      MSB4018 « le tableau source n'est pas assez long ») quand ce profil ne
+      correspond plus aux assemblages réellement liés — après un changement de
+      paquets, ou avec un dossier obj resté en place d'une compilation précédente.
+      Le profil ne fait gagner que quelques dixièmes de seconde au démarrage ;
+      l'AOT elle-même reste active.
+  -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release' and $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
   </PropertyGroup>
 
   <ItemGroup>

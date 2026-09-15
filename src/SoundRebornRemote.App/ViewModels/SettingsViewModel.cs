@@ -15,13 +15,17 @@ public sealed partial class SettingsViewModel : BaseViewModel
 {
     private readonly SpeakerDiscovery _discovery;
     private readonly ArtworkCache _artwork;
+    private readonly ZoneLocator _zones;
     private bool _suppressLanguageApply;
     private bool _suppressThemeApply;
 
-    public SettingsViewModel(SpeakerManager speakers, SpeakerDiscovery discovery, ArtworkCache artwork) : base(speakers)
+    public SettingsViewModel(
+        SpeakerManager speakers, SpeakerDiscovery discovery, ArtworkCache artwork, ZoneLocator zones)
+        : base(speakers)
     {
         _discovery = discovery;
         _artwork = artwork;
+        _zones = zones;
 
         foreach (var speaker in Speakers.KnownSpeakers)
         {
@@ -43,8 +47,49 @@ public sealed partial class SettingsViewModel : BaseViewModel
         RefreshStrGap();
 
         CurrentSpeakerLabel = Localization.Get("L_NoSpeakerSelected");
+
+        // L'enceinte active se change aussi depuis l'onglet Lecture. Sans cet
+        // abonnement, cet écran gardait le nom de la précédente : il n'écrivait
+        // l'étiquette qu'après sa propre sélection, et son OnAppearing ne
+        // travaille qu'au tout premier affichage.
+        Speakers.DeviceChanged += (_, _) => OnMainThread(ApplyCurrentSpeaker);
+
+        // Idem pour la liste : une enceinte trouvée ou oubliée ailleurs doit
+        // apparaître ou disparaître ici sans attendre un redémarrage.
+        Speakers.KnownSpeakersChanged += (_, _) => OnMainThread(Sync);
+
+        ApplyCurrentSpeaker();
         Localization.LanguageChanged += (_, _) => OnMainThread(RefreshLabels);
     }
+
+    /// <summary>
+    /// Met l'étiquette en accord avec l'enceinte DÉSIGNÉE — celle que l'utilisateur a
+    /// touchée — et non avec celle qui reçoit les commandes. Dans un groupe, les deux
+    /// diffèrent : tout est joué par le maître, donc c'est lui qu'on commande, et le
+    /// dire ici laisserait croire que la sélection n'a pas été prise en compte.
+    /// </summary>
+    private void ApplyCurrentSpeaker()
+    {
+        var selected = Speakers.SelectedEndpoint ?? Device?.Endpoint;
+
+        CurrentSpeakerLabel = selected is null
+            ? Localization.Get("L_NoSpeakerSelected")
+            : $"{selected.DisplayName} — {selected.Summary}";
+
+        IsRedirected = Speakers.IsRedirected;
+        RedirectNote = IsRedirected
+            ? Localization.Get("L_CommandsGoTo", Device?.Endpoint.DisplayName ?? "")
+            : "";
+
+        Sync();
+    }
+
+    /// <summary>Vrai quand les commandes partent vers le maître du groupe, pas vers la sélection.</summary>
+    [ObservableProperty]
+    private bool _isRedirected;
+
+    [ObservableProperty]
+    private string _redirectNote = "";
 
     // ---------------------------------------------------------------- Thème
 
@@ -141,7 +186,7 @@ public sealed partial class SettingsViewModel : BaseViewModel
         _ => "https://st-reborn.de/",
     };
 
-    /// <summary>« SoundReborn Remote V0.9.79 » — le code de version Android n'intéresse personne.</summary>
+    /// <summary>« SoundReborn Remote V0.9.81 » — le code de version Android n'intéresse personne.</summary>
     public string AppVersion
     {
         get
@@ -309,7 +354,9 @@ public sealed partial class SettingsViewModel : BaseViewModel
         try
         {
             var device = await Speakers.SelectAsync(speaker).ConfigureAwait(true);
-            CurrentSpeakerLabel = $"{device.Endpoint.DisplayName} — {device.Endpoint.Summary}";
+
+            // L'étiquette suit DeviceChanged ; on ne l'écrit pas une seconde fois ici,
+            // deux sources pour la même valeur finissent toujours par diverger.
             ShowInfo(Localization.Get("S_Connected", device.Endpoint.DisplayName));
         }
         catch (Exception ex)
@@ -336,34 +383,75 @@ public sealed partial class SettingsViewModel : BaseViewModel
         ShowInfo(Localization.Get("S_Removed", speaker.DisplayName));
     }
 
-    /// <summary>Relit les informations de l'enceinte active et affiche ce qu'elle accepte.</summary>
+    /// <summary>
+    /// Relit les informations de l'enceinte SÉLECTIONNÉE — celle qui est nommée en
+    /// haut de cet écran — et affiche ce qu'elle accepte.
+    ///
+    /// Pas l'enceinte commandée : dans un groupe, c'est le maître qui la reçoit, et
+    /// on se retrouvait alors à interroger toujours la même quelle que soit la
+    /// sélection. Les clients sont donc construits sur l'adresse sélectionnée, et on
+    /// ne réutilise ceux de la connexion en cours que si elle vise la même enceinte.
+    /// </summary>
     [RelayCommand]
     private async Task DiagnoseAsync()
     {
-        var device = Device;
+        var endpoint = Speakers.SelectedEndpoint ?? Device?.Endpoint;
 
-        if (device is null)
+        if (endpoint is null)
         {
             ShowInfo(Localization.Get("S_SelectFirst"));
             return;
         }
 
+        var device = Device;
+        var isCommanded = device is not null &&
+            string.Equals(device.Host, endpoint.Host, StringComparison.OrdinalIgnoreCase);
+
+        var bose = isCommanded ? device!.Bose : new BoseApiClient(endpoint.Host, Speakers.Http);
+
         IsBusy = true;
 
         try
         {
-            var info = await device.Bose.GetInfoAsync().ConfigureAwait(true);
+            var info = await bose.GetInfoAsync().ConfigureAwait(true);
 
-            var agent = device.HasStr
-                ? Localization.Get("D_AgentYes", device.Endpoint.StrPort ?? 0)
-                : Localization.Get("D_AgentNo");
+            // Version relue MAINTENANT, et sur les DEUX ports : c'est justement pour
+            // vérifier une mise à jour qu'on ouvre ce bloc, et une réinstallation de
+            // l'agent peut le faire changer de port. Interroger le seul port
+            // enregistré donnait alors un silence — et le silence, retombant sur la
+            // valeur en cache, avait toutes les apparences d'une version relue.
+            var probe = await StrApiClient
+                .ProbeAsync(endpoint.Host, Speakers.Http, TimeSpan.FromSeconds(4))
+                .ConfigureAwait(true);
 
-            var bass = device.BassCapabilities.Available
-                ? Localization.Get("D_BassRange",
-                    device.BassCapabilities.Min,
-                    device.BassCapabilities.Max,
-                    device.BassCapabilities.Default)
-                : Localization.Get("D_BassNone");
+            string agent;
+
+            if (probe is { } found)
+            {
+                if (endpoint.StrPort != found.Port ||
+                    !string.Equals(endpoint.AgentVersion, found.Version, StringComparison.Ordinal))
+                {
+                    endpoint.StrPort = found.Port;
+                    endpoint.AgentVersion = found.Version;
+                    Speakers.SaveKnownSpeakers();
+                }
+
+                agent = Localization.Get("D_AgentYes", found.Port) + $", {found.Version}";
+            }
+            else if (endpoint.HasStr)
+            {
+                // L'agent ne répond pas maintenant. On montre quand même ce qui est
+                // enregistré, mais en le disant : sans cette mention, une version
+                // périmée passait pour une version fraîche.
+                agent = Localization.Get("D_AgentSilent") +
+                    (string.IsNullOrWhiteSpace(endpoint.AgentVersion)
+                        ? ""
+                        : $" — {Localization.Get("D_AgentStored", endpoint.AgentVersion)}");
+            }
+            else
+            {
+                agent = Localization.Get("D_AgentNo");
+            }
 
             var lines = new List<string>
             {
@@ -371,21 +459,40 @@ public sealed partial class SettingsViewModel : BaseViewModel
                 $"{Localization.Get("D_Model")} : {info.Type}",
                 $"deviceID : {info.DeviceId}",
                 $"{Localization.Get("D_Firmware")} : {info.SoftwareVersion ?? "?"}",
-                $"{Localization.Get("D_Address")} : {device.Host}",
+                $"{Localization.Get("D_Address")} : {endpoint.Host}",
                 $"{Localization.Get("D_Agent")} : {agent}",
-                $"{Localization.Get("D_Notifications")} : {Localization.Get(device.Notifications.IsConnected ? "D_WsUp" : "D_WsDown")}",
-                $"{Localization.Get("L_Bass")} : {bass}",
             };
+
+            // Le WebSocket et les capacités de graves ne sont relevés que sur
+            // l'enceinte connectée : les annoncer pour une autre serait inventer.
+            if (isCommanded)
+            {
+                var bass = device!.BassCapabilities.Available
+                    ? Localization.Get("D_BassRange",
+                        device.BassCapabilities.Min,
+                        device.BassCapabilities.Max,
+                        device.BassCapabilities.Default)
+                    : Localization.Get("D_BassNone");
+
+                lines.Add($"{Localization.Get("D_Notifications")} : " +
+                          Localization.Get(device.Notifications.IsConnected ? "D_WsUp" : "D_WsDown"));
+                lines.Add($"{Localization.Get("L_Bass")} : {bass}");
+            }
 
             try
             {
-                var urls = await device.Bose.GetSupportedUrlsAsync().ConfigureAwait(true);
+                var urls = await bose.GetSupportedUrlsAsync().ConfigureAwait(true);
                 lines.Add($"{Localization.Get("D_Endpoints")} ({urls.Count}) : {string.Join(", ", urls.Take(30))}");
             }
             catch (Exception)
             {
                 lines.Add($"{Localization.Get("D_Endpoints")} : {Localization.Get("D_EndpointsNone")}");
             }
+
+            // Ce que chaque enceinte dit de la zone, et ce que l'application en
+            // retient. Quand l'écran et la réalité divergent, la réponse est ici.
+            lines.Add($"{Localization.Get("D_Zone")} :");
+            lines.AddRange((await _zones.DescribeAsync(endpoint.Host, Speakers.KnownSpeakers).ConfigureAwait(true)).Select(l => "  " + l));
 
             Diagnostics = string.Join(Environment.NewLine, lines);
             HasDiagnostics = true;
@@ -404,19 +511,16 @@ public sealed partial class SettingsViewModel : BaseViewModel
     /// <summary>Reconnecte l'enceinte mémorisée au lancement de l'application.</summary>
     public async Task InitializeAsync()
     {
-        Sync();
+        ApplyCurrentSpeaker();
 
         if (Device is not null)
         {
-            CurrentSpeakerLabel = $"{Device.Endpoint.DisplayName} — {Device.Endpoint.Summary}";
             return;
         }
 
-        var device = await Speakers.TryRestoreAsync().ConfigureAwait(true);
-
-        if (device is not null)
+        if (await Speakers.TryRestoreAsync().ConfigureAwait(true) is not null)
         {
-            CurrentSpeakerLabel = $"{device.Endpoint.DisplayName} — {device.Endpoint.Summary}";
+            // DeviceChanged a déjà remis l'étiquette à jour.
             ShowInfo(null);
         }
     }

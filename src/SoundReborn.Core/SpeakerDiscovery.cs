@@ -212,21 +212,14 @@ public sealed class SpeakerDiscovery
             Type = info.Type,
         };
 
-        speaker.StrPort = await StrApiClient.ProbeAsync(host, _http, StrProbeTimeout, ct).ConfigureAwait(false);
+        // La sonde interroge /api/agent/version et rapporte la version au passage :
+        // plus besoin d'un second aller-retour pour l'afficher sur chaque carte.
+        var probe = await StrApiClient.ProbeAsync(host, _http, StrProbeTimeout, ct).ConfigureAwait(false);
 
-        // La version de l'agent est lue tout de suite : sans cela, seule l'enceinte
-        // connectée affichait la sienne, et les autres cartes restaient muettes.
-        if (speaker.StrPort is { } port)
+        if (probe is { } found)
         {
-            try
-            {
-                var agent = await new StrApiClient(host, port, _http).GetAgentInfoAsync(ct).ConfigureAwait(false);
-                speaker.AgentVersion = agent?.DisplayVersion ?? "";
-            }
-            catch (Exception)
-            {
-                // Agent trop ancien pour ce point de terminaison : on laisse vide.
-            }
+            speaker.StrPort = found.Port;
+            speaker.AgentVersion = found.Version;
         }
 
         return speaker;
@@ -297,8 +290,13 @@ public sealed class SpeakerDiscovery
 
                 var octets = unicast.Address.GetAddressBytes();
 
-                // Écarte les adresses APIPA 169.254.x.x, qui ne mènent nulle part.
-                if (octets[0] == 169 && octets[1] == 254)
+                // Seules les plages privées de la RFC 1918 sont balayées. Une
+                // interface de données mobiles ou un tunnel VPN est « up » comme une
+                // autre : sans ce filtre, un appui sur « Balayer » sonderait 254
+                // adresses d'une plage d'opérateur ou du réseau d'une entreprise,
+                // depuis le téléphone de l'utilisateur. Le CGNAT 100.64/10 est
+                // volontairement exclu : c'est de l'espace opérateur, pas du LAN.
+                if (!IsPrivateV4(octets))
                 {
                     continue;
                 }
@@ -307,4 +305,14 @@ public sealed class SpeakerDiscovery
             }
         }
     }
+
+    /// <summary>
+    /// 10.0.0.0/8, 172.16.0.0/12 et 192.168.0.0/16 : les seules plages où une
+    /// enceinte domestique puisse se trouver.
+    /// </summary>
+    private static bool IsPrivateV4(byte[] octets)
+        => octets.Length == 4 &&
+           (octets[0] == 10 ||
+            (octets[0] == 172 && octets[1] >= 16 && octets[1] <= 31) ||
+            (octets[0] == 192 && octets[1] == 168));
 }

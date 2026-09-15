@@ -74,6 +74,10 @@
                         </BindableLayout.ItemTemplate>
                     </FlexLayout>
 
+                    <!-- Un cadre vide ne dit pas s'il faut attendre ou agir. -->
+                    <Label Text="{DynamicResource L_NoSpeakerDetail}" Style="{StaticResource CaptionLabel}"
+                           Margin="0,0,0,4" IsVisible="{Binding SpeakerListEmpty}" />
+
                 </VerticalStackLayout>
             </Border>
 
@@ -189,7 +193,7 @@
                         <Label Grid.Column="1" Text="{Binding VolumeLabel}" Style="{StaticResource ValueLabel}" />
                     </Grid>
 
-                    <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8">
+                    <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" ColumnSpacing="8">
 
                         <!-- Sourdine : haut-parleur, barré quand le son est coupé -->
                         <Border Grid.Column="0" Style="{StaticResource IconSquare}">
@@ -213,17 +217,31 @@
                             </Grid>
                         </Border>
 
-                        <Border Grid.Column="1" Style="{StaticResource IconSquare}">
+                        <!--
+                            Égaliser : met toutes les enceintes du groupe à la valeur
+                            affichée. Signe « égal », et seulement quand un groupe est
+                            actif — seul il n'y a rien à égaliser.
+                        -->
+                        <Border Grid.Column="1" Style="{StaticResource IconSquare}"
+                                IsVisible="{Binding HasGroupVolume}"
+                                SemanticProperties.Description="{DynamicResource L_LevelGroup}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding LevelGroupCommand}" />
+                            </Border.GestureRecognizers>
+                            <Path Style="{StaticResource IconPath}" Data="M5,9 H19 V11 H5 Z M5,13 H19 V15 H5 Z" />
+                        </Border>
+
+                        <Border Grid.Column="2" Style="{StaticResource IconSquare}">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding VolumeStepCommand}" CommandParameter="-1" />
                             </Border.GestureRecognizers>
                             <Path Style="{StaticResource IconPath}" Data="M5,11 H19 V13 H5 Z" />
                         </Border>
 
-                        <Slider Grid.Column="2" Minimum="0" Maximum="100" Value="{Binding Volume, Mode=TwoWay}"
+                        <Slider Grid.Column="3" Minimum="0" Maximum="100" Value="{Binding Volume, Mode=TwoWay}"
                                 VerticalOptions="Center" />
 
-                        <Border Grid.Column="3" Style="{StaticResource IconSquare}">
+                        <Border Grid.Column="4" Style="{StaticResource IconSquare}">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding VolumeStepCommand}" CommandParameter="1" />
                             </Border.GestureRecognizers>
@@ -233,8 +251,10 @@
                     </Grid>
 
                     <!-- En groupe, le curseur ci-dessus règle TOUT le groupe. -->
-                    <Label Text="{DynamicResource L_VolumeOfGroup}" Style="{StaticResource CaptionLabel}"
-                           IsVisible="{Binding HasGroupVolume}" />
+                    <VerticalStackLayout Spacing="1" IsVisible="{Binding HasGroupVolume}">
+                        <Label Text="{DynamicResource L_VolumeOfGroup}" Style="{StaticResource CaptionLabel}" />
+                        <Label Text="{DynamicResource L_LevelGroupHint}" Style="{StaticResource CaptionLabel}" />
+                    </VerticalStackLayout>
 
                     <!-- ===== Réglage enceinte par enceinte ===== -->
                     <VerticalStackLayout Spacing="10" IsVisible="{Binding HasGroupVolume}">
@@ -255,7 +275,24 @@
                                             <Label Grid.Column="1" Text="{Binding VolumeLabel}"
                                                    Style="{StaticResource CaptionLabel}" />
                                         </Grid>
-                                        <Slider Minimum="0" Maximum="100" Value="{Binding Volume, Mode=TwoWay}" />
+                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                            <Border Grid.Column="0" Style="{StaticResource IconSquareSmall}">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding StepCommand}" CommandParameter="-1" />
+                                                </Border.GestureRecognizers>
+                                                <Path Style="{StaticResource IconPathSmall}" Data="M5,11 H19 V13 H5 Z" />
+                                            </Border>
+
+                                            <Slider Grid.Column="1" Minimum="0" Maximum="100"
+                                                    Value="{Binding Volume, Mode=TwoWay}" VerticalOptions="Center" />
+
+                                            <Border Grid.Column="2" Style="{StaticResource IconSquareSmall}">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding StepCommand}" CommandParameter="1" />
+                                                </Border.GestureRecognizers>
+                                                <Path Style="{StaticResource IconPathSmall}" Data="M11,5 H13 V11 H19 V13 H13 V19 H11 V13 H5 V11 H11 Z" />
+                                            </Border>
+                                        </Grid>
                                     </VerticalStackLayout>
                                 </DataTemplate>
                             </BindableLayout.ItemTemplate>
@@ -359,6 +396,16 @@
                 <VerticalStackLayout Spacing="10">
                     <Label Text="{DynamicResource L_GroupWith}" Style="{StaticResource SectionLabel}" />
 
+                    <!--
+                        Cette enceinte suit déjà un groupe mené par une autre : on le dit
+                        au lieu de laisser croire qu'il reste un groupe à former.
+                    -->
+                    <VerticalStackLayout Spacing="1" IsVisible="{Binding ShowGroupedBanner}">
+                        <Label Text="{Binding GroupedWithLabel}" FontSize="14" FontAttributes="Bold"
+                               TextColor="{StaticResource Warning}" />
+                        <Label Text="{DynamicResource L_SlaveOfGroup}" Style="{StaticResource CaptionLabel}" />
+                    </VerticalStackLayout>
+
                     <FlexLayout BindableLayout.ItemsSource="{Binding GroupCandidates}"
                                 Wrap="Wrap" Direction="Row" JustifyContent="Start" AlignItems="Center">
                         <BindableLayout.ItemTemplate>
@@ -391,7 +438,7 @@
                     </FlexLayout>
 
                     <Label Text="{DynamicResource L_TapToUngroup}" Style="{StaticResource CaptionLabel}"
-                           IsVisible="{Binding IsGroupActive}" />
+                           IsVisible="{Binding ShowUngroupHint}" />
                 </VerticalStackLayout>
             </Border>
 

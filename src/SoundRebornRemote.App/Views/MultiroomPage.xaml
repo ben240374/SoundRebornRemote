@@ -19,7 +19,17 @@
                 <VerticalStackLayout Spacing="4">
                     <Label Text="{DynamicResource L_Master}" Style="{StaticResource SectionLabel}" />
                     <Label Text="{Binding MasterName}" Style="{StaticResource TitleLabel}" />
-                    <Label Style="{StaticResource CaptionLabel}" Text="{DynamicResource L_MasterNote}" />
+                    <Label Style="{StaticResource CaptionLabel}" Text="{DynamicResource L_MasterNote}"
+                           IsVisible="{Binding IsMasterSpeaker}" />
+
+                    <!--
+                        Sur un esclave, la note d'origine (« change d'enceinte active
+                        pour changer de maître ») serait trompeuse : on dit plutôt à qui
+                        les commandes de groupe s'adressent réellement.
+                    -->
+                    <Label Style="{StaticResource CaptionLabel}" Text="{DynamicResource L_NotMasterNote}"
+                           TextColor="{StaticResource Warning}"
+                           IsVisible="{Binding IsSlaveSpeaker}" />
                 </VerticalStackLayout>
             </Border>
 
@@ -58,8 +68,10 @@
                     </Grid>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <!-- Grisé sur une esclave : c'est le maître qui compose le groupe. -->
                         <Button Grid.Column="0" Text="{DynamicResource L_FormGroup}"
-                                Style="{StaticResource AccentButton}" Command="{Binding FormGroupCommand}" />
+                                Style="{StaticResource AccentButton}" Command="{Binding FormGroupCommand}"
+                                IsEnabled="{Binding IsMasterSpeaker}" />
                         <Button Grid.Column="1" Text="{DynamicResource L_Dissolve}"
                                 Command="{Binding DissolveGroupCommand}" />
                     </Grid>

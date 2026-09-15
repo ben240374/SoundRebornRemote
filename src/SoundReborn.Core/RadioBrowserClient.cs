@@ -27,7 +27,10 @@ public sealed class RadioBrowserClient
     /// ce qui permet aux mainteneurs de voir d'où vient le trafic. Le service le
     /// demande explicitement, et répond mal à un agent vide.
     /// </summary>
-    private const string UserAgent = "SoundRebornRemote/1.0 (+https://github.com/JRpersonal/streborn)";
+    private const string UserAgent = "SoundRebornRemote/0.9.81 (+https://github.com/ben240374/SoundRebornRemote)";
+
+    /// <summary>Budget d'un appel à l'annuaire de stations.</summary>
+    public static TimeSpan RequestTimeout { get; set; } = TimeSpan.FromSeconds(10);
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -151,7 +154,12 @@ public sealed class RadioBrowserClient
                 request.Headers.TryAddWithoutValidation("User-Agent", UserAgent);
                 request.Headers.TryAddWithoutValidation("Accept", "application/json");
 
-                using var response = await _http.SendAsync(request, ct).ConfigureAwait(false);
+                // L'HttpClient partagé n'impose plus de plafond : l'annuaire a le
+                // sien, un miroir lent ne doit pas bloquer la recherche.
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+                cts.CancelAfter(RequestTimeout);
+
+                using var response = await _http.SendAsync(request, cts.Token).ConfigureAwait(false);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -159,7 +167,7 @@ public sealed class RadioBrowserClient
                     continue;
                 }
 
-                var body = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+                var body = await response.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
                 _mirror = index;
 
                 return string.IsNullOrWhiteSpace(body) ? default : JsonSerializer.Deserialize<T>(body, JsonOptions);

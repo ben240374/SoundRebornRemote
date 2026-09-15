@@ -39,10 +39,34 @@ public sealed class StrApiClient
 
     public string BaseUrl => $"http://{Host}:{Port}";
 
+    /// <summary>Budget d'une commande ordinaire : sur le LAN, au-delà c'est perdu.</summary>
+    public static TimeSpan NormalTimeout { get; set; } = TimeSpan.FromSeconds(8);
+
     /// <summary>
-    /// Cherche l'agent STR sur une enceinte. Renvoie le port qui a répondu, ou null.
+    /// Budget des commandes qui réveillent l'enceinte — lecture, allumage, formation
+    /// d'un groupe. Le réveil à lui seul consomme près de huit secondes, et couper
+    /// trop tôt donne un délai dépassé sur une commande qui allait aboutir.
     /// </summary>
-    public static async Task<int?> ProbeAsync(string host, HttpClient http, TimeSpan timeout, CancellationToken ct = default)
+    public static TimeSpan WakeTimeout { get; set; } = TimeSpan.FromSeconds(25);
+
+    private static CancellationTokenSource Budget(TimeSpan? timeout, CancellationToken ct)
+    {
+        var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        cts.CancelAfter(timeout ?? NormalTimeout);
+        return cts;
+    }
+
+    /// <summary>
+    /// Cherche l'agent STR sur une enceinte. Renvoie le port qui a répondu et la
+    /// version annoncée, ou null.
+    ///
+    /// On interroge /api/agent/version et on exige le mot « version » dans le corps :
+    /// un code 200 ne prouve rien, n'importe quel serveur peut répondre sur un chemin
+    /// qui n'est pas le sien. Au passage, la version est lue ici une bonne fois, ce
+    /// qui évite un second aller-retour juste après.
+    /// </summary>
+    public static async Task<(int Port, string Version)?> ProbeAsync(
+        string host, HttpClient http, TimeSpan timeout, CancellationToken ct = default)
     {
         foreach (var port in CandidatePorts)
         {
@@ -51,20 +75,53 @@ public sealed class StrApiClient
 
             try
             {
-                using var response = await http.GetAsync($"http://{host}:{port}/healthz", cts.Token).ConfigureAwait(false);
+                using var response = await http
+                    .GetAsync($"http://{host}:{port}/api/agent/version", cts.Token)
+                    .ConfigureAwait(false);
 
-                if (response.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
                 {
-                    return port;
+                    continue;
+                }
+
+                var body = await response.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
+
+                if (body.Contains("version", StringComparison.OrdinalIgnoreCase))
+                {
+                    return (port, ReadVersion(body));
                 }
             }
             catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException or TaskCanceledException)
             {
-                // Port fermé ou pas d'agent : on essaie le suivant.
+                // Port fermé, pas d'agent, ou corps illisible : on essaie le suivant.
             }
         }
 
         return null;
+    }
+
+    /// <summary>Extrait « v0.9.79 » du corps de /api/agent/version, sans échouer.</summary>
+    private static string ReadVersion(string body)
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(body);
+
+            foreach (var name in new[] { "version", "Version" })
+            {
+                if (document.RootElement.TryGetProperty(name, out var value) &&
+                    value.ValueKind == JsonValueKind.String)
+                {
+                    return value.GetString() ?? "";
+                }
+            }
+        }
+        catch (JsonException)
+        {
+            // Agent ancien qui répond en texte brut : la version reste vide.
+        }
+
+        return "";
     }
 
     // ---------------------------------------------------------------- Lecture
@@ -120,6 +177,41 @@ public sealed class StrApiClient
     public Task<StrZoneVolume?> GetZoneVolumeAsync(CancellationToken ct = default)
         => GetJsonAsync<StrZoneVolume>("/api/box/zone/volume", ct);
 
+    /// <summary>
+    /// Lit le drapeau « permanent » de la zone courante. L'agent stocke le document
+    /// tel qu'il le reçoit : reformer un groupe sans ce drapeau le transforme en
+    /// groupe ordinaire, qui cesse de se reformer à la lecture et disparaît à la
+    /// première dissolution. Renvoie false si la zone n'existe pas ou ne le dit pas.
+    /// </summary>
+    public async Task<bool> GetZonePermanentAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            using var document = await GetZoneRawAsync(ct).ConfigureAwait(false);
+
+            if (document is null)
+            {
+                return false;
+            }
+
+            foreach (var name in new[] { "permanent", "Permanent", "sticky" })
+            {
+                if (document.RootElement.ValueKind == JsonValueKind.Object &&
+                    document.RootElement.TryGetProperty(name, out var value) &&
+                    (value.ValueKind == JsonValueKind.True || value.ValueKind == JsonValueKind.False))
+                {
+                    return value.GetBoolean();
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Pas de zone, agent muet, JSON inattendu : on ne prétend rien.
+        }
+
+        return false;
+    }
+
     /// <summary>GET /api/box/zone, renvoyé brut (la forme varie selon le châssis).</summary>
     public Task<JsonDocument?> GetZoneRawAsync(CancellationToken ct = default)
         => GetJsonDocumentAsync("/api/box/zone", ct);
@@ -138,7 +230,7 @@ public sealed class StrApiClient
 
     /// <summary>Lance la présélection STR (magasin de l'agent), 1 à 6.</summary>
     public Task PlaySlotAsync(int slot, CancellationToken ct = default)
-        => PostAsync($"/api/play/{slot}", null, ct);
+        => PostAsync($"/api/play/{slot}", null, ct, WakeTimeout);
 
     /// <summary>Mime un appui sur la touche matérielle de présélection, 1 à 6.</summary>
     public Task RecallBoxPresetAsync(int slot, CancellationToken ct = default)
@@ -162,16 +254,23 @@ public sealed class StrApiClient
     /// <summary>Vide une présélection du magasin de l'agent.</summary>
     public async Task DeletePresetAsync(int slot, CancellationToken ct = default)
     {
-        using var response = await _http.DeleteAsync($"{BaseUrl}/api/presets/{slot}", ct).ConfigureAwait(false);
-        await EnsureSuccessAsync(response, $"/api/presets/{slot}", ct).ConfigureAwait(false);
+        using var cts = Budget(null, ct);
+        using var response = await _http.DeleteAsync($"{BaseUrl}/api/presets/{slot}", cts.Token).ConfigureAwait(false);
+        await EnsureSuccessAsync(response, $"/api/presets/{slot}", cts.Token).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Joue n'importe quel flux. L'agent ajoute les métadonnées DIDL et bascule
     /// une URL HTTPS vers HTTP (le moteur UPnP de l'enceinte refuse TLS).
     /// </summary>
-    public Task PlayUrlAsync(string url, string? title = null, string? mime = null, string? icon = null, CancellationToken ct = default)
-        => PostJsonAsync("/api/play", new StrPlayUrlRequest { Url = url, Title = title, Mime = mime, Icon = icon }, ct);
+    /// <summary>
+    /// Joue une URL. <paramref name="codec"/> et non « mime » : côté agent, mime
+    /// signifie « fichier de bibliothèque locale, passe l'URL telle quelle à
+    /// l'enceinte », ce qui désactive le relais de flux et le chemin des stations
+    /// natives. Le budget est long : c'est une commande qui réveille l'enceinte.
+    /// </summary>
+    public Task PlayUrlAsync(string url, string? title = null, string? codec = null, string? icon = null, CancellationToken ct = default)
+        => PostJsonAsync("/api/play", new StrPlayUrlRequest { Url = url, Title = title, Codec = codec, Icon = icon }, ct, WakeTimeout);
 
     // ---------------------------------------------------------------- Réglages
 
@@ -182,7 +281,7 @@ public sealed class StrApiClient
         => PutJsonAsync("/api/box/bass", new { value }, ct);
 
     public Task SetPowerAsync(bool on, CancellationToken ct = default)
-        => PostJsonAsync("/api/box/power", new { on }, ct);
+        => PostJsonAsync("/api/box/power", new { on }, ct, on ? WakeTimeout : null);
 
     /// <summary>Source physique : "AUX", "BLUETOOTH" ou "STANDBY".</summary>
     public Task SetSourceAsync(string source, CancellationToken ct = default)
@@ -196,21 +295,23 @@ public sealed class StrApiClient
             ct);
 
     public Task FormZoneAsync(StrZoneFormRequest request, CancellationToken ct = default)
-        => PostJsonAsync("/api/box/zone", request, ct);
+        => PostJsonAsync("/api/box/zone", request, ct, WakeTimeout);
 
     public async Task DissolveZoneAsync(CancellationToken ct = default)
     {
-        using var response = await _http.DeleteAsync(BaseUrl + "/api/box/zone", ct).ConfigureAwait(false);
-        await EnsureSuccessAsync(response, "/api/box/zone", ct).ConfigureAwait(false);
+        using var cts = Budget(null, ct);
+        using var response = await _http.DeleteAsync(BaseUrl + "/api/box/zone", cts.Token).ConfigureAwait(false);
+        await EnsureSuccessAsync(response, "/api/box/zone", cts.Token).ConfigureAwait(false);
     }
 
     // ---------------------------------------------------------------- Plomberie
 
-    private async Task<string> GetStringAsync(string path, CancellationToken ct)
+    private async Task<string> GetStringAsync(string path, CancellationToken ct, TimeSpan? timeout = null)
     {
-        using var response = await _http.GetAsync(BaseUrl + path, ct).ConfigureAwait(false);
-        await EnsureSuccessAsync(response, path, ct).ConfigureAwait(false);
-        return await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+        using var cts = Budget(timeout, ct);
+        using var response = await _http.GetAsync(BaseUrl + path, cts.Token).ConfigureAwait(false);
+        await EnsureSuccessAsync(response, path, cts.Token).ConfigureAwait(false);
+        return await response.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
     }
 
     private async Task<T?> GetJsonAsync<T>(string path, CancellationToken ct)
@@ -225,23 +326,25 @@ public sealed class StrApiClient
         return string.IsNullOrWhiteSpace(text) ? null : JsonDocument.Parse(text);
     }
 
-    private async Task PostAsync(string path, HttpContent? content, CancellationToken ct)
+    private async Task PostAsync(string path, HttpContent? content, CancellationToken ct, TimeSpan? timeout = null)
     {
-        using var response = await _http.PostAsync(BaseUrl + path, content ?? new StringContent(""), ct).ConfigureAwait(false);
-        await EnsureSuccessAsync(response, path, ct).ConfigureAwait(false);
+        using var cts = Budget(timeout, ct);
+        using var response = await _http.PostAsync(BaseUrl + path, content ?? new StringContent(""), cts.Token).ConfigureAwait(false);
+        await EnsureSuccessAsync(response, path, cts.Token).ConfigureAwait(false);
     }
 
-    private async Task PostJsonAsync<T>(string path, T body, CancellationToken ct)
+    private async Task PostJsonAsync<T>(string path, T body, CancellationToken ct, TimeSpan? timeout = null)
     {
         using var content = new StringContent(JsonSerializer.Serialize(body, JsonOptions), Encoding.UTF8, "application/json");
-        await PostAsync(path, content, ct).ConfigureAwait(false);
+        await PostAsync(path, content, ct, timeout).ConfigureAwait(false);
     }
 
-    private async Task PutJsonAsync<T>(string path, T body, CancellationToken ct)
+    private async Task PutJsonAsync<T>(string path, T body, CancellationToken ct, TimeSpan? timeout = null)
     {
         using var content = new StringContent(JsonSerializer.Serialize(body, JsonOptions), Encoding.UTF8, "application/json");
-        using var response = await _http.PutAsync(BaseUrl + path, content, ct).ConfigureAwait(false);
-        await EnsureSuccessAsync(response, path, ct).ConfigureAwait(false);
+        using var cts = Budget(timeout, ct);
+        using var response = await _http.PutAsync(BaseUrl + path, content, cts.Token).ConfigureAwait(false);
+        await EnsureSuccessAsync(response, path, cts.Token).ConfigureAwait(false);
     }
 
     private static async Task EnsureSuccessAsync(HttpResponseMessage response, string path, CancellationToken ct)

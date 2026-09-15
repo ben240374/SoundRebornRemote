@@ -140,5 +140,12 @@ public sealed class StrPlayUrlRequest
     [JsonPropertyName("url")] public string Url { get; set; } = "";
     [JsonPropertyName("title")] public string? Title { get; set; }
     [JsonPropertyName("icon")] public string? Icon { get; set; }
-    [JsonPropertyName("mime")] public string? Mime { get; set; }
+
+    /// <summary>
+    /// Format du flux : « AAC », « MP3 »… À ne pas confondre avec « mime », que
+    /// l'agent interprète comme « fichier de bibliothèque locale, passe l'URL telle
+    /// quelle à l'enceinte » — ce qui coupe le relais de flux et le chemin des
+    /// stations natives.
+    /// </summary>
+    [JsonPropertyName("codec")] public string? Codec { get; set; }
 }

@@ -20,6 +20,14 @@ public sealed class GabboSocket : IAsyncDisposable
     public const int DefaultPort = 8080;
 
     private static readonly TimeSpan PingInterval = TimeSpan.FromSeconds(60);
+
+    /// <summary>
+    /// Délai accordé au Pong. Sans lui, .NET envoie des Ping sans jamais vérifier
+    /// qu'on lui répond : après une mise en veille du téléphone, ReceiveAsync reste
+    /// bloqué indéfiniment, l'interface continue d'afficher « direct », et le repli
+    /// par sondage ne démarre pas puisqu'il dépend du même indicateur.
+    /// </summary>
+    private static readonly TimeSpan PongTimeout = TimeSpan.FromSeconds(15);
     private static readonly TimeSpan MaxBackoff = TimeSpan.FromSeconds(30);
 
     private readonly string _host;
@@ -35,6 +43,14 @@ public sealed class GabboSocket : IAsyncDisposable
 
     /// <summary>Volume mis à jour par l'enceinte (ou par une autre télécommande).</summary>
     public event EventHandler<VolumeState>? VolumeChanged;
+
+    /// <summary>
+    /// « Le volume a changé, relis-le. » Certains firmwares (27.0.6 au moins)
+    /// envoient un volumeUpdated vide : il annonce l'évènement sans le décrire.
+    /// On le traite comme presetsUpdated, en invitant à relire plutôt qu'en
+    /// prétendant connaître la nouvelle valeur.
+    /// </summary>
+    public event EventHandler? VolumeStale;
 
     /// <summary>Nouveau morceau, nouvelle source, pause, ...</summary>
     public event EventHandler<NowPlaying>? NowPlayingChanged;
@@ -101,6 +117,7 @@ public sealed class GabboSocket : IAsyncDisposable
             using var socket = new ClientWebSocket();
             socket.Options.AddSubProtocol("gabbo");
             socket.Options.KeepAliveInterval = PingInterval;
+            socket.Options.KeepAliveTimeout = PongTimeout;
 
             try
             {
@@ -205,9 +222,15 @@ public sealed class GabboSocket : IAsyncDisposable
             {
                 case "volumeUpdated":
                     var volume = update.Element("volume");
-                    if (volume is not null)
+
+                    if (volume is not null && volume.HasElements)
                     {
                         VolumeChanged?.Invoke(this, FirmwareXml.ParseVolume(volume));
+                    }
+                    else
+                    {
+                        // Trame sans contenu : on ne sait que « ça a bougé ».
+                        VolumeStale?.Invoke(this, EventArgs.Empty);
                     }
 
                     break;
