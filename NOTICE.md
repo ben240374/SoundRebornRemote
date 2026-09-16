@@ -1,3 +1,39 @@
+# Notices
+
+*English below · [Version française](#mentions)*
+
+## Trademarks
+
+This project is neither produced nor endorsed by Bose Corporation. "Bose" and
+"SoundTouch" are trademarks of Bose Corporation, named here only to state what
+hardware this application works with.
+
+## STR — SoundTouch Reborn
+
+The application talks to the **STR (SoundTouch Reborn)** agent by Jens Roggenfelder
+([JRpersonal](https://github.com/JRpersonal/streborn)), published under the MIT
+licence — <https://st-reborn.de>.
+
+STR's code is **not redistributed here**: the application only talks to the agent
+over the network, and does not install it.
+
+**SoundReborn Remote is an independent project.** It is not developed, maintained
+or supported by the STR project. Problems with this application should be reported
+[here](https://github.com/ben240374/SoundRebornRemote/issues), not to the STR
+project.
+
+## Station directory
+
+Station search queries [radio-browser.info](https://www.radio-browser.info), an open
+database maintained by volunteers.
+
+## Tools
+
+The code was written with Claude (Anthropic).
+
+---
+---
+
 # Mentions
 
 ## Marques

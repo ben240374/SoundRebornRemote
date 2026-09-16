@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SoundReborn Remote — Handbuch</title>
-<meta name="description" content="Handbuch — SoundReborn Remote, télécommande Android pour enceintes Bose SoundTouch.">
+<meta name="description" content="Handbuch — SoundReborn Remote, Android remote for Bose SoundTouch speakers.">
 <style>
 :root {
   --bg: #f4f6f9; --surface: #ffffff; --raised: #edf1f6; --border: #d6dee8;
@@ -17,6 +17,8 @@
   }
 }
 * { box-sizing: border-box; }
+.switch { margin: -6px 0 18px; font-size: 15px; }
+.switch a { color: var(--accent); }
 body {
   margin: 0; background: var(--bg); color: var(--text);
   font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -98,9 +100,9 @@ footer a { color: var(--muted); }
 </head>
 <body>
 <header class="top"><div class="wrap">
-  <a class="name" href="./index.html">SoundReborn Remote</a>
+  <a class="name" href="../index.html">SoundReborn Remote</a>
   <a href="https://github.com/ben240374/SoundRebornRemote">GitHub</a>
-  <a href="https://github.com/ben240374/SoundRebornRemote/releases">Téléchargement</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote/releases">Download</a>
   <a href="https://st-reborn.de">STR</a>
 </div></header>
 <div class="wrap">
@@ -191,11 +193,18 @@ Wirkung — ein Livestream lässt sich nicht zurückspulen.</p>
 <p>Der grüne Balken <strong>Standby</strong> schaltet den Lautsprecher aus; ist er aus, heißt er
 <strong>Einschalten</strong>.</p>
 <h3 id="lautstarke">Lautstärke</h3>
-<p>Stumm, minus, Regler, plus. Der Prozentwert steht rechts.</p>
+<p>Stumm, Angleichen, Minus, Regler, Plus. Der Prozentwert steht rechts.</p>
 <p>Gehört der Lautsprecher zu einer Gruppe, wird dieser Regler zur <strong>Lautstärke der ganzen
 Gruppe</strong>: Er verschiebt alle Lautsprecher um denselben Betrag und erhält damit das
-Verhältnis, das du zwischen ihnen eingestellt hast. Die einzelnen Lautstärken bleiben im
-Reiter Gruppen zugänglich.</p>
+Verhältnis, das du eingestellt hast. Küche auf 60, Wohnzimmer auf 30 — die Gruppe um 10
+angehoben ergibt 70 und 40, nicht 70 und 35.</p>
+<p>Die Taste <strong>=</strong> zwischen Stumm und Minus macht das Gegenteil: Sie setzt <em>alle</em>
+Lautsprecher der Gruppe auf den angezeigten Wert. Gruppe auf 25, alle auf 25. Sie
+erscheint nur, solange eine Gruppe aktiv ist — allein gibt es nichts anzugleichen.</p>
+<p>Unter dem Regler führt <strong>Pro Lautsprecher</strong> jedes Mitglied der Gruppe mit eigenem Regler
+und eigenen Tasten − und + auf, sodass du die Küche leiser stellen kannst, ohne das
+Wohnzimmer anzurühren. Ein ausgeschalteter Lautsprecher wird blass dargestellt und
+reagiert nicht: Ein Befehl an ihn ließe die App nur vergeblich warten.</p>
 <h3 id="bass-und-presets">Bass und Presets</h3>
 <p><img alt="Bass und Presets" src="../images/02-lecture-graves.jpg" /></p>
 <p>Der Bass reicht je nach Modell von -10 bis +10. <strong>Eine Höhenregelung gibt es nicht</strong>: Die
@@ -203,10 +212,21 @@ API des Lautsprechers bietet keine — das ist kein Versäumnis der App.</p>
 <p>Die sechs Presets stehen hier noch einmal, um einen Reiterwechsel zu sparen. Die grün
 umrandete Kachel ist die laufende.</p>
 <h3 id="gruppieren-mit">Gruppieren mit</h3>
-<p>Eine Schaltfläche je weiterem Lautsprecher. Tippen fügt ihn der Gruppe hinzu, ein Haken
-erscheint. Erneut tippen nimmt ihn wieder heraus. Der gesteuerte Lautsprecher ist der
-<strong>Master</strong>: Er sendet, die anderen folgen.</p>
-<p>Der Link <strong>Aktualisieren</strong> unten liest alles neu: laufenden Titel, Cover, Lautstärke,
+<p>Ein Plättchen je Lautsprecher, außer dem, der die Befehle erhält. Tippe darauf, um den
+Lautsprecher der Gruppe hinzuzufügen; ein Haken und ein grüner Rand erscheinen. Noch
+einmal tippen nimmt ihn wieder heraus.</p>
+<p><strong>Der Master wird ermittelt, nicht angenommen.</strong> In einer Gruppe gibt ein Lautsprecher
+wieder, die anderen folgen ihm. Wählst du einen folgenden Lautsprecher, sagt die App es
+— <em>Gruppiert mit …</em>, in Bernstein — und schickt Transport, Presets, Standby und
+Lautstärke an den Master, denn er ist es, der wiedergibt. Einen Lautsprecher zu wählen
+unterbricht also nie, was gerade läuft.</p>
+<p>Auf einem folgenden Lautsprecher ist das angehakte Plättchen dieser Lautsprecher selbst:
+Tippen verlässt die Gruppe. Erweitert wird die Gruppe vom Master aus, denn er stellt sie
+zusammen.</p>
+<p><strong>Einen Lautsprecher auszuschalten nimmt ihn zuerst aus der Gruppe</strong> und löst die Gruppe
+auf, wenn es der letzte war. Beim Wiedereinschalten steht er allein da, gibt wieder, was
+er wiederzugeben hat, und kann erneut gruppiert werden.</p>
+<p>Der Link <strong>Aktualisieren</strong> unten liest alles neu: laufender Titel, Cover, Lautstärke,
 Zustand der Gruppe.</p>
 <hr />
 <h2 id="5-der-reiter-presets">5. Der Reiter Presets</h2>
@@ -252,36 +272,47 @@ erneut zu starten.</p>
 <hr />
 <h2 id="7-der-reiter-gruppen">7. Der Reiter Gruppen</h2>
 <p><img alt="Gruppen" src="../images/05-groupes.jpg" /></p>
-<p><strong>Master-Lautsprecher</strong> nennt den sendenden. Um den Master zu wechseln, wechsle im Reiter
-Wiedergabe den aktiven Lautsprecher.</p>
+<p><strong>Master-Lautsprecher</strong> nennt den, der tatsächlich wiedergibt — von den Lautsprechern
+selbst gelesen, nicht als der angenommen, den du ausgewählt hast.</p>
 <p><strong>Zu gruppierende Lautsprecher</strong>: Hake die an, die folgen sollen, dann <strong>Gruppieren</strong>.
 <strong>Auflösen</strong> löst die ganze Gruppe auf.</p>
+<p>Ein Lautsprecher gehört immer nur zu einer Gruppe, und der Master stellt sie zusammen.
+Folgt der ausgewählte Lautsprecher einem anderen, ist <strong>Gruppieren</strong> ausgegraut und eine
+Meldung verweist auf den Master.</p>
 <p>Die Option <strong>Dauerhafte Gruppe</strong> bittet den Agenten, die Gruppe bei der nächsten
-Wiedergabe wiederherzustellen, statt sie zerfallen zu lassen, wenn die Musik endet.</p>
-<p><strong>Gruppenlautstärke</strong> wirkt auf alle Lautsprecher zugleich. Unter diesem Regler hat jeder
-Lautsprecher der Gruppe seinen eigenen, sodass sich die Küche leiser stellen lässt, ohne
-das Wohnzimmer anzurühren. <strong>Auf ganze Gruppe anwenden</strong> setzt alle auf denselben Wert.</p>
-<p>Ein Verhalten sollte man kennen: Der Gruppenregler <strong>verschiebt</strong> die Lautstärken und
-erhält dabei die Abstände. Steht die Küche auf 60 und das Wohnzimmer auf 30, ergibt ein
-Anheben um 10 die Werte 70 und 40 — nicht 70 und 35.</p>
+Wiedergabe neu zu bilden, statt sie zerfallen zu lassen, wenn die Musik endet. Die App
+liest dieses Kennzeichen jetzt zurück, bevor sie eine bestehende Gruppe erweitert, und
+gibt es unverändert weiter: Einen Lautsprecher hinzuzufügen macht aus einer dauerhaften
+Gruppe keine gewöhnliche mehr.</p>
+<p><strong>Gruppenlautstärke</strong> wirkt auf alle Lautsprecher zugleich und verschiebt die Werte,
+ohne die Abstände anzutasten. Küche auf 60, Wohnzimmer auf 30 — die Gruppe um 10
+angehoben ergibt 70 und 40, nicht 70 und 35. Unter dem Regler hat jeder Lautsprecher der
+Gruppe seinen eigenen. <strong>Auf die ganze Gruppe anwenden</strong> setzt alle auf denselben Wert,
+genau wie die Taste <strong>=</strong> im Reiter Wiedergabe.</p>
 <hr />
 <h2 id="8-der-reiter-einstellungen">8. Der Reiter Einstellungen</h2>
 <p><img alt="Bekannte Lautsprecher" src="../images/07-reglages-enceintes.jpg" /></p>
-<p><strong>Aktiver Lautsprecher</strong>: Name, Adresse, Modell und Version des Agenten.</p>
-<p><strong>Sprache</strong>: Französisch, Englisch, Deutsch, Niederländisch, Spanisch. Die Änderung wirkt
-sofort, ohne Neustart, und wird behalten.</p>
-<p><strong>Design</strong>: System, Hell oder Dunkel. „System" folgt der Anzeigeeinstellung des Telefons,
+<p><strong>Ausgewählter Lautsprecher</strong>: Name, Adresse und Modell. Das ist der Lautsprecher, den
+du gewählt hast — nicht zwingend der, der die Befehle erhält. Folgt er einer Gruppe,
+sagt eine bernsteinfarbene Zeile, wohin die Befehle tatsächlich gehen und warum.</p>
+<p><strong>Sprache</strong>: Deutsch, Französisch, Englisch, Niederländisch, Spanisch. Die Umstellung
+gilt sofort, ohne Neustart, und wird gemerkt.</p>
+<p><strong>Thema</strong>: System, Hell oder Dunkel. „System" folgt der Anzeigeeinstellung des Telefons,
 einschließlich der automatischen Umschaltung am Abend.</p>
-<p><strong>Suche</strong>: der Suchlauf und die manuelle Eingabe per IP-Adresse.</p>
-<p><strong>Bekannte Lautsprecher</strong>: die gemerkte Liste. <strong>Verwenden</strong> wechselt dorthin, <strong>✕</strong>
-vergisst den Eintrag. Ein Lautsprecher mit dem Hinweis <strong>„Ohne STR — bereit zur
-Installation"</strong> antwortet einwandfrei, hat aber keinen Agenten; weiter unten erscheint
-dann ein Erklärungsblock mit einem Link zur Seite des STR-Projekts.</p>
-<p><strong>Diagnose</strong>: <em>Aktiven Lautsprecher abfragen</em> zeigt, was der Lautsprecher tatsächlich
-meldet — Name, Modell, Geräte-ID, Firmwareversion, Vorhandensein des Agenten, Zustand der
-Benachrichtigungen, Bassbereich, Liste der erkannten API-Endpunkte. Das ist die Angabe,
-die man einer Fehlermeldung beilegt. <em>Logo-Cache leeren</em> erzwingt das erneute
-Herunterladen der Senderbilder.</p>
+<p><strong>Suche</strong>: der Netzwerk-Scan und die manuelle Eingabe einer IP-Adresse. Die Suche fragt
+zuerst mDNS und durchsucht das Subnetz nur, wenn dabei nichts gefunden wird. Der
+Durchlauf ist auf private Adressbereiche beschränkt und erreicht damit nie ein Mobilnetz
+oder einen VPN-Tunnel.</p>
+<p><strong>Bekannte Lautsprecher</strong>: die gemerkte Liste. <strong>Verwenden</strong> wechselt zu einem, <strong>✕</strong>
+vergisst ihn. Ein Lautsprecher mit dem Hinweis <strong>„Kein STR — bereit zur Installation"</strong>
+antwortet einwandfrei, hat aber keinen Agenten; weiter unten erscheint dann ein
+erklärender Block mit einem Link zur Seite des STR-Projekts.</p>
+<p><strong>Diagnose</strong>: <em>Lautsprecher abfragen</em> betrifft den <strong>ausgewählten</strong> Lautsprecher — Name,
+Modell, Geräte-ID, Firmware-Version, den Agenten mit Port und live auf 17008 und 8888
+gelesener Version, den Zustand der Benachrichtigungen, den Bassbereich, die Liste der
+erkannten API-Endpunkte und das, was jeder bekannte Lautsprecher über die aktuelle Zone
+sagt. Das sind die Angaben, die in eine Fehlermeldung gehören. <em>Logo-Cache leeren</em>
+erzwingt das erneute Laden der Senderbilder.</p>
 <p><strong>Über</strong>: die Version, der Dank an das STR-Projekt mit einem Link zu dessen Seite in der
 gewählten Sprache, und die rechtlichen Hinweise.</p>
 <hr />
@@ -342,10 +373,7 @@ hätte diese App nichts zu steuern.</p>
 <p>Das Senderverzeichnis stellt <a href="https://www.radio-browser.info">radio-browser.info</a> bereit.</p>
 <p>Der Code wurde mit Claude (Anthropic) geschrieben.</p>
 <footer>
-  <p>SoundReborn Remote — licence MIT. Projet personnel, sans lien avec Bose Corporation.
-  « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer
-  la compatibilité. Indépendant du projet
-  <a href="https://st-reborn.de">STR</a>, qui n'en assure pas le support.</p>
+  <p>SoundReborn Remote — MIT-Lizenz. Persönliches Projekt, ohne Verbindung zu Bose Corporation. „Bose“ und „SoundTouch“ sind Marken der Bose Corporation, hier nur zur Angabe der Kompatibilität genannt. Unabhängig vom Projekt <a href="https://st-reborn.de">STR</a>, das keinen Support dafür leistet.</p>
 </footer>
 </div>
 </body>

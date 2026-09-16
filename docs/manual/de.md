@@ -117,12 +117,21 @@ Der grüne Balken **Standby** schaltet den Lautsprecher aus; ist er aus, heißt 
 
 ### Lautstärke
 
-Stumm, minus, Regler, plus. Der Prozentwert steht rechts.
+Stumm, Angleichen, Minus, Regler, Plus. Der Prozentwert steht rechts.
 
 Gehört der Lautsprecher zu einer Gruppe, wird dieser Regler zur **Lautstärke der ganzen
 Gruppe**: Er verschiebt alle Lautsprecher um denselben Betrag und erhält damit das
-Verhältnis, das du zwischen ihnen eingestellt hast. Die einzelnen Lautstärken bleiben im
-Reiter Gruppen zugänglich.
+Verhältnis, das du eingestellt hast. Küche auf 60, Wohnzimmer auf 30 — die Gruppe um 10
+angehoben ergibt 70 und 40, nicht 70 und 35.
+
+Die Taste **=** zwischen Stumm und Minus macht das Gegenteil: Sie setzt *alle*
+Lautsprecher der Gruppe auf den angezeigten Wert. Gruppe auf 25, alle auf 25. Sie
+erscheint nur, solange eine Gruppe aktiv ist — allein gibt es nichts anzugleichen.
+
+Unter dem Regler führt **Pro Lautsprecher** jedes Mitglied der Gruppe mit eigenem Regler
+und eigenen Tasten − und + auf, sodass du die Küche leiser stellen kannst, ohne das
+Wohnzimmer anzurühren. Ein ausgeschalteter Lautsprecher wird blass dargestellt und
+reagiert nicht: Ein Befehl an ihn ließe die App nur vergeblich warten.
 
 ### Bass und Presets
 
@@ -136,11 +145,25 @@ umrandete Kachel ist die laufende.
 
 ### Gruppieren mit
 
-Eine Schaltfläche je weiterem Lautsprecher. Tippen fügt ihn der Gruppe hinzu, ein Haken
-erscheint. Erneut tippen nimmt ihn wieder heraus. Der gesteuerte Lautsprecher ist der
-**Master**: Er sendet, die anderen folgen.
+Ein Plättchen je Lautsprecher, außer dem, der die Befehle erhält. Tippe darauf, um den
+Lautsprecher der Gruppe hinzuzufügen; ein Haken und ein grüner Rand erscheinen. Noch
+einmal tippen nimmt ihn wieder heraus.
 
-Der Link **Aktualisieren** unten liest alles neu: laufenden Titel, Cover, Lautstärke,
+**Der Master wird ermittelt, nicht angenommen.** In einer Gruppe gibt ein Lautsprecher
+wieder, die anderen folgen ihm. Wählst du einen folgenden Lautsprecher, sagt die App es
+— *Gruppiert mit …*, in Bernstein — und schickt Transport, Presets, Standby und
+Lautstärke an den Master, denn er ist es, der wiedergibt. Einen Lautsprecher zu wählen
+unterbricht also nie, was gerade läuft.
+
+Auf einem folgenden Lautsprecher ist das angehakte Plättchen dieser Lautsprecher selbst:
+Tippen verlässt die Gruppe. Erweitert wird die Gruppe vom Master aus, denn er stellt sie
+zusammen.
+
+**Einen Lautsprecher auszuschalten nimmt ihn zuerst aus der Gruppe** und löst die Gruppe
+auf, wenn es der letzte war. Beim Wiedereinschalten steht er allein da, gibt wieder, was
+er wiederzugeben hat, und kann erneut gruppiert werden.
+
+Der Link **Aktualisieren** unten liest alles neu: laufender Titel, Cover, Lautstärke,
 Zustand der Gruppe.
 
 ---
@@ -208,22 +231,27 @@ erneut zu starten.
 
 ![Gruppen](../images/05-groupes.jpg)
 
-**Master-Lautsprecher** nennt den sendenden. Um den Master zu wechseln, wechsle im Reiter
-Wiedergabe den aktiven Lautsprecher.
+**Master-Lautsprecher** nennt den, der tatsächlich wiedergibt — von den Lautsprechern
+selbst gelesen, nicht als der angenommen, den du ausgewählt hast.
 
 **Zu gruppierende Lautsprecher**: Hake die an, die folgen sollen, dann **Gruppieren**.
 **Auflösen** löst die ganze Gruppe auf.
 
+Ein Lautsprecher gehört immer nur zu einer Gruppe, und der Master stellt sie zusammen.
+Folgt der ausgewählte Lautsprecher einem anderen, ist **Gruppieren** ausgegraut und eine
+Meldung verweist auf den Master.
+
 Die Option **Dauerhafte Gruppe** bittet den Agenten, die Gruppe bei der nächsten
-Wiedergabe wiederherzustellen, statt sie zerfallen zu lassen, wenn die Musik endet.
+Wiedergabe neu zu bilden, statt sie zerfallen zu lassen, wenn die Musik endet. Die App
+liest dieses Kennzeichen jetzt zurück, bevor sie eine bestehende Gruppe erweitert, und
+gibt es unverändert weiter: Einen Lautsprecher hinzuzufügen macht aus einer dauerhaften
+Gruppe keine gewöhnliche mehr.
 
-**Gruppenlautstärke** wirkt auf alle Lautsprecher zugleich. Unter diesem Regler hat jeder
-Lautsprecher der Gruppe seinen eigenen, sodass sich die Küche leiser stellen lässt, ohne
-das Wohnzimmer anzurühren. **Auf ganze Gruppe anwenden** setzt alle auf denselben Wert.
-
-Ein Verhalten sollte man kennen: Der Gruppenregler **verschiebt** die Lautstärken und
-erhält dabei die Abstände. Steht die Küche auf 60 und das Wohnzimmer auf 30, ergibt ein
-Anheben um 10 die Werte 70 und 40 — nicht 70 und 35.
+**Gruppenlautstärke** wirkt auf alle Lautsprecher zugleich und verschiebt die Werte,
+ohne die Abstände anzutasten. Küche auf 60, Wohnzimmer auf 30 — die Gruppe um 10
+angehoben ergibt 70 und 40, nicht 70 und 35. Unter dem Regler hat jeder Lautsprecher der
+Gruppe seinen eigenen. **Auf die ganze Gruppe anwenden** setzt alle auf denselben Wert,
+genau wie die Taste **=** im Reiter Wiedergabe.
 
 ---
 
@@ -231,26 +259,32 @@ Anheben um 10 die Werte 70 und 40 — nicht 70 und 35.
 
 ![Bekannte Lautsprecher](../images/07-reglages-enceintes.jpg)
 
-**Aktiver Lautsprecher**: Name, Adresse, Modell und Version des Agenten.
+**Ausgewählter Lautsprecher**: Name, Adresse und Modell. Das ist der Lautsprecher, den
+du gewählt hast — nicht zwingend der, der die Befehle erhält. Folgt er einer Gruppe,
+sagt eine bernsteinfarbene Zeile, wohin die Befehle tatsächlich gehen und warum.
 
-**Sprache**: Französisch, Englisch, Deutsch, Niederländisch, Spanisch. Die Änderung wirkt
-sofort, ohne Neustart, und wird behalten.
+**Sprache**: Deutsch, Französisch, Englisch, Niederländisch, Spanisch. Die Umstellung
+gilt sofort, ohne Neustart, und wird gemerkt.
 
-**Design**: System, Hell oder Dunkel. „System" folgt der Anzeigeeinstellung des Telefons,
+**Thema**: System, Hell oder Dunkel. „System" folgt der Anzeigeeinstellung des Telefons,
 einschließlich der automatischen Umschaltung am Abend.
 
-**Suche**: der Suchlauf und die manuelle Eingabe per IP-Adresse.
+**Suche**: der Netzwerk-Scan und die manuelle Eingabe einer IP-Adresse. Die Suche fragt
+zuerst mDNS und durchsucht das Subnetz nur, wenn dabei nichts gefunden wird. Der
+Durchlauf ist auf private Adressbereiche beschränkt und erreicht damit nie ein Mobilnetz
+oder einen VPN-Tunnel.
 
-**Bekannte Lautsprecher**: die gemerkte Liste. **Verwenden** wechselt dorthin, **✕**
-vergisst den Eintrag. Ein Lautsprecher mit dem Hinweis **„Ohne STR — bereit zur
-Installation"** antwortet einwandfrei, hat aber keinen Agenten; weiter unten erscheint
-dann ein Erklärungsblock mit einem Link zur Seite des STR-Projekts.
+**Bekannte Lautsprecher**: die gemerkte Liste. **Verwenden** wechselt zu einem, **✕**
+vergisst ihn. Ein Lautsprecher mit dem Hinweis **„Kein STR — bereit zur Installation"**
+antwortet einwandfrei, hat aber keinen Agenten; weiter unten erscheint dann ein
+erklärender Block mit einem Link zur Seite des STR-Projekts.
 
-**Diagnose**: *Aktiven Lautsprecher abfragen* zeigt, was der Lautsprecher tatsächlich
-meldet — Name, Modell, Geräte-ID, Firmwareversion, Vorhandensein des Agenten, Zustand der
-Benachrichtigungen, Bassbereich, Liste der erkannten API-Endpunkte. Das ist die Angabe,
-die man einer Fehlermeldung beilegt. *Logo-Cache leeren* erzwingt das erneute
-Herunterladen der Senderbilder.
+**Diagnose**: *Lautsprecher abfragen* betrifft den **ausgewählten** Lautsprecher — Name,
+Modell, Geräte-ID, Firmware-Version, den Agenten mit Port und live auf 17008 und 8888
+gelesener Version, den Zustand der Benachrichtigungen, den Bassbereich, die Liste der
+erkannten API-Endpunkte und das, was jeder bekannte Lautsprecher über die aktuelle Zone
+sagt. Das sind die Angaben, die in eine Fehlermeldung gehören. *Logo-Cache leeren*
+erzwingt das erneute Laden der Senderbilder.
 
 **Über**: die Version, der Dank an das STR-Projekt mit einem Link zu dessen Seite in der
 gewählten Sprache, und die rechtlichen Hinweise.

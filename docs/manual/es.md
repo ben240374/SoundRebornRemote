@@ -113,12 +113,21 @@ La banda verde **Reposo** apaga el altavoz; una vez apagado, pasa a leerse **Enc
 
 ### Volumen
 
-Silencio, menos, control deslizante, más. El porcentaje aparece a la derecha.
+Silencio, igualar, menos, control deslizante, más. El porcentaje aparece a la derecha.
 
-Cuando el altavoz forma parte de un grupo, este control pasa a ser **el volumen de todo el
-grupo**: moverlo desplaza todos los altavoces la misma cantidad, lo que conserva el
-equilibrio que hayas fijado entre ellos. Los volúmenes individuales siguen disponibles en
-la pestaña Grupos.
+Cuando el altavoz forma parte de un grupo, este control pasa a ser **el volumen de todo
+el grupo**: moverlo desplaza todos los altavoces en la misma medida, lo que conserva el
+equilibrio que has ajustado entre ellos. Cocina a 60 y salón a 30 — subir el grupo 10 da
+70 y 40, no 70 y 35.
+
+La tecla **=**, entre silencio y menos, hace lo contrario: pone *todos* los altavoces
+del grupo en el valor mostrado. Grupo a 25, todos a 25. Solo aparece mientras hay un
+grupo activo — en solitario, un altavoz no tiene nada que igualar.
+
+Debajo del control, **Por altavoz** muestra una línea por miembro del grupo, con su
+propio control y sus teclas − y +, para bajar la cocina sin tocar el salón. Un altavoz
+apagado aparece atenuado y no responde: enviarle una orden solo haría esperar a la
+aplicación para nada.
 
 ### Graves y presintonías
 
@@ -132,12 +141,24 @@ borde verde es la que suena.
 
 ### Agrupar con
 
-Un botón por cada uno de los demás altavoces. Tócalo para sumarlo al grupo; aparece una
-marca de verificación. Tócalo de nuevo para sacarlo. El altavoz controlado es el
-**maestro**: es el que emite, los demás lo siguen.
+Una pastilla por altavoz, salvo el que recibe las órdenes. Tócala para añadir ese
+altavoz al grupo; aparecen una marca y un contorno verde. Tócala de nuevo para sacarlo.
 
-El enlace **Actualizar**, abajo, vuelve a leerlo todo: título en curso, carátula, volumen,
-estado del grupo.
+**El maestro se busca, no se supone.** En un grupo, un altavoz reproduce y los demás lo
+siguen. Si seleccionas un altavoz que sigue, la aplicación lo dice — *Agrupado con …*,
+en ámbar — y envía el transporte, las presintonías, el reposo y el volumen al maestro,
+porque es él quien reproduce. Seleccionar un altavoz, por tanto, nunca interrumpe lo que
+estás escuchando.
+
+En un altavoz que sigue, la pastilla marcada es ese mismo altavoz: tocarla lo saca del
+grupo. Ampliar el grupo se hace desde el maestro, ya que es él quien lo compone.
+
+**Apagar un altavoz lo saca primero del grupo** y disuelve el grupo si era el último. Al
+volver a encenderlo tienes un altavoz solo, reproduciendo lo que le toca, que puedes
+agrupar de nuevo.
+
+El enlace **Actualizar**, abajo, relee todo: título en curso, carátula, volumen y estado
+del grupo.
 
 ---
 
@@ -204,22 +225,26 @@ volver a empezar.
 
 ![Grupos](../images/05-groupes.jpg)
 
-**Altavoz maestro** indica cuál emite. Para cambiar de maestro, cambia de altavoz activo
-en la pestaña Reproducción.
+**Altavoz maestro** indica cuál reproduce de verdad — leído en los propios altavoces, no
+supuesto como el que has seleccionado.
 
-**Altavoces a agrupar**: marca los que deben seguir y luego **Agrupar**. **Disolver**
-deshace el grupo entero.
+**Altavoces a agrupar**: marca los que deben seguir y pulsa **Agrupar**. **Disolver**
+deshace todo el grupo.
 
-La opción **Grupo permanente** pide al agente que rehaga el grupo en la siguiente
-reproducción, en lugar de dejar que se deshaga cuando la música se detiene.
+Un altavoz pertenece a un solo grupo a la vez, y es el maestro quien lo compone. Si el
+altavoz seleccionado sigue a otro, **Agrupar** aparece atenuado y un mensaje te remite
+al maestro.
 
-**Volumen del grupo** actúa sobre todos los altavoces a la vez. Bajo ese control, cada
-altavoz del grupo tiene el suyo, lo que permite bajar la cocina sin tocar el salón.
-**Aplicar a todo el grupo** iguala a todos en el mismo valor.
+La opción **Grupo permanente** pide al agente que rehaga el grupo en la próxima
+reproducción, en lugar de dejar que se deshaga cuando la música para. La aplicación
+ahora relee este indicador antes de ampliar un grupo existente y lo devuelve sin
+cambios: añadir un altavoz ya no degrada un grupo permanente a grupo corriente.
 
-Conviene conocer un comportamiento: el control de conjunto **desplaza** los volúmenes
-conservando las diferencias. Si la cocina está a 60 y el salón a 30, subir el conjunto 10
-da 70 y 40, no 70 y 35.
+**Volumen del grupo** actúa sobre todos los altavoces a la vez, desplazando los
+volúmenes sin tocar las diferencias. Cocina a 60 y salón a 30 — subir el grupo 10 da 70
+y 40, no 70 y 35. Debajo de ese control, cada altavoz del grupo tiene el suyo.
+**Aplicar a todo el grupo** pone a todos en el mismo valor, igual que la tecla **=** de
+la pestaña Reproducción.
 
 ---
 
@@ -227,29 +252,35 @@ da 70 y 40, no 70 y 35.
 
 ![Altavoces conocidos](../images/07-reglages-enceintes.jpg)
 
-**Altavoz activo**: nombre, dirección, modelo y versión del agente.
+**Altavoz seleccionado**: nombre, dirección y modelo. Es el altavoz que has elegido — no
+necesariamente el que recibe las órdenes. Cuando sigue a un grupo, una línea ámbar
+indica adónde van realmente las órdenes, y por qué.
 
-**Idioma**: francés, inglés, alemán, neerlandés, español. El cambio es inmediato, sin
-reiniciar, y se recuerda.
+**Idioma**: español, francés, inglés, alemán, neerlandés. El cambio es inmediato, sin
+reiniciar, y queda memorizado.
 
 **Tema**: Sistema, Claro u Oscuro. «Sistema» sigue el ajuste de pantalla del teléfono,
-incluido su cambio automático por la noche.
+incluido su cambio automático al anochecer.
 
-**Búsqueda**: el escaneo y la adición manual por dirección IP.
+**Búsqueda**: el rastreo de la red y la introducción manual de una dirección IP. El
+descubrimiento pregunta primero por mDNS y solo recorre la subred si no encuentra nada.
+El recorrido se limita a los rangos de direcciones privadas, así que nunca alcanza una
+red móvil ni un túnel VPN.
 
-**Altavoces conocidos**: la lista memorizada. **Usar** cambia a ese altavoz, **✕** lo
-olvida. Un altavoz marcado **«Sin STR — listo para instalar»** responde correctamente pero
-no tiene agente; más abajo aparece entonces un bloque explicativo con un enlace al sitio
-del proyecto STR.
+**Altavoces conocidos**: la lista memorizada. **Usar** cambia a uno, **✕** lo olvida. Un
+altavoz marcado **«Sin STR — listo para la instalación»** responde bien pero no tiene el
+agente; más abajo aparece entonces un bloque explicativo con un enlace al sitio del
+proyecto STR.
 
-**Diagnóstico**: *Consultar el altavoz activo* muestra lo que el altavoz declara realmente
-— nombre, modelo, identificador, versión del firmware, presencia del agente, estado de las
-notificaciones, rango de graves, lista de puntos de API reconocidos. Es la información que
-conviene adjuntar a un informe de problema. *Vaciar la caché de logotipos* obliga a
-descargar de nuevo las imágenes de las emisoras.
+**Diagnóstico**: *Consultar el altavoz* se refiere al altavoz **seleccionado** — nombre,
+modelo, identificador, versión del firmware, el agente con su puerto y su versión leída
+en directo en 17008 y 8888, el estado de las notificaciones, el rango de graves, la
+lista de puntos de API reconocidos, y lo que cada altavoz conocido declara sobre la zona
+en curso. Esta es la información que debe adjuntarse a un informe de problema. *Vaciar
+la caché de logotipos* fuerza la nueva descarga de las imágenes de emisoras.
 
-**Acerca de**: la versión, el crédito al proyecto STR con el enlace a su sitio en el idioma
-elegido, y los avisos legales.
+**Acerca de**: la versión, el crédito al proyecto STR con un enlace a su sitio en el
+idioma elegido, y los avisos legales.
 
 ---
 

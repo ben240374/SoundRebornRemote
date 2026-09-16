@@ -117,12 +117,21 @@ Le bandeau vert **Veille** éteint l'enceinte ; une fois éteinte, il devient **
 
 ### Volume
 
-Sourdine, moins, curseur, plus. Le pourcentage s'affiche à droite.
+Sourdine, égaliser, moins, curseur, plus. Le pourcentage s'affiche à droite.
 
 Quand l'enceinte fait partie d'un groupe, ce curseur devient **le volume de l'ensemble
 du groupe** : le déplacer décale toutes les enceintes du même écart, ce qui préserve
-l'équilibre que tu as réglé entre elles. Les volumes individuels restent accessibles
-dans l'onglet Groupes.
+l'équilibre que tu as réglé entre elles. Cuisine à 60 et salon à 30, monter le groupe de
+10 donne 70 et 40, pas 70 et 35.
+
+La touche **=**, entre la sourdine et le moins, fait l'inverse : elle met *toutes* les
+enceintes du groupe à la valeur affichée. Groupe à 25, tout le monde à 25. Elle
+n'apparaît que lorsqu'un groupe est actif — seule, une enceinte n'a rien à égaliser.
+
+Sous le curseur, **Par enceinte** donne une ligne par membre du groupe, avec son propre
+curseur et ses touches − et +, pour baisser la cuisine sans toucher au salon. Une
+enceinte éteinte apparaît estompée et ne réagit pas : lui envoyer une commande ne ferait
+qu'attendre pour rien.
 
 ### Graves et présélections
 
@@ -137,9 +146,23 @@ encadrée de vert est celle qui joue.
 
 ### Grouper avec
 
-Une pastille par autre enceinte. Touche-la pour la joindre au groupe ; une coche
-apparaît. Touche-la de nouveau pour l'en retirer. L'enceinte pilotée est le **maître** :
-c'est elle qui diffuse, les autres suivent.
+Une pastille par enceinte, hors celle qui reçoit les commandes. Touche une pastille pour
+joindre cette enceinte au groupe ; une coche et un contour vert apparaissent. Touche-la
+de nouveau pour l'en retirer.
+
+**Le maître se cherche, il ne se suppose pas.** Dans un groupe, une enceinte diffuse et
+les autres la suivent. Si tu sélectionnes une enceinte qui suit, l'application le dit —
+*Groupé avec …*, en ambre — et adresse le transport, les présélections, la veille et le
+volume au maître, puisque c'est lui qui diffuse. Sélectionner une enceinte n'interrompt
+donc jamais ce que tu es en train d'écouter.
+
+Sur une enceinte qui suit, la pastille cochée est cette enceinte elle-même : la toucher
+la fait quitter le groupe. L'extension du groupe se fait depuis le maître, puisque c'est
+lui qui le compose.
+
+**Éteindre une enceinte la sort d'abord du groupe**, et dissout le groupe si c'était la
+dernière. En la rallumant, tu retrouves une enceinte seule, qui diffuse ce qu'elle a à
+diffuser, et que tu peux regrouper.
 
 Le lien **Rafraîchir**, en bas, relit tout : titre en cours, pochette, volume, état du
 groupe.
@@ -210,22 +233,26 @@ relancer.
 
 ![Groupes](../images/05-groupes.jpg)
 
-**Enceinte maître** rappelle laquelle diffuse. Pour changer de maître, change d'enceinte
-active dans l'onglet Lecture.
+**Enceinte maître** indique celle qui diffuse réellement — relevée sur les enceintes
+elles-mêmes, et non supposée être celle que tu as sélectionnée.
 
 **Enceintes à grouper** : coche celles qui doivent suivre, puis **Grouper**.
-**Dissoudre** défait le groupe entier.
+**Dissoudre** défait tout le groupe.
+
+Une enceinte n'appartient qu'à un groupe à la fois, et c'est le maître qui le compose.
+Si l'enceinte que tu as sélectionnée en suit une autre, **Grouper** est grisé et un
+message te renvoie vers le maître.
 
 L'option **Groupe permanent** demande à l'agent de reformer le groupe à la prochaine
-lecture, au lieu de le laisser se défaire quand la musique s'arrête.
+lecture, au lieu de le laisser se défaire quand la musique s'arrête. L'application relit
+désormais ce drapeau avant d'étendre un groupe existant et le rend tel quel : ajouter une
+enceinte ne rétrograde plus un groupe permanent en groupe ordinaire.
 
-**Volume du groupe** agit sur toutes les enceintes à la fois. Sous ce curseur, chaque
-enceinte du groupe a le sien, ce qui permet de baisser la cuisine sans toucher au salon.
-**Appliquer à tout le groupe** aligne tout le monde sur la même valeur.
-
-Le comportement mérite d'être connu : le curseur d'ensemble **décale** les volumes en
-conservant les écarts. Si la cuisine est à 60 et le salon à 30, monter l'ensemble de 10
-donne 70 et 40 — et non 70 et 35.
+**Volume du groupe** agit sur toutes les enceintes à la fois, en décalant les volumes
+sans toucher aux écarts. Cuisine à 60 et salon à 30, monter le groupe de 10 donne 70 et
+40, pas 70 et 35. Sous ce curseur, chaque enceinte du groupe a le sien. **Appliquer à
+tout le groupe** met tout le monde à la même valeur, ce que fait aussi la touche **=**
+de l'onglet Lecture.
 
 ---
 
@@ -233,28 +260,34 @@ donne 70 et 40 — et non 70 et 35.
 
 ![Enceintes connues](../images/07-reglages-enceintes.jpg)
 
-**Enceinte active** : nom, adresse, modèle et version de l'agent.
+**Enceinte sélectionnée** : nom, adresse et modèle. C'est l'enceinte que tu as choisie —
+pas forcément celle qui reçoit les commandes. Quand elle suit un groupe, une ligne ambre
+dit où partent réellement les commandes, et pourquoi.
 
 **Langue** : français, anglais, allemand, néerlandais, espagnol. Le changement est
-immédiat, sans redémarrage, et retenu.
+immédiat, sans redémarrage, et il est mémorisé.
 
 **Thème** : Système, Clair ou Foncé. « Système » suit le réglage d'affichage du
 téléphone, y compris sa bascule automatique le soir.
 
-**Recherche** : le balayage, et l'ajout manuel par adresse IP.
+**Recherche** : le balayage du réseau, et la saisie manuelle d'une adresse IP. La
+découverte interroge d'abord le mDNS et ne balaie le sous-réseau que si elle ne trouve
+rien. Le balayage est restreint aux plages d'adresses privées : il n'atteint donc jamais
+un réseau mobile ni un tunnel VPN.
 
 **Enceintes connues** : la liste mémorisée. **Utiliser** bascule dessus, **✕** l'oublie.
-Une enceinte marquée **« Sans STR — prête pour l'installation »** répond bien, mais sans
-agent : un bloc d'explication apparaît alors plus bas, avec un lien vers le site du
-projet STR.
+Une enceinte marquée **« Pas de STR — prête pour l'installation »** répond correctement
+mais n'a pas l'agent ; un bloc explicatif apparaît alors plus bas, avec un lien vers le
+site du projet STR.
 
-**Diagnostic** : *Interroger l'enceinte active* affiche ce que l'enceinte déclare
-réellement — nom, modèle, identifiant, version du firmware, présence de l'agent, état des
-notifications, plage de graves, liste des points d'API reconnus. C'est l'information à
-joindre à un rapport de problème. *Vider le cache des logos* force le retéléchargement
-des images de stations.
+**Diagnostic** : *Interroger l'enceinte* porte sur l'enceinte **sélectionnée** — nom,
+modèle, identifiant, version du firmware, l'agent avec son port et sa version relue en
+direct sur 17008 et 8888, l'état des notifications, la plage de graves, la liste des
+points d'API reconnus, et ce que chaque enceinte connue déclare de la zone en cours.
+C'est l'information à joindre à un signalement de problème. *Vider le cache des logos*
+force le retéléchargement des images de stations.
 
-**À propos** : la version, le crédit au projet STR avec le lien vers son site dans la
+**À propos** : la version, le crédit au projet STR avec un lien vers son site dans la
 langue choisie, et les mentions légales.
 
 ---

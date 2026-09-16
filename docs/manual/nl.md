@@ -114,12 +114,21 @@ De groene balk **Stand-by** schakelt de speaker uit; is hij uit, dan staat er
 
 ### Volume
 
-Dempen, min, schuifregelaar, plus. Het percentage staat rechts.
+Demping, gelijkzetten, min, schuif, plus. Het percentage staat rechts.
 
-Zit de speaker in een groep, dan wordt deze regelaar **het volume van de hele groep**:
-verschuiven verplaatst alle speakers met hetzelfde bedrag, zodat de verhouding die je
-tussen hen hebt ingesteld bewaard blijft. De afzonderlijke volumes blijven bereikbaar in
-het tabblad Groepen.
+Hoort de speaker bij een groep, dan wordt deze schuif **het volume van de hele groep**:
+hij verschuift alle speakers met dezelfde stap en houdt zo de verhouding aan die je hebt
+ingesteld. Keuken op 60 en woonkamer op 30 — de groep 10 omhoog geeft 70 en 40, niet 70
+en 35.
+
+De toets **=** tussen demping en min doet het omgekeerde: hij zet *alle* speakers van de
+groep op de getoonde waarde. Groep op 25, iedereen op 25. Hij verschijnt alleen zolang
+er een groep actief is — alleen valt er niets gelijk te zetten.
+
+Onder de schuif geeft **Per speaker** een regel per lid van de groep, met een eigen
+schuif en eigen toetsen − en +, zodat je de keuken zachter kunt zetten zonder de
+woonkamer aan te raken. Een uitgeschakelde speaker staat vaag en reageert niet: een
+opdracht ernaartoe zou de app alleen voor niets laten wachten.
 
 ### Bass en presets
 
@@ -133,12 +142,24 @@ is degene die speelt.
 
 ### Groeperen met
 
-Eén knopje per andere speaker. Tikken voegt die aan de groep toe; er verschijnt een vink.
-Nogmaals tikken haalt hem eruit. De bediende speaker is de **master**: hij zendt uit, de
-andere volgen.
+Eén chip per speaker, behalve die welke de opdrachten krijgt. Tik erop om die speaker
+aan de groep toe te voegen; een vinkje en een groene rand verschijnen. Nog een tik haalt
+hem er weer uit.
 
-De link **Vernieuwen** onderaan leest alles opnieuw: titel, hoes, volume, toestand van de
-groep.
+**De master wordt opgezocht, niet aangenomen.** In een groep speelt één speaker af en
+volgen de andere. Kies je een speaker die volgt, dan zegt de app dat — *Gegroepeerd met
+…*, in amber — en stuurt bediening, presets, stand-by en volume naar de master, want die
+speelt af. Een speaker kiezen onderbreekt dus nooit wat je aan het luisteren bent.
+
+Op een volgende speaker is de aangevinkte chip die speaker zelf: erop tikken verlaat de
+groep. Uitbreiden gebeurt vanaf de master, want die stelt de groep samen.
+
+**Een speaker uitzetten haalt hem eerst uit de groep** en heft de groep op als het de
+laatste was. Zet je hem weer aan, dan staat hij op zichzelf, speelt af wat hij af te
+spelen heeft, en kun je hem opnieuw groeperen.
+
+De link **Vernieuwen** onderaan leest alles opnieuw: lopende titel, hoes, volume, staat
+van de groep.
 
 ---
 
@@ -204,22 +225,26 @@ opnieuw te starten.
 
 ![Groepen](../images/05-groupes.jpg)
 
-**Masterspeaker** geeft aan welke uitzendt. Wil je van master wisselen, wissel dan van
-actieve speaker in het tabblad Afspelen.
+**Masterspeaker** noemt degene die werkelijk afspeelt — afgelezen bij de speakers zelf,
+niet aangenomen als degene die je hebt gekozen.
 
-**Te groeperen speakers**: vink aan wie moet volgen, dan **Groeperen**. **Ontbinden**
-verbreekt de hele groep.
+**Te groeperen speakers**: vink aan wie moet volgen, dan **Groeperen**. **Opheffen**
+haalt de hele groep uit elkaar.
 
-De optie **Vaste groep** vraagt de agent de groep bij het volgende afspelen opnieuw te
-vormen, in plaats van hem te laten wegvallen als de muziek stopt.
+Een speaker hoort maar bij één groep tegelijk, en de master stelt die samen. Volgt de
+gekozen speaker een andere, dan is **Groeperen** grijs en verwijst een bericht je naar
+de master.
 
-**Groepsvolume** werkt op alle speakers tegelijk. Onder die regelaar heeft elke speaker
-van de groep zijn eigen volume, zodat je de keuken zachter kunt zetten zonder de
-woonkamer aan te raken. **Op hele groep toepassen** zet iedereen op dezelfde waarde.
+De optie **Blijvende groep** vraagt de agent de groep bij de volgende weergave opnieuw
+te vormen, in plaats van hem uiteen te laten vallen als de muziek stopt. De app leest
+deze vlag nu terug voordat zij een bestaande groep uitbreidt en geeft hem ongewijzigd
+door: één speaker toevoegen maakt van een blijvende groep geen gewone meer.
 
-Eén gedrag is goed om te weten: de groepsregelaar **verschuift** de volumes met behoud van
-de onderlinge verschillen. Staat de keuken op 60 en de woonkamer op 30, dan geeft tien
-erbij 70 en 40 — niet 70 en 35.
+**Groepsvolume** werkt op alle speakers tegelijk en verschuift de waarden zonder de
+onderlinge afstanden aan te tasten. Keuken op 60 en woonkamer op 30 — de groep 10 omhoog
+geeft 70 en 40, niet 70 en 35. Onder die schuif heeft elke speaker van de groep zijn
+eigen. **Op de hele groep toepassen** zet iedereen op dezelfde waarde, net als de toets
+**=** in het tabblad Afspelen.
 
 ---
 
@@ -227,25 +252,31 @@ erbij 70 en 40 — niet 70 en 35.
 
 ![Bekende speakers](../images/07-reglages-enceintes.jpg)
 
-**Actieve speaker**: naam, adres, model en versie van de agent.
+**Gekozen speaker**: naam, adres en model. Dit is de speaker die jij hebt gekozen — niet
+per se degene die de opdrachten krijgt. Volgt hij een groep, dan zegt een amberkleurige
+regel waar de opdrachten werkelijk heen gaan, en waarom.
 
-**Taal**: Frans, Engels, Duits, Nederlands, Spaans. De wijziging is meteen van kracht,
-zonder herstart, en wordt onthouden.
+**Taal**: Nederlands, Frans, Engels, Duits, Spaans. De wijziging geldt meteen, zonder
+herstart, en wordt onthouden.
 
 **Thema**: Systeem, Licht of Donker. "Systeem" volgt de weergave-instelling van de
-telefoon, inclusief het automatisch omschakelen 's avonds.
+telefoon, inclusief de automatische omschakeling 's avonds.
 
-**Zoeken**: de netwerkscan en het handmatig toevoegen via IP-adres.
+**Zoeken**: de netwerkscan en het handmatig invoeren van een IP-adres. Het zoeken vraagt
+eerst mDNS en doorzoekt het subnet alleen als dat niets oplevert. De scan blijft beperkt
+tot privé-adresbereiken en bereikt dus nooit een mobiel netwerk of een VPN-tunnel.
 
-**Bekende speakers**: de onthouden lijst. **Gebruiken** schakelt over, **✕** vergeet de
-speaker. Een speaker met de vermelding **"Zonder STR — klaar voor installatie"** antwoordt
-prima maar heeft geen agent; verderop verschijnt dan een uitlegblok met een link naar de
-site van het STR-project.
+**Bekende speakers**: de onthouden lijst. **Gebruiken** schakelt over, **✕** vergeet
+hem. Een speaker met de melding **"Geen STR — klaar voor installatie"** antwoordt prima
+maar heeft geen agent; verderop verschijnt dan een uitlegblok met een link naar de site
+van het STR-project.
 
-**Diagnose**: *Actieve speaker bevragen* toont wat de speaker werkelijk opgeeft — naam,
-model, apparaat-ID, firmwareversie, aanwezigheid van de agent, toestand van de meldingen,
-bassbereik, lijst van herkende API-eindpunten. Dat is de informatie die je bij een
-probleemmelding voegt. *Logocache legen* dwingt zenderafbeeldingen opnieuw te downloaden.
+**Diagnose**: *Speaker bevragen* gaat over de **gekozen** speaker — naam, model,
+apparaat-ID, firmwareversie, de agent met zijn poort en zijn live op 17008 en 8888
+gelezen versie, de staat van de meldingen, het bassbereik, de lijst met herkende
+API-eindpunten, en wat elke bekende speaker over de huidige zone verklaart. Dit is de
+informatie die bij een probleemmelding hoort. *Logocache legen* dwingt het opnieuw
+ophalen van zenderafbeeldingen af.
 
 **Over**: de versie, de vermelding van het STR-project met een link naar zijn site in de
 gekozen taal, en de juridische vermeldingen.

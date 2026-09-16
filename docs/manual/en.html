@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SoundReborn Remote — User manual</title>
-<meta name="description" content="User manual — SoundReborn Remote, télécommande Android pour enceintes Bose SoundTouch.">
+<meta name="description" content="User manual — SoundReborn Remote, Android remote for Bose SoundTouch speakers.">
 <style>
 :root {
   --bg: #f4f6f9; --surface: #ffffff; --raised: #edf1f6; --border: #d6dee8;
@@ -17,6 +17,8 @@
   }
 }
 * { box-sizing: border-box; }
+.switch { margin: -6px 0 18px; font-size: 15px; }
+.switch a { color: var(--accent); }
 body {
   margin: 0; background: var(--bg); color: var(--text);
   font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -98,9 +100,9 @@ footer a { color: var(--muted); }
 </head>
 <body>
 <header class="top"><div class="wrap">
-  <a class="name" href="./index.html">SoundReborn Remote</a>
+  <a class="name" href="../index.html">SoundReborn Remote</a>
   <a href="https://github.com/ben240374/SoundRebornRemote">GitHub</a>
-  <a href="https://github.com/ben240374/SoundRebornRemote/releases">Téléchargement</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote/releases">Download</a>
   <a href="https://st-reborn.de">STR</a>
 </div></header>
 <div class="wrap">
@@ -184,10 +186,18 @@ name; for Spotify, the album cover.</p>
 effect — a live radio stream cannot be rewound.</p>
 <p>The green <strong>Standby</strong> bar turns the speaker off; once off, it reads <strong>Turn on</strong>.</p>
 <h3 id="volume">Volume</h3>
-<p>Mute, minus, slider, plus. The percentage is shown on the right.</p>
+<p>Mute, level, minus, slider, plus. The percentage is shown on the right.</p>
 <p>When the speaker is part of a group, this slider becomes <strong>the volume of the whole
 group</strong>: moving it shifts every speaker by the same amount, which preserves the balance
-you set between them. Individual volumes remain available in the Groups tab.</p>
+you set between them. If the kitchen is at 60 and the living room at 30, raising the
+group by 10 gives 70 and 40, not 70 and 35.</p>
+<p>The <strong>=</strong> key, between mute and minus, does the opposite: it sets <em>every</em> speaker in the
+group to the displayed value. Group at 25, everyone at 25. It only appears while a group
+is active — on its own, a speaker has nothing to level.</p>
+<p>Below the slider, <strong>Per speaker</strong> lists each member of the group with its own slider and
+its own − and + keys, so you can turn the kitchen down without touching the living room.
+A speaker that is switched off is dimmed and does not react: sending it a command would
+only make the app wait for nothing.</p>
 <h3 id="bass-and-presets">Bass and presets</h3>
 <p><img alt="Bass and presets" src="../images/02-lecture-graves.jpg" /></p>
 <p>Bass ranges from -10 to +10 depending on the model. <strong>There is no treble control</strong>: the
@@ -195,9 +205,19 @@ speaker's API exposes none — this is not an omission in the app.</p>
 <p>The six presets are repeated here to save a tab change. The tile outlined in green is
 the one playing.</p>
 <h3 id="group-with">Group with</h3>
-<p>One chip per other speaker. Tap it to add that speaker to the group; a tick appears. Tap
-again to remove it. The controlled speaker is the <strong>master</strong>: it streams, the others
-follow.</p>
+<p>One chip per speaker, other than the one the commands go to. Tap a chip to add that
+speaker to the group; a tick and a green outline appear. Tap it again to remove it.</p>
+<p><strong>The master is found, not assumed.</strong> In a group, one speaker streams and the others
+follow it. If you select a speaker that is following, the app says so — <em>Grouped with …</em>
+in amber — and sends transport, presets, standby and volume to the master, because the
+master is what is playing. Selecting a speaker therefore never interrupts what you are
+listening to.</p>
+<p>On a speaker that follows, the ticked chip is that speaker itself: tapping it leaves the
+group. Extending the group is done from the master, since it is the master that composes
+it.</p>
+<p><strong>Turning a speaker off takes it out of the group</strong> first, and dissolves the group if it
+was the last member. Turning it back on gives you a speaker on its own, playing what it
+plays, which you can group again.</p>
 <p>The <strong>Refresh</strong> link at the bottom re-reads everything: current title, artwork, volume,
 group state.</p>
 <hr />
@@ -242,34 +262,44 @@ directory. This needs the STR agent.</p>
 <hr />
 <h2 id="7-the-groups-tab">7. The Groups tab</h2>
 <p><img alt="Groups" src="../images/05-groupes.jpg" /></p>
-<p><strong>Master speaker</strong> states which one streams. To change master, change the active speaker
-in the Play tab.</p>
+<p><strong>Master speaker</strong> states which one actually streams — read from the speakers
+themselves, not assumed to be the one you selected.</p>
 <p><strong>Speakers to group</strong>: tick those that should follow, then <strong>Group</strong>. <strong>Dissolve</strong>
 breaks up the whole group.</p>
+<p>A speaker belongs to only one group at a time, and it is the master that composes it. If
+the speaker you selected is following another, <strong>Group</strong> is greyed out and a message
+points you to the master.</p>
 <p>The <strong>Sticky group</strong> option asks the agent to re-form the group at the next playback,
-rather than letting it fall apart when the music stops.</p>
-<p><strong>Group volume</strong> acts on every speaker at once. Below that slider, each speaker in the
-group has its own, so you can turn the kitchen down without touching the living room.
-<strong>Apply to the whole group</strong> sets everyone to the same value.</p>
-<p>One behaviour is worth knowing: the group slider <strong>shifts</strong> volumes while keeping the
-gaps. If the kitchen is at 60 and the living room at 30, raising the group by 10 gives 70
-and 40 — not 70 and 35.</p>
+rather than letting it fall apart when the music stops. The app now reads this flag back
+before extending an existing group and hands it in unchanged, so adding one speaker no
+longer turns a sticky group into an ordinary one.</p>
+<p><strong>Group volume</strong> acts on every speaker at once, shifting volumes while keeping the gaps.
+If the kitchen is at 60 and the living room at 30, raising the group by 10 gives 70 and
+40 — not 70 and 35. Below that slider, each speaker in the group has its own. <strong>Apply to
+the whole group</strong> sets everyone to the same value, which is what the <strong>=</strong> key does in
+the Play tab.</p>
 <hr />
 <h2 id="8-the-settings-tab">8. The Settings tab</h2>
 <p><img alt="Known speakers" src="../images/07-reglages-enceintes.jpg" /></p>
-<p><strong>Active speaker</strong>: name, address, model and agent version.</p>
-<p><strong>Language</strong>: French, English, German, Dutch, Spanish. The change is immediate, with no
+<p><strong>Selected speaker</strong>: name, address and model. This is the speaker you picked — not
+necessarily the one receiving the commands. When it is following a group, a line in
+amber says where the commands actually go, and why.</p>
+<p><strong>Language</strong>: English, French, German, Dutch, Spanish. The change is immediate, with no
 restart, and is remembered.</p>
 <p><strong>Theme</strong>: System, Light or Dark. "System" follows the phone's display setting,
 including its automatic switch in the evening.</p>
-<p><strong>Search</strong>: the network scan, and manual entry by IP address.</p>
+<p><strong>Search</strong>: the network scan, and manual entry by IP address. Discovery asks mDNS first
+and only sweeps the subnet if that finds nothing. The sweep is restricted to private
+address ranges, so it never reaches a mobile network or a VPN tunnel.</p>
 <p><strong>Known speakers</strong>: the remembered list. <strong>Use</strong> switches to one, <strong>✕</strong> forgets it. A
 speaker marked <strong>"No STR — ready for installation"</strong> answers fine but has no agent; an
 explanatory block then appears further down, with a link to the STR project site.</p>
-<p><strong>Diagnostics</strong>: <em>Query the active speaker</em> shows what the speaker actually declares —
-name, model, device ID, firmware version, presence of the agent, state of notifications,
-bass range, list of recognised API endpoints. This is the information to attach to a
-problem report. <em>Clear the logo cache</em> forces station images to be downloaded again.</p>
+<p><strong>Diagnostics</strong>: <em>Query the speaker</em> reports on the <strong>selected</strong> speaker — name, model,
+device ID, firmware version, the agent with its port and its version read live on both
+17008 and 8888, the state of notifications, the bass range, the list of recognised API
+endpoints, and what each known speaker declares about the current zone. This is the
+information to attach to a problem report. <em>Clear the logo cache</em> forces station images
+to be downloaded again.</p>
 <p><strong>About</strong>: the version, credit to the STR project with a link to its site in the chosen
 language, and the legal notices.</p>
 <hr />
@@ -326,10 +356,7 @@ it, this app would have nothing to control.</p>
 <p>The station directory is provided by <a href="https://www.radio-browser.info">radio-browser.info</a>.</p>
 <p>The code was written with Claude (Anthropic).</p>
 <footer>
-  <p>SoundReborn Remote — licence MIT. Projet personnel, sans lien avec Bose Corporation.
-  « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer
-  la compatibilité. Indépendant du projet
-  <a href="https://st-reborn.de">STR</a>, qui n'en assure pas le support.</p>
+  <p>SoundReborn Remote — MIT licence. A personal project, unaffiliated with Bose Corporation. “Bose” and “SoundTouch” are trademarks of Bose Corporation, named here to state compatibility. Independent of the <a href="https://st-reborn.de">STR</a> project, which does not support it.</p>
 </footer>
 </div>
 </body>

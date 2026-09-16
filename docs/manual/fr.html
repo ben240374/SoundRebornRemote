@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SoundReborn Remote — Manuel d'utilisation</title>
-<meta name="description" content="Manuel d'utilisation — SoundReborn Remote, télécommande Android pour enceintes Bose SoundTouch.">
+<meta name="description" content="Manuel d'utilisation — SoundReborn Remote, Android remote for Bose SoundTouch speakers.">
 <style>
 :root {
   --bg: #f4f6f9; --surface: #ffffff; --raised: #edf1f6; --border: #d6dee8;
@@ -17,6 +17,8 @@
   }
 }
 * { box-sizing: border-box; }
+.switch { margin: -6px 0 18px; font-size: 15px; }
+.switch a { color: var(--accent); }
 body {
   margin: 0; background: var(--bg); color: var(--text);
   font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -98,7 +100,7 @@ footer a { color: var(--muted); }
 </head>
 <body>
 <header class="top"><div class="wrap">
-  <a class="name" href="./index.html">SoundReborn Remote</a>
+  <a class="name" href="../index-fr.html">SoundReborn Remote</a>
   <a href="https://github.com/ben240374/SoundRebornRemote">GitHub</a>
   <a href="https://github.com/ben240374/SoundRebornRemote/releases">Téléchargement</a>
   <a href="https://st-reborn.de">STR</a>
@@ -191,11 +193,18 @@ et son nom ; pour Spotify, la pochette de l'album.</p>
 n'ont pas d'effet — une radio en direct ne se rembobine pas.</p>
 <p>Le bandeau vert <strong>Veille</strong> éteint l'enceinte ; une fois éteinte, il devient <strong>Allumer</strong>.</p>
 <h3 id="volume">Volume</h3>
-<p>Sourdine, moins, curseur, plus. Le pourcentage s'affiche à droite.</p>
+<p>Sourdine, égaliser, moins, curseur, plus. Le pourcentage s'affiche à droite.</p>
 <p>Quand l'enceinte fait partie d'un groupe, ce curseur devient <strong>le volume de l'ensemble
 du groupe</strong> : le déplacer décale toutes les enceintes du même écart, ce qui préserve
-l'équilibre que tu as réglé entre elles. Les volumes individuels restent accessibles
-dans l'onglet Groupes.</p>
+l'équilibre que tu as réglé entre elles. Cuisine à 60 et salon à 30, monter le groupe de
+10 donne 70 et 40, pas 70 et 35.</p>
+<p>La touche <strong>=</strong>, entre la sourdine et le moins, fait l'inverse : elle met <em>toutes</em> les
+enceintes du groupe à la valeur affichée. Groupe à 25, tout le monde à 25. Elle
+n'apparaît que lorsqu'un groupe est actif — seule, une enceinte n'a rien à égaliser.</p>
+<p>Sous le curseur, <strong>Par enceinte</strong> donne une ligne par membre du groupe, avec son propre
+curseur et ses touches − et +, pour baisser la cuisine sans toucher au salon. Une
+enceinte éteinte apparaît estompée et ne réagit pas : lui envoyer une commande ne ferait
+qu'attendre pour rien.</p>
 <h3 id="graves-et-preselections">Graves et présélections</h3>
 <p><img alt="Graves et présélections" src="../images/02-lecture-graves.jpg" /></p>
 <p>Le réglage des graves va de -10 à +10 selon les modèles. <strong>Il n'y a pas de réglage
@@ -204,9 +213,20 @@ l'application.</p>
 <p>Les six présélections sont reprises ici pour éviter un changement d'onglet. La tuile
 encadrée de vert est celle qui joue.</p>
 <h3 id="grouper-avec">Grouper avec</h3>
-<p>Une pastille par autre enceinte. Touche-la pour la joindre au groupe ; une coche
-apparaît. Touche-la de nouveau pour l'en retirer. L'enceinte pilotée est le <strong>maître</strong> :
-c'est elle qui diffuse, les autres suivent.</p>
+<p>Une pastille par enceinte, hors celle qui reçoit les commandes. Touche une pastille pour
+joindre cette enceinte au groupe ; une coche et un contour vert apparaissent. Touche-la
+de nouveau pour l'en retirer.</p>
+<p><strong>Le maître se cherche, il ne se suppose pas.</strong> Dans un groupe, une enceinte diffuse et
+les autres la suivent. Si tu sélectionnes une enceinte qui suit, l'application le dit —
+<em>Groupé avec …</em>, en ambre — et adresse le transport, les présélections, la veille et le
+volume au maître, puisque c'est lui qui diffuse. Sélectionner une enceinte n'interrompt
+donc jamais ce que tu es en train d'écouter.</p>
+<p>Sur une enceinte qui suit, la pastille cochée est cette enceinte elle-même : la toucher
+la fait quitter le groupe. L'extension du groupe se fait depuis le maître, puisque c'est
+lui qui le compose.</p>
+<p><strong>Éteindre une enceinte la sort d'abord du groupe</strong>, et dissout le groupe si c'était la
+dernière. En la rallumant, tu retrouves une enceinte seule, qui diffuse ce qu'elle a à
+diffuser, et que tu peux regrouper.</p>
 <p>Le lien <strong>Rafraîchir</strong>, en bas, relit tout : titre en cours, pochette, volume, état du
 groupe.</p>
 <hr />
@@ -254,37 +274,47 @@ relancer.</p>
 <hr />
 <h2 id="7-longlet-groupes">7. L'onglet Groupes</h2>
 <p><img alt="Groupes" src="../images/05-groupes.jpg" /></p>
-<p><strong>Enceinte maître</strong> rappelle laquelle diffuse. Pour changer de maître, change d'enceinte
-active dans l'onglet Lecture.</p>
+<p><strong>Enceinte maître</strong> indique celle qui diffuse réellement — relevée sur les enceintes
+elles-mêmes, et non supposée être celle que tu as sélectionnée.</p>
 <p><strong>Enceintes à grouper</strong> : coche celles qui doivent suivre, puis <strong>Grouper</strong>.
-<strong>Dissoudre</strong> défait le groupe entier.</p>
+<strong>Dissoudre</strong> défait tout le groupe.</p>
+<p>Une enceinte n'appartient qu'à un groupe à la fois, et c'est le maître qui le compose.
+Si l'enceinte que tu as sélectionnée en suit une autre, <strong>Grouper</strong> est grisé et un
+message te renvoie vers le maître.</p>
 <p>L'option <strong>Groupe permanent</strong> demande à l'agent de reformer le groupe à la prochaine
-lecture, au lieu de le laisser se défaire quand la musique s'arrête.</p>
-<p><strong>Volume du groupe</strong> agit sur toutes les enceintes à la fois. Sous ce curseur, chaque
-enceinte du groupe a le sien, ce qui permet de baisser la cuisine sans toucher au salon.
-<strong>Appliquer à tout le groupe</strong> aligne tout le monde sur la même valeur.</p>
-<p>Le comportement mérite d'être connu : le curseur d'ensemble <strong>décale</strong> les volumes en
-conservant les écarts. Si la cuisine est à 60 et le salon à 30, monter l'ensemble de 10
-donne 70 et 40 — et non 70 et 35.</p>
+lecture, au lieu de le laisser se défaire quand la musique s'arrête. L'application relit
+désormais ce drapeau avant d'étendre un groupe existant et le rend tel quel : ajouter une
+enceinte ne rétrograde plus un groupe permanent en groupe ordinaire.</p>
+<p><strong>Volume du groupe</strong> agit sur toutes les enceintes à la fois, en décalant les volumes
+sans toucher aux écarts. Cuisine à 60 et salon à 30, monter le groupe de 10 donne 70 et
+40, pas 70 et 35. Sous ce curseur, chaque enceinte du groupe a le sien. <strong>Appliquer à
+tout le groupe</strong> met tout le monde à la même valeur, ce que fait aussi la touche <strong>=</strong>
+de l'onglet Lecture.</p>
 <hr />
 <h2 id="8-longlet-reglages">8. L'onglet Réglages</h2>
 <p><img alt="Enceintes connues" src="../images/07-reglages-enceintes.jpg" /></p>
-<p><strong>Enceinte active</strong> : nom, adresse, modèle et version de l'agent.</p>
+<p><strong>Enceinte sélectionnée</strong> : nom, adresse et modèle. C'est l'enceinte que tu as choisie —
+pas forcément celle qui reçoit les commandes. Quand elle suit un groupe, une ligne ambre
+dit où partent réellement les commandes, et pourquoi.</p>
 <p><strong>Langue</strong> : français, anglais, allemand, néerlandais, espagnol. Le changement est
-immédiat, sans redémarrage, et retenu.</p>
+immédiat, sans redémarrage, et il est mémorisé.</p>
 <p><strong>Thème</strong> : Système, Clair ou Foncé. « Système » suit le réglage d'affichage du
 téléphone, y compris sa bascule automatique le soir.</p>
-<p><strong>Recherche</strong> : le balayage, et l'ajout manuel par adresse IP.</p>
+<p><strong>Recherche</strong> : le balayage du réseau, et la saisie manuelle d'une adresse IP. La
+découverte interroge d'abord le mDNS et ne balaie le sous-réseau que si elle ne trouve
+rien. Le balayage est restreint aux plages d'adresses privées : il n'atteint donc jamais
+un réseau mobile ni un tunnel VPN.</p>
 <p><strong>Enceintes connues</strong> : la liste mémorisée. <strong>Utiliser</strong> bascule dessus, <strong>✕</strong> l'oublie.
-Une enceinte marquée <strong>« Sans STR — prête pour l'installation »</strong> répond bien, mais sans
-agent : un bloc d'explication apparaît alors plus bas, avec un lien vers le site du
-projet STR.</p>
-<p><strong>Diagnostic</strong> : <em>Interroger l'enceinte active</em> affiche ce que l'enceinte déclare
-réellement — nom, modèle, identifiant, version du firmware, présence de l'agent, état des
-notifications, plage de graves, liste des points d'API reconnus. C'est l'information à
-joindre à un rapport de problème. <em>Vider le cache des logos</em> force le retéléchargement
-des images de stations.</p>
-<p><strong>À propos</strong> : la version, le crédit au projet STR avec le lien vers son site dans la
+Une enceinte marquée <strong>« Pas de STR — prête pour l'installation »</strong> répond correctement
+mais n'a pas l'agent ; un bloc explicatif apparaît alors plus bas, avec un lien vers le
+site du projet STR.</p>
+<p><strong>Diagnostic</strong> : <em>Interroger l'enceinte</em> porte sur l'enceinte <strong>sélectionnée</strong> — nom,
+modèle, identifiant, version du firmware, l'agent avec son port et sa version relue en
+direct sur 17008 et 8888, l'état des notifications, la plage de graves, la liste des
+points d'API reconnus, et ce que chaque enceinte connue déclare de la zone en cours.
+C'est l'information à joindre à un signalement de problème. <em>Vider le cache des logos</em>
+force le retéléchargement des images de stations.</p>
+<p><strong>À propos</strong> : la version, le crédit au projet STR avec un lien vers son site dans la
 langue choisie, et les mentions légales.</p>
 <hr />
 <h2 id="9-gestes">9. Gestes</h2>
@@ -341,10 +371,7 @@ lui, cette application n'aurait rien à piloter.</p>
 <p>L'annuaire de stations est fourni par <a href="https://www.radio-browser.info">radio-browser.info</a>.</p>
 <p>Le code a été écrit avec Claude (Anthropic).</p>
 <footer>
-  <p>SoundReborn Remote — licence MIT. Projet personnel, sans lien avec Bose Corporation.
-  « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer
-  la compatibilité. Indépendant du projet
-  <a href="https://st-reborn.de">STR</a>, qui n'en assure pas le support.</p>
+  <p>SoundReborn Remote — licence MIT. Projet personnel, sans lien avec Bose Corporation. « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer la compatibilité. Indépendant du projet <a href="https://st-reborn.de">STR</a>, qui n'en assure pas le support.</p>
 </footer>
 </div>
 </body>

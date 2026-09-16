@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SoundReborn Remote — télécommande Android pour Bose SoundTouch</title>
-<meta name="description" content="Télécommande Android locale pour enceintes Bose SoundTouch, basée sur l'agent STR. Manuel en cinq langues et APK à télécharger.">
+<title>SoundReborn Remote — Android remote for Bose SoundTouch</title>
+<meta name="description" content="Local Android remote for Bose SoundTouch speakers, built on the STR agent. Manual in five languages, APK to download.">
 <style>
 :root {
   --bg: #f4f6f9; --surface: #ffffff; --raised: #edf1f6; --border: #d6dee8;
@@ -17,6 +17,8 @@
   }
 }
 * { box-sizing: border-box; }
+.switch { margin: -6px 0 18px; font-size: 15px; }
+.switch a { color: var(--accent); }
 body {
   margin: 0; background: var(--bg); color: var(--text);
   font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -100,59 +102,57 @@ footer a { color: var(--muted); }
 <header class="top"><div class="wrap">
   <a class="name" href="./index.html">SoundReborn Remote</a>
   <a href="https://github.com/ben240374/SoundRebornRemote">GitHub</a>
-  <a href="https://github.com/ben240374/SoundRebornRemote/releases">Téléchargement</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote/releases">Download</a>
   <a href="https://st-reborn.de">STR</a>
 </div></header>
 <div class="wrap">
 
 <h1>SoundReborn Remote</h1>
-<p class="sub">Télécommande Android pour enceintes Bose SoundTouch. Tout se passe sur
-le réseau local : aucun compte, aucun cloud, aucun service intermédiaire.</p>
+<p class="switch"><a href="index-fr.html">En français</a></p>
+<p class="sub">Android remote for Bose SoundTouch speakers. Everything happens on your
+local network: no account, no cloud, no service in between.</p>
 
 <p>
-  <a class="cta" href="https://github.com/ben240374/SoundRebornRemote/releases">Télécharger l'APK</a>
-  <a class="cta ghost" href="https://github.com/ben240374/SoundRebornRemote">Code source</a>
+  <a class="cta" href="https://github.com/ben240374/SoundRebornRemote/releases">Download the APK</a>
+  <a class="cta ghost" href="https://github.com/ben240374/SoundRebornRemote">Source code</a>
 </p>
 
 <div class="note">
-  <strong>Il faut l'agent STR sur l'enceinte.</strong> C'est lui qui rend aux SoundTouch
-  ce que le cloud Bose assurait avant son arrêt, le 6 mai 2026. Son installation se fait
-  avec l'outil STR pour PC ou Mac — <a href="https://st-reborn.de">st-reborn.de</a>.
-  Cette application ne l'installe pas ; elle signale les enceintes qui ne l'ont pas.
+  <strong>The STR agent must be on the speaker.</strong> It is what gives SoundTouch
+  speakers back what the Bose cloud provided until it shut down on 6 May 2026. You install
+  it with the STR tool for PC or Mac — <a href="https://st-reborn.de">st-reborn.de</a>.
+  This application does not install it; it flags the speakers that do not have it.
 </div>
 
 <div class="shots"><img src="images/01-lecture.jpg" alt=""><img src="images/03-preselections.jpg" alt=""><img src="images/05-groupes.jpg" alt=""><img src="images/04-sources.jpg" alt=""><img src="images/06-reglages.jpg" alt=""></div>
 
-<h2>Manuel d'utilisation</h2>
-<p>Installation, écran par écran, gestes, dépannage et limites connues.
-Les versions PDF sont jointes à chaque
-<a href="https://github.com/ben240374/SoundRebornRemote/releases">release</a>.</p>
+<h2>User manual</h2>
+<p>Installation, screen by screen, gestures, troubleshooting and known limits.
+PDF versions are attached to each <a href="https://github.com/ben240374/SoundRebornRemote/releases">release</a>.</p>
 <ul class="cards"><li><a href="manual/fr.html"><strong>Français</strong><span>Manuel d'utilisation</span></a></li><li><a href="manual/en.html"><strong>English</strong><span>User manual</span></a></li><li><a href="manual/de.html"><strong>Deutsch</strong><span>Handbuch</span></a></li><li><a href="manual/nl.html"><strong>Nederlands</strong><span>Handleiding</span></a></li><li><a href="manual/es.html"><strong>Español</strong><span>Manual de uso</span></a></li></ul>
 
-<h2>Ce que l'application pilote</h2>
+<h2>What the application controls</h2>
 <ul>
-  <li>Volume, sourdine, marche/veille, graves</li>
-  <li>Lecture, pause, piste suivante et précédente</li>
-  <li>Les six présélections, avec le logo des stations</li>
-  <li>Recherche de stations internet et affectation aux touches</li>
-  <li>Sources de l'enceinte, Bluetooth, AUX, lecture d'un flux quelconque</li>
-  <li>Groupes multi-pièces, avec volume d'ensemble et volume par enceinte</li>
-  <li>Découverte des enceintes par mDNS, avec repli sur le balayage du réseau</li>
-  <li>Interface en français, anglais, allemand, néerlandais et espagnol, thème clair ou foncé</li>
+  <li>Volume, mute, standby, bass</li>
+  <li>Play, pause, next and previous track</li>
+  <li>The six presets, with station logos</li>
+  <li>Internet station search, and assigning a station to a key</li>
+  <li>Speaker sources, Bluetooth, AUX, playing an arbitrary stream</li>
+  <li>Multi-room groups: whole-group volume, per-speaker volume, levelling in one key</li>
+  <li>Commands follow the group's master, because the master is what plays</li>
+  <li>Speaker discovery over mDNS, falling back to a network sweep</li>
+  <li>Interface in English, French, German, Dutch and Spanish, light or dark theme</li>
 </ul>
 
-<h2>Grâce à STR</h2>
-<p>Quand Bose a coupé son cloud, les enceintes SoundTouch ont perdu l'essentiel de leur
-usage. <a href="https://st-reborn.de">STR — SoundTouch Reborn</a>, de Jens Roggenfelder
-(<a href="https://github.com/JRpersonal/streborn">JRpersonal</a>), est l'agent qui tourne
-sur l'enceinte elle-même et lui rend ce que le cloud assurait. Cette application ne fait
-que lui parler : sans son travail, elle n'aurait rien à piloter.</p>
+<h2>Thanks to STR</h2>
+<p>When Bose shut down its cloud, SoundTouch speakers lost most of what made them useful.
+<a href="https://st-reborn.de">STR — SoundTouch Reborn</a>, by Jens Roggenfelder
+(<a href="https://github.com/JRpersonal/streborn">JRpersonal</a>), is the agent that runs
+on the speaker itself and gives back what the cloud provided. This application does
+nothing more than talk to it: without his work it would have nothing to control.</p>
 
 <footer>
-  <p>SoundReborn Remote — licence MIT. Projet personnel, sans lien avec Bose Corporation.
-  « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer
-  la compatibilité. Indépendant du projet
-  <a href="https://st-reborn.de">STR</a>, qui n'en assure pas le support.</p>
+  <p>SoundReborn Remote — MIT licence. A personal project, unaffiliated with Bose Corporation. “Bose” and “SoundTouch” are trademarks of Bose Corporation, named here to state compatibility. Independent of the <a href="https://st-reborn.de">STR</a> project, which does not support it.</p>
 </footer>
 </div>
 </body>

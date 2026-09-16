@@ -110,11 +110,21 @@ The green **Standby** bar turns the speaker off; once off, it reads **Turn on**.
 
 ### Volume
 
-Mute, minus, slider, plus. The percentage is shown on the right.
+Mute, level, minus, slider, plus. The percentage is shown on the right.
 
 When the speaker is part of a group, this slider becomes **the volume of the whole
 group**: moving it shifts every speaker by the same amount, which preserves the balance
-you set between them. Individual volumes remain available in the Groups tab.
+you set between them. If the kitchen is at 60 and the living room at 30, raising the
+group by 10 gives 70 and 40, not 70 and 35.
+
+The **=** key, between mute and minus, does the opposite: it sets *every* speaker in the
+group to the displayed value. Group at 25, everyone at 25. It only appears while a group
+is active — on its own, a speaker has nothing to level.
+
+Below the slider, **Per speaker** lists each member of the group with its own slider and
+its own − and + keys, so you can turn the kitchen down without touching the living room.
+A speaker that is switched off is dimmed and does not react: sending it a command would
+only make the app wait for nothing.
 
 ### Bass and presets
 
@@ -128,9 +138,22 @@ the one playing.
 
 ### Group with
 
-One chip per other speaker. Tap it to add that speaker to the group; a tick appears. Tap
-again to remove it. The controlled speaker is the **master**: it streams, the others
-follow.
+One chip per speaker, other than the one the commands go to. Tap a chip to add that
+speaker to the group; a tick and a green outline appear. Tap it again to remove it.
+
+**The master is found, not assumed.** In a group, one speaker streams and the others
+follow it. If you select a speaker that is following, the app says so — *Grouped with …*
+in amber — and sends transport, presets, standby and volume to the master, because the
+master is what is playing. Selecting a speaker therefore never interrupts what you are
+listening to.
+
+On a speaker that follows, the ticked chip is that speaker itself: tapping it leaves the
+group. Extending the group is done from the master, since it is the master that composes
+it.
+
+**Turning a speaker off takes it out of the group** first, and dissolves the group if it
+was the last member. Turning it back on gives you a speaker on its own, playing what it
+plays, which you can group again.
 
 The **Refresh** link at the bottom re-reads everything: current title, artwork, volume,
 group state.
@@ -198,22 +221,26 @@ directory. This needs the STR agent.
 
 ![Groups](../images/05-groupes.jpg)
 
-**Master speaker** states which one streams. To change master, change the active speaker
-in the Play tab.
+**Master speaker** states which one actually streams — read from the speakers
+themselves, not assumed to be the one you selected.
 
 **Speakers to group**: tick those that should follow, then **Group**. **Dissolve**
 breaks up the whole group.
 
+A speaker belongs to only one group at a time, and it is the master that composes it. If
+the speaker you selected is following another, **Group** is greyed out and a message
+points you to the master.
+
 The **Sticky group** option asks the agent to re-form the group at the next playback,
-rather than letting it fall apart when the music stops.
+rather than letting it fall apart when the music stops. The app now reads this flag back
+before extending an existing group and hands it in unchanged, so adding one speaker no
+longer turns a sticky group into an ordinary one.
 
-**Group volume** acts on every speaker at once. Below that slider, each speaker in the
-group has its own, so you can turn the kitchen down without touching the living room.
-**Apply to the whole group** sets everyone to the same value.
-
-One behaviour is worth knowing: the group slider **shifts** volumes while keeping the
-gaps. If the kitchen is at 60 and the living room at 30, raising the group by 10 gives 70
-and 40 — not 70 and 35.
+**Group volume** acts on every speaker at once, shifting volumes while keeping the gaps.
+If the kitchen is at 60 and the living room at 30, raising the group by 10 gives 70 and
+40 — not 70 and 35. Below that slider, each speaker in the group has its own. **Apply to
+the whole group** sets everyone to the same value, which is what the **=** key does in
+the Play tab.
 
 ---
 
@@ -221,24 +248,30 @@ and 40 — not 70 and 35.
 
 ![Known speakers](../images/07-reglages-enceintes.jpg)
 
-**Active speaker**: name, address, model and agent version.
+**Selected speaker**: name, address and model. This is the speaker you picked — not
+necessarily the one receiving the commands. When it is following a group, a line in
+amber says where the commands actually go, and why.
 
-**Language**: French, English, German, Dutch, Spanish. The change is immediate, with no
+**Language**: English, French, German, Dutch, Spanish. The change is immediate, with no
 restart, and is remembered.
 
 **Theme**: System, Light or Dark. "System" follows the phone's display setting,
 including its automatic switch in the evening.
 
-**Search**: the network scan, and manual entry by IP address.
+**Search**: the network scan, and manual entry by IP address. Discovery asks mDNS first
+and only sweeps the subnet if that finds nothing. The sweep is restricted to private
+address ranges, so it never reaches a mobile network or a VPN tunnel.
 
 **Known speakers**: the remembered list. **Use** switches to one, **✕** forgets it. A
 speaker marked **"No STR — ready for installation"** answers fine but has no agent; an
 explanatory block then appears further down, with a link to the STR project site.
 
-**Diagnostics**: *Query the active speaker* shows what the speaker actually declares —
-name, model, device ID, firmware version, presence of the agent, state of notifications,
-bass range, list of recognised API endpoints. This is the information to attach to a
-problem report. *Clear the logo cache* forces station images to be downloaded again.
+**Diagnostics**: *Query the speaker* reports on the **selected** speaker — name, model,
+device ID, firmware version, the agent with its port and its version read live on both
+17008 and 8888, the state of notifications, the bass range, the list of recognised API
+endpoints, and what each known speaker declares about the current zone. This is the
+information to attach to a problem report. *Clear the logo cache* forces station images
+to be downloaded again.
 
 **About**: the version, credit to the STR project with a link to its site in the chosen
 language, and the legal notices.
