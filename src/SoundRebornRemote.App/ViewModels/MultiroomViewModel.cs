@@ -250,6 +250,20 @@ public sealed partial class MultiroomViewModel : BaseViewModel
         {
             if (device.Str is not null)
             {
+                // Cet écran sert deux gestes que rien ne distinguait : créer un
+                // groupe, et en étendre un qui existe déjà — les membres actuels y
+                // arrivent cochés. Dans le second cas, envoyer la case « permanent »
+                // telle quelle rétrograde le groupe enregistré, car la case part à
+                // faux et n'a jamais été relue de l'enceinte. On relit donc la zone,
+                // et on renonce si cette lecture échoue : republier à l'aveugle
+                // détruirait ce que l'utilisateur a enregistré.
+                var facts = await device.Str.GetZoneFactsAsync().ConfigureAwait(false);
+
+                if (facts is null)
+                {
+                    throw new InvalidOperationException(Localization.Get("S_ZoneUnreadable"));
+                }
+
                 var request = new StrZoneFormRequest
                 {
                     Master = new StrZoneMemberRef { DeviceId = device.Endpoint.DeviceId, Ip = device.Host },
@@ -257,7 +271,12 @@ public sealed partial class MultiroomViewModel : BaseViewModel
                         .Select(c => new StrZoneMemberRef { DeviceId = c.Endpoint.DeviceId, Ip = c.Endpoint.Host })
                         .ToList(),
                     Mode = "native",
-                    Permanent = MakePermanent,
+
+                    // Un groupe déjà durable le reste ; sur un groupe neuf, c'est la
+                    // case qui décide, puisqu'il n'y a rien à préserver.
+                    Permanent = IsGrouped ? facts.Permanent || MakePermanent : MakePermanent,
+                    Stereo = facts.Stereo,
+                    Name = facts.StereoName,
                 };
 
                 await device.Str.FormZoneAsync(request).ConfigureAwait(false);
@@ -289,16 +308,36 @@ public sealed partial class MultiroomViewModel : BaseViewModel
     [RelayCommand]
     private async Task DissolveGroupAsync()
     {
+        var kept = false;
+
         await RunAsync(async device =>
         {
             if (device.Str is not null)
             {
-                await device.Str.DissolveZoneAsync().ConfigureAwait(false);
+                // Un 200 ne vaut pas succès : l'agent répond 200 avec « ok : false »
+                // quand l'enceinte a pris la demande et gardé le groupe. Afficher la
+                // confirmation sur cette réponse, c'est cocher un groupe qui joue.
+                var result = await device.Str.DissolveZoneAsync().ConfigureAwait(false);
+
+                if (!result.Ok)
+                {
+                    throw new InvalidOperationException(
+                        Localization.Get("S_GroupStillUp", result.Remaining));
+                }
+
+                kept = result.StereoPairKept;
                 return;
             }
 
             await device.Bose.DissolveZoneAsync(device.Endpoint.DeviceId, device.Host).ConfigureAwait(false);
         }, Localization.Get("S_GroupDissolved"));
+
+        // La paire stéréo n'est pas un groupe multi-pièces : la défaire demande une
+        // autre requête. On le dit plutôt que de laisser croire que tout est séparé.
+        if (kept && !IsError)
+        {
+            ShowInfo(Localization.Get("S_StereoPairKept"));
+        }
 
         await RefreshAsync();
     }

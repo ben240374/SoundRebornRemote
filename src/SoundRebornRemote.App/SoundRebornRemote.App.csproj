@@ -18,8 +18,8 @@
          code de version Android, qui doit rester un entier croissant. L'identifiant
          de paquet a changé avec le nom : Android voit une nouvelle application, donc
          le code de version repart à 1. -->
-    <ApplicationDisplayVersion>0.9.81</ApplicationDisplayVersion>
-    <ApplicationVersion>18</ApplicationVersion>
+    <ApplicationDisplayVersion>0.9.82</ApplicationDisplayVersion>
+    <ApplicationVersion>19</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
   </PropertyGroup>

@@ -178,38 +178,97 @@ public sealed class StrApiClient
         => GetJsonAsync<StrZoneVolume>("/api/box/zone/volume", ct);
 
     /// <summary>
-    /// Lit le drapeau « permanent » de la zone courante. L'agent stocke le document
-    /// tel qu'il le reçoit : reformer un groupe sans ce drapeau le transforme en
-    /// groupe ordinaire, qui cesse de se reformer à la lecture et disparaît à la
-    /// première dissolution. Renvoie false si la zone n'existe pas ou ne le dit pas.
+    /// Lit de la zone courante ce qu'il faut savoir avant de la republier.
+    ///
+    /// L'agent stocke le document tel qu'il le reçoit : republier sans « permanent »
+    /// transforme un groupe durable en groupe ordinaire, qui cesse de se reformer à
+    /// la lecture et disparaît à la première dissolution. Idem pour « stereo » et le
+    /// nom de la paire.
+    ///
+    /// Renvoie <c>null</c> quand la lecture a échoué — agent muet, appel expiré,
+    /// JSON inattendu. C'est volontairement distinct d'une zone sans drapeau : un
+    /// appelant qui prendrait l'échec pour un « permanent : false » rétrograderait
+    /// le groupe de l'utilisateur sur un simple hoquet réseau. Il doit renoncer.
     /// </summary>
-    public async Task<bool> GetZonePermanentAsync(CancellationToken ct = default)
+    public async Task<StrZoneFacts?> GetZoneFactsAsync(CancellationToken ct = default)
     {
         try
         {
             using var document = await GetZoneRawAsync(ct).ConfigureAwait(false);
 
-            if (document is null)
+            if (document is null || document.RootElement.ValueKind != JsonValueKind.Object)
             {
-                return false;
+                // Pas de zone du tout : il n'y a rien à préserver, et ce n'est pas
+                // un échec de lecture.
+                return new StrZoneFacts();
             }
 
-            foreach (var name in new[] { "permanent", "Permanent", "sticky" })
+            var root = document.RootElement;
+
+            return new StrZoneFacts
             {
-                if (document.RootElement.ValueKind == JsonValueKind.Object &&
-                    document.RootElement.TryGetProperty(name, out var value) &&
-                    (value.ValueKind == JsonValueKind.True || value.ValueKind == JsonValueKind.False))
-                {
-                    return value.GetBoolean();
-                }
-            }
+                Permanent = ReadFlag(root, "permanent", "Permanent", "sticky") ?? false,
+                Stereo = ReadStereoFlag(root),
+                StereoName = ReadStereoName(root),
+            };
         }
         catch (Exception)
         {
-            // Pas de zone, agent muet, JSON inattendu : on ne prétend rien.
+            return null;
+        }
+    }
+
+    private static bool? ReadFlag(JsonElement root, params string[] names)
+    {
+        foreach (var name in names)
+        {
+            if (root.TryGetProperty(name, out var value) &&
+                (value.ValueKind == JsonValueKind.True || value.ValueKind == JsonValueKind.False))
+            {
+                return value.GetBoolean();
+            }
         }
 
-        return false;
+        return null;
+    }
+
+    /// <summary>
+    /// « stereo » est tantôt un booléen, tantôt l'objet qui porte le nom de la
+    /// paire — la documentation de l'agent décrit la seconde forme, des versions
+    /// plus anciennes renvoient la première.
+    /// </summary>
+    private static bool ReadStereoFlag(JsonElement root)
+    {
+        if (!root.TryGetProperty("stereo", out var stereo))
+        {
+            return false;
+        }
+
+        return stereo.ValueKind switch
+        {
+            JsonValueKind.True => true,
+            JsonValueKind.False => false,
+            JsonValueKind.Object => true,
+            _ => false,
+        };
+    }
+
+    private static string? ReadStereoName(JsonElement root)
+    {
+        if (root.TryGetProperty("stereo", out var stereo) &&
+            stereo.ValueKind == JsonValueKind.Object &&
+            stereo.TryGetProperty("name", out var name) &&
+            name.ValueKind == JsonValueKind.String)
+        {
+            return name.GetString();
+        }
+
+        if (root.TryGetProperty("stereoName", out var flat) && flat.ValueKind == JsonValueKind.String)
+        {
+            return flat.GetString();
+        }
+
+        return null;
     }
 
     /// <summary>GET /api/box/zone, renvoyé brut (la forme varie selon le châssis).</summary>
@@ -297,11 +356,73 @@ public sealed class StrApiClient
     public Task FormZoneAsync(StrZoneFormRequest request, CancellationToken ct = default)
         => PostJsonAsync("/api/box/zone", request, ct, WakeTimeout);
 
-    public async Task DissolveZoneAsync(CancellationToken ct = default)
+    /// <summary>
+    /// DELETE /api/box/zone — défait le groupe en cours.
+    ///
+    /// Un 200 ne vaut pas succès. L'agent répond 200 avec <c>ok:false</c> et le
+    /// nombre de membres restants quand l'enceinte a accepté la requête puis gardé
+    /// le groupe, et 200 avec <c>nothing:true</c> quand il n'y avait rien à défaire.
+    /// Prendre le code HTTP pour une réussite, c'est afficher une coche verte sur
+    /// un groupe qui joue encore.
+    /// </summary>
+    /// <param name="forget">Supprime aussi le groupe mémorisé, pas seulement le groupe actif.</param>
+    /// <param name="stereo">Défait la paire stéréo au lieu du groupe multi-pièces.</param>
+    public async Task<StrDissolveResult> DissolveZoneAsync(
+        bool forget = false, bool stereo = false, CancellationToken ct = default)
     {
+        var query = (forget, stereo) switch
+        {
+            (true, true) => "?forget=1&stereo=1",
+            (true, false) => "?forget=1",
+            (false, true) => "?stereo=1",
+            _ => "",
+        };
+
         using var cts = Budget(null, ct);
-        using var response = await _http.DeleteAsync(BaseUrl + "/api/box/zone", cts.Token).ConfigureAwait(false);
+        using var response = await _http.DeleteAsync(BaseUrl + "/api/box/zone" + query, cts.Token).ConfigureAwait(false);
         await EnsureSuccessAsync(response, "/api/box/zone", cts.Token).ConfigureAwait(false);
+
+        var body = await response.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
+        return ReadDissolve(body);
+    }
+
+    private static StrDissolveResult ReadDissolve(string body)
+    {
+        if (string.IsNullOrWhiteSpace(body))
+        {
+            // Agent plus ancien, qui ne décrit pas sa réponse : on ne peut que le croire.
+            return new StrDissolveResult { Ok = true };
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(body);
+            var root = document.RootElement;
+
+            if (root.ValueKind != JsonValueKind.Object)
+            {
+                return new StrDissolveResult { Ok = true };
+            }
+
+            return new StrDissolveResult
+            {
+                Ok = ReadFlag(root, "ok") ?? true,
+                Nothing = ReadFlag(root, "nothing") ?? false,
+                StereoPairKept = ReadFlag(root, "stereoPairKept") ?? false,
+                Remaining = root.TryGetProperty("remaining", out var remaining) &&
+                            remaining.ValueKind == JsonValueKind.Number
+                    ? remaining.GetInt32()
+                    : 0,
+                Error = root.TryGetProperty("error", out var error) &&
+                        error.ValueKind == JsonValueKind.String
+                    ? error.GetString()
+                    : null,
+            };
+        }
+        catch (JsonException)
+        {
+            return new StrDissolveResult { Ok = true };
+        }
     }
 
     // ---------------------------------------------------------------- Plomberie
@@ -360,6 +481,8 @@ public sealed class StrApiClient
             ? " (l'agent STR de cette enceinte ne connaît pas ce point de terminaison — version trop ancienne ?)"
             : "";
 
-        throw new SpeakerException($"{path} a répondu {(int)response.StatusCode}{hint}.", body);
+        throw new SpeakerException(
+            $"{path} a répondu {(int)response.StatusCode}{hint}.", body,
+            statusCode: response.StatusCode);
     }
 }

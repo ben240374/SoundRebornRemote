@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Xml.Linq;
@@ -174,7 +175,9 @@ public sealed class BoseApiClient
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new SpeakerException($"{path} a répondu {(int)response.StatusCode} ({response.StatusCode}).", text);
+            throw new SpeakerException(
+                $"{path} a répondu {(int)response.StatusCode} ({response.StatusCode}).",
+                text, statusCode: response.StatusCode);
         }
 
         if (string.IsNullOrWhiteSpace(text))
@@ -193,7 +196,8 @@ public sealed class BoseApiClient
                               .Select(e => e.Value)
                               .FirstOrDefault(v => !string.IsNullOrWhiteSpace(v)) ?? "erreur non détaillée";
 
-            throw new SpeakerException($"{path} refusé par l'enceinte : {message.Trim()}", text);
+            throw new SpeakerException(
+                $"{path} refusé par l'enceinte : {message.Trim()}", text, refusedByDevice: true);
         }
 
         return root;
@@ -203,11 +207,40 @@ public sealed class BoseApiClient
 /// <summary>Erreur renvoyée par l'enceinte ou l'agent, avec le corps brut pour le diagnostic.</summary>
 public sealed class SpeakerException : Exception
 {
-    public SpeakerException(string message, string? responseBody = null, Exception? inner = null)
+    public SpeakerException(
+        string message,
+        string? responseBody = null,
+        Exception? inner = null,
+        HttpStatusCode? statusCode = null,
+        bool refusedByDevice = false)
         : base(message, inner)
     {
         ResponseBody = responseBody;
+        StatusCode = statusCode;
+        RefusedByDevice = refusedByDevice;
     }
 
     public string? ResponseBody { get; }
+
+    /// <summary>Code HTTP de la réponse, quand l'erreur en vient d'une.</summary>
+    public HttpStatusCode? StatusCode { get; }
+
+    /// <summary>
+    /// Vrai quand le firmware a refusé la commande dans le corps de la réponse,
+    /// avec un code 200 — sa manière habituelle de dire non.
+    /// </summary>
+    public bool RefusedByDevice { get; }
+
+    /// <summary>
+    /// Refus net : l'appareil a reçu la requête, l'a comprise, et l'a rejetée.
+    ///
+    /// Un 4xx en est un ; un refus annoncé dans le corps aussi. Un 5xx, non :
+    /// l'agent répond 502 quand sa propre lecture du firmware expire, et cette
+    /// requête-là a très bien pu arriver jusqu'à l'enceinte. Retomber sur une
+    /// touche matérielle dans ce cas rallumerait une enceinte qu'on vient
+    /// d'éteindre, puisque POWER et PLAY_PAUSE sont des bascules.
+    /// </summary>
+    public bool IsRefusal =>
+        RefusedByDevice ||
+        (StatusCode is { } code && (int)code >= 400 && (int)code < 500);
 }

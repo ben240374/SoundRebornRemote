@@ -499,6 +499,24 @@ public static class Localization
             "Solo se conoce un altavoz. Lanza un escaneo en Ajustes.");
         Add("S_GroupFormed", "Groupe formé", "Group formed", "Gruppe gebildet", "Groep gevormd", "Grupo formado");
         Add("S_GroupDissolved", "Groupe dissous", "Group dissolved", "Gruppe aufgelöst", "Groep ontbonden", "Grupo disuelto");
+        Add("S_GroupStillUp",
+            "L'enceinte a gardé le groupe : {0} membre(s) encore liés.",
+            "The speaker kept the group: {0} member(s) still linked.",
+            "Der Lautsprecher hat die Gruppe behalten: {0} Mitglied(er) noch verbunden.",
+            "De speaker hield de groep aan: {0} lid/leden nog verbonden.",
+            "El altavoz mantuvo el grupo: {0} miembro(s) aún enlazados.");
+        Add("S_StereoPairKept",
+            "Le groupe est défait, la paire stéréo reste active.",
+            "The group is undone; the stereo pair is still active.",
+            "Die Gruppe ist aufgelöst, das Stereopaar bleibt bestehen.",
+            "De groep is opgeheven, het stereopaar blijft actief.",
+            "El grupo está deshecho; la pareja estéreo sigue activa.");
+        Add("S_ZoneUnreadable",
+            "Zone illisible : rien n'a été modifié, pour ne pas perdre le groupe enregistré.",
+            "Zone unreadable: nothing was changed, so the saved group is not lost.",
+            "Zone nicht lesbar: nichts geändert, damit die gespeicherte Gruppe erhalten bleibt.",
+            "Zone onleesbaar: er is niets gewijzigd, zodat de opgeslagen groep blijft.",
+            "Zona ilegible: no se cambió nada, para no perder el grupo guardado.");
         Add("S_GroupVolumeApplied", "Volume du groupe appliqué", "Group volume applied", "Gruppenlautstärke angewendet", "Groepsvolume toegepast", "Volumen de grupo aplicado");
         Add("S_NeedAgentGroupVolume",
             "Le volume de groupe demande l'agent STR.",

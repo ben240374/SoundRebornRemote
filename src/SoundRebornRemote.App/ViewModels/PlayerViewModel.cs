@@ -366,8 +366,16 @@ public sealed partial class PlayerViewModel : BaseViewModel
                 // L'agent enregistre le document tel qu'il le reçoit : omettre
                 // « permanent » sur un groupe qui l'était le rétrograde en groupe
                 // ordinaire, qui cesse de se reformer et qu'une dissolution efface
-                // définitivement. On relit donc le drapeau avant de republier.
-                var permanent = await device.Str.GetZonePermanentAsync().ConfigureAwait(false);
+                // définitivement. Même chose pour la paire stéréo et son nom.
+                // On relit donc la zone avant de republier — et si cette lecture
+                // échoue, on renonce : republier à l'aveugle détruirait ce que
+                // l'utilisateur a enregistré, pour un simple hoquet réseau.
+                var facts = await device.Str.GetZoneFactsAsync().ConfigureAwait(false);
+
+                if (facts is null)
+                {
+                    throw new InvalidOperationException(Localization.Get("S_ZoneUnreadable"));
+                }
 
                 // Le maître est celui de la zone existante, pas l'enceinte qu'on
                 // regarde : republier avec un autre maître déplacerait la diffusion
@@ -391,7 +399,9 @@ public sealed partial class PlayerViewModel : BaseViewModel
                     Master = master,
                     Slaves = slaves,
                     Mode = "native",
-                    Permanent = permanent,
+                    Permanent = facts.Permanent,
+                    Stereo = facts.Stereo,
+                    Name = facts.StereoName,
                 }).ConfigureAwait(false);
 
                 return;
@@ -440,47 +450,148 @@ public sealed partial class PlayerViewModel : BaseViewModel
         return (device.Endpoint.DeviceId, device.Host);
     }
 
-    private static async Task UngroupAsync(
+    /// <summary>
+    /// Les membres de la zone en cours, adresse et deviceID.
+    ///
+    /// La liste de l'agent est la meilleure source quand elle existe ; sinon on la
+    /// reconstitue à partir des pastilles marquées groupées et de l'enceinte
+    /// commandée, qui fait forcément partie du groupe qu'elle décrit.
+    /// </summary>
+    private List<StrZoneMemberRef> CurrentZoneMembers(SpeakerDevice device)
+    {
+        var members = new List<StrZoneMemberRef>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        void Add(string ip, string deviceId)
+        {
+            if (!string.IsNullOrWhiteSpace(ip) && seen.Add(ip))
+            {
+                members.Add(new StrZoneMemberRef { DeviceId = deviceId, Ip = ip });
+            }
+        }
+
+        foreach (var row in GroupMembers)
+        {
+            Add(row.Ip, row.DeviceId);
+        }
+
+        if (members.Count == 0)
+        {
+            Add(device.Host, device.Endpoint.DeviceId);
+
+            foreach (var candidate in GroupCandidates.Where(c => c.IsGrouped))
+            {
+                Add(candidate.Host, candidate.Endpoint.DeviceId);
+            }
+        }
+
+        return members;
+    }
+
+    private async Task UngroupAsync(
         SpeakerDevice device, SpeakerEndpoint self, SpeakerChoice choice, (string DeviceId, string Ip) master)
     {
-        // Retirer un seul membre n'existe pas côté agent : on passe par le firmware,
-        // qui exige l'identité du MAÎTRE de la zone. Ce n'est pas forcément l'enceinte
-        // pilotée : on peut très bien regarder un esclave.
         var tappedTheMaster = string.Equals(choice.Host, master.Ip, StringComparison.OrdinalIgnoreCase);
 
         // Toucher la pastille du maître depuis une enceinte qui le suit ne veut pas
         // dire « retirer le maître » — une zone sans maître n'existe pas. Cela veut
         // dire « quitter le groupe » : c'est l'enceinte DÉSIGNÉE qu'on retire, pas
         // celle qui reçoit les commandes, qui est justement le maître dans ce cas.
-        // L'ordre, lui, s'adresse toujours au maître.
-        var removedId = tappedTheMaster ? self.DeviceId : choice.Endpoint.DeviceId;
         var removedIp = tappedTheMaster ? self.Host : choice.Endpoint.Host;
+        var removedId = tappedTheMaster ? self.DeviceId : choice.Endpoint.DeviceId;
 
-        if (!string.IsNullOrWhiteSpace(removedId) && !string.IsNullOrWhiteSpace(master.DeviceId))
-        {
-            try
-            {
-                await device.Bose.RemoveZoneSlaveAsync(
-                    master.DeviceId,
-                    master.Ip,
-                    new[] { new ZoneMember { DeviceId = removedId, IpAddress = removedIp } })
-                    .ConfigureAwait(false);
+        await RemoveFromZoneAsync(device, removedIp, removedId, master, choice.Name).ConfigureAwait(false);
+    }
 
-                return;
-            }
-            catch (Exception)
-            {
-                // On retombe sur la dissolution complète.
-            }
-        }
-
+    /// <summary>
+    /// Retire une enceinte du groupe, en préservant ce que l'agent a enregistré.
+    ///
+    /// Sert à deux endroits — la pastille « Grouper avec » et la mise en veille —
+    /// et les deux doivent se comporter pareil, sans quoi éteindre une enceinte et
+    /// la retirer à la main laisseraient le groupe dans deux états différents.
+    /// </summary>
+    private async Task RemoveFromZoneAsync(
+        SpeakerDevice device, string removedIp, string removedId,
+        (string DeviceId, string Ip) master, string removedName)
+    {
+        // Avec l'agent, on REPUBLIE la zone sans le membre retiré, au lieu de passer
+        // par le /removeZoneSlave du firmware. Ce dernier défait bien le groupe
+        // vivant, mais le groupe MÉMORISÉ par l'agent continue de lister l'enceinte :
+        // à la lecture suivante il la réveille et la rattache, et l'utilisateur voit
+        // revenir ce qu'il venait de retirer.
         if (device.Str is not null)
         {
-            await device.Str.DissolveZoneAsync().ConfigureAwait(false);
+            var facts = await device.Str.GetZoneFactsAsync().ConfigureAwait(false);
+
+            if (facts is null)
+            {
+                throw new InvalidOperationException(Localization.Get("S_ZoneUnreadable"));
+            }
+
+            var remaining = CurrentZoneMembers(device)
+                .Where(m => !string.Equals(m.Ip, removedIp, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            // Plus personne à grouper avec le maître : le groupe n'a plus d'objet.
+            if (remaining.Count <= 1)
+            {
+                await DissolveWithAgentAsync(device).ConfigureAwait(false);
+                return;
+            }
+
+            await device.Str.FormZoneAsync(new StrZoneFormRequest
+            {
+                Master = new StrZoneMemberRef { DeviceId = master.DeviceId, Ip = master.Ip },
+                Slaves = remaining
+                    .Where(m => !string.Equals(m.Ip, master.Ip, StringComparison.OrdinalIgnoreCase))
+                    .ToList(),
+                Mode = "native",
+                Permanent = facts.Permanent,
+                Stereo = facts.Stereo,
+                Name = facts.StereoName,
+            }).ConfigureAwait(false);
+
             return;
         }
 
-        await device.Bose.DissolveZoneAsync(master.DeviceId, master.Ip).ConfigureAwait(false);
+        // Sans agent, le firmware est la seule voie, et il réclame l'identité du
+        // MAÎTRE. En cas d'échec on remonte l'erreur : l'ancien repli dissolvait le
+        // groupe entier, ce qui punissait l'utilisateur d'un délai dépassé.
+        if (string.IsNullOrWhiteSpace(removedId) || string.IsNullOrWhiteSpace(master.DeviceId))
+        {
+            throw new InvalidOperationException(Localization.Get("S_MissingDeviceId", removedName));
+        }
+
+        await device.Bose.RemoveZoneSlaveAsync(
+            master.DeviceId,
+            master.Ip,
+            new[] { new ZoneMember { DeviceId = removedId, IpAddress = removedIp } })
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Défait le groupe par l'agent et rend compte de ce qu'il a réellement fait :
+    /// un 200 peut annoncer un groupe conservé, ou une paire stéréo qui subsiste.
+    /// </summary>
+    private async Task DissolveWithAgentAsync(SpeakerDevice device)
+    {
+        if (device.Str is null)
+        {
+            return;
+        }
+
+        var result = await device.Str.DissolveZoneAsync().ConfigureAwait(false);
+
+        if (!result.Ok)
+        {
+            throw new InvalidOperationException(
+                Localization.Get("S_GroupStillUp", result.Remaining));
+        }
+
+        if (result.StereoPairKept)
+        {
+            OnMainThread(() => ShowInfo(Localization.Get("S_StereoPairKept")));
+        }
     }
 
     /// <summary>Recharge les cartes d'enceintes et marque celle qui est active.</summary>
@@ -877,6 +988,21 @@ public sealed partial class PlayerViewModel : BaseViewModel
     {
         var wanted = IsStandby;   // en veille : on veut allumer, et inversement
 
+        // La veille est la seule commande qui NE suit PAS le maître du groupe.
+        //
+        // Tout le reste — transport, présélections, volume — s'adresse au maître,
+        // puisque c'est lui qui diffuse. Mais « éteindre » vise une enceinte
+        // précise : celle que l'utilisateur a désignée. Envoyer la veille au maître
+        // éteignait toute la pièce d'à côté et laissait allumée l'enceinte qu'on
+        // croyait éteindre.
+        var target = Speakers.SelectedEndpoint ?? Device?.Endpoint;
+
+        if (target is null)
+        {
+            ShowInfo(Localization.Get("S_NoSpeaker"));
+            return;
+        }
+
         // Une enceinte qu'on éteint doit d'abord quitter le groupe. Sans ça, la zone
         // garde un membre injoignable : le maître continue de lui diffuser, l'agent
         // s'épuise à le joindre, et au rallumage l'enceinte se retrouve prisonnière
@@ -884,14 +1010,14 @@ public sealed partial class PlayerViewModel : BaseViewModel
         // elle en était le dernier membre utile, le groupe est dissous.
         if (!wanted)
         {
-            await LeaveGroupBeforeStandbyAsync().ConfigureAwait(true);
+            await LeaveGroupBeforeStandbyAsync(target).ConfigureAwait(true);
         }
 
         _powerRequestedAt = DateTime.UtcNow;
         _powerRequestedOn = wanted;
         IsStandby = !wanted;      // le bouton reflète tout de suite l'intention
 
-        await RunAsync(d => d.SetPowerAsync(wanted)).ConfigureAwait(true);
+        await RunAsync(d => SetPowerOnEndpointAsync(d, target, wanted)).ConfigureAwait(true);
 
         if (IsError)
         {
@@ -908,51 +1034,87 @@ public sealed partial class PlayerViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Retire l'enceinte pilotée du groupe avant sa mise en veille.
+    /// Envoie la veille ou l'allumage à une enceinte précise, qui n'est pas
+    /// forcément celle à laquelle l'application est connectée.
     ///
-    /// Trois cas : elle est le maître, et le groupe entier n'a plus de raison
-    /// d'exister ; elle est le dernier esclave, même conclusion ; sinon on ne retire
-    /// qu'elle. L'échec n'est jamais bloquant — la mise en veille reste l'action
-    /// demandée, et un groupe mal défait se rattrape à la relecture suivante.
+    /// Par l'agent quand elle en a un : l'ordre y est explicite, « on : false ».
+    /// Sans agent il faut la touche POWER du firmware, qui est une BASCULE — on
+    /// relit donc l'état avant d'appuyer, faute de quoi éteindre une enceinte déjà
+    /// éteinte la rallumerait.
     /// </summary>
-    private async Task LeaveGroupBeforeStandbyAsync()
+    private async Task SetPowerOnEndpointAsync(SpeakerDevice device, SpeakerEndpoint target, bool on)
+    {
+        // L'enceinte désignée est celle qui reçoit les commandes : le chemin
+        // habituel, avec ses replis éprouvés.
+        if (string.Equals(target.Host, device.Host, StringComparison.OrdinalIgnoreCase))
+        {
+            await device.SetPowerAsync(on).ConfigureAwait(false);
+            return;
+        }
+
+        if (target.StrPort is int port)
+        {
+            var agent = new StrApiClient(target.Host, port, Speakers.Http);
+            await agent.SetPowerAsync(on).ConfigureAwait(false);
+            return;
+        }
+
+        var bose = new BoseApiClient(target.Host, Speakers.Http);
+        var nowPlaying = await bose.GetNowPlayingAsync().ConfigureAwait(false);
+
+        if (nowPlaying.IsStandby != on)
+        {
+            return;   // déjà dans l'état voulu : appuyer la ferait basculer à l'envers
+        }
+
+        await bose.PressKeyAsync(RemoteKey.Power).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Retire du groupe l'enceinte qu'on s'apprête à mettre en veille.
+    ///
+    /// L'enceinte concernée est celle que l'utilisateur a DÉSIGNÉE, pas celle qui
+    /// reçoit les commandes. Depuis que les commandes suivent le maître, les deux
+    /// diffèrent dès qu'on regarde une suivante : la version précédente se croyait
+    /// donc toujours maître, dissolvait le groupe entier et endormait le maître,
+    /// pendant que la suivante visée restait allumée et muette.
+    ///
+    /// Deux cas : l'enceinte visée mène le groupe, ou le groupe tomberait à un seul
+    /// membre — il n'a plus d'objet, on le défait ; sinon on ne retire qu'elle.
+    /// L'échec n'est jamais bloquant : la veille reste l'action demandée.
+    /// </summary>
+    private async Task LeaveGroupBeforeStandbyAsync(SpeakerEndpoint target)
     {
         var device = Device;
 
-        if (device is null || !(IsGroupActive || HasGroupVolume) || GroupMembers.Count == 0)
+        if (device is null || !(IsGroupActive || HasGroupVolume))
         {
             return;
         }
 
-        var self = GroupMembers.FirstOrDefault(
-            m => string.Equals(m.Ip, device.Host, StringComparison.OrdinalIgnoreCase));
+        var master = MasterIdentity(device);
+        var members = CurrentZoneMembers(device);
 
-        var master = GroupMembers.FirstOrDefault(m => m.IsMaster);
-        var slaves = GroupMembers.Count(m => !m.IsMaster);
+        var targetIsMaster = string.Equals(target.Host, master.Ip, StringComparison.OrdinalIgnoreCase);
 
         try
         {
-            if (self is null || self.IsMaster || slaves <= 1)
+            if (targetIsMaster || members.Count <= 2)
             {
                 if (device.Str is not null)
                 {
-                    await device.Str.DissolveZoneAsync().ConfigureAwait(true);
+                    await DissolveWithAgentAsync(device).ConfigureAwait(true);
                 }
                 else
                 {
                     await device.Bose.SetZoneAsync(
-                        device.Endpoint.DeviceId, device.Host, Array.Empty<ZoneMember>()).ConfigureAwait(true);
+                        master.DeviceId, master.Ip, Array.Empty<ZoneMember>()).ConfigureAwait(true);
                 }
             }
-            else if (master is not null && !string.IsNullOrWhiteSpace(master.DeviceId))
+            else
             {
-                // Le retrait passe par le firmware et réclame l'identité du MAÎTRE,
-                // qui n'est pas forcément l'enceinte pilotée.
-                await device.Bose.RemoveZoneSlaveAsync(
-                    master.DeviceId,
-                    master.Ip,
-                    new[] { new ZoneMember { DeviceId = self.DeviceId, IpAddress = self.Ip } })
-                    .ConfigureAwait(true);
+                await RemoveFromZoneAsync(
+                    device, target.Host, target.DeviceId, master, target.DisplayName).ConfigureAwait(true);
             }
 
             await LoadZoneAsync().ConfigureAwait(true);
@@ -986,6 +1148,11 @@ public sealed partial class PlayerViewModel : BaseViewModel
             var nowPlaying = await device.GetNowPlayingAsync().ConfigureAwait(true);
             await ApplyNowPlayingAsync(nowPlaying).ConfigureAwait(true);
 
+            // La vérification porte sur l'enceinte VISÉE. Elle n'est pas forcément
+            // celle qui reçoit les commandes : interroger le maître dirait que tout
+            // va bien alors que la suivante n'a pas obéi.
+            await ApplySelectedStandbyAsync().ConfigureAwait(true);
+
             if (wantedOn && IsStandby)
             {
                 IsError = true;
@@ -995,6 +1162,44 @@ public sealed partial class PlayerViewModel : BaseViewModel
         catch (Exception ex)
         {
             ShowError(ex);
+        }
+    }
+
+    /// <summary>
+    /// Aligne le bouton de veille sur l'enceinte DÉSIGNÉE quand les commandes
+    /// suivent le maître.
+    ///
+    /// Sans cela le bouton annoncerait l'état du maître pour une touche qui agit
+    /// sur une autre enceinte : on éteint la suivante, le maître joue toujours, et
+    /// le bouton propose de l'éteindre une seconde fois.
+    ///
+    /// Un seul appel, et seulement en situation de redirection — hors groupe, la
+    /// lecture habituelle suffit et rien de plus n'est demandé au réseau.
+    /// </summary>
+    private async Task ApplySelectedStandbyAsync()
+    {
+        var target = Speakers.SelectedEndpoint;
+
+        if (!Speakers.IsRedirected || target is null)
+        {
+            return;
+        }
+
+        // Pendant le sursis, l'intention prime sur ce que l'enceinte annonce.
+        if (DateTime.UtcNow - _powerRequestedAt < PowerGrace)
+        {
+            return;
+        }
+
+        try
+        {
+            var bose = new BoseApiClient(target.Host, Speakers.Http);
+            var state = await bose.GetNowPlayingAsync().ConfigureAwait(true);
+            IsStandby = state.IsStandby;
+        }
+        catch (Exception)
+        {
+            // Injoignable : on garde l'affichage en place plutôt que d'inventer.
         }
     }
 
@@ -1112,6 +1317,7 @@ public sealed partial class PlayerViewModel : BaseViewModel
             }
 
             await LoadZoneAsync().ConfigureAwait(true);
+            await ApplySelectedStandbyAsync().ConfigureAwait(true);
 
             ShowInfo(null);
         }

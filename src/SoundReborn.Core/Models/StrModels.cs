@@ -132,6 +132,55 @@ public sealed class StrZoneFormRequest
 
     /// <summary>Groupe permanent : re-formé automatiquement à la prochaine lecture du maître.</summary>
     [JsonPropertyName("permanent")] public bool Permanent { get; set; }
+
+    /// <summary>
+    /// Paire stéréo plutôt que groupe multi-pièces. À renvoyer tel quel quand on
+    /// republie une zone existante : l'agent stocke le document reçu, et l'omettre
+    /// fait perdre la paire.
+    /// </summary>
+    [JsonPropertyName("stereo")] public bool Stereo { get; set; }
+
+    /// <summary>
+    /// Nom de la paire stéréo, porté par les enceintes elles-mêmes. Omis quand il
+    /// est vide, sinon une republication l'écraserait par une chaîne vide.
+    /// </summary>
+    [JsonPropertyName("name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Name { get; set; }
+}
+
+/// <summary>
+/// Ce qu'il faut relire d'une zone avant de la republier. L'agent enregistre le
+/// document tel quel : tout drapeau omis est un drapeau perdu.
+/// </summary>
+public sealed class StrZoneFacts
+{
+    public bool Permanent { get; init; }
+
+    public bool Stereo { get; init; }
+
+    public string? StereoName { get; init; }
+}
+
+/// <summary>
+/// Réponse de DELETE /api/box/zone. L'agent répond 200 même lorsqu'il n'a pas
+/// défait le groupe ; c'est le corps qui le dit.
+/// </summary>
+public sealed class StrDissolveResult
+{
+    /// <summary>Faux quand l'enceinte a gardé le groupe malgré la demande.</summary>
+    public bool Ok { get; init; }
+
+    /// <summary>Vrai quand il n'y avait aucun groupe à défaire — ce n'est pas un échec.</summary>
+    public bool Nothing { get; init; }
+
+    /// <summary>Nombre de membres encore groupés quand <see cref="Ok"/> est faux.</summary>
+    public int Remaining { get; init; }
+
+    /// <summary>Vrai quand le groupe est défait mais que la paire stéréo subsiste.</summary>
+    public bool StereoPairKept { get; init; }
+
+    public string? Error { get; init; }
 }
 
 /// <summary>Corps de POST /api/play (jouer une URL arbitraire).</summary>

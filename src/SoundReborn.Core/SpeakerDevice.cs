@@ -339,14 +339,41 @@ public sealed class SpeakerDevice : IAsyncDisposable
     /// Décide si l'échec d'un appel à l'agent autorise le repli sur la touche
     /// matérielle.
     ///
-    /// Une réponse d'erreur ou une connexion refusée sont des refus : l'agent a
-    /// tranché, le repli est légitime. Un délai dépassé ne dit rien — la commande
-    /// est peut-être arrivée et c'est la réponse qui s'est perdue. Or POWER et
-    /// PLAY_PAUSE sont des bascules : rejouer la commande éteindrait l'enceinte
-    /// qu'on voulait allumer. Dans le doute, on ne fait rien.
+    /// La question n'est pas « est-ce que ça a échoué », mais « est-ce que la
+    /// requête est arrivée ». POWER et PLAY_PAUSE sont des bascules : rejouer une
+    /// commande déjà reçue éteint l'enceinte qu'on voulait allumer.
+    ///
+    /// Deux cas seulement autorisent le repli, et ils ont en commun que l'enceinte
+    /// n'a rien exécuté :
+    ///
+    ///   – un refus net, 4xx ou refus annoncé dans le corps. L'agent a compris et
+    ///     a dit non ;
+    ///   – un échec AVANT l'établissement de la connexion : nom non résolu, port
+    ///     fermé, poignée de main TLS ratée. Rien n'est parti.
+    ///
+    /// Tout le reste interdit le repli. Un 502 en particulier : l'agent le renvoie
+    /// quand sa propre lecture du firmware expire, et cette lecture-là a très bien
+    /// pu aboutir côté enceinte. Une connexion coupée après l'envoi est dans le
+    /// même cas, et se présente aussi comme une HttpRequestException — c'est
+    /// pourquoi ce type ne suffit pas à lui seul.
     /// </summary>
-    private static bool IsDefiniteRefusal(Exception ex)
-        => ex is SpeakerException || ex is HttpRequestException;
+    private static bool IsDefiniteRefusal(Exception ex) => ex switch
+    {
+        SpeakerException speaker => speaker.IsRefusal,
+        HttpRequestException request => FailedBeforeSending(request),
+        _ => false,
+    };
+
+    /// <summary>
+    /// Vrai quand l'échec réseau s'est produit avant que la requête ne parte.
+    /// HttpRequestError date de .NET 8 ; auparavant il fallait lire le message,
+    /// ce qui dépendait de la langue du système.
+    /// </summary>
+    private static bool FailedBeforeSending(HttpRequestException ex)
+        => ex.HttpRequestError is HttpRequestError.ConnectionError
+                               or HttpRequestError.NameResolutionError
+                               or HttpRequestError.SecureConnectionError
+                               or HttpRequestError.ProxyTunnelError;
 
     public async ValueTask DisposeAsync() => await Notifications.DisposeAsync().ConfigureAwait(false);
 }
