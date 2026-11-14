@@ -46,8 +46,9 @@ better there.
 In the repository: [English](docs/manual/en.md) · [Français](docs/manual/fr.md) ·
 [Deutsch](docs/manual/de.md) · [Nederlands](docs/manual/nl.md) · [Español](docs/manual/es.md)
 
-Installation, screen by screen, gestures, troubleshooting and known limits. PDF versions
-are in [`docs/manual/pdf`](docs/manual/pdf).
+Installation, screen by screen, gestures, troubleshooting and known limits. PDF versions,
+attached to the latest release: [English](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-en.pdf) · [Français](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-fr.pdf) ·
+[Deutsch](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-de.pdf) · [Nederlands](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-nl.pdf) · [Español](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-es.pdf).
 
 ## What the application controls
 
@@ -338,8 +339,9 @@ plus confortablement.
 Dans le dépôt : [Français](docs/manual/fr.md) · [English](docs/manual/en.md) ·
 [Deutsch](docs/manual/de.md) · [Nederlands](docs/manual/nl.md) · [Español](docs/manual/es.md)
 
-Installation, écran par écran, gestes, dépannage et limites connues. Les versions PDF
-sont dans [`docs/manual/pdf`](docs/manual/pdf).
+Installation, écran par écran, gestes, dépannage et limites connues. Les versions PDF,
+jointes à la dernière release : [Français](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-fr.pdf) · [English](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-en.pdf) ·
+[Deutsch](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-de.pdf) · [Nederlands](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-nl.pdf) · [Español](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-es.pdf).
 
 ## Ce que l'application pilote
 
