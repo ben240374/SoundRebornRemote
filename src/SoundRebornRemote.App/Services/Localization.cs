@@ -753,5 +753,108 @@ public static class Localization
             "/supportedURLs nicht verfügbar.",
             "/supportedURLs niet beschikbaar.",
             "/supportedURLs no disponible.");
+
+        // ---------------------------------------------------------- Seconde rangée de touches
+        Add("L_RowOnce", "Une fois", "Once", "Einmal", "Eén keer", "Una vez");
+        Add("L_RowTwice", "Deux fois", "Twice", "Zweimal", "Twee keer", "Dos veces");
+        Add("S_AlreadyOnKey",
+            "Déjà enregistré sur la touche {0}.",
+            "Already stored on key {0}.",
+            "Bereits auf Taste {0} gespeichert.",
+            "Staat al op toets {0}.",
+            "Ya está guardado en la tecla {0}.");
+        Add("S_AlreadyOnKeyNamed",
+            "{0} est déjà sur la touche {1}.",
+            "{0} is already on key {1}.",
+            "{0} liegt bereits auf Taste {1}.",
+            "{0} staat al op toets {1}.",
+            "{0} ya está en la tecla {1}.");
+
+        // ---------------------------------------------------------- Garder ce qui joue
+        Add("L_KeepPlaying",
+            "Garder ce qui joue sur une touche",
+            "Keep what's playing on a key",
+            "Laufendes auf eine Taste legen",
+            "Wat nu speelt op een toets zetten",
+            "Guardar lo que suena en una tecla");
+        Add("L_KeepPlayingTitle", "Sur quelle touche ?", "On which key?", "Auf welche Taste?", "Op welke toets?", "¿En qué tecla?");
+        Add("S_NeedAgentKeep",
+            "Garder ce qui joue demande l'agent STR.",
+            "Keeping what's playing needs the STR agent.",
+            "Laufendes zu speichern erfordert den STR-Agenten.",
+            "Bewaren wat nu speelt vereist de STR-agent.",
+            "Guardar lo que suena requiere el agente STR.");
+        Add("S_Kept",
+            "{0} : enregistré sur la touche {1}",
+            "{0} saved to key {1}",
+            "{0} auf Taste {1} gespeichert",
+            "{0} opgeslagen op toets {1}",
+            "{0}: guardado en la tecla {1}");
+        Add("S_KeptAlready",
+            "{0} est déjà sur la touche {1}",
+            "{0} is already on key {1}",
+            "{0} liegt bereits auf Taste {1}",
+            "{0} staat al op toets {1}",
+            "{0} ya está en la tecla {1}");
+        Add("S_NothingToKeep",
+            "Ce qui joue ne peut pas être gardé sur une touche (veille, AUX, Bluetooth ou Spotify).",
+            "What's playing cannot be kept on a key (standby, AUX, Bluetooth or Spotify).",
+            "Das Laufende lässt sich nicht auf eine Taste legen (Standby, AUX, Bluetooth oder Spotify).",
+            "Wat nu speelt kan niet op een toets worden gezet (stand-by, AUX, Bluetooth of Spotify).",
+            "Lo que suena no se puede guardar en una tecla (reposo, AUX, Bluetooth o Spotify).");
+
+        // ---------------------------------------------------------- Historique : bibliothèque
+        Add("S_LibraryOffline",
+            "Le serveur de médias est éteint ou introuvable : rien n'a été lancé.",
+            "The media server is off or cannot be found: nothing was started.",
+            "Der Medienserver ist aus oder nicht auffindbar: Es wurde nichts gestartet.",
+            "De mediaserver staat uit of is niet te vinden: er is niets gestart.",
+            "El servidor multimedia está apagado o no se encuentra: no se ha iniciado nada.");
+        Add("S_LibraryOfflineNamed",
+            "Le serveur de médias {0} est éteint ou introuvable : rien n'a été lancé.",
+            "Media server {0} is off or cannot be found: nothing was started.",
+            "Der Medienserver {0} ist aus oder nicht auffindbar: Es wurde nichts gestartet.",
+            "Mediaserver {0} staat uit of is niet te vinden: er is niets gestart.",
+            "El servidor multimedia {0} está apagado o no se encuentra: no se ha iniciado nada.");
+
+        // ---------------------------------------------------------- Minuterie de sommeil
+        Add("L_Sleep", "Minuterie de sommeil", "Sleep timer", "Sleeptimer", "Slaaptimer", "Temporizador de apagado");
+        Add("L_SleepIn", "Veille dans {0} min", "Standby in {0} min", "Standby in {0} Min.", "Stand-by over {0} min", "Reposo en {0} min");
+        Add("L_SleepInGroup",
+            "Veille du groupe dans {0} min",
+            "Group standby in {0} min",
+            "Gruppe in {0} Min. im Standby",
+            "Groep in stand-by over {0} min",
+            "Grupo en reposo en {0} min");
+        Add("L_SleepTitle", "Mettre en veille dans…", "Go to standby in…", "In den Standby in…", "Naar stand-by over…", "Pasar a reposo en…");
+        Add("L_SleepCancel", "Annuler la minuterie", "Cancel the timer", "Timer abbrechen", "Timer annuleren", "Cancelar el temporizador");
+        Add("L_Minutes", "{0} min", "{0} min", "{0} Min.", "{0} min", "{0} min");
+        Add("L_SleepScope",
+            "Que faut-il mettre en veille ?",
+            "What should go to standby?",
+            "Was soll in den Standby?",
+            "Wat moet naar stand-by?",
+            "¿Qué debe pasar a reposo?");
+        Add("L_SleepWholeGroup", "Tout le groupe", "The whole group", "Die ganze Gruppe", "De hele groep", "Todo el grupo");
+        Add("L_SleepOnlyThis", "Seulement {0}", "Only {0}", "Nur {0}", "Alleen {0}", "Solo {0}");
+        Add("S_NeedAgentSleep",
+            "La minuterie de sommeil demande l'agent STR.",
+            "The sleep timer needs the STR agent.",
+            "Der Sleeptimer erfordert den STR-Agenten.",
+            "De slaaptimer vereist de STR-agent.",
+            "El temporizador requiere el agente STR.");
+        Add("S_SleepCancelled", "Minuterie annulée", "Timer cancelled", "Timer abgebrochen", "Timer geannuleerd", "Temporizador cancelado");
+        Add("S_SleepSet",
+            "{0} passera en veille dans {1} min",
+            "{0} will go to standby in {1} min",
+            "{0} geht in {1} Min. in den Standby",
+            "{0} gaat over {1} min naar stand-by",
+            "{0} pasará a reposo en {1} min");
+        Add("S_SleepSetGroup",
+            "Le groupe passera en veille dans {0} min",
+            "The group will go to standby in {0} min",
+            "Die Gruppe geht in {0} Min. in den Standby",
+            "De groep gaat over {0} min naar stand-by",
+            "El grupo pasará a reposo en {0} min");
     }
 }

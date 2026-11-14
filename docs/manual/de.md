@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handbuch
 
-Version 0.9.82 · Android 7 und neuer
+Version 1.6.0 · Android 7 und neuer
 
 > Sprachen: [Français](fr.md) · [English](en.md) · **Deutsch** · [Nederlands](nl.md) · [Español](es.md)
 
@@ -115,6 +115,13 @@ Wirkung — ein Livestream lässt sich nicht zurückspulen.
 Der grüne Balken **Standby** schaltet den Lautsprecher aus; ist er aus, heißt er
 **Einschalten**.
 
+Unter dem Balken schickt **Sleeptimer** den Lautsprecher nach 15 bis 120 Minuten in den
+Standby. Solange er läuft, zeigt der Link die Restzeit; tippe darauf, um die Dauer zu
+ändern oder abzubrechen. In einer Gruppe fragt die App, ob die ganze Gruppe oder nur der
+ausgewählte Lautsprecher ausgehen soll. Der Timer lebt im STR-Agenten des Lautsprechers:
+Er läuft weiter, wenn du die App schließt, ein Neustart des Lautsprechers bricht ihn aber
+ab. Der Link erscheint nur, wenn der Agent den Timer kennt.
+
 ### Lautstärke
 
 Stumm, Angleichen, Minus, Regler, Plus. Der Prozentwert steht rechts.
@@ -143,6 +150,15 @@ API des Lautsprechers bietet keine — das ist kein Versäumnis der App.
 Die sechs Presets stehen hier noch einmal, um einen Reiterwechsel zu sparen. Die grün
 umrandete Kachel ist die laufende.
 
+Wenn der STR-Agent die zweite Reihe unterstützt, erscheinen über den Kacheln zwei
+Schaltflächen, **Einmal** und **Zweimal**: Die zweite zeigt die sechs Sender, die der
+Lautsprecher startet, wenn eine Taste zweimal gedrückt wird. Die Wahl gilt für beide
+Reiter.
+
+**Laufendes auf eine Taste legen**, unter den Kacheln, speichert das, was der
+Lautsprecher gerade spielt — Sender, Album oder Titel aus der Bibliothek — auf der Taste
+deiner Wahl. Spotify, AUX und Bluetooth lassen sich so nicht speichern.
+
 ### Gruppieren mit
 
 Ein Plättchen je Lautsprecher, außer dem, der die Befehle erhält. Tippe darauf, um den
@@ -151,9 +167,10 @@ einmal tippen nimmt ihn wieder heraus.
 
 **Der Master wird ermittelt, nicht angenommen.** In einer Gruppe gibt ein Lautsprecher
 wieder, die anderen folgen ihm. Wählst du einen folgenden Lautsprecher, sagt die App es
-— *Gruppiert mit …*, in Bernstein — und schickt Transport, Presets, Standby und
+— *Gruppiert mit …*, in Bernstein — und schickt Transport, Presets und
 Lautstärke an den Master, denn er ist es, der wiedergibt. Einen Lautsprecher zu wählen
-unterbricht also nie, was gerade läuft.
+unterbricht also nie, was gerade läuft. Standby und Sleeptimer sind die Ausnahme: Sie
+wirken auf den ausgewählten Lautsprecher.
 
 Auf einem folgenden Lautsprecher ist das angehakte Plättchen dieser Lautsprecher selbst:
 Tippen verlässt die Gruppe. Erweitert wird die Gruppe vom Master aus, denn er stellt sie
@@ -180,6 +197,16 @@ Bitrate. Tippen startet die Wiedergabe; der grüne Rahmen markiert die laufende.
 Logos werden heruntergeladen und danach lokal behalten. Fehlt eines, veröffentlicht der
 Sender kein brauchbares Bild, oder sein Server antwortet nicht.
 
+### Einmal, zweimal
+
+Mit einem aktuellen STR-Agenten (ab v1.6) trägt jede Taste des Lautsprechers zwei
+Sender: Ein Druck startet den ersten, zwei schnelle Drücke den zweiten. Die
+Schaltflächen **Einmal** und **Zweimal** wählen die angezeigte Reihe; die Kacheln
+behalten ihre Tastennummer, ① bis ⑥.
+
+Die zweite Reihe existiert nur im Agenten: Auf einem Lautsprecher ohne Agent oder mit
+einem älteren erscheinen die Schaltflächen nicht.
+
 ### Einen Sender finden
 
 Das Suchfeld fragt **radio-browser.info** ab, ein offenes, von Freiwilligen gepflegtes
@@ -200,6 +227,10 @@ Tippe auf ein Ergebnis, dann öffnet sich ein Auswahlblatt mit
 **Das Zuweisen setzt den STR-Agenten voraus.** Ohne ihn ist nur sofortiges Anhören
 möglich; gespeichert wird dann durch Gedrückthalten der Taste am Lautsprecher selbst oder
 über die STR-Desktop-App.
+
+Mit der zweiten Reihe bietet das Menü zwölf Tasten an: **①** bis **⑥**, dann **①×2**
+bis **⑥×2**. Ein Sender liegt immer nur auf einer Taste: Ist er schon woanders
+gespeichert, lehnt der Agent ab, und die App nennt die Taste, auf der er liegt.
 
 ---
 
@@ -224,6 +255,10 @@ Webradio, das im Verzeichnis fehlt. Dafür ist der STR-Agent nötig.
 
 **Zuletzt gehört** zeigt den vom Agenten geführten Verlauf: Tippe auf eine Zeile, um
 erneut zu starten.
+
+Ein Album oder Ordner aus der Bibliothek wird vollständig erneut abgespielt, nicht nur
+der erste Titel. Ist der Medienserver ausgeschaltet, sagt die App das, statt eine
+Wiedergabe anzukündigen, die nie startet.
 
 ---
 
@@ -344,6 +379,9 @@ Einstellungen → Sprache. Die Wahl hat Vorrang vor der Sprache des Telefons.
 - **Spotify wird aus Spotify gesteuert**, über Spotify Connect.
 - **Kein Durchsuchen einer DLNA-Bibliothek**, bislang.
 - **Nur Android.** Eine iOS-Fassung gibt es nicht.
+- **Zweite Reihe, Sleeptimer und „Laufendes auf eine Taste legen“ erfordern einen
+  aktuellen STR-Agenten.** Mit einem älteren Agenten erscheinen diese Befehle nicht oder
+  werden abgelehnt.
 
 ---
 

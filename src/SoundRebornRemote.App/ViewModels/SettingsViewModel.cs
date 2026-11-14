@@ -186,7 +186,7 @@ public sealed partial class SettingsViewModel : BaseViewModel
         _ => "https://st-reborn.de/",
     };
 
-    /// <summary>« SoundReborn Remote V0.9.81 » — le code de version Android n'intéresse personne.</summary>
+    /// <summary>« SoundReborn Remote V1.6.0 » — le code de version Android n'intéresse personne.</summary>
     public string AppVersion
     {
         get

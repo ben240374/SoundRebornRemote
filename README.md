@@ -47,7 +47,7 @@ In the repository: [English](docs/manual/en.md) · [Français](docs/manual/fr.md
 [Deutsch](docs/manual/de.md) · [Nederlands](docs/manual/nl.md) · [Español](docs/manual/es.md)
 
 Installation, screen by screen, gestures, troubleshooting and known limits. PDF versions
-are attached to each [release](https://github.com/ben240374/SoundRebornRemote/releases).
+are in [`docs/manual/pdf`](docs/manual/pdf).
 
 ## What the application controls
 
@@ -57,17 +57,20 @@ are attached to each [release](https://github.com/ben240374/SoundRebornRemote/re
 | Play / pause / next / previous | Play tab | `POST :8888/api/pause` `…/resume` `…/next` `…/prev`, falling back to `POST :8090/key` |
 | Bass | Play tab | `POST :8090/bass`, range read from `/bassCapabilities` |
 | Presets 1 to 6 | Presets tab | `POST :8888/api/play/<slot>`, falling back to the `PRESET_n` key |
+| Second preset row (keys pressed twice, slots 7 to 12) | Play and Presets tabs | `POST :8888/api/play/<slot>` — agent only, shown when `/api/agent/version` reports `presetRows` |
+| Keeping what is playing on a key | Play tab | `POST :8888/api/box/save-playing` |
+| Sleep timer | Play tab | `GET/POST/DELETE :8888/api/box/sleep` |
 | Now playing, artwork, source | everywhere | WebSocket `:8080` (subprotocol `gabbo`), falling back to `GET /now_playing` |
 | Sources, Bluetooth, AUX | Sources tab | `GET :8090/sources`, `POST :8090/select`, `PUT :8888/api/box/source` |
 | Playing an arbitrary URL | Sources tab | `POST :8888/api/play` |
-| Listening history | Sources tab | `GET :8888/api/recent` |
+| Listening history, replayed by kind (station, library track, whole album) | Sources tab | `GET :8888/api/recent`, then `POST :8888/api/play` or `POST :8888/api/queue/replay-card` |
 | Multi-room groups | Groups tab | `POST :8888/api/box/zone`, falling back to `POST :8090/setZone` |
 | Per-speaker volume in a group | Play and Groups tabs | `GET/POST :8888/api/box/zone/volume` |
 | Speaker discovery | Settings tab | mDNS (`_streborn._tcp`, `_soundtouch._tcp`), falling back to a `/24` sweep on `GET :8090/info` |
 | Switching speakers | Play tab | cards at the top of the screen, with model and agent version |
 | STR agent version | Play tab | `GET :8888/api/agent/version` |
 | Station search | Presets tab | radio-browser.info, queried by the application itself |
-| Assigning a station to a key | Presets tab | `PUT :8888/api/presets/{slot}` |
+| Assigning a station to a key (1 to 12) | Presets tab | `PUT :8888/api/presets/{slot}` |
 | Interface language | Settings tab | EN, FR, DE, NL, ES — applied immediately, no restart |
 | Light or dark theme | Settings tab | System, Light or Dark — switches immediately |
 | Swipe navigation | everywhere | horizontal gesture recognised in `MainActivity`, without touching scrolling |
@@ -336,7 +339,7 @@ Dans le dépôt : [Français](docs/manual/fr.md) · [English](docs/manual/en.md)
 [Deutsch](docs/manual/de.md) · [Nederlands](docs/manual/nl.md) · [Español](docs/manual/es.md)
 
 Installation, écran par écran, gestes, dépannage et limites connues. Les versions PDF
-sont jointes à chaque [release](https://github.com/ben240374/SoundRebornRemote/releases).
+sont dans [`docs/manual/pdf`](docs/manual/pdf).
 
 ## Ce que l'application pilote
 
@@ -346,17 +349,20 @@ sont jointes à chaque [release](https://github.com/ben240374/SoundRebornRemote/
 | Lecture / pause / suivant / précédent | onglet Lecture | `POST :8888/api/pause` `…/resume` `…/next` `…/prev`, repli sur `POST :8090/key` |
 | Graves | onglet Lecture | `POST :8090/bass`, plage lue dans `/bassCapabilities` |
 | Présélections 1 à 6 | onglet Présélections | `POST :8888/api/play/<slot>`, repli sur la touche `PRESET_n` |
+| Seconde rangée de touches (pressées deux fois, emplacements 7 à 12) | onglets Lecture et Présélections | `POST :8888/api/play/<slot>` — agent seul, affichée quand `/api/agent/version` annonce `presetRows` |
+| Garder ce qui joue sur une touche | onglet Lecture | `POST :8888/api/box/save-playing` |
+| Minuterie de sommeil | onglet Lecture | `GET/POST/DELETE :8888/api/box/sleep` |
 | Titre en cours, pochette, source | partout | WebSocket `:8080` (sous-protocole `gabbo`), repli sur `GET /now_playing` |
 | Sources, Bluetooth, AUX | onglet Sources | `GET :8090/sources`, `POST :8090/select`, `PUT :8888/api/box/source` |
 | Lecture d'une URL quelconque | onglet Sources | `POST :8888/api/play` |
-| Historique d'écoute | onglet Sources | `GET :8888/api/recent` |
+| Historique d'écoute, relancé selon sa nature (station, piste, album entier) | onglet Sources | `GET :8888/api/recent`, puis `POST :8888/api/play` ou `POST :8888/api/queue/replay-card` |
 | Groupes multi-pièces | onglet Groupes | `POST :8888/api/box/zone`, repli sur `POST :8090/setZone` |
 | Volume par enceinte du groupe | onglets Lecture et Groupes | `GET/POST :8888/api/box/zone/volume` |
 | Découverte des enceintes | onglet Réglages | mDNS (`_streborn._tcp`, `_soundtouch._tcp`), repli sur le balayage du `/24` sur `GET :8090/info` |
 | Bascule d'une enceinte à l'autre | onglet Lecture | cartes en haut de l'écran, avec modèle et version de l'agent |
 | Version de l'agent STR | onglet Lecture | `GET :8888/api/agent/version` |
 | Recherche de stations | onglet Présélections | radio-browser.info, interrogé directement par l'application |
-| Affectation à une touche | onglet Présélections | `PUT :8888/api/presets/{slot}` |
+| Affectation à une touche (1 à 12) | onglet Présélections | `PUT :8888/api/presets/{slot}` |
 | Langue de l'interface | onglet Réglages | FR, EN, DE, NL, ES — changement immédiat, sans redémarrage |
 | Thème clair ou foncé | onglet Réglages | Système, Clair ou Foncé — bascule immédiate |
 | Navigation par balayage | partout | geste horizontal reconnu dans `MainActivity`, sans toucher au défilement |

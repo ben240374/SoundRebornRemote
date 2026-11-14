@@ -251,7 +251,18 @@ public sealed partial class PlayerViewModel : BaseViewModel
             Subscribe(device);
             ReloadSpeakerList();
             _ = RefreshAsync();
+            _ = RefreshSleepAsync();
         });
+
+        // La rangée de touches affichée appartient à l'onglet Présélections ; cette
+        // page la montre aussi, elle relaie donc ses changements à son sélecteur.
+        _presetsViewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(HasSecondRow) or nameof(IsSecondRow) or nameof(IsFirstRow))
+            {
+                OnPropertyChanged(e.PropertyName);
+            }
+        };
 
         // Une enceinte oubliée ou retrouvée dans les réglages doit se voir ici
         // tout de suite, sans attendre un retour sur l'onglet.
@@ -266,6 +277,18 @@ public sealed partial class PlayerViewModel : BaseViewModel
 
     /// <summary>Les six touches, partagées avec l'onglet dédié — une seule source de vérité.</summary>
     public ObservableCollection<PresetTile> Presets => _presetsViewModel.Presets;
+
+    /// <summary>Vrai quand l'agent gère la seconde rangée : le sélecteur apparaît.</summary>
+    public bool HasSecondRow => _presetsViewModel.HasSecondRow;
+
+    /// <summary>Vrai quand la grille montre les touches pressées deux fois.</summary>
+    public bool IsSecondRow => _presetsViewModel.IsSecondRow;
+
+    public bool IsFirstRow => _presetsViewModel.IsFirstRow;
+
+    /// <summary>Sélecteur « Une fois / Deux fois » de cette page. Le paramètre vaut "1" ou "2".</summary>
+    [RelayCommand]
+    private Task ShowPresetRowAsync(string? row) => _presetsViewModel.SelectRowAsync(row == "2");
 
     // ================================================================ Enceintes
 
@@ -1251,6 +1274,62 @@ public sealed partial class PlayerViewModel : BaseViewModel
     }
 
     /// <summary>
+    /// Garde ce qui joue sur une touche, au choix de l'utilisateur.
+    ///
+    /// C'est l'agent qui décide de ce qu'il enregistre — la station, le dossier ou
+    /// la piste de bibliothèque — d'après ce que l'enceinte joue réellement. La
+    /// commande part donc vers l'enceinte qui reçoit les ordres : en groupe, le
+    /// maître, puisque c'est lui qui joue.
+    /// </summary>
+    [RelayCommand]
+    private async Task SavePlayingAsync()
+    {
+        var device = Device;
+
+        if (device is null)
+        {
+            IsError = true;
+            StatusMessage = Localization.Get("S_NoSpeaker");
+            return;
+        }
+
+        if (device.Str is null)
+        {
+            IsError = true;
+            StatusMessage = Localization.Get("S_NeedAgentKeep");
+            return;
+        }
+
+        try
+        {
+            var slot = await _presetsViewModel.PickSlotAsync(Localization.Get("L_KeepPlayingTitle")).ConfigureAwait(true);
+
+            if (slot is not { } key)
+            {
+                return;
+            }
+
+            var kept = await device.Str.SavePlayingAsync(key).ConfigureAwait(true);
+
+            await _presetsViewModel.RevealSlotAsync(key).ConfigureAwait(true);
+
+            var name = FirstNonEmpty(kept.Name, Title) ?? "";
+
+            ShowInfo(Localization.Get(kept.Unchanged ? "S_KeptAlready" : "S_Kept", name, PresetKeys.Label(key)));
+        }
+        catch (SpeakerException ex) when (ex.StatusCode is { } code && (int)code == 422)
+        {
+            // Veille, AUX, Bluetooth, Spotify : rien que l'agent sache garder.
+            IsError = true;
+            StatusMessage = Localization.Get("S_NothingToKeep");
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    /// <summary>
     /// Le bouton « Rafraîchir » : relit tout, y compris la pochette et la grille
     /// des touches, puis confirme. Sans ce retour visible, l'appui donnait
     /// l'impression de ne rien faire.
@@ -1590,6 +1669,265 @@ public sealed partial class PlayerViewModel : BaseViewModel
         }
     }
 
+    // ================================================================ Minuterie de sommeil
+
+    /// <summary>Durées proposées, en minutes.</summary>
+    private static readonly int[] SleepChoices = { 15, 30, 45, 60, 90, 120 };
+
+    /// <summary>Relecture auprès de l'agent pendant qu'une minuterie tourne.</summary>
+    private static readonly TimeSpan SleepPollInterval = TimeSpan.FromSeconds(60);
+
+    /// <summary>Hors minuterie : juste de quoi voir celle qu'un autre appareil aurait armée.</summary>
+    private static readonly TimeSpan IdleSleepPollInterval = TimeSpan.FromSeconds(120);
+
+    private DateTime _sleepReadAt = DateTime.MinValue;
+    private DateTime _sleepEndsAt = DateTime.MinValue;
+    private bool _sleepForGroup;
+
+    /// <summary>Enceinte dont la minuterie est affichée.</summary>
+    private string? _sleepHost;
+
+    /// <summary>Vrai quand l'agent de l'enceinte désignée connaît la minuterie.</summary>
+    [ObservableProperty]
+    private bool _sleepAvailable;
+
+    [ObservableProperty]
+    private bool _sleepActive;
+
+    /// <summary>« Minuterie », ou « Veille dans 42 min » quand elle tourne.</summary>
+    [ObservableProperty]
+    private string _sleepLabel = "";
+
+    /// <summary>
+    /// L'agent qui porte la minuterie : celui de l'enceinte DÉSIGNÉE.
+    ///
+    /// Comme la veille, la minuterie ne suit pas le maître du groupe : elle éteint
+    /// l'enceinte que l'utilisateur regarde. Null quand cette enceinte n'a pas d'agent.
+    /// </summary>
+    private StrApiClient? SleepAgent()
+    {
+        var device = Device;
+
+        if (device is null)
+        {
+            return null;
+        }
+
+        var target = Speakers.SelectedEndpoint ?? device.Endpoint;
+
+        if (string.Equals(target.Host, device.Host, StringComparison.OrdinalIgnoreCase))
+        {
+            return device.Str;
+        }
+
+        return target.StrPort is int port ? new StrApiClient(target.Host, port, Speakers.Http) : null;
+    }
+
+    private bool IsSleepHost(StrApiClient agent)
+        => string.Equals(_sleepHost, agent.Host, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Relit la minuterie auprès de l'agent. Elle peut avoir été armée ou annulée
+    /// ailleurs — l'application de bureau, un autre téléphone — et elle disparaît
+    /// quand l'agent redémarre.
+    /// </summary>
+    private async Task RefreshSleepAsync()
+    {
+        var agent = SleepAgent();
+
+        _sleepReadAt = DateTime.UtcNow;
+
+        if (agent is null)
+        {
+            _sleepHost = null;
+            SleepAvailable = false;
+            ApplySleep(null);
+            return;
+        }
+
+        if (!IsSleepHost(agent))
+        {
+            // Autre enceinte : la minuterie affichée n'est pas la sienne.
+            _sleepHost = agent.Host;
+            ApplySleep(null);
+        }
+
+        try
+        {
+            var state = await agent.GetSleepAsync().ConfigureAwait(true);
+
+            if (!IsSleepHost(agent))
+            {
+                return;   // l'utilisateur a changé d'enceinte pendant la lecture
+            }
+
+            SleepAvailable = true;
+            ApplySleep(state);
+        }
+        catch (SpeakerException ex) when (ex.StatusCode is { } code && (int)code == 404)
+        {
+            // Agent antérieur à la minuterie : le bouton n'a pas lieu d'être.
+            if (IsSleepHost(agent))
+            {
+                SleepAvailable = false;
+                ApplySleep(null);
+            }
+        }
+        catch (Exception)
+        {
+            // Injoignable cette fois-ci : on garde l'affichage, le décompte continue.
+        }
+    }
+
+    private void ApplySleep(StrSleepState? state)
+    {
+        if (state is { Active: true, RemainingSec: > 0 })
+        {
+            SleepActive = true;
+            _sleepForGroup = state.Group;
+            _sleepEndsAt = DateTime.UtcNow.AddSeconds(state.RemainingSec);
+        }
+        else
+        {
+            SleepActive = false;
+            _sleepForGroup = false;
+            _sleepEndsAt = DateTime.MinValue;
+        }
+
+        UpdateSleepLabel();
+    }
+
+    /// <summary>Le décompte se fait sur l'horloge du téléphone, entre deux relectures.</summary>
+    private void UpdateSleepLabel()
+    {
+        if (SleepActive)
+        {
+            var remaining = _sleepEndsAt - DateTime.UtcNow;
+
+            if (remaining > TimeSpan.Zero)
+            {
+                var minutes = Math.Max(1, (int)Math.Ceiling(remaining.TotalMinutes));
+                SleepLabel = Localization.Get(_sleepForGroup ? "L_SleepInGroup" : "L_SleepIn", minutes);
+                return;
+            }
+
+            // Échéance passée : l'agent dira ce qu'il en est à la prochaine relecture.
+            SleepActive = false;
+            _sleepForGroup = false;
+            _sleepReadAt = DateTime.MinValue;
+        }
+
+        SleepLabel = Localization.Get("L_Sleep");
+    }
+
+    /// <summary>Appelé par le minuteur de la page : décompte, et relecture quand elle est due.</summary>
+    private void TickSleep()
+    {
+        if (SleepActive)
+        {
+            UpdateSleepLabel();
+        }
+
+        var due = SleepActive ? SleepPollInterval : IdleSleepPollInterval;
+
+        if (DateTime.UtcNow - _sleepReadAt >= due)
+        {
+            _ = RefreshSleepAsync();
+        }
+    }
+
+    /// <summary>
+    /// Le bouton « Minuterie » : choisir une durée, ou annuler celle qui tourne.
+    /// En groupe, on demande s'il faut éteindre tout le groupe ou cette seule enceinte.
+    /// </summary>
+    [RelayCommand]
+    private async Task SleepAsync()
+    {
+        var agent = SleepAgent();
+
+        if (agent is null)
+        {
+            IsError = true;
+            StatusMessage = Localization.Get(Device is null ? "S_NoSpeaker" : "S_NeedAgentSleep");
+            return;
+        }
+
+        try
+        {
+            var cancel = Localization.Get("L_Cancel");
+            var stop = Localization.Get("L_SleepCancel");
+            var durations = SleepChoices.Select(m => Localization.Get("L_Minutes", m)).ToArray();
+
+            var choice = await Shell.Current.DisplayActionSheetAsync(
+                Localization.Get("L_SleepTitle"),
+                cancel,
+                SleepActive ? stop : null,
+                durations).ConfigureAwait(true);
+
+            if (string.IsNullOrWhiteSpace(choice) || choice == cancel)
+            {
+                return;
+            }
+
+            if (choice == stop)
+            {
+                await agent.CancelSleepAsync().ConfigureAwait(true);
+                _sleepReadAt = DateTime.UtcNow;
+                ApplySleep(null);
+                ShowInfo(Localization.Get("S_SleepCancelled"));
+                return;
+            }
+
+            var index = Array.IndexOf(durations, choice);
+
+            if (index < 0)
+            {
+                return;
+            }
+
+            var minutes = SleepChoices[index];
+            var name = (Speakers.SelectedEndpoint ?? Device?.Endpoint)?.DisplayName ?? "";
+            var wholeGroup = false;
+
+            if (IsGroupActive || HasGroupVolume)
+            {
+                var all = Localization.Get("L_SleepWholeGroup");
+                var only = Localization.Get("L_SleepOnlyThis", name);
+
+                var scope = await Shell.Current.DisplayActionSheetAsync(
+                    Localization.Get("L_SleepScope"),
+                    cancel,
+                    null,
+                    all,
+                    only).ConfigureAwait(true);
+
+                if (scope == all)
+                {
+                    wholeGroup = true;
+                }
+                else if (scope != only)
+                {
+                    return;
+                }
+            }
+
+            await agent.SetSleepAsync(minutes, wholeGroup).ConfigureAwait(true);
+
+            _sleepHost = agent.Host;
+            _sleepReadAt = DateTime.UtcNow;
+            SleepAvailable = true;
+            ApplySleep(new StrSleepState { Active = true, RemainingSec = minutes * 60, Group = wholeGroup });
+
+            ShowInfo(wholeGroup
+                ? Localization.Get("S_SleepSetGroup", minutes)
+                : Localization.Get("S_SleepSet", name, minutes));
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
     // ================================================================ Cycle de vie
 
     public void OnAppearing()
@@ -1599,6 +1937,7 @@ public sealed partial class PlayerViewModel : BaseViewModel
 
         ReloadSpeakerList();
         _ = RefreshAsync();
+        _ = RefreshSleepAsync();
 
         // La grille de cette page partage la collection de l'onglet dédié :
         // on la remplit sans attendre que l'utilisateur y aille.
@@ -1645,6 +1984,10 @@ public sealed partial class PlayerViewModel : BaseViewModel
             }
 
             SetLive(device.Notifications.IsConnected);
+
+            // La minuterie de sommeil n'est annoncée par personne : décompte local,
+            // et relecture de loin en loin.
+            TickSleep();
 
             // Le WebSocket est la source normale ; ce rafraîchissement ne sert
             // que lorsqu'il est tombé, pour ne pas matraquer le firmware.
@@ -1754,6 +2097,7 @@ public sealed partial class PlayerViewModel : BaseViewModel
         SetLive(IsLive);
         OnPropertyChanged(nameof(PowerLabel));
         OnPropertyChanged(nameof(GroupedWithLabel));
+        UpdateSleepLabel();
         _artKey = "";
         _ = ApplyNowPlayingAsync(_lastNowPlaying);
 
@@ -1843,6 +2187,18 @@ public sealed partial class PlayerViewModel : BaseViewModel
             if (!string.IsNullOrWhiteSpace(tile?.ArtUrl))
             {
                 candidates.Add(tile!.ArtUrl!);
+            }
+
+            if (tile is null)
+            {
+                // La station peut être rangée sur une touche de la rangée qui
+                // n'est pas à l'écran : son logo est connu quand même.
+                var stored = _presetsViewModel.ArtOfStoredStation(station);
+
+                if (stored is not null)
+                {
+                    candidates.Add(stored);
+                }
             }
         }
 

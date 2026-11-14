@@ -25,6 +25,42 @@
                                 Command="{Binding RefreshCommand}" />
                     </Grid>
 
+                    <!--
+                        Seconde rangée : la même touche pressée deux fois. Le sélecteur
+                        n'apparaît que si l'agent de l'enceinte gère ces six touches-là.
+                    -->
+                    <HorizontalStackLayout Spacing="8" IsVisible="{Binding HasSecondRow}">
+                        <Border Style="{StaticResource Chip}" Padding="14,6">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ShowRowCommand}" CommandParameter="1" />
+                            </Border.GestureRecognizers>
+
+                            <Label Text="{DynamicResource L_RowOnce}" FontSize="13" />
+
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsFirstRow}" Value="True">
+                                    <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                    <Setter Property="StrokeThickness" Value="2" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                        </Border>
+
+                        <Border Style="{StaticResource Chip}" Padding="14,6">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ShowRowCommand}" CommandParameter="2" />
+                            </Border.GestureRecognizers>
+
+                            <Label Text="{DynamicResource L_RowTwice}" FontSize="13" />
+
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsSecondRow}" Value="True">
+                                    <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                    <Setter Property="StrokeThickness" Value="2" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                        </Border>
+                    </HorizontalStackLayout>
+
                     <CollectionView ItemsSource="{Binding Presets}" HeightRequest="268">
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout Orientation="Vertical" Span="3"

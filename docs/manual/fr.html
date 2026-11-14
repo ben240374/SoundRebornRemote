@@ -106,8 +106,8 @@ footer a { color: var(--muted); }
   <a href="https://st-reborn.de">STR</a>
 </div></header>
 <div class="wrap">
-<h1 id="soundreborn-remote-manuel-dutilisation">SoundReborn Remote — Manuel d'utilisation</h1>
-<p>Version 0.9.81 · Android 7 et suivants</p>
+<h1 id="soundreborn-remote--manuel-dutilisation">SoundReborn Remote — Manuel d'utilisation</h1>
+<p>Version 1.6.0 · Android 7 et suivants</p>
 <ul class="langbar"><li><a href="fr.html" aria-current="page">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
 <h2 id="sommaire">Sommaire</h2>
 <ol>
@@ -157,7 +157,7 @@ du projet, section <em>Releases</em> :
 <p>Aucune autorisation particulière n'est demandée au premier lancement : l'application
 n'accède ni aux contacts, ni à la position, ni au stockage.</p>
 <hr />
-<h2 id="3-premier-demarrage">3. Premier démarrage</h2>
+<h2 id="3-premier-démarrage">3. Premier démarrage</h2>
 <p>L'application s'ouvre dans la langue du téléphone si elle la connaît — français,
 anglais, allemand, néerlandais, espagnol — et en anglais sinon. Tu pourras en changer à
 tout moment.</p>
@@ -192,6 +192,12 @@ et son nom ; pour Spotify, la pochette de l'album.</p>
 <p>Quatre touches : arrêt, précédent, lecture/pause, suivant. Selon la source, certaines
 n'ont pas d'effet — une radio en direct ne se rembobine pas.</p>
 <p>Le bandeau vert <strong>Veille</strong> éteint l'enceinte ; une fois éteinte, il devient <strong>Allumer</strong>.</p>
+<p>Sous le bandeau, <strong>Minuterie de sommeil</strong> met l'enceinte en veille après 15 à 120
+minutes. Tant qu'elle tourne, le lien affiche le temps restant ; touche-le pour changer
+la durée ou annuler. En groupe, l'application demande s'il faut éteindre tout le groupe
+ou seulement l'enceinte sélectionnée. La minuterie vit dans l'agent STR de l'enceinte :
+elle continue si tu fermes l'application, mais un redémarrage de l'enceinte l'annule. Le
+lien n'apparaît que si l'agent connaît la minuterie.</p>
 <h3 id="volume">Volume</h3>
 <p>Sourdine, égaliser, moins, curseur, plus. Le pourcentage s'affiche à droite.</p>
 <p>Quand l'enceinte fait partie d'un groupe, ce curseur devient <strong>le volume de l'ensemble
@@ -205,22 +211,29 @@ n'apparaît que lorsqu'un groupe est actif — seule, une enceinte n'a rien à �
 curseur et ses touches − et +, pour baisser la cuisine sans toucher au salon. Une
 enceinte éteinte apparaît estompée et ne réagit pas : lui envoyer une commande ne ferait
 qu'attendre pour rien.</p>
-<h3 id="graves-et-preselections">Graves et présélections</h3>
+<h3 id="graves-et-présélections">Graves et présélections</h3>
 <p><img alt="Graves et présélections" src="../images/02-lecture-graves.jpg" /></p>
 <p>Le réglage des graves va de -10 à +10 selon les modèles. <strong>Il n'y a pas de réglage
 d'aigus</strong> : l'API de l'enceinte n'en expose aucun, ce n'est pas un oubli de
 l'application.</p>
 <p>Les six présélections sont reprises ici pour éviter un changement d'onglet. La tuile
 encadrée de vert est celle qui joue.</p>
+<p>Quand l'agent STR gère la seconde rangée, deux pastilles <strong>Une fois</strong> et <strong>Deux fois</strong>
+apparaissent au-dessus des tuiles : la seconde montre les six stations que l'enceinte
+lance quand on presse deux fois une touche. Le choix vaut pour les deux onglets.</p>
+<p><strong>Garder ce qui joue sur une touche</strong>, sous les tuiles, range sur la touche de ton choix
+ce que l'enceinte joue en ce moment — station, album ou piste de la bibliothèque.
+Spotify, l'AUX et le Bluetooth ne se gardent pas ainsi.</p>
 <h3 id="grouper-avec">Grouper avec</h3>
 <p>Une pastille par enceinte, hors celle qui reçoit les commandes. Touche une pastille pour
 joindre cette enceinte au groupe ; une coche et un contour vert apparaissent. Touche-la
 de nouveau pour l'en retirer.</p>
 <p><strong>Le maître se cherche, il ne se suppose pas.</strong> Dans un groupe, une enceinte diffuse et
 les autres la suivent. Si tu sélectionnes une enceinte qui suit, l'application le dit —
-<em>Groupé avec …</em>, en ambre — et adresse le transport, les présélections, la veille et le
+<em>Groupé avec …</em>, en ambre — et adresse le transport, les présélections et le
 volume au maître, puisque c'est lui qui diffuse. Sélectionner une enceinte n'interrompt
-donc jamais ce que tu es en train d'écouter.</p>
+donc jamais ce que tu es en train d'écouter. La veille et la minuterie de sommeil font
+exception : elles visent l'enceinte sélectionnée.</p>
 <p>Sur une enceinte qui suit, la pastille cochée est cette enceinte elle-même : la toucher
 la fait quitter le groupe. L'extension du groupe se fait depuis le maître, puisque c'est
 lui qui le compose.</p>
@@ -230,7 +243,7 @@ diffuser, et que tu peux regrouper.</p>
 <p>Le lien <strong>Rafraîchir</strong>, en bas, relit tout : titre en cours, pochette, volume, état du
 groupe.</p>
 <hr />
-<h2 id="5-longlet-preselections">5. L'onglet Présélections</h2>
+<h2 id="5-longlet-présélections">5. L'onglet Présélections</h2>
 <p><img alt="Présélections" src="../images/03-preselections.jpg" /></p>
 <h3 id="les-six-touches">Les six touches</h3>
 <p>Les mêmes que les touches physiques de l'enceinte. Chaque tuile montre le logo de la
@@ -238,6 +251,13 @@ station et son débit. Touche-la pour lancer la lecture ; le cadre vert indique 
 joue.</p>
 <p>Les logos sont téléchargés puis conservés localement. S'ils manquent, la station ne
 publie pas d'image exploitable, ou son serveur ne répond pas.</p>
+<h3 id="une-fois-deux-fois">Une fois, deux fois</h3>
+<p>Avec un agent STR récent (v1.6 et suivants), chaque touche de l'enceinte porte deux
+stations : une pression lance la première, deux pressions rapprochées la seconde. Les
+pastilles <strong>Une fois</strong> et <strong>Deux fois</strong> choisissent la rangée affichée ; les tuiles
+gardent leur numéro de touche, de ① à ⑥.</p>
+<p>La seconde rangée n'existe que dans l'agent : les pastilles n'apparaissent pas sur une
+enceinte sans agent, ou dont l'agent est plus ancien.</p>
 <h3 id="trouver-une-station">Trouver une station</h3>
 <p>Le champ de recherche interroge <strong>radio-browser.info</strong>, un annuaire ouvert tenu par des
 bénévoles. Deux listes déroulantes limitent la recherche à un pays et à une langue, et
@@ -255,6 +275,9 @@ laisser ainsi : elle écarte les formats que les enceintes SoundTouch ne savent 
 <p><strong>L'affectation exige l'agent STR.</strong> Sans lui, seule l'écoute immédiate est possible ;
 l'enregistrement se fait alors en maintenant la touche appuyée sur l'enceinte elle-même,
 ou depuis l'application STR de bureau.</p>
+<p>Avec la seconde rangée, la feuille propose douze touches : <strong>①</strong> à <strong>⑥</strong>, puis <strong>①×2</strong>
+à <strong>⑥×2</strong>. Une station ne vit que sur une touche : si elle est déjà rangée ailleurs,
+l'agent refuse et l'application dit sur quelle touche elle se trouve.</p>
 <hr />
 <h2 id="6-longlet-sources">6. L'onglet Sources</h2>
 <p><img alt="Sources" src="../images/04-sources.jpg" /></p>
@@ -271,6 +294,9 @@ et le lance sur l'enceinte. Utile pour une webradio absente de l'annuaire. Cette
 fonction demande l'agent STR.</p>
 <p><strong>Écouté récemment</strong> reprend l'historique tenu par l'agent : touche une ligne pour
 relancer.</p>
+<p>Un album ou un dossier de la bibliothèque est relancé en entier, pas seulement sa
+première piste. Si le serveur de médias est éteint, l'application le dit au lieu
+d'annoncer une lecture qui ne démarre pas.</p>
 <hr />
 <h2 id="7-longlet-groupes">7. L'onglet Groupes</h2>
 <p><img alt="Groupes" src="../images/05-groupes.jpg" /></p>
@@ -291,7 +317,7 @@ sans toucher aux écarts. Cuisine à 60 et salon à 30, monter le groupe de 10 d
 tout le groupe</strong> met tout le monde à la même valeur, ce que fait aussi la touche <strong>=</strong>
 de l'onglet Lecture.</p>
 <hr />
-<h2 id="8-longlet-reglages">8. L'onglet Réglages</h2>
+<h2 id="8-longlet-réglages">8. L'onglet Réglages</h2>
 <p><img alt="Enceintes connues" src="../images/07-reglages-enceintes.jpg" /></p>
 <p><strong>Enceinte sélectionnée</strong> : nom, adresse et modèle. C'est l'enceinte que tu as choisie —
 pas forcément celle qui reçoit les commandes. Quand elle suit un groupe, une ligne ambre
@@ -355,6 +381,8 @@ Réglages → Langue. Le choix prime sur la langue du téléphone.</p>
 <li><strong>Spotify se pilote depuis Spotify</strong>, par Spotify Connect.</li>
 <li><strong>Pas de parcours de bibliothèque DLNA</strong> pour le moment.</li>
 <li><strong>Android uniquement.</strong> Il n'existe pas de version iOS.</li>
+<li><strong>Seconde rangée, minuterie et « garder ce qui joue » demandent un agent STR récent.</strong>
+  Sur un agent plus ancien, ces commandes n'apparaissent pas ou sont refusées.</li>
 </ul>
 <hr />
 <h2 id="12-mentions">12. Mentions</h2>

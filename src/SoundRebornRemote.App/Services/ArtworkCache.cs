@@ -31,6 +31,15 @@ public sealed class ArtworkCache
     /// <summary>URL déjà résolues pendant cette session, y compris les échecs (valeur nulle).</summary>
     private readonly Dictionary<string, string?> _resolved = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Téléchargements en cours, par URL. Deux demandes de la même image — la tuile
+    /// d'une station et la vignette « En ce moment » de cette même station, au
+    /// lancement — partagent un seul téléchargement au lieu d'écrire toutes deux le
+    /// même fichier : la perdante échouait, et notait l'image comme introuvable
+    /// pour toute la session alors qu'elle venait d'être enregistrée.
+    /// </summary>
+    private readonly Dictionary<string, Task<string?>> _inFlight = new(StringComparer.OrdinalIgnoreCase);
+
     private readonly SemaphoreSlim _gate = new(4);
 
     public ArtworkCache()
@@ -72,24 +81,52 @@ public sealed class ArtworkCache
 
         var path = Path.Combine(_directory, FileNameFor(url));
 
-        if (File.Exists(path) && new FileInfo(path).Length > 0)
+        if (IsUsable(path))
         {
             Remember(url, path);
             return path;
         }
 
-        await _gate.WaitAsync(ct).ConfigureAwait(false);
+        Task<string?> download;
+
+        lock (_resolved)
+        {
+            if (!_inFlight.TryGetValue(url, out var running))
+            {
+                // Task.Run : le téléchargement démarre hors du verrou, et hors du
+                // fil de l'interface.
+                var target = url;
+                running = Task.Run(() => DownloadToFileAsync(target, path));
+                _inFlight[url] = running;
+            }
+
+            download = running;
+        }
+
+        // Le jeton de l'appelant n'interrompt que SON attente. Le téléchargement,
+        // partagé, va au bout : l'annuler pour un appelant priverait les autres de
+        // l'image, et la noterait introuvable pour la session.
+        return await download.WaitAsync(ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Télécharge une image vers son fichier de cache. Un seul appel à la fois par
+    /// URL (voir <see cref="_inFlight"/>). Ne lève jamais : null en cas d'échec.
+    /// </summary>
+    private async Task<string?> DownloadToFileAsync(string url, string path)
+    {
+        await _gate.WaitAsync().ConfigureAwait(false);
 
         try
         {
             // Une autre tâche a pu télécharger la même image pendant l'attente.
-            if (File.Exists(path) && new FileInfo(path).Length > 0)
+            if (IsUsable(path))
             {
                 Remember(url, path);
                 return path;
             }
 
-            var bytes = await DownloadAsync(url, ct).ConfigureAwait(false);
+            var bytes = await DownloadAsync(url, CancellationToken.None).ConfigureAwait(false);
 
             if (bytes is null)
             {
@@ -100,7 +137,7 @@ public sealed class ArtworkCache
             // Écriture par un fichier temporaire puis renommage : une image à
             // moitié écrite, si l'application est tuée, ne sera jamais servie.
             var temp = path + ".part";
-            await File.WriteAllBytesAsync(temp, bytes, ct).ConfigureAwait(false);
+            await File.WriteAllBytesAsync(temp, bytes).ConfigureAwait(false);
             File.Move(temp, path, overwrite: true);
 
             Remember(url, path);
@@ -108,12 +145,32 @@ public sealed class ArtworkCache
         }
         catch (Exception)
         {
-            Remember(url, null);
-            return null;
+            // Un échec d'écriture n'efface pas une image qui est bel et bien là.
+            var found = IsUsable(path) ? path : null;
+            Remember(url, found);
+            return found;
         }
         finally
         {
             _gate.Release();
+
+            lock (_resolved)
+            {
+                _inFlight.Remove(url);
+            }
+        }
+    }
+
+    /// <summary>Vrai quand le fichier existe et n'est pas vide. Ne lève jamais.</summary>
+    private static bool IsUsable(string path)
+    {
+        try
+        {
+            return File.Exists(path) && new FileInfo(path).Length > 0;
+        }
+        catch (Exception)
+        {
+            return false;
         }
     }
 

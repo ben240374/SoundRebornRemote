@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manuel d'utilisation
 
-Version 0.9.82 · Android 7 et suivants
+Version 1.6.0 · Android 7 et suivants
 
 > Langues : **Français** · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md)
 
@@ -115,6 +115,13 @@ n'ont pas d'effet — une radio en direct ne se rembobine pas.
 
 Le bandeau vert **Veille** éteint l'enceinte ; une fois éteinte, il devient **Allumer**.
 
+Sous le bandeau, **Minuterie de sommeil** met l'enceinte en veille après 15 à 120
+minutes. Tant qu'elle tourne, le lien affiche le temps restant ; touche-le pour changer
+la durée ou annuler. En groupe, l'application demande s'il faut éteindre tout le groupe
+ou seulement l'enceinte sélectionnée. La minuterie vit dans l'agent STR de l'enceinte :
+elle continue si tu fermes l'application, mais un redémarrage de l'enceinte l'annule. Le
+lien n'apparaît que si l'agent connaît la minuterie.
+
 ### Volume
 
 Sourdine, égaliser, moins, curseur, plus. Le pourcentage s'affiche à droite.
@@ -144,6 +151,14 @@ l'application.
 Les six présélections sont reprises ici pour éviter un changement d'onglet. La tuile
 encadrée de vert est celle qui joue.
 
+Quand l'agent STR gère la seconde rangée, deux pastilles **Une fois** et **Deux fois**
+apparaissent au-dessus des tuiles : la seconde montre les six stations que l'enceinte
+lance quand on presse deux fois une touche. Le choix vaut pour les deux onglets.
+
+**Garder ce qui joue sur une touche**, sous les tuiles, range sur la touche de ton choix
+ce que l'enceinte joue en ce moment — station, album ou piste de la bibliothèque.
+Spotify, l'AUX et le Bluetooth ne se gardent pas ainsi.
+
 ### Grouper avec
 
 Une pastille par enceinte, hors celle qui reçoit les commandes. Touche une pastille pour
@@ -152,9 +167,10 @@ de nouveau pour l'en retirer.
 
 **Le maître se cherche, il ne se suppose pas.** Dans un groupe, une enceinte diffuse et
 les autres la suivent. Si tu sélectionnes une enceinte qui suit, l'application le dit —
-*Groupé avec …*, en ambre — et adresse le transport, les présélections, la veille et le
+*Groupé avec …*, en ambre — et adresse le transport, les présélections et le
 volume au maître, puisque c'est lui qui diffuse. Sélectionner une enceinte n'interrompt
-donc jamais ce que tu es en train d'écouter.
+donc jamais ce que tu es en train d'écouter. La veille et la minuterie de sommeil font
+exception : elles visent l'enceinte sélectionnée.
 
 Sur une enceinte qui suit, la pastille cochée est cette enceinte elle-même : la toucher
 la fait quitter le groupe. L'extension du groupe se fait depuis le maître, puisque c'est
@@ -182,6 +198,16 @@ joue.
 Les logos sont téléchargés puis conservés localement. S'ils manquent, la station ne
 publie pas d'image exploitable, ou son serveur ne répond pas.
 
+### Une fois, deux fois
+
+Avec un agent STR récent (v1.6 et suivants), chaque touche de l'enceinte porte deux
+stations : une pression lance la première, deux pressions rapprochées la seconde. Les
+pastilles **Une fois** et **Deux fois** choisissent la rangée affichée ; les tuiles
+gardent leur numéro de touche, de ① à ⑥.
+
+La seconde rangée n'existe que dans l'agent : les pastilles n'apparaissent pas sur une
+enceinte sans agent, ou dont l'agent est plus ancien.
+
 ### Trouver une station
 
 Le champ de recherche interroge **radio-browser.info**, un annuaire ouvert tenu par des
@@ -202,6 +228,10 @@ Touche un résultat : une feuille d'actions s'ouvre, avec
 **L'affectation exige l'agent STR.** Sans lui, seule l'écoute immédiate est possible ;
 l'enregistrement se fait alors en maintenant la touche appuyée sur l'enceinte elle-même,
 ou depuis l'application STR de bureau.
+
+Avec la seconde rangée, la feuille propose douze touches : **①** à **⑥**, puis **①×2**
+à **⑥×2**. Une station ne vit que sur une touche : si elle est déjà rangée ailleurs,
+l'agent refuse et l'application dit sur quelle touche elle se trouve.
 
 ---
 
@@ -226,6 +256,10 @@ fonction demande l'agent STR.
 
 **Écouté récemment** reprend l'historique tenu par l'agent : touche une ligne pour
 relancer.
+
+Un album ou un dossier de la bibliothèque est relancé en entier, pas seulement sa
+première piste. Si le serveur de médias est éteint, l'application le dit au lieu
+d'annoncer une lecture qui ne démarre pas.
 
 ---
 
@@ -343,6 +377,8 @@ Réglages → Langue. Le choix prime sur la langue du téléphone.
 - **Spotify se pilote depuis Spotify**, par Spotify Connect.
 - **Pas de parcours de bibliothèque DLNA** pour le moment.
 - **Android uniquement.** Il n'existe pas de version iOS.
+- **Seconde rangée, minuterie et « garder ce qui joue » demandent un agent STR récent.**
+  Sur un agent plus ancien, ces commandes n'apparaissent pas ou sont refusées.
 
 ---
 

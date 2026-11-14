@@ -106,8 +106,8 @@ footer a { color: var(--muted); }
   <a href="https://st-reborn.de">STR</a>
 </div></header>
 <div class="wrap">
-<h1 id="soundreborn-remote-handleiding">SoundReborn Remote — Handleiding</h1>
-<p>Versie 0.9.81 · Android 7 en hoger</p>
+<h1 id="soundreborn-remote--handleiding">SoundReborn Remote — Handleiding</h1>
+<p>Versie 1.6.0 · Android 7 en hoger</p>
 <ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html" aria-current="page">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
 <h2 id="inhoud">Inhoud</h2>
 <ol>
@@ -189,6 +189,12 @@ bij Spotify de albumhoes.</p>
 sommige niets — een live radiostream laat zich niet terugspoelen.</p>
 <p>De groene balk <strong>Stand-by</strong> schakelt de speaker uit; is hij uit, dan staat er
 <strong>Inschakelen</strong>.</p>
+<p>Onder de balk zet <strong>Slaaptimer</strong> de speaker na 15 tot 120 minuten in stand-by. Zolang
+hij loopt, toont de link de resterende tijd; tik erop om de duur te wijzigen of te
+annuleren. In een groep vraagt de app of de hele groep moet uitgaan of alleen de
+geselecteerde speaker. De timer leeft in de STR-agent van de speaker: hij loopt door als
+je de app sluit, maar een herstart van de speaker annuleert hem. De link verschijnt
+alleen als de agent de timer kent.</p>
 <h3 id="volume">Volume</h3>
 <p>Demping, gelijkzetten, min, schuif, plus. Het percentage staat rechts.</p>
 <p>Hoort de speaker bij een groep, dan wordt deze schuif <strong>het volume van de hele groep</strong>:
@@ -208,14 +214,21 @@ opdracht ernaartoe zou de app alleen voor niets laten wachten.</p>
 is er niet</strong>: de API van de speaker biedt die niet — het is geen vergetelheid van de app.</p>
 <p>De zes presets staan hier ook, om een tabbladwissel te besparen. De groen omlijnde tegel
 is degene die speelt.</p>
+<p>Als de STR-agent de tweede rij ondersteunt, verschijnen boven de tegels twee knoppen,
+<strong>Eén keer</strong> en <strong>Twee keer</strong>: de tweede toont de zes zenders die de speaker start
+wanneer een toets twee keer wordt ingedrukt. De keuze geldt voor beide tabbladen.</p>
+<p><strong>Wat nu speelt op een toets zetten</strong>, onder de tegels, bewaart wat de speaker op dit
+moment speelt — zender, album of nummer uit de bibliotheek — op de toets van je keuze.
+Spotify, AUX en Bluetooth kunnen zo niet worden bewaard.</p>
 <h3 id="groeperen-met">Groeperen met</h3>
 <p>Eén chip per speaker, behalve die welke de opdrachten krijgt. Tik erop om die speaker
 aan de groep toe te voegen; een vinkje en een groene rand verschijnen. Nog een tik haalt
 hem er weer uit.</p>
 <p><strong>De master wordt opgezocht, niet aangenomen.</strong> In een groep speelt één speaker af en
 volgen de andere. Kies je een speaker die volgt, dan zegt de app dat — <em>Gegroepeerd met
-…</em>, in amber — en stuurt bediening, presets, stand-by en volume naar de master, want die
-speelt af. Een speaker kiezen onderbreekt dus nooit wat je aan het luisteren bent.</p>
+…</em>, in amber — en stuurt bediening, presets en volume naar de master, want die
+speelt af. Een speaker kiezen onderbreekt dus nooit wat je aan het luisteren bent.
+Stand-by en de slaaptimer zijn de uitzondering: die werken op de geselecteerde speaker.</p>
 <p>Op een volgende speaker is de aangevinkte chip die speaker zelf: erop tikken verlaat de
 groep. Uitbreiden gebeurt vanaf de master, want die stelt de groep samen.</p>
 <p><strong>Een speaker uitzetten haalt hem eerst uit de groep</strong> en heft de groep op als het de
@@ -231,6 +244,12 @@ van de groep.</p>
 bitrate. Tikken start het afspelen; de groene omlijning markeert wat er speelt.</p>
 <p>Logo's worden gedownload en daarna lokaal bewaard. Ontbreekt er een, dan publiceert de
 zender geen bruikbare afbeelding, of antwoordt zijn server niet.</p>
+<h3 id="eén-keer-twee-keer">Eén keer, twee keer</h3>
+<p>Met een recente STR-agent (v1.6 en later) draagt elke toets van de speaker twee zenders:
+één druk start de eerste, twee snelle drukken de tweede. De knoppen <strong>Eén keer</strong> en
+<strong>Twee keer</strong> kiezen de getoonde rij; de tegels houden hun toetsnummer, ① tot ⑥.</p>
+<p>De tweede rij bestaat alleen in de agent: op een speaker zonder agent, of met een
+oudere, verschijnen de knoppen niet.</p>
 <h3 id="een-zender-vinden">Een zender vinden</h3>
 <p>Het zoekveld bevraagt <strong>radio-browser.info</strong>, een open gids die door vrijwilligers wordt
 bijgehouden. Twee keuzelijsten beperken de zoekactie tot een land en een taal, en
@@ -248,6 +267,9 @@ die stilte zonder foutmelding zouden opleveren.</p>
 <p><strong>Toewijzen vereist de STR-agent.</strong> Zonder hem kun je alleen meteen luisteren; opslaan
 gebeurt dan door de toets op de speaker zelf ingedrukt te houden, of via de
 STR-desktopapp.</p>
+<p>Met de tweede rij biedt het menu twaalf toetsen aan: <strong>①</strong> tot <strong>⑥</strong>, daarna <strong>①×2</strong>
+tot <strong>⑥×2</strong>. Een zender staat maar op één toets: staat hij al ergens anders, dan weigert
+de agent en zegt de app op welke toets hij staat.</p>
 <hr />
 <h2 id="6-het-tabblad-bronnen">6. Het tabblad Bronnen</h2>
 <p><img alt="Bronnen" src="../images/04-sources.jpg" /></p>
@@ -263,6 +285,9 @@ streamingdienst waarvan het account sinds de cloud-afsluiting onbereikbaar is.</
 gids ontbreekt. Hiervoor is de STR-agent nodig.</p>
 <p><strong>Onlangs afgespeeld</strong> toont de geschiedenis die de agent bijhoudt: tik op een regel om
 opnieuw te starten.</p>
+<p>Een album of map uit de bibliotheek wordt volledig opnieuw afgespeeld, niet alleen het
+eerste nummer. Staat de mediaserver uit, dan zegt de app dat, in plaats van een weergave
+aan te kondigen die nooit start.</p>
 <hr />
 <h2 id="7-het-tabblad-groepen">7. Het tabblad Groepen</h2>
 <p><img alt="Groepen" src="../images/05-groupes.jpg" /></p>
@@ -347,6 +372,9 @@ Instellingen → Taal. Jouw keuze gaat voor op de taal van de telefoon.</p>
 <li><strong>Spotify wordt vanuit Spotify bediend</strong>, via Spotify Connect.</li>
 <li><strong>Geen DLNA-bibliotheek doorbladeren</strong>, vooralsnog.</li>
 <li><strong>Alleen Android.</strong> Er is geen iOS-versie.</li>
+<li><strong>De tweede rij, de slaaptimer en ‘wat nu speelt op een toets zetten’ vereisen een
+  recente STR-agent.</strong> Met een oudere agent verschijnen deze opdrachten niet of worden ze
+  geweigerd.</li>
 </ul>
 <hr />
 <h2 id="12-vermeldingen">12. Vermeldingen</h2>

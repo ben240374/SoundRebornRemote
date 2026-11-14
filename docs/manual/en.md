@@ -1,6 +1,6 @@
 # SoundReborn Remote — User manual
 
-Version 0.9.82 · Android 7 and later
+Version 1.6.0 · Android 7 and later
 
 > Languages: [Français](fr.md) · **English** · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md)
 
@@ -108,6 +108,13 @@ effect — a live radio stream cannot be rewound.
 
 The green **Standby** bar turns the speaker off; once off, it reads **Turn on**.
 
+Below the bar, **Sleep timer** sends the speaker to standby after 15 to 120 minutes.
+While it runs, the link shows the time left; tap it to change the duration or cancel. In
+a group, the app asks whether to switch off the whole group or only the selected
+speaker. The timer lives in the speaker's STR agent: it keeps running if you close the
+app, but a speaker restart cancels it. The link only appears when the agent knows the
+timer.
+
 ### Volume
 
 Mute, level, minus, slider, plus. The percentage is shown on the right.
@@ -136,6 +143,14 @@ speaker's API exposes none — this is not an omission in the app.
 The six presets are repeated here to save a tab change. The tile outlined in green is
 the one playing.
 
+When the STR agent handles the second row, two chips, **Once** and **Twice**, appear
+above the tiles: the second shows the six stations the speaker starts when a key is
+pressed twice. The choice applies to both tabs.
+
+**Keep what's playing on a key**, below the tiles, stores what the speaker is playing
+right now — station, album or library track — on the key you pick. Spotify, AUX and
+Bluetooth cannot be kept this way.
+
 ### Group with
 
 One chip per speaker, other than the one the commands go to. Tap a chip to add that
@@ -143,9 +158,10 @@ speaker to the group; a tick and a green outline appear. Tap it again to remove 
 
 **The master is found, not assumed.** In a group, one speaker streams and the others
 follow it. If you select a speaker that is following, the app says so — *Grouped with …*
-in amber — and sends transport, presets, standby and volume to the master, because the
+in amber — and sends transport, presets and volume to the master, because the
 master is what is playing. Selecting a speaker therefore never interrupts what you are
-listening to.
+listening to. Standby and the sleep timer are the exception: they act on the selected
+speaker.
 
 On a speaker that follows, the ticked chip is that speaker itself: tapping it leaves the
 group. Extending the group is done from the master, since it is the master that composes
@@ -172,6 +188,15 @@ its bitrate. Tap to start playback; the green outline marks the one playing.
 Logos are downloaded and then kept locally. When one is missing, the station publishes no
 usable image, or its server is not answering.
 
+### Once, twice
+
+With a recent STR agent (v1.6 and later), each key of the speaker holds two stations:
+one press starts the first, two quick presses the second. The **Once** and **Twice**
+chips choose the row shown; the tiles keep their key number, ① to ⑥.
+
+The second row exists only in the agent: the chips do not appear on a speaker without
+the agent, or with an older one.
+
 ### Find a station
 
 The search box queries **radio-browser.info**, an open directory maintained by
@@ -192,6 +217,10 @@ Tap a result and an action sheet opens with
 **Assigning requires the STR agent.** Without it only immediate listening is possible;
 storing is then done by holding the key on the speaker itself, or from the STR desktop
 app.
+
+With the second row, the sheet offers twelve keys: **①** to **⑥**, then **①×2** to
+**⑥×2**. A station lives on one key only: if it is already stored elsewhere, the agent
+refuses and the app says which key holds it.
 
 ---
 
@@ -214,6 +243,10 @@ streaming service whose account is no longer reachable since the cloud shutdown.
 directory. This needs the STR agent.
 
 **Recently played** shows the history kept by the agent: tap a line to start it again.
+
+A library album or folder is replayed in full, not just its first track. If the media
+server is switched off, the app says so instead of announcing playback that never
+starts.
 
 ---
 
@@ -328,6 +361,8 @@ Settings → Language. Your choice overrides the phone's language.
 - **Spotify is driven from Spotify**, through Spotify Connect.
 - **No DLNA library browsing** at this stage.
 - **Android only.** There is no iOS version.
+- **The second row, the sleep timer and “keep what's playing” need a recent STR agent.**
+  On an older agent these commands do not appear or are refused.
 
 ---
 

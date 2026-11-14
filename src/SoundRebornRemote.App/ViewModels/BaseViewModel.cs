@@ -29,7 +29,9 @@ public abstract partial class BaseViewModel : ObservableObject
 
     protected void ShowError(Exception ex)
     {
-        var message = ex switch
+        // Un refus de l'agent qui porte un code connu se dit en clair, dans la
+        // langue de l'utilisateur. Tout le reste suit le chemin habituel.
+        var message = DescribeRefusal(ex) ?? ex switch
         {
             SpeakerException ste => ste.Message,
             TaskCanceledException => Localization.Get("S_Timeout"),
@@ -40,6 +42,42 @@ public abstract partial class BaseViewModel : ObservableObject
         IsError = true;
         StatusMessage = message;
     }
+
+    /// <summary>
+    /// Traduit les refus de l'agent STR que l'on sait nommer. Null pour tout le
+    /// reste, y compris une erreur qui ne vient pas de l'agent.
+    /// </summary>
+    private static string? DescribeRefusal(Exception ex)
+    {
+        var refusal = StrRefusal.From(ex);
+
+        if (refusal is null)
+        {
+            return null;
+        }
+
+        if (refusal.Code == StrRefusal.AlreadyOnSlot && refusal.Slot > 0)
+        {
+            var key = PresetKeys.Label(refusal.Slot);
+
+            return string.IsNullOrWhiteSpace(refusal.Name)
+                ? Localization.Get("S_AlreadyOnKey", key)
+                : Localization.Get("S_AlreadyOnKeyNamed", refusal.Name!, key);
+        }
+
+        if (refusal.Code == StrRefusal.LibraryServerOffline)
+        {
+            return LibraryOfflineMessage(refusal.Server);
+        }
+
+        return null;
+    }
+
+    /// <summary>Le serveur de médias de la bibliothèque est éteint ou introuvable.</summary>
+    protected static string LibraryOfflineMessage(string? server)
+        => string.IsNullOrWhiteSpace(server)
+            ? Localization.Get("S_LibraryOffline")
+            : Localization.Get("S_LibraryOfflineNamed", server!);
 
     protected void ShowInfo(string? message)
     {

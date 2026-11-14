@@ -245,6 +245,20 @@ public sealed class SpeakerDevice : IAsyncDisposable
     /// </summary>
     public async Task RecallPresetAsync(int slot, CancellationToken ct = default)
     {
+        // La seconde rangée (7 à 12) n'existe que dans le magasin de l'agent : les
+        // touches du firmware s'arrêtent à 6. Aucun repli matériel n'est possible,
+        // et tenter PRESET_n lancerait une AUTRE station que celle demandée.
+        if (slot > 6)
+        {
+            if (Str is null)
+            {
+                throw new InvalidOperationException("La seconde rangée de présélections demande l'agent STR.");
+            }
+
+            await Str.PlaySlotAsync(slot, ct).ConfigureAwait(false);
+            return;
+        }
+
         if (Str is not null)
         {
             try
@@ -323,7 +337,7 @@ public sealed class SpeakerDevice : IAsyncDisposable
         return Str.PlayUrlAsync(station.PlayableUrl, station.Name, station.Codec, station.Favicon, ct);
     }
 
-    /// <summary>Enregistre une station sur une touche de présélection (1 à 6).</summary>
+    /// <summary>Enregistre une station sur une touche de présélection (1 à 12).</summary>
     public Task SaveStationAsync(RadioStation station, int slot, CancellationToken ct = default)
     {
         if (Str is null)

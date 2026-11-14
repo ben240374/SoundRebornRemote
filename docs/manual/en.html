@@ -106,8 +106,8 @@ footer a { color: var(--muted); }
   <a href="https://st-reborn.de">STR</a>
 </div></header>
 <div class="wrap">
-<h1 id="soundreborn-remote-user-manual">SoundReborn Remote — User manual</h1>
-<p>Version 0.9.81 · Android 7 and later</p>
+<h1 id="soundreborn-remote--user-manual">SoundReborn Remote — User manual</h1>
+<p>Version 1.6.0 · Android 7 and later</p>
 <ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html" aria-current="page">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
 <h2 id="contents">Contents</h2>
 <ol>
@@ -185,6 +185,12 @@ name; for Spotify, the album cover.</p>
 <p>Four keys: stop, previous, play/pause, next. Depending on the source some have no
 effect — a live radio stream cannot be rewound.</p>
 <p>The green <strong>Standby</strong> bar turns the speaker off; once off, it reads <strong>Turn on</strong>.</p>
+<p>Below the bar, <strong>Sleep timer</strong> sends the speaker to standby after 15 to 120 minutes.
+While it runs, the link shows the time left; tap it to change the duration or cancel. In
+a group, the app asks whether to switch off the whole group or only the selected
+speaker. The timer lives in the speaker's STR agent: it keeps running if you close the
+app, but a speaker restart cancels it. The link only appears when the agent knows the
+timer.</p>
 <h3 id="volume">Volume</h3>
 <p>Mute, level, minus, slider, plus. The percentage is shown on the right.</p>
 <p>When the speaker is part of a group, this slider becomes <strong>the volume of the whole
@@ -204,14 +210,21 @@ only make the app wait for nothing.</p>
 speaker's API exposes none — this is not an omission in the app.</p>
 <p>The six presets are repeated here to save a tab change. The tile outlined in green is
 the one playing.</p>
+<p>When the STR agent handles the second row, two chips, <strong>Once</strong> and <strong>Twice</strong>, appear
+above the tiles: the second shows the six stations the speaker starts when a key is
+pressed twice. The choice applies to both tabs.</p>
+<p><strong>Keep what's playing on a key</strong>, below the tiles, stores what the speaker is playing
+right now — station, album or library track — on the key you pick. Spotify, AUX and
+Bluetooth cannot be kept this way.</p>
 <h3 id="group-with">Group with</h3>
 <p>One chip per speaker, other than the one the commands go to. Tap a chip to add that
 speaker to the group; a tick and a green outline appear. Tap it again to remove it.</p>
 <p><strong>The master is found, not assumed.</strong> In a group, one speaker streams and the others
 follow it. If you select a speaker that is following, the app says so — <em>Grouped with …</em>
-in amber — and sends transport, presets, standby and volume to the master, because the
+in amber — and sends transport, presets and volume to the master, because the
 master is what is playing. Selecting a speaker therefore never interrupts what you are
-listening to.</p>
+listening to. Standby and the sleep timer are the exception: they act on the selected
+speaker.</p>
 <p>On a speaker that follows, the ticked chip is that speaker itself: tapping it leaves the
 group. Extending the group is done from the master, since it is the master that composes
 it.</p>
@@ -228,6 +241,12 @@ group state.</p>
 its bitrate. Tap to start playback; the green outline marks the one playing.</p>
 <p>Logos are downloaded and then kept locally. When one is missing, the station publishes no
 usable image, or its server is not answering.</p>
+<h3 id="once-twice">Once, twice</h3>
+<p>With a recent STR agent (v1.6 and later), each key of the speaker holds two stations:
+one press starts the first, two quick presses the second. The <strong>Once</strong> and <strong>Twice</strong>
+chips choose the row shown; the tiles keep their key number, ① to ⑥.</p>
+<p>The second row exists only in the agent: the chips do not appear on a speaker without
+the agent, or with an older one.</p>
 <h3 id="find-a-station">Find a station</h3>
 <p>The search box queries <strong>radio-browser.info</strong>, an open directory maintained by
 volunteers. Two drop-downs narrow the search to a country and a language, and <strong>Top
@@ -245,6 +264,9 @@ produce silence with no error message.</p>
 <p><strong>Assigning requires the STR agent.</strong> Without it only immediate listening is possible;
 storing is then done by holding the key on the speaker itself, or from the STR desktop
 app.</p>
+<p>With the second row, the sheet offers twelve keys: <strong>①</strong> to <strong>⑥</strong>, then <strong>①×2</strong> to
+<strong>⑥×2</strong>. A station lives on one key only: if it is already stored elsewhere, the agent
+refuses and the app says which key holds it.</p>
 <hr />
 <h2 id="6-the-sources-tab">6. The Sources tab</h2>
 <p><img alt="Sources" src="../images/04-sources.jpg" /></p>
@@ -259,6 +281,9 @@ streaming service whose account is no longer reachable since the cloud shutdown.
 <code>.m3u8</code> — and starts it on the speaker. Useful for a web radio missing from the
 directory. This needs the STR agent.</p>
 <p><strong>Recently played</strong> shows the history kept by the agent: tap a line to start it again.</p>
+<p>A library album or folder is replayed in full, not just its first track. If the media
+server is switched off, the app says so instead of announcing playback that never
+starts.</p>
 <hr />
 <h2 id="7-the-groups-tab">7. The Groups tab</h2>
 <p><img alt="Groups" src="../images/05-groupes.jpg" /></p>
@@ -340,6 +365,8 @@ Settings → Language. Your choice overrides the phone's language.</p>
 <li><strong>Spotify is driven from Spotify</strong>, through Spotify Connect.</li>
 <li><strong>No DLNA library browsing</strong> at this stage.</li>
 <li><strong>Android only.</strong> There is no iOS version.</li>
+<li><strong>The second row, the sleep timer and “keep what's playing” need a recent STR agent.</strong>
+  On an older agent these commands do not appear or are refused.</li>
 </ul>
 <hr />
 <h2 id="12-notices">12. Notices</h2>

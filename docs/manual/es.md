@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manual de uso
 
-Versión 0.9.82 · Android 7 y posteriores
+Versión 1.6.0 · Android 7 y posteriores
 
 > Idiomas: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · **Español**
 
@@ -111,6 +111,13 @@ tienen efecto: una radio en directo no se rebobina.
 
 La banda verde **Reposo** apaga el altavoz; una vez apagado, pasa a leerse **Encender**.
 
+Bajo la banda, **Temporizador de apagado** pone el altavoz en reposo tras 15 a 120
+minutos. Mientras corre, el enlace muestra el tiempo restante; tócalo para cambiar la
+duración o cancelar. En un grupo, la aplicación pregunta si debe apagarse todo el grupo o
+solo el altavoz seleccionado. El temporizador vive en el agente STR del altavoz: sigue
+corriendo si cierras la aplicación, pero un reinicio del altavoz lo cancela. El enlace
+solo aparece si el agente conoce el temporizador.
+
 ### Volumen
 
 Silencio, igualar, menos, control deslizante, más. El porcentaje aparece a la derecha.
@@ -139,6 +146,14 @@ altavoz no ofrece ninguno; no es un olvido de la aplicación.
 Las seis presintonías se repiten aquí para ahorrar un cambio de pestaña. La tarjeta con
 borde verde es la que suena.
 
+Cuando el agente STR admite la segunda fila, aparecen sobre las tarjetas dos botones,
+**Una vez** y **Dos veces**: el segundo muestra las seis emisoras que el altavoz inicia
+al pulsar una tecla dos veces. La elección vale para las dos pestañas.
+
+**Guardar lo que suena en una tecla**, bajo las tarjetas, guarda en la tecla que elijas
+lo que el altavoz reproduce en este momento — emisora, álbum o pista de la biblioteca.
+Spotify, AUX y Bluetooth no se pueden guardar así.
+
 ### Agrupar con
 
 Una pastilla por altavoz, salvo el que recibe las órdenes. Tócala para añadir ese
@@ -146,9 +161,10 @@ altavoz al grupo; aparecen una marca y un contorno verde. Tócala de nuevo para 
 
 **El maestro se busca, no se supone.** En un grupo, un altavoz reproduce y los demás lo
 siguen. Si seleccionas un altavoz que sigue, la aplicación lo dice — *Agrupado con …*,
-en ámbar — y envía el transporte, las presintonías, el reposo y el volumen al maestro,
+en ámbar — y envía el transporte, las presintonías y el volumen al maestro,
 porque es él quien reproduce. Seleccionar un altavoz, por tanto, nunca interrumpe lo que
-estás escuchando.
+estás escuchando. El reposo y el temporizador son la excepción: actúan sobre el altavoz
+seleccionado.
 
 En un altavoz que sigue, la pastilla marcada es ese mismo altavoz: tocarla lo saca del
 grupo. Ampliar el grupo se hace desde el maestro, ya que es él quien lo compone.
@@ -175,6 +191,16 @@ que suena.
 Los logotipos se descargan y luego se conservan localmente. Si falta alguno, la emisora no
 publica una imagen utilizable o su servidor no responde.
 
+### Una vez, dos veces
+
+Con un agente STR reciente (v1.6 y posteriores), cada tecla del altavoz lleva dos
+emisoras: una pulsación inicia la primera, dos pulsaciones rápidas la segunda. Los
+botones **Una vez** y **Dos veces** eligen la fila mostrada; las tarjetas conservan su
+número de tecla, de ① a ⑥.
+
+La segunda fila solo existe en el agente: los botones no aparecen en un altavoz sin
+agente, o con uno más antiguo.
+
 ### Encontrar una emisora
 
 El campo de búsqueda consulta **radio-browser.info**, un directorio abierto mantenido por
@@ -195,6 +221,10 @@ Toca un resultado y se abre una hoja de acciones con
 **La asignación exige el agente STR.** Sin él solo es posible la escucha inmediata; el
 guardado se hace entonces manteniendo pulsada la tecla en el propio altavoz, o desde la
 aplicación STR de escritorio.
+
+Con la segunda fila, el menú ofrece doce teclas: de **①** a **⑥**, y luego de **①×2** a
+**⑥×2**. Una emisora solo ocupa una tecla: si ya está guardada en otra, el agente lo
+rechaza y la aplicación indica en qué tecla está.
 
 ---
 
@@ -218,6 +248,10 @@ Requiere el agente STR.
 
 **Escuchado recientemente** recoge el historial que lleva el agente: toca una línea para
 volver a empezar.
+
+Un álbum o una carpeta de la biblioteca se reproduce de nuevo por completo, no solo su
+primera pista. Si el servidor multimedia está apagado, la aplicación lo dice en lugar de
+anunciar una reproducción que nunca empieza.
 
 ---
 
@@ -337,6 +371,8 @@ Ajustes → Idioma. Tu elección prevalece sobre el idioma del teléfono.
 - **Spotify se controla desde Spotify**, mediante Spotify Connect.
 - **Sin exploración de biblioteca DLNA**, por ahora.
 - **Solo Android.** No existe versión para iOS.
+- **La segunda fila, el temporizador y «guardar lo que suena» requieren un agente STR
+  reciente.** Con un agente más antiguo, estos mandos no aparecen o se rechazan.
 
 ---
 

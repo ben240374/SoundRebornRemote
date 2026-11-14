@@ -9,7 +9,37 @@ using SoundRebornRemote.App.Services;
 
 namespace SoundRebornRemote.App.ViewModels;
 
-/// <summary>Une des six touches, telle qu'affichée dans la grille.</summary>
+/// <summary>
+/// Numérotation des douze emplacements de l'agent STR.
+///
+/// 1 à 6 sont les touches de l'enceinte. 7 à 12 forment la seconde rangée : la
+/// touche n pressée deux fois donne l'emplacement 6 + n. À l'écran on parle donc
+/// toujours de la touche 1 à 6, en précisant « ×2 » pour la seconde rangée.
+/// </summary>
+public static class PresetKeys
+{
+    public const int PerRow = 6;
+
+    public const int Total = 12;
+
+    /// <summary>Vrai pour un emplacement de la seconde rangée (7 à 12).</summary>
+    public static bool InSecondRow(int slot) => slot > PerRow;
+
+    /// <summary>Numéro de la touche physique, 1 à 6, quelle que soit la rangée.</summary>
+    public static int Number(int slot) => InSecondRow(slot) ? slot - PerRow : slot;
+
+    /// <summary>« 3 », ou « 3 ×2 » en seconde rangée : la touche telle qu'on l'écrit dans une phrase.</summary>
+    public static string Label(int slot)
+    {
+        var number = Number(slot).ToString(CultureInfo.InvariantCulture);
+        return InSecondRow(slot) ? number + " ×2" : number;
+    }
+}
+
+/// <summary>
+/// Une des six touches, telle qu'affichée dans la grille. Son emplacement vaut 1 à
+/// 6, ou 7 à 12 quand la grille montre la seconde rangée.
+/// </summary>
 public sealed partial class PresetTile : ObservableObject
 {
     [ObservableProperty]
@@ -56,6 +86,13 @@ public sealed partial class PresetTile : ObservableObject
     /// <summary>Type de la touche tel que l'agent le stocke : radio, spotify, queue…</summary>
     [ObservableProperty]
     private string _kind = "";
+
+    /// <summary>
+    /// Emplacement auquel appartient l'image affichée, 0 sans image. Les six tuiles
+    /// servent aux deux rangées : après un changement de rangée, l'image encore à
+    /// l'écran est celle de l'autre rangée tant que cette valeur diffère de Slot.
+    /// </summary>
+    public int ArtSlot { get; set; }
 }
 
 /// <summary>Une station de l'annuaire, avec son logo déjà téléchargé.</summary>
@@ -112,6 +149,24 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
     private DateTime _optimisticUntil = DateTime.MinValue;
 
+    /// <summary>
+    /// Photo de la dernière lecture réussie, tous emplacements confondus. C'est ce
+    /// qui permet de passer d'une rangée à l'autre sans refaire l'aller-retour, et
+    /// de dire ce que porte une touche qui n'est pas à l'écran.
+    /// </summary>
+    private Dictionary<int, PresetInfo> _lastHardware = new();
+
+    private Dictionary<int, StrPreset> _lastStore = new();
+
+    /// <summary>Enceinte à laquelle appartient cette photo. Null tant que rien n'a été lu.</summary>
+    private string? _snapshotHost;
+
+    /// <summary>Dernière enceinte dont l'agent a annoncé la seconde rangée.</summary>
+    private string? _secondRowHost;
+
+    /// <summary>Dernier état de lecture reçu, pour replacer la mise en avant après un changement de rangée.</summary>
+    private (string Source, string? Station, string? Location, bool IsIdle)? _lastSync;
+
     public PresetsViewModel(SpeakerManager speakers, ArtworkCache artwork, RadioBrowserClient radio) : base(speakers)
     {
         _artwork = artwork;
@@ -145,6 +200,20 @@ public sealed partial class PresetsViewModel : BaseViewModel
     [ObservableProperty]
     private bool _isRefreshing;
 
+    /// <summary>
+    /// Vrai quand l'agent de l'enceinte gère la seconde rangée (touches pressées
+    /// deux fois). Sans cela le sélecteur de rangée reste caché et rien ne change.
+    /// </summary>
+    [ObservableProperty]
+    private bool _hasSecondRow;
+
+    /// <summary>Vrai quand la grille montre la seconde rangée, emplacements 7 à 12.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsFirstRow))]
+    private bool _isSecondRow;
+
+    public bool IsFirstRow => !IsSecondRow;
+
     // ================================================================ Les six touches
 
     [RelayCommand]
@@ -154,6 +223,8 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
         if (device is null)
         {
+            // Sans enceinte, pas de seconde rangée : on revient aux six touches.
+            ApplyRowSupport(false);
             await ResetAsync().ConfigureAwait(true);
             return;
         }
@@ -211,15 +282,53 @@ public sealed partial class PresetsViewModel : BaseViewModel
                 return;
             }
 
+            // On garde ce qui vient d'être lu. Une source restée muette ne remplace
+            // pas ce que l'on savait d'elle — sauf si l'enceinte a changé entre-temps,
+            // auquel cas l'ancienne photo ne vaut plus rien.
+            var sameSpeaker = IsSnapshotOf(device);
+
+            if (hardwareRead || !sameSpeaker)
+            {
+                _lastHardware = hardware;
+            }
+
+            if (storeRead || !sameSpeaker)
+            {
+                _lastStore = store;
+            }
+
+            _snapshotHost = device.Host;
+
+            ApplyRowSupport(await DetectSecondRowAsync(device, store, storeRead).ConfigureAwait(true));
+
+            // La seconde rangée ne vit que dans l'agent. S'il n'a pas répondu cette
+            // fois-ci, ses touches restent telles qu'elles sont : même règle que
+            // plus haut, un silence n'est pas une grille vide.
+            var secondRowUnread = false;
+
             foreach (var tile in Presets)
             {
+                if (PresetKeys.InSecondRow(tile.Slot) && !storeRead)
+                {
+                    secondRowUnread = true;
+                    ClearArtOfAnotherSlot(tile);
+                    continue;
+                }
+
                 await ApplyAsync(tile, hardware.GetValueOrDefault(tile.Slot), store.GetValueOrDefault(tile.Slot))
                     .ConfigureAwait(true);
             }
 
             SaveArtCache();
 
-            ShowInfo(store.Count == 0 && hardware.Count == 0 ? Localization.Get("S_NoPresets") : null);
+            if (secondRowUnread)
+            {
+                ShowInfo(Localization.Get("S_PresetsUnread"));
+            }
+            else
+            {
+                ShowInfo(store.Count == 0 && hardware.Count == 0 ? Localization.Get("S_NoPresets") : null);
+            }
         }
         catch (Exception ex)
         {
@@ -272,6 +381,8 @@ public sealed partial class PresetsViewModel : BaseViewModel
     /// </summary>
     public void SyncActive(string source, string? stationName, string? location, bool isIdle)
     {
+        _lastSync = (source, stationName, location, isIdle);
+
         if (DateTime.UtcNow < _optimisticUntil)
         {
             return;
@@ -358,7 +469,10 @@ public sealed partial class PresetsViewModel : BaseViewModel
         }
 
         // Touche réellement vide côté enceinte ET côté agent : on oublie son image.
-        tile.Name = Localization.Get("L_PresetNumber", tile.Slot);
+        // IsEmpty doit redevenir vrai : une tuile réutilisée — touche vidée, ou
+        // changement de rangée — resterait sinon cliquable sur un emplacement vide.
+        tile.IsEmpty = true;
+        tile.Name = Localization.Get("L_PresetNumber", PresetKeys.Number(tile.Slot));
         tile.Detail = Localization.Get("L_PresetEmpty");
         tile.Glyph = SlotNumber(tile.Slot);
         tile.Kind = "";
@@ -366,33 +480,80 @@ public sealed partial class PresetsViewModel : BaseViewModel
         tile.ArtUrl = null;
         tile.ArtSource = null;
         tile.HasArt = false;
+        tile.ArtSlot = 0;
         tile.IsActive = false;
         _artCache.Remove(tile.Slot);
     }
 
+    /// <summary>
+    /// Pose l'image d'une tuile.
+    ///
+    /// Une image déjà affichée n'est jamais retirée pour être reposée aussitôt :
+    /// quand la nouvelle est disponible tout de suite — c'est le cas dès qu'elle
+    /// est dans le cache — elle REMPLACE l'ancienne en une seule affectation.
+    /// Vider puis remplir dans le même passage d'interface est précisément ce qui
+    /// laissait la tuile sans logo après un changement de rangée.
+    /// </summary>
     private async Task SetArtAsync(PresetTile tile, string? art)
     {
-        if (string.IsNullOrWhiteSpace(art))
-        {
-            // Pas d'image cette fois-ci : on garde celle qui est déjà affichée
-            // plutôt que de vider la tuile.
-            return;
-        }
+        // L'emplacement est relevé AVANT toute attente : si l'utilisateur change de
+        // rangée pendant le téléchargement, cette image n'est plus celle de la tuile.
+        var slot = tile.Slot;
 
-        var (source, used) = await _artwork.GetFromChainAsync(art).ConfigureAwait(true);
+        ImageSource? source = null;
+        string? used = null;
+
+        if (!string.IsNullOrWhiteSpace(art))
+        {
+            var pending = _artwork.GetFromChainAsync(art);
+
+            if (!pending.IsCompleted)
+            {
+                // Il faut télécharger. Le logo de l'autre rangée ne doit pas rester
+                // sous le nom de cette touche pendant ce temps.
+                ClearArtOfAnotherSlot(tile);
+            }
+
+            (source, used) = await pending.ConfigureAwait(true);
+
+            if (tile.Slot != slot)
+            {
+                return;
+            }
+        }
 
         if (source is null || used is null)
         {
-            // Aucun candidat n'a donné d'image : le symbole de repli reste en place.
+            // Pas d'image cette fois-ci : on garde celle qui est affichée plutôt que
+            // de vider la tuile — à condition que ce soit bien celle de cette touche.
+            ClearArtOfAnotherSlot(tile);
             return;
         }
 
         tile.ArtUrl = used;
         tile.ArtSource = source;
         tile.HasArt = true;
+        tile.ArtSlot = slot;
 
         // On mémorise l'adresse qui a réellement marché, pas toute la chaîne.
-        _artCache[tile.Slot] = used;
+        _artCache[slot] = used;
+    }
+
+    /// <summary>
+    /// Retire l'image d'une tuile quand elle appartient à un autre emplacement que
+    /// celui que la tuile porte maintenant. Sans effet sinon.
+    /// </summary>
+    private static void ClearArtOfAnotherSlot(PresetTile tile)
+    {
+        if (tile.ArtSlot == tile.Slot)
+        {
+            return;
+        }
+
+        tile.ArtUrl = null;
+        tile.ArtSource = null;
+        tile.HasArt = false;
+        tile.ArtSlot = 0;
     }
 
     /// <summary>Première valeur non vide parmi celles proposées, null si toutes le sont.</summary>
@@ -425,7 +586,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
     {
         foreach (var tile in Presets.Where(t => t.IsEmpty))
         {
-            tile.Name = Localization.Get("L_PresetNumber", tile.Slot);
+            tile.Name = Localization.Get("L_PresetNumber", PresetKeys.Number(tile.Slot));
             tile.Detail = Localization.Get("L_PresetEmpty");
         }
     }
@@ -436,6 +597,298 @@ public sealed partial class PresetsViewModel : BaseViewModel
         {
             await ApplyAsync(tile, null, null).ConfigureAwait(true);
         }
+    }
+
+    // ================================================================ Seconde rangée
+
+    /// <summary>Commande du sélecteur « Une fois / Deux fois ». Le paramètre vaut "1" ou "2".</summary>
+    [RelayCommand]
+    private Task ShowRowAsync(string? row) => SelectRowAsync(row == "2");
+
+    /// <summary>
+    /// Fait montrer à la grille la première ou la seconde rangée.
+    ///
+    /// Ce sont les six mêmes tuiles : seul leur emplacement change, 1 à 6 ou 7 à 12.
+    /// Les deux onglets partagent la collection, ils suivent donc ensemble.
+    /// </summary>
+    public async Task SelectRowAsync(bool second)
+    {
+        second = second && HasSecondRow;
+
+        if (second == IsSecondRow)
+        {
+            return;
+        }
+
+        try
+        {
+            IsSecondRow = second;
+            RetargetTiles();
+
+            var device = Device;
+
+            if (device is null || !IsSnapshotOf(device))
+            {
+                // Rien de lu pour cette enceinte : les tuiles restent neutres, sans
+                // le logo de l'autre rangée, le temps d'une vraie lecture.
+                foreach (var tile in Presets)
+                {
+                    ClearArtOfAnotherSlot(tile);
+                }
+
+                await RefreshAsync().ConfigureAwait(true);
+                return;
+            }
+
+            // Les six tuiles sont garnies avant la moindre attente : chaque appel
+            // pose le texte tout de suite et ne rend la main que si un logo est à
+            // télécharger. Aucune tuile n'attend donc le téléchargement d'une autre.
+            var pending = new List<Task>(Presets.Count);
+
+            foreach (var tile in Presets)
+            {
+                pending.Add(ApplyAsync(tile, _lastHardware.GetValueOrDefault(tile.Slot), _lastStore.GetValueOrDefault(tile.Slot)));
+            }
+
+            await Task.WhenAll(pending).ConfigureAwait(true);
+
+            SaveArtCache();
+
+            if (_lastSync is { } last)
+            {
+                SyncActive(last.Source, last.Station, last.Location, last.IsIdle);
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    /// <summary>
+    /// Après un enregistrement : montre la rangée de la touche concernée, puis
+    /// relit la grille pour afficher ce que l'enceinte a réellement retenu.
+    /// </summary>
+    public async Task RevealSlotAsync(int slot)
+    {
+        await SelectRowAsync(PresetKeys.InSecondRow(slot)).ConfigureAwait(true);
+        await RefreshAsync().ConfigureAwait(true);
+    }
+
+    /// <summary>
+    /// Renumérote les six tuiles pour la rangée affichée et les remet à l'état
+    /// neutre, d'un seul geste et sans attente.
+    ///
+    /// Une tuile ne doit jamais garder le nom d'une rangée avec l'emplacement de
+    /// l'autre, même un instant : un appui lancerait alors une autre station que
+    /// celle affichée. Neutre veut dire vide, donc inerte, jusqu'à ce que le
+    /// contenu de la nouvelle rangée y soit posé.
+    ///
+    /// L'image, elle, n'est pas touchée ici. Elle appartient désormais à un autre
+    /// emplacement (ArtSlot ≠ Slot) et sera remplacée ou retirée par SetArtAsync,
+    /// en une seule fois : la retirer ici pour la reposer dans la foulée faisait
+    /// disparaître le logo des touches garnies dans les deux rangées.
+    /// </summary>
+    private void RetargetTiles()
+    {
+        var offset = IsSecondRow ? PresetKeys.PerRow : 0;
+
+        // La mise en avant appartient à un emplacement, pas à une tuile.
+        _optimisticUntil = DateTime.MinValue;
+
+        for (var index = 0; index < Presets.Count; index++)
+        {
+            var tile = Presets[index];
+
+            tile.Slot = offset + index + 1;
+            tile.IsEmpty = true;
+            tile.IsActive = false;
+            tile.Name = Localization.Get("L_PresetNumber", PresetKeys.Number(tile.Slot));
+            tile.Detail = Localization.Get("L_PresetEmpty");
+            tile.Glyph = SlotNumber(tile.Slot);
+            tile.Kind = "";
+            tile.SourceKey = "";
+        }
+    }
+
+    /// <summary>
+    /// Retient si l'enceinte gère la seconde rangée. Quand elle ne la gère pas
+    /// alors que la grille la montrait — autre enceinte, agent plus ancien — on
+    /// revient à la première : ses touches n'existent pas là-bas.
+    /// </summary>
+    private void ApplyRowSupport(bool supported)
+    {
+        HasSecondRow = supported;
+
+        if (!supported && IsSecondRow)
+        {
+            IsSecondRow = false;
+            RetargetTiles();
+        }
+    }
+
+    /// <summary>
+    /// L'agent annonce la seconde rangée par « presetRows » dans sa version. Un
+    /// magasin qui porte déjà un emplacement au-delà du sixième le prouve aussi.
+    /// </summary>
+    private async Task<bool> DetectSecondRowAsync(SpeakerDevice device, Dictionary<int, StrPreset> store, bool storeRead)
+    {
+        if (device.Str is null)
+        {
+            return false;
+        }
+
+        if (store.Keys.Any(PresetKeys.InSecondRow) || device.Agent?.HasSecondPresetRow == true)
+        {
+            _secondRowHost = device.Host;
+            return true;
+        }
+
+        // La version a été lue à la connexion ; l'agent a pu être mis à jour depuis.
+        // On ne repose la question que s'il vient de répondre : inutile d'attendre
+        // un agent muet une seconde fois.
+        if (storeRead)
+        {
+            try
+            {
+                var info = await device.Str.GetAgentInfoAsync().ConfigureAwait(true);
+
+                if (info is not null)
+                {
+                    if (info.HasSecondPresetRow)
+                    {
+                        _secondRowHost = device.Host;
+                    }
+                    else if (SameHost(_secondRowHost, device.Host))
+                    {
+                        _secondRowHost = null;
+                    }
+
+                    return info.HasSecondPresetRow;
+                }
+            }
+            catch (Exception)
+            {
+                // Lecture ratée : on s'en tient à ce que l'on savait de cette enceinte.
+            }
+        }
+
+        return SameHost(_secondRowHost, device.Host);
+    }
+
+    private bool IsSnapshotOf(SpeakerDevice device) => SameHost(_snapshotHost, device.Host);
+
+    private static bool SameHost(string? left, string? right)
+        => !string.IsNullOrWhiteSpace(left) && string.Equals(left, right, StringComparison.OrdinalIgnoreCase);
+
+    // ================================================================ Choix d'une touche
+
+    /// <summary>
+    /// Les touches proposées quand il faut en choisir une pour y ranger quelque
+    /// chose : six, ou douze quand la seconde rangée existe. Chaque libellé dit ce
+    /// que la touche porte déjà, y compris pour la rangée qui n'est pas à l'écran.
+    /// </summary>
+    private List<(int Slot, string Label)> SlotChoices()
+    {
+        var count = HasSecondRow ? PresetKeys.Total : PresetKeys.PerRow;
+        var choices = new List<(int Slot, string Label)>(count);
+
+        for (var slot = 1; slot <= count; slot++)
+        {
+            choices.Add((slot, SlotActionLabel(slot, OccupantOf(slot))));
+        }
+
+        return choices;
+    }
+
+    /// <summary>Nom de ce que porte un emplacement, null s'il est libre.</summary>
+    private string? OccupantOf(int slot)
+    {
+        // La tuile affichée fait foi pour sa rangée : c'est ce que l'utilisateur voit.
+        var tile = Presets.FirstOrDefault(t => t.Slot == slot);
+
+        if (tile is not null)
+        {
+            return tile.IsEmpty ? null : tile.Name;
+        }
+
+        if (_lastStore.TryGetValue(slot, out var stored))
+        {
+            return stored.DisplayName;
+        }
+
+        return _lastHardware.TryGetValue(slot, out var hardware) && !hardware.IsEmpty ? hardware.Name : null;
+    }
+
+    /// <summary>
+    /// Demande sur quelle touche ranger quelque chose. Renvoie l'emplacement, 1 à
+    /// 12, ou null si l'utilisateur a renoncé.
+    /// </summary>
+    public async Task<int?> PickSlotAsync(string title)
+    {
+        var device = Device;
+
+        if (device is not null && !IsSnapshotOf(device))
+        {
+            // Les libellés disent ce que chaque touche porte : autant qu'ils soient
+            // ceux de cette enceinte.
+            await RefreshAsync().ConfigureAwait(true);
+        }
+
+        var choices = SlotChoices();
+        var cancel = Localization.Get("L_Cancel");
+
+        var choice = await Shell.Current.DisplayActionSheetAsync(
+            title,
+            cancel,
+            null,
+            choices.Select(c => c.Label).ToArray()).ConfigureAwait(true);
+
+        if (string.IsNullOrWhiteSpace(choice) || choice == cancel)
+        {
+            return null;
+        }
+
+        foreach (var candidate in choices)
+        {
+            if (candidate.Label == choice)
+            {
+                return candidate.Slot;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Logo d'une station rangée sur une touche qui n'est pas à l'écran. L'onglet
+    /// Lecture s'en sert quand ce qui joue vient de l'autre rangée.
+    /// </summary>
+    public string? ArtOfStoredStation(string? stationName)
+    {
+        var device = Device;
+
+        if (string.IsNullOrWhiteSpace(stationName) || device is null || !IsSnapshotOf(device))
+        {
+            return null;
+        }
+
+        foreach (var (slot, stored) in _lastStore)
+        {
+            if (!string.Equals(stored.DisplayName, stationName, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var art = JoinCandidates(_artCache.GetValueOrDefault(slot), stored.Art);
+
+            if (art is not null)
+            {
+                return art;
+            }
+        }
+
+        return null;
     }
 
     // ================================================================ Recherche de stations
@@ -557,7 +1010,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
     /// <summary>
     /// Propose d'écouter la station tout de suite, ou de l'affecter à l'une des
-    /// six touches. La feuille d'actions est la façon native de poser ce choix
+    /// touches — six, ou douze avec la seconde rangée. La feuille d'actions est la façon native de poser ce choix
     /// sur Android, sans encombrer la page d'un sélecteur permanent.
     /// </summary>
     [RelayCommand]
@@ -586,10 +1039,17 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
         var listen = Localization.Get("L_Listen");
 
+        if (!IsSnapshotOf(device))
+        {
+            // Les libellés ci-dessous décrivent les touches de CETTE enceinte.
+            await RefreshAsync().ConfigureAwait(true);
+        }
+
         // Chaque entrée dit ce que la touche contient déjà : « ① Remplacer Bel RTL »
         // est plus parlant que « Affecter à la touche 1 », et évite d'écraser une
         // station par erreur.
-        var slots = Presets.Select(SlotActionLabel).ToArray();
+        var choices = SlotChoices();
+        var slots = choices.Select(c => c.Label).ToArray();
 
         var choice = await Shell.Current.DisplayActionSheetAsync(
             result.Name,
@@ -619,13 +1079,25 @@ public sealed partial class PresetsViewModel : BaseViewModel
             return;
         }
 
-        var slot = index + 1;
+        var slot = choices[index].Slot;
+        var saved = Localization.Get("S_StationSaved", result.Name, PresetKeys.Label(slot));
 
-        await RunAsync(
-            d => d.SaveStationAsync(result.Station, slot),
-            Localization.Get("S_StationSaved", result.Name, slot)).ConfigureAwait(true);
+        await RunAsync(d => d.SaveStationAsync(result.Station, slot), saved).ConfigureAwait(true);
 
-        await RefreshAsync().ConfigureAwait(true);
+        if (IsError)
+        {
+            // Refusé — la station est déjà sur une autre touche, par exemple. Rien
+            // n'a changé, et relire la grille effacerait la raison du refus.
+            return;
+        }
+
+        await RevealSlotAsync(slot).ConfigureAwait(true);
+
+        if (!IsError)
+        {
+            // La relecture remet le message à blanc : on redit ce qui a été fait.
+            ShowInfo(saved);
+        }
     }
 
     /// <summary>
@@ -633,17 +1105,21 @@ public sealed partial class PresetsViewModel : BaseViewModel
     /// « Remplacer la station » quand la touche est occupée, sinon l'invitation à
     /// l'affecter.
     /// </summary>
-    private static string SlotActionLabel(PresetTile tile)
+    private static string SlotActionLabel(int slot, string? occupant)
     {
-        var number = SlotNumber(tile.Slot);
+        // « ①×2 » pour la seconde rangée : la même touche, pressée deux fois.
+        var number = PresetKeys.InSecondRow(slot) ? SlotNumber(slot) + "×2" : SlotNumber(slot);
 
-        return tile.IsEmpty
+        return occupant is null
             ? $"{number}  {Localization.Get("L_AssignEmpty")}"
-            : $"{number}  {Localization.Get("L_ReplacePreset", tile.Name)}";
+            : $"{number}  {Localization.Get("L_ReplacePreset", occupant)}";
     }
 
-    /// <summary>Chiffres cerclés ①..⑥ — des caractères de texte, pas des émojis.</summary>
-    private static string SlotNumber(int slot) => slot switch
+    /// <summary>
+    /// Chiffres cerclés ①..⑥ — des caractères de texte, pas des émojis. Toujours le
+    /// numéro de la touche physique : l'emplacement 8 s'affiche ②.
+    /// </summary>
+    private static string SlotNumber(int slot) => PresetKeys.Number(slot) switch
     {
         1 => "①",
         2 => "②",

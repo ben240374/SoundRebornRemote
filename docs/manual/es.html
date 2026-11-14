@@ -106,10 +106,10 @@ footer a { color: var(--muted); }
   <a href="https://st-reborn.de">STR</a>
 </div></header>
 <div class="wrap">
-<h1 id="soundreborn-remote-manual-de-uso">SoundReborn Remote — Manual de uso</h1>
-<p>Versión 0.9.81 · Android 7 y posteriores</p>
+<h1 id="soundreborn-remote--manual-de-uso">SoundReborn Remote — Manual de uso</h1>
+<p>Versión 1.6.0 · Android 7 y posteriores</p>
 <ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html" aria-current="page">Español</a></li></ul><hr />
-<h2 id="indice">Índice</h2>
+<h2 id="índice">Índice</h2>
 <ol>
 <li><a href="#1-lo-que-hace-falta-antes-de-empezar">Lo que hace falta antes de empezar</a></li>
 <li><a href="#2-instalación">Instalación</a></li>
@@ -143,7 +143,7 @@ salgan de casa.</p>
 <li><strong>Android 7 o posterior.</strong></li>
 </ul>
 <hr />
-<h2 id="2-instalacion">2. Instalación</h2>
+<h2 id="2-instalación">2. Instalación</h2>
 <p>La aplicación no se distribuye por Play Store. Se descarga en la página <em>Releases</em> del
 proyecto: <a href="https://github.com/ben240374/SoundRebornRemote/releases">https://github.com/ben240374/SoundRebornRemote/releases</a></p>
 <ol>
@@ -171,7 +171,7 @@ sola.</p>
 <p>Si el escaneo no encuentra nada pero conoces la dirección IP del altavoz, escríbela en el
 campo previsto y toca <strong>Añadir</strong>.</p>
 <hr />
-<h2 id="4-la-pestana-reproduccion">4. La pestaña Reproducción</h2>
+<h2 id="4-la-pestaña-reproducción">4. La pestaña Reproducción</h2>
 <p>La pantalla principal, la que se abre para actuar deprisa.</p>
 <p><img alt="Reproducción" src="../images/01-lecture.jpg" /></p>
 <h3 id="elegir-el-altavoz">Elegir el altavoz</h3>
@@ -188,6 +188,12 @@ nombre; para Spotify, la portada del álbum.</p>
 <p>Cuatro teclas: parar, anterior, reproducir/pausar, siguiente. Según la fuente, algunas no
 tienen efecto: una radio en directo no se rebobina.</p>
 <p>La banda verde <strong>Reposo</strong> apaga el altavoz; una vez apagado, pasa a leerse <strong>Encender</strong>.</p>
+<p>Bajo la banda, <strong>Temporizador de apagado</strong> pone el altavoz en reposo tras 15 a 120
+minutos. Mientras corre, el enlace muestra el tiempo restante; tócalo para cambiar la
+duración o cancelar. En un grupo, la aplicación pregunta si debe apagarse todo el grupo o
+solo el altavoz seleccionado. El temporizador vive en el agente STR del altavoz: sigue
+corriendo si cierras la aplicación, pero un reinicio del altavoz lo cancela. El enlace
+solo aparece si el agente conoce el temporizador.</p>
 <h3 id="volumen">Volumen</h3>
 <p>Silencio, igualar, menos, control deslizante, más. El porcentaje aparece a la derecha.</p>
 <p>Cuando el altavoz forma parte de un grupo, este control pasa a ser <strong>el volumen de todo
@@ -201,20 +207,27 @@ grupo activo — en solitario, un altavoz no tiene nada que igualar.</p>
 propio control y sus teclas − y +, para bajar la cocina sin tocar el salón. Un altavoz
 apagado aparece atenuado y no responde: enviarle una orden solo haría esperar a la
 aplicación para nada.</p>
-<h3 id="graves-y-presintonias">Graves y presintonías</h3>
+<h3 id="graves-y-presintonías">Graves y presintonías</h3>
 <p><img alt="Graves y presintonías" src="../images/02-lecture-graves.jpg" /></p>
 <p>Los graves van de -10 a +10 según el modelo. <strong>No hay control de agudos</strong>: la API del
 altavoz no ofrece ninguno; no es un olvido de la aplicación.</p>
 <p>Las seis presintonías se repiten aquí para ahorrar un cambio de pestaña. La tarjeta con
 borde verde es la que suena.</p>
+<p>Cuando el agente STR admite la segunda fila, aparecen sobre las tarjetas dos botones,
+<strong>Una vez</strong> y <strong>Dos veces</strong>: el segundo muestra las seis emisoras que el altavoz inicia
+al pulsar una tecla dos veces. La elección vale para las dos pestañas.</p>
+<p><strong>Guardar lo que suena en una tecla</strong>, bajo las tarjetas, guarda en la tecla que elijas
+lo que el altavoz reproduce en este momento — emisora, álbum o pista de la biblioteca.
+Spotify, AUX y Bluetooth no se pueden guardar así.</p>
 <h3 id="agrupar-con">Agrupar con</h3>
 <p>Una pastilla por altavoz, salvo el que recibe las órdenes. Tócala para añadir ese
 altavoz al grupo; aparecen una marca y un contorno verde. Tócala de nuevo para sacarlo.</p>
 <p><strong>El maestro se busca, no se supone.</strong> En un grupo, un altavoz reproduce y los demás lo
 siguen. Si seleccionas un altavoz que sigue, la aplicación lo dice — <em>Agrupado con …</em>,
-en ámbar — y envía el transporte, las presintonías, el reposo y el volumen al maestro,
+en ámbar — y envía el transporte, las presintonías y el volumen al maestro,
 porque es él quien reproduce. Seleccionar un altavoz, por tanto, nunca interrumpe lo que
-estás escuchando.</p>
+estás escuchando. El reposo y el temporizador son la excepción: actúan sobre el altavoz
+seleccionado.</p>
 <p>En un altavoz que sigue, la pastilla marcada es ese mismo altavoz: tocarla lo saca del
 grupo. Ampliar el grupo se hace desde el maestro, ya que es él quien lo compone.</p>
 <p><strong>Apagar un altavoz lo saca primero del grupo</strong> y disuelve el grupo si era el último. Al
@@ -223,7 +236,7 @@ agrupar de nuevo.</p>
 <p>El enlace <strong>Actualizar</strong>, abajo, relee todo: título en curso, carátula, volumen y estado
 del grupo.</p>
 <hr />
-<h2 id="5-la-pestana-presintonias">5. La pestaña Presintonías</h2>
+<h2 id="5-la-pestaña-presintonías">5. La pestaña Presintonías</h2>
 <p><img alt="Presintonías" src="../images/03-preselections.jpg" /></p>
 <h3 id="las-seis-teclas">Las seis teclas</h3>
 <p>Las mismas que las teclas físicas del altavoz. Cada tarjeta muestra el logotipo de la
@@ -231,6 +244,13 @@ emisora y su tasa de bits. Tócala para empezar la reproducción; el borde verde
 que suena.</p>
 <p>Los logotipos se descargan y luego se conservan localmente. Si falta alguno, la emisora no
 publica una imagen utilizable o su servidor no responde.</p>
+<h3 id="una-vez-dos-veces">Una vez, dos veces</h3>
+<p>Con un agente STR reciente (v1.6 y posteriores), cada tecla del altavoz lleva dos
+emisoras: una pulsación inicia la primera, dos pulsaciones rápidas la segunda. Los
+botones <strong>Una vez</strong> y <strong>Dos veces</strong> eligen la fila mostrada; las tarjetas conservan su
+número de tecla, de ① a ⑥.</p>
+<p>La segunda fila solo existe en el agente: los botones no aparecen en un altavoz sin
+agente, o con uno más antiguo.</p>
 <h3 id="encontrar-una-emisora">Encontrar una emisora</h3>
 <p>El campo de búsqueda consulta <strong>radio-browser.info</strong>, un directorio abierto mantenido por
 voluntarios. Dos listas desplegables acotan la búsqueda a un país y a un idioma, y <strong>Top
@@ -248,8 +268,11 @@ producirían silencio sin mensaje de error.</p>
 <p><strong>La asignación exige el agente STR.</strong> Sin él solo es posible la escucha inmediata; el
 guardado se hace entonces manteniendo pulsada la tecla en el propio altavoz, o desde la
 aplicación STR de escritorio.</p>
+<p>Con la segunda fila, el menú ofrece doce teclas: de <strong>①</strong> a <strong>⑥</strong>, y luego de <strong>①×2</strong> a
+<strong>⑥×2</strong>. Una emisora solo ocupa una tecla: si ya está guardada en otra, el agente lo
+rechaza y la aplicación indica en qué tecla está.</p>
 <hr />
-<h2 id="6-la-pestana-fuentes">6. La pestaña Fuentes</h2>
+<h2 id="6-la-pestaña-fuentes">6. La pestaña Fuentes</h2>
 <p><img alt="Fuentes" src="../images/04-sources.jpg" /></p>
 <p><strong>Bluetooth</strong>, <strong>AUX</strong> y <strong>Reposo</strong> arriba: tres atajos directos.</p>
 <p><strong>Spotify</strong> no se controla desde esta aplicación. Abre Spotify en el teléfono y elige el
@@ -263,8 +286,11 @@ servicio de streaming cuya cuenta ya no es accesible desde el cierre de la nube.
 Requiere el agente STR.</p>
 <p><strong>Escuchado recientemente</strong> recoge el historial que lleva el agente: toca una línea para
 volver a empezar.</p>
+<p>Un álbum o una carpeta de la biblioteca se reproduce de nuevo por completo, no solo su
+primera pista. Si el servidor multimedia está apagado, la aplicación lo dice en lugar de
+anunciar una reproducción que nunca empieza.</p>
 <hr />
-<h2 id="7-la-pestana-grupos">7. La pestaña Grupos</h2>
+<h2 id="7-la-pestaña-grupos">7. La pestaña Grupos</h2>
 <p><img alt="Grupos" src="../images/05-groupes.jpg" /></p>
 <p><strong>Altavoz maestro</strong> indica cuál reproduce de verdad — leído en los propios altavoces, no
 supuesto como el que has seleccionado.</p>
@@ -283,7 +309,7 @@ y 40, no 70 y 35. Debajo de ese control, cada altavoz del grupo tiene el suyo.
 <strong>Aplicar a todo el grupo</strong> pone a todos en el mismo valor, igual que la tecla <strong>=</strong> de
 la pestaña Reproducción.</p>
 <hr />
-<h2 id="8-la-pestana-ajustes">8. La pestaña Ajustes</h2>
+<h2 id="8-la-pestaña-ajustes">8. La pestaña Ajustes</h2>
 <p><img alt="Altavoces conocidos" src="../images/07-reglages-enceintes.jpg" /></p>
 <p><strong>Altavoz seleccionado</strong>: nombre, dirección y modelo. Es el altavoz que has elegido — no
 necesariamente el que recibe las órdenes. Cuando sigue a un grupo, una línea ámbar
@@ -317,7 +343,7 @@ lento no se interpreta como cambio de pestaña.</p>
 deliberado, de lo contrario el volumen sería imposible de ajustar. Empieza el gesto en una
 zona libre.</p>
 <hr />
-<h2 id="10-que-hacer-si">10. Qué hacer si…</h2>
+<h2 id="10-qué-hacer-si">10. Qué hacer si…</h2>
 <p><strong>El escaneo no encuentra ningún altavoz.</strong>
 Comprueba que el teléfono está en la misma wifi que los altavoces, y no en la red de
 invitados ni en datos móviles. Algunos routers aíslan los aparatos entre sí: ese ajuste
@@ -341,7 +367,7 @@ agrupación pasa por el firmware: menos fiable y a veces rechazada sin mensaje.<
 <p><strong>La aplicación está en el idioma equivocado.</strong>
 Ajustes → Idioma. Tu elección prevalece sobre el idioma del teléfono.</p>
 <hr />
-<h2 id="11-limites-conocidos">11. Límites conocidos</h2>
+<h2 id="11-límites-conocidos">11. Límites conocidos</h2>
 <ul>
 <li><strong>Sin control de agudos.</strong> La API del altavoz no ofrece ninguno.</li>
 <li><strong>La aplicación no instala el agente STR.</strong> Eso exige acceso de sistema al altavoz y un
@@ -349,6 +375,8 @@ Ajustes → Idioma. Tu elección prevalece sobre el idioma del teléfono.</p>
 <li><strong>Spotify se controla desde Spotify</strong>, mediante Spotify Connect.</li>
 <li><strong>Sin exploración de biblioteca DLNA</strong>, por ahora.</li>
 <li><strong>Solo Android.</strong> No existe versión para iOS.</li>
+<li><strong>La segunda fila, el temporizador y «guardar lo que suena» requieren un agente STR
+  reciente.</strong> Con un agente más antiguo, estos mandos no aparecen o se rechazan.</li>
 </ul>
 <hr />
 <h2 id="12-avisos">12. Avisos</h2>

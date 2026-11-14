@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handleiding
 
-Versie 0.9.82 · Android 7 en hoger
+Versie 1.6.0 · Android 7 en hoger
 
 > Talen: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · **Nederlands** · [Español](es.md)
 
@@ -112,6 +112,13 @@ sommige niets — een live radiostream laat zich niet terugspoelen.
 De groene balk **Stand-by** schakelt de speaker uit; is hij uit, dan staat er
 **Inschakelen**.
 
+Onder de balk zet **Slaaptimer** de speaker na 15 tot 120 minuten in stand-by. Zolang
+hij loopt, toont de link de resterende tijd; tik erop om de duur te wijzigen of te
+annuleren. In een groep vraagt de app of de hele groep moet uitgaan of alleen de
+geselecteerde speaker. De timer leeft in de STR-agent van de speaker: hij loopt door als
+je de app sluit, maar een herstart van de speaker annuleert hem. De link verschijnt
+alleen als de agent de timer kent.
+
 ### Volume
 
 Demping, gelijkzetten, min, schuif, plus. Het percentage staat rechts.
@@ -140,6 +147,14 @@ is er niet**: de API van de speaker biedt die niet — het is geen vergetelheid 
 De zes presets staan hier ook, om een tabbladwissel te besparen. De groen omlijnde tegel
 is degene die speelt.
 
+Als de STR-agent de tweede rij ondersteunt, verschijnen boven de tegels twee knoppen,
+**Eén keer** en **Twee keer**: de tweede toont de zes zenders die de speaker start
+wanneer een toets twee keer wordt ingedrukt. De keuze geldt voor beide tabbladen.
+
+**Wat nu speelt op een toets zetten**, onder de tegels, bewaart wat de speaker op dit
+moment speelt — zender, album of nummer uit de bibliotheek — op de toets van je keuze.
+Spotify, AUX en Bluetooth kunnen zo niet worden bewaard.
+
 ### Groeperen met
 
 Eén chip per speaker, behalve die welke de opdrachten krijgt. Tik erop om die speaker
@@ -148,8 +163,9 @@ hem er weer uit.
 
 **De master wordt opgezocht, niet aangenomen.** In een groep speelt één speaker af en
 volgen de andere. Kies je een speaker die volgt, dan zegt de app dat — *Gegroepeerd met
-…*, in amber — en stuurt bediening, presets, stand-by en volume naar de master, want die
+…*, in amber — en stuurt bediening, presets en volume naar de master, want die
 speelt af. Een speaker kiezen onderbreekt dus nooit wat je aan het luisteren bent.
+Stand-by en de slaaptimer zijn de uitzondering: die werken op de geselecteerde speaker.
 
 Op een volgende speaker is de aangevinkte chip die speaker zelf: erop tikken verlaat de
 groep. Uitbreiden gebeurt vanaf de master, want die stelt de groep samen.
@@ -175,6 +191,15 @@ bitrate. Tikken start het afspelen; de groene omlijning markeert wat er speelt.
 Logo's worden gedownload en daarna lokaal bewaard. Ontbreekt er een, dan publiceert de
 zender geen bruikbare afbeelding, of antwoordt zijn server niet.
 
+### Eén keer, twee keer
+
+Met een recente STR-agent (v1.6 en later) draagt elke toets van de speaker twee zenders:
+één druk start de eerste, twee snelle drukken de tweede. De knoppen **Eén keer** en
+**Twee keer** kiezen de getoonde rij; de tegels houden hun toetsnummer, ① tot ⑥.
+
+De tweede rij bestaat alleen in de agent: op een speaker zonder agent, of met een
+oudere, verschijnen de knoppen niet.
+
 ### Een zender vinden
 
 Het zoekveld bevraagt **radio-browser.info**, een open gids die door vrijwilligers wordt
@@ -195,6 +220,10 @@ Tik op een resultaat en er opent een actieblad met
 **Toewijzen vereist de STR-agent.** Zonder hem kun je alleen meteen luisteren; opslaan
 gebeurt dan door de toets op de speaker zelf ingedrukt te houden, of via de
 STR-desktopapp.
+
+Met de tweede rij biedt het menu twaalf toetsen aan: **①** tot **⑥**, daarna **①×2**
+tot **⑥×2**. Een zender staat maar op één toets: staat hij al ergens anders, dan weigert
+de agent en zegt de app op welke toets hij staat.
 
 ---
 
@@ -218,6 +247,10 @@ gids ontbreekt. Hiervoor is de STR-agent nodig.
 
 **Onlangs afgespeeld** toont de geschiedenis die de agent bijhoudt: tik op een regel om
 opnieuw te starten.
+
+Een album of map uit de bibliotheek wordt volledig opnieuw afgespeeld, niet alleen het
+eerste nummer. Staat de mediaserver uit, dan zegt de app dat, in plaats van een weergave
+aan te kondigen die nooit start.
 
 ---
 
@@ -335,6 +368,9 @@ Instellingen → Taal. Jouw keuze gaat voor op de taal van de telefoon.
 - **Spotify wordt vanuit Spotify bediend**, via Spotify Connect.
 - **Geen DLNA-bibliotheek doorbladeren**, vooralsnog.
 - **Alleen Android.** Er is geen iOS-versie.
+- **De tweede rij, de slaaptimer en ‘wat nu speelt op een toets zetten’ vereisen een
+  recente STR-agent.** Met een oudere agent verschijnen deze opdrachten niet of worden ze
+  geweigerd.
 
 ---
 

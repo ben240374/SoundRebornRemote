@@ -180,6 +180,14 @@
                         </Border.Triggers>
                     </Border>
 
+                    <!--
+                        Minuterie de sommeil. Elle vise la même enceinte que le bouton
+                        de veille, et n'apparaît que si son agent la connaît.
+                    -->
+                    <Button Text="{Binding SleepLabel}" Style="{StaticResource QuietButton}"
+                            Command="{Binding SleepCommand}" HorizontalOptions="Center"
+                            IsVisible="{Binding SleepAvailable}" />
+
                 </VerticalStackLayout>
             </Border>
 
@@ -342,6 +350,42 @@
                 <VerticalStackLayout Spacing="10">
                     <Label Text="{DynamicResource L_Presets}" Style="{StaticResource SectionLabel}" />
 
+                    <!--
+                        Seconde rangée : la même touche pressée deux fois. Le sélecteur
+                        n'apparaît que si l'agent de l'enceinte gère ces six touches-là.
+                    -->
+                    <HorizontalStackLayout Spacing="8" IsVisible="{Binding HasSecondRow}">
+                        <Border Style="{StaticResource Chip}" Padding="14,6">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ShowPresetRowCommand}" CommandParameter="1" />
+                            </Border.GestureRecognizers>
+
+                            <Label Text="{DynamicResource L_RowOnce}" FontSize="13" />
+
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsFirstRow}" Value="True">
+                                    <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                    <Setter Property="StrokeThickness" Value="2" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                        </Border>
+
+                        <Border Style="{StaticResource Chip}" Padding="14,6">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ShowPresetRowCommand}" CommandParameter="2" />
+                            </Border.GestureRecognizers>
+
+                            <Label Text="{DynamicResource L_RowTwice}" FontSize="13" />
+
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsSecondRow}" Value="True">
+                                    <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                    <Setter Property="StrokeThickness" Value="2" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                        </Border>
+                    </HorizontalStackLayout>
+
                     <CollectionView ItemsSource="{Binding Presets}" HeightRequest="252">
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout Orientation="Vertical" Span="3"
@@ -388,6 +432,11 @@
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
+
+                    <!-- Range sur une touche ce que l'enceinte joue en ce moment. -->
+                    <Button Text="{DynamicResource L_KeepPlaying}" Style="{StaticResource QuietButton}"
+                            Command="{Binding SavePlayingCommand}" HorizontalOptions="Center"
+                            IsVisible="{Binding HasStrAgent}" />
                 </VerticalStackLayout>
             </Border>
 

@@ -287,7 +287,11 @@ public sealed class StrApiClient
 
     public Task PreviousAsync(CancellationToken ct = default) => PostAsync("/api/prev", null, ct);
 
-    /// <summary>Lance la présélection STR (magasin de l'agent), 1 à 6.</summary>
+    /// <summary>
+    /// Lance la présélection STR (magasin de l'agent), 1 à 12. Les emplacements 7 à
+    /// 12 sont la seconde rangée : ils n'existent que dans l'agent, aucune touche du
+    /// firmware ne les atteint. Un agent antérieur à la seconde rangée répond 400.
+    /// </summary>
     public Task PlaySlotAsync(int slot, CancellationToken ct = default)
         => PostAsync($"/api/play/{slot}", null, ct, WakeTimeout);
 
@@ -298,13 +302,17 @@ public sealed class StrApiClient
     /// <summary>
     /// Écrit une présélection dans le magasin de l'agent (PUT /api/presets/{slot}).
     /// L'agent enregistre le flux, le nom et le logo, puis enrôle la touche
-    /// matérielle correspondante sur l'enceinte.
+    /// matérielle correspondante sur l'enceinte (emplacements 1 à 6 ; 7 à 12
+    /// restent dans le seul magasin de l'agent).
+    ///
+    /// Une station ne vit que sur une touche : si elle est déjà ailleurs, l'agent
+    /// refuse par un 409 « already-on-slot » plutôt que de vider l'autre touche.
     /// </summary>
     public Task SavePresetAsync(StrPreset preset, CancellationToken ct = default)
     {
-        if (preset.Slot is < 1 or > 6)
+        if (preset.Slot is < 1 or > 12)
         {
-            throw new ArgumentOutOfRangeException(nameof(preset), preset.Slot, "Présélection 1 à 6 uniquement");
+            throw new ArgumentOutOfRangeException(nameof(preset), preset.Slot, "Présélection 1 à 12 uniquement");
         }
 
         return PutJsonAsync($"/api/presets/{preset.Slot}", preset, ct);
@@ -319,9 +327,115 @@ public sealed class StrApiClient
     }
 
     /// <summary>
-    /// Joue n'importe quel flux. L'agent ajoute les métadonnées DIDL et bascule
-    /// une URL HTTPS vers HTTP (le moteur UPnP de l'enceinte refuse TLS).
+    /// Garde ce que l'enceinte joue en ce moment sur une touche, 1 à 12
+    /// (POST /api/box/save-playing) : la station, le dossier ou la piste de
+    /// bibliothèque, ou une copie de la touche qui joue.
+    ///
+    /// 422 quand rien de conservable ne joue (veille, AUX, Bluetooth, Spotify) ;
+    /// 409 « already-on-slot » quand c'est déjà sur une autre touche.
     /// </summary>
+    public async Task<StrSavedPlaying> SavePlayingAsync(int slot, CancellationToken ct = default)
+    {
+        if (slot is < 1 or > 12)
+        {
+            throw new ArgumentOutOfRangeException(nameof(slot), slot, "Présélection 1 à 12 uniquement");
+        }
+
+        var body = await PostJsonReadAsync("/api/box/save-playing", new { slot }, ct).ConfigureAwait(false);
+
+        if (!string.IsNullOrWhiteSpace(body))
+        {
+            try
+            {
+                var saved = JsonSerializer.Deserialize<StrSavedPlaying>(body, JsonOptions);
+
+                if (saved is not null)
+                {
+                    return saved;
+                }
+            }
+            catch (JsonException)
+            {
+                // Corps inattendu : la commande a tout de même été acceptée.
+            }
+        }
+
+        return new StrSavedPlaying { Slot = slot };
+    }
+
+    /// <summary>
+    /// Relance une entrée de l'historique. La requête dépend de ce qu'est l'entrée :
+    ///
+    ///   – un album ou un dossier de bibliothèque se rejoue par sa clé, sur
+    ///     /api/queue/replay-card. Son adresse ne désigne que la première piste ;
+    ///   – une piste de bibliothèque part sur /api/play AVEC « mime » et la durée.
+    ///     Sans « mime », un agent jusqu'à v1.6.0 la prenait pour une station et la
+    ///     reclassait en radio dans l'historique ;
+    ///   – une station part sur /api/play avec son nom et son logo, sans « mime ».
+    ///
+    /// Un 200 n'est pas un succès : un dossier dont le serveur de médias est
+    /// introuvable répond 200 avec « offline ». D'où le résultat renvoyé.
+    /// </summary>
+    public async Task<StrReplayOutcome> ReplayAsync(RecentEntry entry, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+
+        if (entry.IsQueueCard)
+        {
+            var card = new StrReplayCardRequest { Key = entry.CardKey!, Name = entry.CardName, Art = entry.CardArt };
+
+            return ReadReplay(
+                await PostJsonReadAsync("/api/queue/replay-card", card, ct, WakeTimeout).ConfigureAwait(false));
+        }
+
+        var request = new StrPlayUrlRequest
+        {
+            Url = entry.CardUrl ?? "",
+            Title = entry.CardName,
+            Icon = entry.CardArt,
+        };
+
+        if (entry.IsLibrary)
+        {
+            request.Mime = string.IsNullOrWhiteSpace(entry.Mime) ? null : entry.Mime;
+            request.DurationSec = entry.DurationSeconds;
+        }
+
+        return ReadReplay(await PostJsonReadAsync("/api/play", request, ct, WakeTimeout).ConfigureAwait(false));
+    }
+
+    private static StrReplayOutcome ReadReplay(string body)
+    {
+        if (string.IsNullOrWhiteSpace(body))
+        {
+            return new StrReplayOutcome();
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(body);
+            var root = document.RootElement;
+
+            if (root.ValueKind != JsonValueKind.Object)
+            {
+                return new StrReplayOutcome();
+            }
+
+            return new StrReplayOutcome
+            {
+                Offline = ReadFlag(root, "offline") ?? false,
+                Server = root.TryGetProperty("server", out var server) &&
+                         server.ValueKind == JsonValueKind.String
+                    ? server.GetString()
+                    : null,
+            };
+        }
+        catch (JsonException)
+        {
+            return new StrReplayOutcome();
+        }
+    }
+
     /// <summary>
     /// Joue une URL. <paramref name="codec"/> et non « mime » : côté agent, mime
     /// signifie « fichier de bibliothèque locale, passe l'URL telle quelle à
@@ -341,6 +455,29 @@ public sealed class StrApiClient
 
     public Task SetPowerAsync(bool on, CancellationToken ct = default)
         => PostJsonAsync("/api/box/power", new { on }, ct, on ? WakeTimeout : null);
+
+    /// <summary>
+    /// Minuterie de sommeil en cours (GET /api/box/sleep). Elle ne vit que dans la
+    /// mémoire de l'agent : un redémarrage ou une mise à jour l'annule.
+    /// </summary>
+    public async Task<StrSleepState> GetSleepAsync(CancellationToken ct = default)
+        => await GetJsonAsync<StrSleepState>("/api/box/sleep", ct).ConfigureAwait(false)
+           ?? new StrSleepState();
+
+    /// <summary>
+    /// Arme la minuterie, en remplaçant celle qui tournait. À l'échéance l'enceinte
+    /// passe en veille — et tout son groupe avec elle si <paramref name="group"/>.
+    /// </summary>
+    public Task SetSleepAsync(int minutes, bool group, CancellationToken ct = default)
+        => PostJsonAsync("/api/box/sleep", new { minutes = Math.Clamp(minutes, 1, 720), group }, ct);
+
+    /// <summary>Annule la minuterie de sommeil.</summary>
+    public async Task CancelSleepAsync(CancellationToken ct = default)
+    {
+        using var cts = Budget(null, ct);
+        using var response = await _http.DeleteAsync(BaseUrl + "/api/box/sleep", cts.Token).ConfigureAwait(false);
+        await EnsureSuccessAsync(response, "/api/box/sleep", cts.Token).ConfigureAwait(false);
+    }
 
     /// <summary>Source physique : "AUX", "BLUETOOTH" ou "STANDBY".</summary>
     public Task SetSourceAsync(string source, CancellationToken ct = default)
@@ -458,6 +595,19 @@ public sealed class StrApiClient
     {
         using var content = new StringContent(JsonSerializer.Serialize(body, JsonOptions), Encoding.UTF8, "application/json");
         await PostAsync(path, content, ct, timeout).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// POST JSON dont le CORPS de réponse compte. Plusieurs points de l'agent
+    /// répondent 200 en disant dans le corps que rien ne s'est passé.
+    /// </summary>
+    private async Task<string> PostJsonReadAsync<T>(string path, T body, CancellationToken ct, TimeSpan? timeout = null)
+    {
+        using var content = new StringContent(JsonSerializer.Serialize(body, JsonOptions), Encoding.UTF8, "application/json");
+        using var cts = Budget(timeout, ct);
+        using var response = await _http.PostAsync(BaseUrl + path, content, cts.Token).ConfigureAwait(false);
+        await EnsureSuccessAsync(response, path, cts.Token).ConfigureAwait(false);
+        return await response.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
     }
 
     private async Task PutJsonAsync<T>(string path, T body, CancellationToken ct, TimeSpan? timeout = null)

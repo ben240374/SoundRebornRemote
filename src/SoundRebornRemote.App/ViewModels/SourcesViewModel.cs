@@ -120,29 +120,60 @@ public sealed partial class SourcesViewModel : BaseViewModel
             ? Task.CompletedTask
             : RunAsync(d => d.SelectSourceAsync(source), Localization.Get("S_SourceSet", source.DisplayName));
 
+    /// <summary>
+    /// Relance une entrée de l'historique.
+    ///
+    /// La requête dépend de l'entrée — station, piste de bibliothèque, ou album
+    /// entier — et c'est StrApiClient.ReplayAsync qui en décide, d'après la table
+    /// de l'agent. Tout envoyer sur /api/play comme une station ne jouait que la
+    /// première piste d'un album, et reclassait une piste de bibliothèque en radio
+    /// dans l'historique.
+    /// </summary>
     [RelayCommand]
-    private Task ReplayAsync(RecentResult? result)
+    private async Task ReplayAsync(RecentResult? result)
     {
         var entry = result?.Entry;
 
         if (entry is null || !entry.CanReplay)
         {
             ShowInfo(Localization.Get("S_NotReplayable"));
-            return Task.CompletedTask;
+            return;
         }
 
-        return RunAsync(async d =>
+        var device = Device;
+
+        if (device is null)
         {
-            if (d.Str is null)
+            IsError = true;
+            StatusMessage = Localization.Get("S_NoSpeaker");
+            return;
+        }
+
+        if (device.Str is null)
+        {
+            IsError = true;
+            StatusMessage = Localization.Get("S_NeedAgentReplay");
+            return;
+        }
+
+        try
+        {
+            var outcome = await device.Str.ReplayAsync(entry).ConfigureAwait(true);
+
+            if (outcome.Offline)
             {
-                throw new InvalidOperationException(Localization.Get("S_NeedAgentReplay"));
+                // Répondu 200, mais rien ne joue : le serveur de médias est introuvable.
+                IsError = true;
+                StatusMessage = LibraryOfflineMessage(outcome.Server);
+                return;
             }
 
-            // On ne transmet pas entry.Mime : c'est un type MIME, et le champ attendu
-            // est le codec. Un type MIME y ferait basculer l'agent en mode « fichier
-            // de bibliothèque locale ». Sans rien, il détermine le format lui-même.
-            await d.Str.PlayUrlAsync(entry.CardUrl!, entry.CardName).ConfigureAwait(false);
-        }, Localization.Get("S_Replaying", entry.DisplayTitle));
+            ShowInfo(Localization.Get("S_Replaying", entry.DisplayTitle));
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
     }
 
     /// <summary>
