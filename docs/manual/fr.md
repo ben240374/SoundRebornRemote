@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manuel d'utilisation
 
-Version 1.6.0 · Android 7 et suivants
+Version 1.6.1 · Android 7 et suivants
 
 > Langues : **Français** · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md)
 
@@ -288,6 +288,11 @@ sans toucher aux écarts. Cuisine à 60 et salon à 30, monter le groupe de 10 d
 tout le groupe** met tout le monde à la même valeur, ce que fait aussi la touche **=**
 de l'onglet Lecture.
 
+Un groupe permanent reste tel que tu l'as composé. Mettre une de ses enceintes en veille
+la sort du groupe qui joue sans la retirer du groupe enregistré : elle le rejoint à la
+prochaine lecture. Et si un groupe permanent attend sa prochaine lecture, l'application
+le signale et demande confirmation avant d'en former un autre à sa place.
+
 ---
 
 ## 8. L'onglet Réglages
@@ -379,6 +384,8 @@ Réglages → Langue. Le choix prime sur la langue du téléphone.
 - **Android uniquement.** Il n'existe pas de version iOS.
 - **Seconde rangée, minuterie et « garder ce qui joue » demandent un agent STR récent.**
   Sur un agent plus ancien, ces commandes n'apparaissent pas ou sont refusées.
+- **Paires stéréo.** L'application ne crée ni ne défait de paire stéréo, et refuse
+  d'ajouter une enceinte à une paire.
 
 ---
 

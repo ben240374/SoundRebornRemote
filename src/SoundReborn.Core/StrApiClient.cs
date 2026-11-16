@@ -210,6 +210,7 @@ public sealed class StrApiClient
                 Permanent = ReadFlag(root, "permanent", "Permanent", "sticky") ?? false,
                 Stereo = ReadStereoFlag(root),
                 StereoName = ReadStereoName(root),
+                Remembered = ReadRemembered(root),
             };
         }
         catch (Exception)
@@ -270,6 +271,49 @@ public sealed class StrApiClient
 
         return null;
     }
+
+    /// <summary>
+    /// « remembered » : les suiveuses du groupe enregistré, que l'agent ne donne
+    /// que lorsqu'aucun groupe n'est vivant. Une entrée sans adresse est ignorée.
+    /// </summary>
+    private static IReadOnlyList<StrRememberedMember> ReadRemembered(JsonElement root)
+    {
+        if (!root.TryGetProperty("remembered", out var list) || list.ValueKind != JsonValueKind.Array)
+        {
+            return Array.Empty<StrRememberedMember>();
+        }
+
+        var members = new List<StrRememberedMember>();
+
+        foreach (var item in list.EnumerateArray())
+        {
+            if (item.ValueKind != JsonValueKind.Object)
+            {
+                continue;
+            }
+
+            var ip = ReadText(item, "ip");
+
+            if (string.IsNullOrWhiteSpace(ip))
+            {
+                continue;
+            }
+
+            members.Add(new StrRememberedMember
+            {
+                Ip = ip!.Trim(),
+                DeviceId = ReadText(item, "deviceID"),
+                Name = ReadText(item, "name"),
+            });
+        }
+
+        return members;
+    }
+
+    private static string? ReadText(JsonElement owner, string name)
+        => owner.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()
+            : null;
 
     /// <summary>GET /api/box/zone, renvoyé brut (la forme varie selon le châssis).</summary>
     public Task<JsonDocument?> GetZoneRawAsync(CancellationToken ct = default)
@@ -545,7 +589,9 @@ public sealed class StrApiClient
             {
                 Ok = ReadFlag(root, "ok") ?? true,
                 Nothing = ReadFlag(root, "nothing") ?? false,
-                StereoPairKept = ReadFlag(root, "stereoPairKept") ?? false,
+                // « firmwarePair » : même constat, quand la paire n'est connue que du
+                // firmware et pas du magasin de l'agent.
+                StereoPairKept = ReadFlag(root, "stereoPairKept", "firmwarePair") ?? false,
                 Remaining = root.TryGetProperty("remaining", out var remaining) &&
                             remaining.ValueKind == JsonValueKind.Number
                     ? remaining.GetInt32()

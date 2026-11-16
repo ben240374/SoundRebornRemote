@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handleiding
 
-Versie 1.6.0 · Android 7 en hoger
+Versie 1.6.1 · Android 7 en hoger
 
 > Talen: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · **Nederlands** · [Español](es.md)
 
@@ -279,6 +279,12 @@ geeft 70 en 40, niet 70 en 35. Onder die schuif heeft elke speaker van de groep 
 eigen. **Op de hele groep toepassen** zet iedereen op dezelfde waarde, net als de toets
 **=** in het tabblad Afspelen.
 
+Een permanente groep blijft zoals je hem hebt samengesteld. Een van de speakers in
+stand-by zetten haalt hem uit de groep die speelt, zonder hem uit de opgeslagen groep te
+verwijderen: bij de volgende weergave doet hij weer mee. En als een permanente groep op
+zijn volgende weergave wacht, meldt de app dat en vraagt hij om bevestiging voordat er
+een andere groep voor in de plaats komt.
+
 ---
 
 ## 8. Het tabblad Instellingen
@@ -371,6 +377,8 @@ Instellingen → Taal. Jouw keuze gaat voor op de taal van de telefoon.
 - **De tweede rij, de slaaptimer en ‘wat nu speelt op een toets zetten’ vereisen een
   recente STR-agent.** Met een oudere agent verschijnen deze opdrachten niet of worden ze
   geweigerd.
+- **Stereoparen.** De app maakt geen stereopaar en heft er geen op, en weigert een
+  speaker aan een paar toe te voegen.
 
 ---
 

@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handbuch
 
-Version 1.6.0 · Android 7 und neuer
+Version 1.6.1 · Android 7 und neuer
 
 > Sprachen: [Français](fr.md) · [English](en.md) · **Deutsch** · [Nederlands](nl.md) · [Español](es.md)
 
@@ -288,6 +288,12 @@ angehoben ergibt 70 und 40, nicht 70 und 35. Unter dem Regler hat jeder Lautspre
 Gruppe seinen eigenen. **Auf die ganze Gruppe anwenden** setzt alle auf denselben Wert,
 genau wie die Taste **=** im Reiter Wiedergabe.
 
+Eine permanente Gruppe bleibt so, wie du sie zusammengestellt hast. Einen ihrer
+Lautsprecher in den Standby zu schicken nimmt ihn aus der laufenden Gruppe, ohne ihn aus
+der gespeicherten Gruppe zu entfernen: Bei der nächsten Wiedergabe ist er wieder dabei.
+Und wartet eine permanente Gruppe auf ihre nächste Wiedergabe, weist die App darauf hin
+und fragt nach, bevor sie an ihrer Stelle eine andere bildet.
+
 ---
 
 ## 8. Der Reiter Einstellungen
@@ -382,6 +388,8 @@ Einstellungen → Sprache. Die Wahl hat Vorrang vor der Sprache des Telefons.
 - **Zweite Reihe, Sleeptimer und „Laufendes auf eine Taste legen“ erfordern einen
   aktuellen STR-Agenten.** Mit einem älteren Agenten erscheinen diese Befehle nicht oder
   werden abgelehnt.
+- **Stereopaare.** Die App bildet und löst keine Stereopaare und lehnt es ab, einem Paar
+  einen Lautsprecher hinzuzufügen.
 
 ---
 

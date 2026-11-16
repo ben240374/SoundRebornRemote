@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manual de uso
 
-Versión 1.6.0 · Android 7 y posteriores
+Versión 1.6.1 · Android 7 y posteriores
 
 > Idiomas: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · **Español**
 
@@ -280,6 +280,11 @@ y 40, no 70 y 35. Debajo de ese control, cada altavoz del grupo tiene el suyo.
 **Aplicar a todo el grupo** pone a todos en el mismo valor, igual que la tecla **=** de
 la pestaña Reproducción.
 
+Un grupo permanente se queda como lo compusiste. Poner uno de sus altavoces en reposo
+lo saca del grupo que suena sin quitarlo del grupo guardado: vuelve a unirse en la
+próxima reproducción. Y si un grupo permanente espera su próxima reproducción, la
+aplicación lo indica y pide confirmación antes de formar otro en su lugar.
+
 ---
 
 ## 8. La pestaña Ajustes
@@ -373,6 +378,8 @@ Ajustes → Idioma. Tu elección prevalece sobre el idioma del teléfono.
 - **Solo Android.** No existe versión para iOS.
 - **La segunda fila, el temporizador y «guardar lo que suena» requieren un agente STR
   reciente.** Con un agente más antiguo, estos mandos no aparecen o se rechazan.
+- **Pares estéreo.** La aplicación no crea ni deshace pares estéreo, y se niega a añadir
+  un altavoz a un par.
 
 ---
 

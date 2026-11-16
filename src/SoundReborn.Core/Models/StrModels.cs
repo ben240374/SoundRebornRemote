@@ -213,20 +213,25 @@ public sealed class StrZoneFormRequest
     /// <summary>Groupe permanent : re-formé automatiquement à la prochaine lecture du maître.</summary>
     [JsonPropertyName("permanent")] public bool Permanent { get; set; }
 
-    /// <summary>
-    /// Paire stéréo plutôt que groupe multi-pièces. À renvoyer tel quel quand on
-    /// republie une zone existante : l'agent stocke le document reçu, et l'omettre
-    /// fait perdre la paire.
-    /// </summary>
-    [JsonPropertyName("stereo")] public bool Stereo { get; set; }
+    // Pas de champ « stereo », et c'est voulu.
+    //
+    // Pour l'agent, « stereo : true » n'est pas une propriété du groupe que l'on
+    // rendrait telle qu'on l'a lue : c'est un ORDRE, « fais une paire stéréo de
+    // ces enceintes » (/addGroup du firmware). Le renvoyer en ajoutant une
+    // troisième enceinte à la moitié d'une paire demandait donc d'apparier A et
+    // C. Une paire est un groupe du firmware, distinct de la zone multi-pièces ;
+    // cette application ne les crée pas, et ce type ne peut plus en demander une.
+    // « name » disparaît avec lui : il ne servait qu'à nommer la paire.
+}
 
-    /// <summary>
-    /// Nom de la paire stéréo, porté par les enceintes elles-mêmes. Omis quand il
-    /// est vide, sinon une republication l'écraserait par une chaîne vide.
-    /// </summary>
-    [JsonPropertyName("name")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Name { get; set; }
+/// <summary>Une suiveuse du groupe que l'agent garde en mémoire quand aucun groupe n'est vivant.</summary>
+public sealed class StrRememberedMember
+{
+    public string Ip { get; init; } = "";
+
+    public string? DeviceId { get; init; }
+
+    public string? Name { get; init; }
 }
 
 /// <summary>
@@ -235,11 +240,56 @@ public sealed class StrZoneFormRequest
 /// </summary>
 public sealed class StrZoneFacts
 {
+    /// <summary>
+    /// Vrai quand le groupe ENREGISTRÉ sur cette enceinte est durable — qu'il soit
+    /// vivant ou qu'il attende la prochaine lecture de son maître.
+    /// </summary>
     public bool Permanent { get; init; }
 
+    /// <summary>
+    /// Vrai quand l'enceinte est la moitié d'une paire stéréo. À lire seulement :
+    /// ce drapeau ne se renvoie jamais dans une formation de groupe.
+    /// </summary>
     public bool Stereo { get; init; }
 
     public string? StereoName { get; init; }
+
+    /// <summary>
+    /// Les suiveuses du groupe enregistré, quand AUCUN groupe n'est vivant. Vide
+    /// dès qu'un groupe joue : l'agent ne les donne que pour le groupe en attente.
+    /// </summary>
+    public IReadOnlyList<StrRememberedMember> Remembered { get; init; } = Array.Empty<StrRememberedMember>();
+
+    /// <summary>
+    /// Vrai quand ces suiveuses sont exactement celles du groupe enregistré : on
+    /// s'apprête alors à FORMER ce groupe, pas à le remplacer par un autre.
+    /// </summary>
+    public bool RemembersExactly(IEnumerable<string?> followerIps)
+    {
+        var wanted = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var ip in followerIps)
+        {
+            if (!string.IsNullOrWhiteSpace(ip))
+            {
+                wanted.Add(ip!.Trim());
+            }
+        }
+
+        if (wanted.Count == 0 || Remembered.Count == 0)
+        {
+            return false;
+        }
+
+        var saved = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var member in Remembered)
+        {
+            saved.Add(member.Ip.Trim());
+        }
+
+        return saved.SetEquals(wanted);
+    }
 }
 
 /// <summary>

@@ -770,6 +770,32 @@ public static class Localization
             "{0} staat al op toets {1}.",
             "{0} ya está en la tecla {1}.");
 
+        // ---------------------------------------------------------- Paires stéréo et groupe enregistré
+        Add("S_StereoCannotExtend",
+            "Cette enceinte fait partie d'une paire stéréo : l'application ne sait pas encore ajouter d'enceinte à une paire.",
+            "This speaker is half of a stereo pair: the app cannot add a speaker to a pair yet.",
+            "Dieser Lautsprecher gehört zu einem Stereopaar: Die App kann einem Paar noch keinen Lautsprecher hinzufügen.",
+            "Deze speaker maakt deel uit van een stereopaar: de app kan nog geen speaker aan een paar toevoegen.",
+            "Este altavoz forma parte de un par estéreo: la aplicación aún no puede añadir un altavoz a un par.");
+        Add("L_SavedGroupAsk",
+            "Un groupe permanent est enregistré sur cette enceinte. Former un autre groupe peut le remplacer.",
+            "A permanent group is saved on this speaker. Forming a different group may replace it.",
+            "Auf diesem Lautsprecher ist eine permanente Gruppe gespeichert. Eine andere Gruppe zu bilden kann sie ersetzen.",
+            "Op deze speaker is een permanente groep opgeslagen. Een andere groep vormen kan die vervangen.",
+            "Hay un grupo permanente guardado en este altavoz. Formar otro grupo puede sustituirlo.");
+        Add("L_SavedGroupAskNamed",
+            "Un groupe permanent est enregistré sur cette enceinte ({0}). Former un autre groupe peut le remplacer.",
+            "A permanent group is saved on this speaker ({0}). Forming a different group may replace it.",
+            "Auf diesem Lautsprecher ist eine permanente Gruppe gespeichert ({0}). Eine andere Gruppe zu bilden kann sie ersetzen.",
+            "Op deze speaker is een permanente groep opgeslagen ({0}). Een andere groep vormen kan die vervangen.",
+            "Hay un grupo permanente guardado en este altavoz ({0}). Formar otro grupo puede sustituirlo.");
+        Add("L_FormAnyway",
+            "Former ce groupe quand même",
+            "Form this group anyway",
+            "Diese Gruppe trotzdem bilden",
+            "Deze groep toch vormen",
+            "Formar este grupo de todos modos");
+
         // ---------------------------------------------------------- Garder ce qui joue
         Add("L_KeepPlaying",
             "Garder ce qui joue sur une touche",

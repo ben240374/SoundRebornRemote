@@ -1,6 +1,6 @@
 # SoundReborn Remote — User manual
 
-Version 1.6.0 · Android 7 and later
+Version 1.6.1 · Android 7 and later
 
 > Languages: [Français](fr.md) · **English** · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md)
 
@@ -275,6 +275,11 @@ If the kitchen is at 60 and the living room at 30, raising the group by 10 gives
 the whole group** sets everyone to the same value, which is what the **=** key does in
 the Play tab.
 
+A permanent group stays the way you built it. Putting one of its speakers in standby
+takes it out of the group that is playing without removing it from the saved group: it
+joins again on the next play. And when a permanent group is waiting for its next play,
+the app says so and asks before forming a different one in its place.
+
 ---
 
 ## 8. The Settings tab
@@ -363,6 +368,8 @@ Settings → Language. Your choice overrides the phone's language.
 - **Android only.** There is no iOS version.
 - **The second row, the sleep timer and “keep what's playing” need a recent STR agent.**
   On an older agent these commands do not appear or are refused.
+- **Stereo pairs.** The app neither creates nor undoes a stereo pair, and refuses to add
+  a speaker to one.
 
 ---
 

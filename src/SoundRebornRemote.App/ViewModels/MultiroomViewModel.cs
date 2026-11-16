@@ -246,40 +246,92 @@ public sealed partial class MultiroomViewModel : BaseViewModel
             return;
         }
 
-        await RunAsync(async device =>
+        var device = Device;
+
+        if (device is null)
         {
-            if (device.Str is not null)
+            IsError = true;
+            StatusMessage = Localization.Get("S_NoSpeaker");
+            return;
+        }
+
+        // Ce que vaudra « permanent » dans la requête. Sans agent, la case seule.
+        var permanent = MakePermanent;
+
+        if (device.Str is not null)
+        {
+            // On relit la zone AVANT d'envoyer quoi que ce soit, et on renonce si
+            // cette lecture échoue : republier à l'aveugle détruirait ce que
+            // l'utilisateur a enregistré, pour un simple hoquet réseau.
+            var facts = await device.Str.GetZoneFactsAsync().ConfigureAwait(true);
+
+            if (facts is null)
             {
-                // Cet écran sert deux gestes que rien ne distinguait : créer un
-                // groupe, et en étendre un qui existe déjà — les membres actuels y
-                // arrivent cochés. Dans le second cas, envoyer la case « permanent »
-                // telle quelle rétrograde le groupe enregistré, car la case part à
-                // faux et n'a jamais été relue de l'enceinte. On relit donc la zone,
-                // et on renonce si cette lecture échoue : republier à l'aveugle
-                // détruirait ce que l'utilisateur a enregistré.
-                var facts = await device.Str.GetZoneFactsAsync().ConfigureAwait(false);
+                IsError = true;
+                StatusMessage = Localization.Get("S_ZoneUnreadable");
+                return;
+            }
 
-                if (facts is null)
+            // Une paire stéréo n'est pas un groupe multi-pièces, et l'agent ne sait
+            // pas encore lui adjoindre une enceinte. Retirer un membre d'un groupe
+            // existant reste permis ; en ajouter un, non.
+            if (facts.Stereo && selected.Any(c => !c.IsInGroup))
+            {
+                IsError = true;
+                StatusMessage = Localization.Get("S_StereoCannotExtend");
+                return;
+            }
+
+            if (IsGrouped)
+            {
+                // On étend ou on réduit le groupe qui joue : c'est le même groupe.
+                // S'il était durable il le reste ; la case peut le rendre durable,
+                // jamais le rétrograder.
+                permanent = facts.Permanent || MakePermanent;
+            }
+            else if (facts.Permanent)
+            {
+                // Aucun groupe ne joue, mais l'agent en garde un, durable, qui
+                // attend la prochaine lecture. Rien ne le montre sur cet écran :
+                // l'envoyer promener d'un appui sur « Grouper » serait le perdre
+                // sans l'avoir su.
+                if (facts.RemembersExactly(selected.Select(c => c.Host)))
                 {
-                    throw new InvalidOperationException(Localization.Get("S_ZoneUnreadable"));
+                    // Les mêmes enceintes : on FORME ce groupe, on ne le remplace
+                    // pas. Il reste donc durable, quelle que soit la case.
+                    permanent = true;
                 }
+                else if (!await ConfirmOverSavedGroupAsync(facts.Remembered).ConfigureAwait(true))
+                {
+                    return;
+                }
+            }
+        }
 
+        await RunAsync(async target =>
+        {
+            // La lecture ci-dessus vaut pour CETTE enceinte. Si l'enceinte pilotée a
+            // changé pendant la question posée à l'utilisateur, on ne publie rien.
+            if (!string.Equals(target.Host, device.Host, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException(Localization.Get("S_ZoneUnreadable"));
+            }
+
+            if (target.Str is not null)
+            {
+                // Jamais de « stereo » ici : pour l'agent ce serait l'ordre de faire
+                // une paire de ces enceintes, pas un attribut du groupe.
                 var request = new StrZoneFormRequest
                 {
-                    Master = new StrZoneMemberRef { DeviceId = device.Endpoint.DeviceId, Ip = device.Host },
+                    Master = new StrZoneMemberRef { DeviceId = target.Endpoint.DeviceId, Ip = target.Host },
                     Slaves = selected
                         .Select(c => new StrZoneMemberRef { DeviceId = c.Endpoint.DeviceId, Ip = c.Endpoint.Host })
                         .ToList(),
                     Mode = "native",
-
-                    // Un groupe déjà durable le reste ; sur un groupe neuf, c'est la
-                    // case qui décide, puisqu'il n'y a rien à préserver.
-                    Permanent = IsGrouped ? facts.Permanent || MakePermanent : MakePermanent,
-                    Stereo = facts.Stereo,
-                    Name = facts.StereoName,
+                    Permanent = permanent,
                 };
 
-                await device.Str.FormZoneAsync(request).ConfigureAwait(false);
+                await target.Str.FormZoneAsync(request).ConfigureAwait(false);
             }
             else
             {
@@ -298,11 +350,49 @@ public sealed partial class MultiroomViewModel : BaseViewModel
                     IpAddress = c.Endpoint.Host,
                 });
 
-                await device.Bose.SetZoneAsync(device.Endpoint.DeviceId, device.Host, members).ConfigureAwait(false);
+                await target.Bose.SetZoneAsync(target.Endpoint.DeviceId, target.Host, members).ConfigureAwait(false);
             }
         }, Localization.Get("S_GroupFormed"));
 
         await RefreshAsync();
+    }
+
+    /// <summary>
+    /// Demande s'il faut former un groupe par-dessus le groupe durable que l'agent
+    /// garde en mémoire. Le groupe enregistré est nommé, pour que l'utilisateur
+    /// sache de quoi on parle : rien d'autre sur cet écran ne le montre.
+    /// </summary>
+    private async Task<bool> ConfirmOverSavedGroupAsync(IReadOnlyList<StrRememberedMember> remembered)
+    {
+        var names = string.Join(", ", remembered.Select(SavedMemberName).Where(n => n.Length > 0));
+
+        var question = names.Length == 0
+            ? Localization.Get("L_SavedGroupAsk")
+            : Localization.Get("L_SavedGroupAskNamed", names);
+
+        var proceed = Localization.Get("L_FormAnyway");
+
+        var choice = await Shell.Current.DisplayActionSheetAsync(
+            question,
+            Localization.Get("L_Cancel"),
+            null,
+            proceed).ConfigureAwait(true);
+
+        return choice == proceed;
+    }
+
+    /// <summary>Le nom d'une suiveuse enregistrée : celui de l'agent, sinon celui que l'application lui connaît.</summary>
+    private string SavedMemberName(StrRememberedMember member)
+    {
+        if (!string.IsNullOrWhiteSpace(member.Name))
+        {
+            return member.Name!.Trim();
+        }
+
+        var known = Speakers.KnownSpeakers.FirstOrDefault(k =>
+            string.Equals(k.Host, member.Ip, StringComparison.OrdinalIgnoreCase));
+
+        return known?.DisplayName ?? member.Ip;
     }
 
     [RelayCommand]

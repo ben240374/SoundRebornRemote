@@ -370,6 +370,10 @@ public sealed partial class PlayerViewModel : BaseViewModel
             return;
         }
 
+        // Relevé ici, avant tout appel réseau : étend-on un groupe qui joue, ou en
+        // forme-t-on un nouveau ? La réponse décide de ce que vaut « permanent ».
+        var extendsLiveGroup = IsGroupActive || HasGroupVolume || GroupCandidates.Any(c => c.IsGrouped);
+
         await RunAsync(async device =>
         {
             if (wasGrouped)
@@ -400,6 +404,14 @@ public sealed partial class PlayerViewModel : BaseViewModel
                     throw new InvalidOperationException(Localization.Get("S_ZoneUnreadable"));
                 }
 
+                // Une paire stéréo n'est pas un groupe multi-pièces, et l'agent ne
+                // sait pas encore lui adjoindre une troisième enceinte. On refuse
+                // plutôt que d'envoyer une formation dont l'issue est inconnue.
+                if (facts.Stereo)
+                {
+                    throw new InvalidOperationException(Localization.Get("S_StereoCannotExtend"));
+                }
+
                 // Le maître est celui de la zone existante, pas l'enceinte qu'on
                 // regarde : republier avec un autre maître déplacerait la diffusion
                 // d'une pièce à l'autre sans que personne ne l'ait demandé.
@@ -417,14 +429,25 @@ public sealed partial class PlayerViewModel : BaseViewModel
                 // Le maître ne doit pas figurer parmi ses propres suivantes.
                 slaves.RemoveAll(s => string.Equals(s.Ip, identity.Ip, StringComparison.OrdinalIgnoreCase));
 
+                // « permanent » se rend tel qu'on l'a lu quand on ÉTEND le groupe qui
+                // joue : c'est le même groupe, avec une enceinte de plus.
+                //
+                // Sans groupe vivant, le drapeau lu décrit un AUTRE groupe : celui
+                // que l'agent garde en mémoire et qui attend la prochaine lecture.
+                // Le rendre ici remplacerait ce groupe durable par celui qu'on forme
+                // d'un geste. On ne le rend donc que si l'on forme exactement ce
+                // groupe-là ; sinon le nouveau groupe est ordinaire, et l'agent met
+                // le groupe durable de côté pour le rétablir ensuite.
+                var permanent = extendsLiveGroup
+                    ? facts.Permanent
+                    : facts.Permanent && facts.RemembersExactly(slaves.Select(s => s.Ip));
+
                 await device.Str.FormZoneAsync(new StrZoneFormRequest
                 {
                     Master = master,
                     Slaves = slaves,
                     Mode = "native",
-                    Permanent = facts.Permanent,
-                    Stereo = facts.Stereo,
-                    Name = facts.StereoName,
+                    Permanent = permanent,
                 }).ConfigureAwait(false);
 
                 return;
@@ -527,11 +550,13 @@ public sealed partial class PlayerViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Retire une enceinte du groupe, en préservant ce que l'agent a enregistré.
+    /// Retire une enceinte du groupe À LA DEMANDE de l'utilisateur : la pastille
+    /// « Grouper avec ». Le groupe enregistré par l'agent suit, puisque c'est sa
+    /// composition que l'utilisateur vient de changer.
     ///
-    /// Sert à deux endroits — la pastille « Grouper avec » et la mise en veille —
-    /// et les deux doivent se comporter pareil, sans quoi éteindre une enceinte et
-    /// la retirer à la main laisseraient le groupe dans deux états différents.
+    /// La mise en veille ne passe PAS par ici : elle sort l'enceinte du groupe qui
+    /// joue sans rien changer au groupe enregistré. Voir
+    /// <see cref="RemoveFromLiveZoneAsync"/>.
     /// </summary>
     private async Task RemoveFromZoneAsync(
         SpeakerDevice device, string removedIp, string removedId,
@@ -570,8 +595,6 @@ public sealed partial class PlayerViewModel : BaseViewModel
                     .ToList(),
                 Mode = "native",
                 Permanent = facts.Permanent,
-                Stereo = facts.Stereo,
-                Name = facts.StereoName,
             }).ConfigureAwait(false);
 
             return;
@@ -589,6 +612,47 @@ public sealed partial class PlayerViewModel : BaseViewModel
             master.DeviceId,
             master.Ip,
             new[] { new ZoneMember { DeviceId = removedId, IpAddress = removedIp } })
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Sort une enceinte du groupe QUI JOUE, sans toucher au groupe enregistré.
+    ///
+    /// C'est ce qu'il faut avant une mise en veille. Éteindre une enceinte n'est
+    /// pas changer la composition du groupe : republier la zone sans elle, comme
+    /// le fait un retrait demandé, raccourcissait le groupe durable de
+    /// l'utilisateur à chaque veille. L'agent sait très bien qu'un membre d'un
+    /// groupe enregistré peut dormir ; il le laisse dormir, et le rappelle à la
+    /// prochaine lecture si le groupe est permanent.
+    ///
+    /// On passe donc par le /removeZoneSlave du firmware, qui n'agit que sur la
+    /// zone vivante, et on l'adresse au maître, seul à pouvoir l'exécuter.
+    /// </summary>
+    private async Task RemoveFromLiveZoneAsync(
+        SpeakerDevice device, SpeakerEndpoint target,
+        (string DeviceId, string Ip) master, IReadOnlyList<StrZoneMemberRef> members)
+    {
+        // L'identifiant que la zone elle-même donne à l'enceinte prime sur celui
+        // de la découverte : certains châssis en annoncent deux, et le firmware
+        // ne reconnaît que le sien.
+        var listed = members.FirstOrDefault(m =>
+            string.Equals(m.Ip, target.Host, StringComparison.OrdinalIgnoreCase));
+
+        var targetId = string.IsNullOrWhiteSpace(listed?.DeviceId) ? target.DeviceId : listed!.DeviceId!;
+
+        if (string.IsNullOrWhiteSpace(targetId) || string.IsNullOrWhiteSpace(master.DeviceId))
+        {
+            throw new InvalidOperationException(Localization.Get("S_MissingDeviceId", target.DisplayName));
+        }
+
+        var bose = string.Equals(master.Ip, device.Host, StringComparison.OrdinalIgnoreCase)
+            ? device.Bose
+            : new BoseApiClient(master.Ip, Speakers.Http);
+
+        await bose.RemoveZoneSlaveAsync(
+            master.DeviceId,
+            master.Ip,
+            new[] { new ZoneMember { DeviceId = targetId, IpAddress = target.Host } })
             .ConfigureAwait(false);
     }
 
@@ -1105,6 +1169,12 @@ public sealed partial class PlayerViewModel : BaseViewModel
     /// Deux cas : l'enceinte visée mène le groupe, ou le groupe tomberait à un seul
     /// membre — il n'a plus d'objet, on le défait ; sinon on ne retire qu'elle.
     /// L'échec n'est jamais bloquant : la veille reste l'action demandée.
+    ///
+    /// Dans les deux cas, seul le groupe QUI JOUE est touché. Le groupe enregistré
+    /// par l'agent reste ce que l'utilisateur en a fait : une veille n'est pas une
+    /// modification du groupe. Défaire le groupe vivant garde le groupe permanent
+    /// en mémoire, et retirer une suivante passe par le firmware, pas par une
+    /// republication de la zone.
     /// </summary>
     private async Task LeaveGroupBeforeStandbyAsync(SpeakerEndpoint target)
     {
@@ -1136,8 +1206,7 @@ public sealed partial class PlayerViewModel : BaseViewModel
             }
             else
             {
-                await RemoveFromZoneAsync(
-                    device, target.Host, target.DeviceId, master, target.DisplayName).ConfigureAwait(true);
+                await RemoveFromLiveZoneAsync(device, target, master, members).ConfigureAwait(true);
             }
 
             await LoadZoneAsync().ConfigureAwait(true);
