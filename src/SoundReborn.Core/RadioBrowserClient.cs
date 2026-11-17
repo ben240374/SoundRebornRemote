@@ -27,7 +27,7 @@ public sealed class RadioBrowserClient
     /// ce qui permet aux mainteneurs de voir d'où vient le trafic. Le service le
     /// demande explicitement, et répond mal à un agent vide.
     /// </summary>
-    private const string UserAgent = "SoundRebornRemote/1.6.1 (+https://github.com/ben240374/SoundRebornRemote)";
+    private const string UserAgent = "SoundRebornRemote/1.6.4 (+https://github.com/ben240374/SoundRebornRemote)";
 
     /// <summary>Budget d'un appel à l'annuaire de stations.</summary>
     public static TimeSpan RequestTimeout { get; set; } = TimeSpan.FromSeconds(10);

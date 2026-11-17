@@ -22,6 +22,193 @@
                 </VerticalStackLayout>
             </Border>
 
+            <!--
+                Réveils et volume de départ de l'enceinte DÉSIGNÉE. Le ContentView reçoit
+                son BindingContext avec le type de la page ; le type des réveils ne vaut
+                qu'à l'intérieur, sur le bloc enfant.
+            -->
+            <ContentView BindingContext="{Binding Alarms}">
+                <VerticalStackLayout x:DataType="vm:AlarmsViewModel" Spacing="14">
+
+                    <Border Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="8">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <Label Grid.Column="0" Text="{DynamicResource L_AlarmsTitle}" Style="{StaticResource SectionLabel}"
+                                       VerticalOptions="Center" />
+                                <Button Grid.Column="1" Text="{DynamicResource L_Refresh}" Style="{StaticResource QuietButton}"
+                                        Command="{Binding RefreshCommand}" />
+                            </Grid>
+
+                            <Label Text="{Binding SpeakerLabel}" Style="{StaticResource SubtitleLabel}" />
+
+                            <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" />
+
+                            <Label Text="{Binding UnavailableNote}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap"
+                                   IsVisible="{Binding IsAvailable, Converter={StaticResource InvertedBool}}" />
+
+                            <VerticalStackLayout Spacing="8" IsVisible="{Binding IsAvailable}">
+                                <Label Text="{Binding WarningText}" TextColor="{StaticResource Warning}" FontSize="13"
+                                       LineBreakMode="WordWrap" IsVisible="{Binding HasWarning}" />
+
+                                <Label Text="{Binding NextAlarmText}" FontAttributes="Bold" FontSize="14"
+                                       LineBreakMode="WordWrap" IsVisible="{Binding HasNextAlarm}" />
+
+                                <Label Text="{Binding ZoneText}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+
+                                <Label Text="{DynamicResource L_AlarmsNone}" Style="{StaticResource CaptionLabel}"
+                                       IsVisible="{Binding HasAlarms, Converter={StaticResource InvertedBool}}" />
+
+                                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Alarms}" Spacing="6">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:AlarmRow">
+                                            <!--
+                                                Deux zones côte à côte, jamais imbriquées : un appui sur la
+                                                corbeille ne doit pas aussi ouvrir l'éditeur.
+                                            -->
+                                            <Border Style="{StaticResource TileCard}" Padding="10,8">
+                                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                    <Grid Grid.Column="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                                        <Grid.GestureRecognizers>
+                                                            <TapGestureRecognizer
+                                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AlarmsViewModel}}, Path=EditAlarmCommand}"
+                                                                CommandParameter="{Binding .}" />
+                                                        </Grid.GestureRecognizers>
+
+                                                        <Label Grid.Column="0" Text="{Binding Time}" FontSize="20" FontAttributes="Bold"
+                                                               VerticalOptions="Center" />
+                                                        <Label Grid.Column="1" Text="{Binding Detail}" Style="{StaticResource CaptionLabel}"
+                                                               LineBreakMode="WordWrap" VerticalOptions="Center" />
+                                                        <Label Grid.Column="2" Text="{Binding State}" Style="{StaticResource CaptionLabel}"
+                                                               VerticalOptions="Center" />
+                                                    </Grid>
+
+                                                    <!-- Corbeille : supprime après confirmation. -->
+                                                    <Border Grid.Column="1" Style="{StaticResource IconSquareSmall}" VerticalOptions="Center">
+                                                        <Border.GestureRecognizers>
+                                                            <TapGestureRecognizer
+                                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AlarmsViewModel}}, Path=DeleteAlarmRowCommand}"
+                                                                CommandParameter="{Binding .}" />
+                                                        </Border.GestureRecognizers>
+                                                        <Path Style="{StaticResource IconPathSmall}" Fill="{StaticResource DangerBrush}"
+                                                              Data="M9,3 H15 V5 H20 V7 H4 V5 H9 Z M6,8 H18 L17,21 H7 Z" />
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+
+                                <Button Text="{DynamicResource L_AlarmAdd}" Command="{Binding AddAlarmCommand}"
+                                        IsVisible="{Binding ShowAddButton}" />
+
+                                <!-- Éditeur d'un réveil -->
+                                <VerticalStackLayout Spacing="8" IsVisible="{Binding IsEditing}">
+                                    <Label Text="{Binding EditorTitle}" Style="{StaticResource SectionLabel}" Margin="0,6,0,0" />
+
+                                    <!--
+                                        Le sélecteur d'heure du système : sur Android, le cadran
+                                        Material. « HH:mm » l'affiche et le règle en 24 heures.
+                                    -->
+                                    <Label Text="{DynamicResource L_AlarmHour}" Style="{StaticResource CaptionLabel}" />
+                                    <TimePicker Time="{Binding AlarmTime, Mode=TwoWay}" Format="HH:mm" FontSize="28" />
+
+                                    <Label Text="{DynamicResource L_AlarmDays}" Style="{StaticResource CaptionLabel}" />
+                                    <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="2">
+                                        <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding Monday, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Grid.Row="0" Grid.Column="1" Text="{DynamicResource L_DayMonday}" VerticalOptions="Center" />
+                                        <CheckBox Grid.Row="0" Grid.Column="2" IsChecked="{Binding Tuesday, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Grid.Row="0" Grid.Column="3" Text="{DynamicResource L_DayTuesday}" VerticalOptions="Center" />
+                                        <CheckBox Grid.Row="0" Grid.Column="4" IsChecked="{Binding Wednesday, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Grid.Row="0" Grid.Column="5" Text="{DynamicResource L_DayWednesday}" VerticalOptions="Center" />
+                                        <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding Thursday, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Grid.Row="1" Grid.Column="1" Text="{DynamicResource L_DayThursday}" VerticalOptions="Center" />
+                                        <CheckBox Grid.Row="1" Grid.Column="2" IsChecked="{Binding Friday, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Grid.Row="1" Grid.Column="3" Text="{DynamicResource L_DayFriday}" VerticalOptions="Center" />
+                                        <CheckBox Grid.Row="1" Grid.Column="4" IsChecked="{Binding Saturday, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Grid.Row="1" Grid.Column="5" Text="{DynamicResource L_DaySaturday}" VerticalOptions="Center" />
+                                        <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding Sunday, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Grid.Row="2" Grid.Column="1" Text="{DynamicResource L_DaySunday}" VerticalOptions="Center" />
+                                    </Grid>
+
+                                    <Label Text="{DynamicResource L_AlarmKeyTitle}" Style="{StaticResource CaptionLabel}" />
+                                    <Picker ItemsSource="{Binding KeyLabels}" SelectedIndex="{Binding KeyIndex, Mode=TwoWay}" />
+
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                        <CheckBox Grid.Column="0" IsChecked="{Binding UseAlarmVolume, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Grid.Column="1" Text="{DynamicResource L_AlarmUseVolume}" Style="{StaticResource SubtitleLabel}"
+                                               VerticalOptions="Center" LineBreakMode="WordWrap" />
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" IsVisible="{Binding UseAlarmVolume}">
+                                        <Slider Grid.Column="0" Minimum="0" Maximum="100" Value="{Binding AlarmVolume, Mode=TwoWay}"
+                                                VerticalOptions="Center" />
+                                        <Label Grid.Column="1" Text="{Binding AlarmVolumeLabel}" WidthRequest="36"
+                                               HorizontalTextAlignment="End" VerticalOptions="Center" />
+                                    </Grid>
+
+                                    <Label Text="{DynamicResource L_AlarmAutoOffTitle}" Style="{StaticResource CaptionLabel}" />
+                                    <Picker ItemsSource="{Binding AutoOffLabels}" SelectedIndex="{Binding AutoOffIndex, Mode=TwoWay}"
+                                            IsVisible="{Binding HasOffAt, Converter={StaticResource InvertedBool}}" />
+                                    <Label Text="{Binding OffAtNote}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap"
+                                           IsVisible="{Binding HasOffAt}" />
+
+                                    <Label Text="{DynamicResource L_AlarmSnoozeTitle}" Style="{StaticResource CaptionLabel}" />
+                                    <Picker ItemsSource="{Binding SnoozeLabels}" SelectedIndex="{Binding SnoozeIndex, Mode=TwoWay}" />
+                                    <Label Text="{DynamicResource L_AlarmSnoozeNote}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                        <CheckBox Grid.Column="0" IsChecked="{Binding AlarmEnabled, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Grid.Column="1" Text="{DynamicResource L_AlarmEnabled}" Style="{StaticResource SubtitleLabel}"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                        <Button Grid.Column="0" Text="{DynamicResource L_AlarmSave}" Style="{StaticResource AccentButton}"
+                                                Command="{Binding SaveAlarmCommand}"
+                                                IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBool}}" />
+                                        <Button Grid.Column="1" Text="{DynamicResource L_Cancel}" Command="{Binding CancelEditCommand}" />
+                                    </Grid>
+
+                                    <Button Text="{DynamicResource L_AlarmDelete}" Style="{StaticResource QuietButton}"
+                                            TextColor="{StaticResource Danger}"
+                                            Command="{Binding DeleteAlarmCommand}" IsVisible="{Binding IsExisting}" />
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+
+                            <Label Text="{Binding StatusMessage}"
+                                   TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                                   FontSize="13" LineBreakMode="WordWrap"
+                                   IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Volume de départ : le niveau que prend l'enceinte quand on l'allume. -->
+                    <Border Style="{StaticResource Card}" IsVisible="{Binding StartVolumeAvailable}">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="{DynamicResource L_StartVolumeTitle}" Style="{StaticResource SectionLabel}" />
+
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                <CheckBox Grid.Column="0" IsChecked="{Binding StartVolumeOn, Mode=TwoWay}" VerticalOptions="Center" />
+                                <Label Grid.Column="1" Text="{DynamicResource L_StartVolumeUse}" Style="{StaticResource SubtitleLabel}"
+                                       VerticalOptions="Center" LineBreakMode="WordWrap" />
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" IsVisible="{Binding StartVolumeOn}">
+                                <Slider Grid.Column="0" Minimum="0" Maximum="100" Value="{Binding StartVolumeLevel, Mode=TwoWay}"
+                                        VerticalOptions="Center" />
+                                <Label Grid.Column="1" Text="{Binding StartVolumeLabel}" WidthRequest="36"
+                                       HorizontalTextAlignment="End" VerticalOptions="Center" />
+                            </Grid>
+
+                            <Label Text="{DynamicResource L_StartVolumeNote}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+
+                            <Button Text="{DynamicResource L_StartVolumeSave}" Command="{Binding SaveStartVolumeCommand}"
+                                    IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBool}}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </ContentView>
+
             <!-- Apparence -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Spacing="10">
@@ -122,6 +309,22 @@
                     <Label Text="{DynamicResource L_StrMissingBody}" Style="{StaticResource CaptionLabel}" />
 
                     <Button Text="{DynamicResource L_StrMissingOpen}"
+                            Command="{Binding OpenUrlCommand}"
+                            CommandParameter="{Binding StrWebsite}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Même bloc, pour un agent présent mais trop ancien : la mise à jour se fait aussi depuis l'outil STR. -->
+            <Border Style="{StaticResource Card}" IsVisible="{Binding HasOutdatedAgents}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{DynamicResource L_AgentOldTitle}" Style="{StaticResource SectionLabel}"
+                           TextColor="{StaticResource Warning}" />
+
+                    <Label Text="{Binding OutdatedAgentSummary}" FontAttributes="Bold" FontSize="14" />
+
+                    <Label Text="{DynamicResource L_AgentOldBody}" Style="{StaticResource CaptionLabel}" />
+
+                    <Button Text="{DynamicResource L_AgentOldOpen}"
                             Command="{Binding OpenUrlCommand}"
                             CommandParameter="{Binding StrWebsite}" />
                 </VerticalStackLayout>

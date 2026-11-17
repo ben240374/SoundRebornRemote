@@ -251,6 +251,29 @@ public sealed partial class PresetsViewModel : BaseViewModel
                 // Une enceinte en veille profonde refuse /presets : on continue avec STR seul.
             }
 
+            // Agent v1.6.3 et suivants : une touche qui ne porte une station que sur
+            // son double appui reçoit côté enceinte une présélection factice (« 2x »),
+            // sans quoi l'enceinte ne signalerait pas l'appui. Ce n'est pas une
+            // station : l'agent la marque, et la touche « une fois » reste vide.
+            if (hardwareRead && hardware.Count > 0 && device.Str is not null)
+            {
+                try
+                {
+                    foreach (var marked in await device.Str.GetBoxPresetsAsync().ConfigureAwait(true))
+                    {
+                        if (marked.IsRow2Placeholder)
+                        {
+                            hardware.Remove(marked.Slot);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    // Agent plus ancien ou silencieux : il ne pose pas cette touche
+                    // factice, la liste du firmware vaut telle quelle.
+                }
+            }
+
             var store = new Dictionary<int, StrPreset>();
             var storeRead = false;
 
@@ -277,6 +300,18 @@ public sealed partial class PresetsViewModel : BaseViewModel
             // arrivait chaque fois qu'une commande tombait pendant une reconnexion.
             // Tant qu'aucune des deux sources n'a répondu, on garde l'affichage.
             if (!hardwareRead && !storeRead)
+            {
+                ShowInfo(Localization.Get("S_PresetsUnread"));
+                return;
+            }
+
+            // Même règle quand c'est l'AGENT qui se tait — enceinte qui se réveille ou
+            // redémarre. La liste du firmware seule n'a ni les noms ni les logos que
+            // STR range, et elle peut être vide à ce moment-là : reconstruire les
+            // touches dessus effaçait leurs images, et le cache des logos avec. On
+            // garde donc l'affichage connu de cette enceinte jusqu'à la prochaine
+            // lecture complète. Sans affichage connu, le firmware reste mieux que rien.
+            if (device.Str is not null && !storeRead && IsSnapshotOf(device))
             {
                 ShowInfo(Localization.Get("S_PresetsUnread"));
                 return;

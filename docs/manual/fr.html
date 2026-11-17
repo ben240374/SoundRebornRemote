@@ -107,7 +107,7 @@ footer a { color: var(--muted); }
 </div></header>
 <div class="wrap">
 <h1 id="soundreborn-remote--manuel-dutilisation">SoundReborn Remote — Manuel d'utilisation</h1>
-<p>Version 1.6.1 · Android 7 et suivants</p>
+<p>Version 1.6.4 · Android 7 et suivants</p>
 <ul class="langbar"><li><a href="fr.html" aria-current="page">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
 <h2 id="sommaire">Sommaire</h2>
 <ol>
@@ -129,7 +129,7 @@ footer a { color: var(--muted); }
 <p>SoundReborn Remote pilote des enceintes <strong>Bose SoundTouch</strong> depuis un téléphone ou une
 tablette Android. Tout se passe sur ton réseau local : aucun compte, aucun service en
 ligne, aucune donnée qui sort de chez toi.</p>
-<p>Trois conditions :</p>
+<p>Quatre conditions :</p>
 <ul>
 <li><strong>Le téléphone et les enceintes sur le même Wi-Fi.</strong> Attention aux réseaux invités
   et aux box qui isolent les appareils entre eux : dans ce cas, rien ne se verra.</li>
@@ -141,6 +141,8 @@ ligne, aucune donnée qui sort de chez toi.</p>
   L'installation se fait avec l'outil STR pour PC ou Mac — <a href="https://st-reborn.de">https://st-reborn.de</a>.
   <strong>Cette application ne l'installe pas</strong> ; elle se contente de signaler les enceintes
   qui ne l'ont pas.</li>
+<li><strong>Un agent STR 1.6.0 ou plus récent pour modifier les groupes.</strong> Avec un agent plus
+  ancien, l'application le signale et ne touche pas aux groupes ; le reste fonctionne.</li>
 <li><strong>Android 7 ou plus récent.</strong></li>
 </ul>
 <hr />
@@ -228,6 +230,7 @@ Spotify, l'AUX et le Bluetooth ne se gardent pas ainsi.</p>
 <p>Une pastille par enceinte, hors celle qui reçoit les commandes. Touche une pastille pour
 joindre cette enceinte au groupe ; une coche et un contour vert apparaissent. Touche-la
 de nouveau pour l'en retirer.</p>
+<p>Le groupement prend quelques secondes : pendant ce temps, le bloc affiche <em>Groupement avec … en cours…</em>, puis le résultat — ou l'erreur, en rouge.</p>
 <p><strong>Le maître se cherche, il ne se suppose pas.</strong> Dans un groupe, une enceinte diffuse et
 les autres la suivent. Si tu sélectionnes une enceinte qui suit, l'application le dit —
 <em>Groupé avec …</em>, en ambre — et adresse le transport, les présélections et le
@@ -258,6 +261,9 @@ pastilles <strong>Une fois</strong> et <strong>Deux fois</strong> choisissent la
 gardent leur numéro de touche, de ① à ⑥.</p>
 <p>La seconde rangée n'existe que dans l'agent : les pastilles n'apparaissent pas sur une
 enceinte sans agent, ou dont l'agent est plus ancien.</p>
+<p>Une touche qui n'a de station que sur sa seconde rangée apparaît vide en <strong>Une fois</strong> :
+une seule pression sur l'enceinte lance alors la station de la seconde rangée (agent
+STR 1.6.3 et suivants).</p>
 <h3 id="trouver-une-station">Trouver une station</h3>
 <p>Le champ de recherche interroge <strong>radio-browser.info</strong>, un annuaire ouvert tenu par des
 bénévoles. Deux listes déroulantes limitent la recherche à un pays et à une langue, et
@@ -315,17 +321,32 @@ enceinte ne rétrograde plus un groupe permanent en groupe ordinaire.</p>
 sans toucher aux écarts. Cuisine à 60 et salon à 30, monter le groupe de 10 donne 70 et
 40, pas 70 et 35. Sous ce curseur, chaque enceinte du groupe a le sien. <strong>Appliquer à
 tout le groupe</strong> met tout le monde à la même valeur, ce que fait aussi la touche <strong>=</strong>
-de l'onglet Lecture.</p>
+de l'onglet Lecture. Ce bloc n'apparaît que lorsqu'un groupe existe.</p>
 <p>Un groupe permanent reste tel que tu l'as composé. Mettre une de ses enceintes en veille
 la sort du groupe qui joue sans la retirer du groupe enregistré : elle le rejoint à la
 prochaine lecture. Et si un groupe permanent attend sa prochaine lecture, l'application
 le signale et demande confirmation avant d'en former un autre à sa place.</p>
+<p>Si aucun groupe ne joue, qu'un groupe ordinaire est enregistré et que tu coches <strong>Groupe
+permanent</strong>, l'application demande aussi confirmation : un groupe permanent que l'agent
+garderait de côté derrière lui serait remplacé.</p>
 <hr />
 <h2 id="8-longlet-réglages">8. L'onglet Réglages</h2>
 <p><img alt="Enceintes connues" src="../images/07-reglages-enceintes.jpg" /></p>
 <p><strong>Enceinte sélectionnée</strong> : nom, adresse et modèle. C'est l'enceinte que tu as choisie —
 pas forcément celle qui reçoit les commandes. Quand elle suit un groupe, une ligne ambre
 dit où partent réellement les commandes, et pourquoi.</p>
+<p><strong>Réveils</strong> : ceux de l'enceinte sélectionnée — un réveil ne fait sonner que l'enceinte
+sur laquelle il est enregistré, même dans un groupe. Chaque réveil joue une touche (1 à 6,
+ou 1 à 6 pressée deux fois), à l'heure et les jours choisis. On règle aussi son volume
+(ou on laisse celui de l'enceinte), l'arrêt automatique et la durée de répétition. La
+carte affiche le prochain réveil tel que l'enceinte le prévoit, et prévient si son
+horloge n'est pas encore à l'heure. Si le fuseau horaire de l'enceinte est vide (UTC),
+celui du téléphone est enregistré avec le réveil suivant. Les réveils modifiés ailleurs —
+page téléphone STR, application de bureau — ne sont pas écrasés : l'application
+n'enregistre que ce que tu as changé. Agent STR requis. L'heure se règle sur le cadran du téléphone. La corbeille d'une ligne supprime le réveil, après confirmation.</p>
+<p><strong>Volume de départ</strong> : le niveau que prend l'enceinte quand on l'allume et qu'elle se met
+à jouer. Coche la case, choisis le niveau, puis <strong>Enregistrer le volume de départ</strong>. Un
+volume réglé pendant l'écoute n'est jamais modifié.</p>
 <p><strong>Langue</strong> : français, anglais, allemand, néerlandais, espagnol. Le changement est
 immédiat, sans redémarrage, et il est mémorisé.</p>
 <p><strong>Thème</strong> : Système, Clair ou Foncé. « Système » suit le réglage d'affichage du
@@ -338,6 +359,9 @@ un réseau mobile ni un tunnel VPN.</p>
 Une enceinte marquée <strong>« Pas de STR — prête pour l'installation »</strong> répond correctement
 mais n'a pas l'agent ; un bloc explicatif apparaît alors plus bas, avec un lien vers le
 site du projet STR.</p>
+<p>Une enceinte dont l'agent est antérieur à la version 1.6.0 fait apparaître un bloc
+semblable, <strong>Agent STR trop ancien</strong>, et sa carte dans l'onglet Lecture porte la mention
+« trop ancien ».</p>
 <p><strong>Diagnostic</strong> : <em>Interroger l'enceinte</em> porte sur l'enceinte <strong>sélectionnée</strong> — nom,
 modèle, identifiant, version du firmware, l'agent avec son port et sa version relue en
 direct sur 17008 et 8888, l'état des notifications, la plage de graves, la liste des
@@ -387,8 +411,9 @@ Réglages → Langue. Le choix prime sur la langue du téléphone.</p>
 <li><strong>Android uniquement.</strong> Il n'existe pas de version iOS.</li>
 <li><strong>Seconde rangée, minuterie et « garder ce qui joue » demandent un agent STR récent.</strong>
   Sur un agent plus ancien, ces commandes n'apparaissent pas ou sont refusées.</li>
-<li><strong>Paires stéréo.</strong> L'application ne crée ni ne défait de paire stéréo, et refuse
-  d'ajouter une enceinte à une paire.</li>
+<li><strong>Paires stéréo.</strong> L'application ne crée ni ne défait de paire stéréo. Une paire ne
+  peut pas diriger un groupe ; avec un agent STR 1.6.3 ou plus récent, elle peut en
+  rejoindre un, lancé depuis une autre enceinte.</li>
 </ul>
 <hr />
 <h2 id="12-mentions">12. Mentions</h2>

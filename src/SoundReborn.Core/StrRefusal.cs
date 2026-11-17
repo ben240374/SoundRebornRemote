@@ -16,6 +16,12 @@ public sealed class StrRefusal
 
     public const string LibraryServerOffline = "library-server-offline";
 
+    /// <summary>
+    /// Agent v1.6.3 et suivants : l'enceinte appelée à diriger le groupe est une
+    /// moitié de paire stéréo. Une paire peut rejoindre un groupe, pas le diriger.
+    /// </summary>
+    public const string PairCannotLead = "pair-cannot-lead";
+
     private StrRefusal()
     {
     }

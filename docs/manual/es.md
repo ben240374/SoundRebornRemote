@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manual de uso
 
-Versión 1.6.1 · Android 7 y posteriores
+Versión 1.6.4 · Android 7 y posteriores
 
 > Idiomas: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · **Español**
 
@@ -29,7 +29,7 @@ SoundReborn Remote controla altavoces **Bose SoundTouch** desde un teléfono o u
 Android. Todo ocurre en tu red local: sin cuenta, sin servicio en línea, sin datos que
 salgan de casa.
 
-Tres condiciones:
+Cuatro condiciones:
 
 - **El teléfono y los altavoces en la misma wifi.** Cuidado con las redes de invitados y
   con los routers que aíslan los aparatos entre sí: en ese caso no se encontrará nada.
@@ -40,6 +40,8 @@ Tres condiciones:
   el agente.
   La instalación se hace con la herramienta STR para PC o Mac — <https://st-reborn.de>.
   **Esta aplicación no lo instala**; solo señala los altavoces que no lo tienen.
+- **Un agente STR 1.6.0 o posterior para cambiar grupos.** Con un agente más antiguo,
+  la aplicación lo indica y no toca los grupos; todo lo demás funciona.
 - **Android 7 o posterior.**
 
 ---
@@ -159,6 +161,8 @@ Spotify, AUX y Bluetooth no se pueden guardar así.
 Una pastilla por altavoz, salvo el que recibe las órdenes. Tócala para añadir ese
 altavoz al grupo; aparecen una marca y un contorno verde. Tócala de nuevo para sacarlo.
 
+Agrupar tarda unos segundos: mientras tanto el bloque muestra *Agrupando con …*, y después el resultado — o el error, en rojo.
+
 **El maestro se busca, no se supone.** En un grupo, un altavoz reproduce y los demás lo
 siguen. Si seleccionas un altavoz que sigue, la aplicación lo dice — *Agrupado con …*,
 en ámbar — y envía el transporte, las presintonías y el volumen al maestro,
@@ -200,6 +204,10 @@ número de tecla, de ① a ⑥.
 
 La segunda fila solo existe en el agente: los botones no aparecen en un altavoz sin
 agente, o con uno más antiguo.
+
+Una tecla que solo tiene emisora en su segunda fila aparece vacía en **Una vez**: una
+sola pulsación en el altavoz inicia entonces la emisora de la segunda fila (agente STR
+1.6.3 y posteriores).
 
 ### Encontrar una emisora
 
@@ -278,12 +286,16 @@ cambios: añadir un altavoz ya no degrada un grupo permanente a grupo corriente.
 volúmenes sin tocar las diferencias. Cocina a 60 y salón a 30 — subir el grupo 10 da 70
 y 40, no 70 y 35. Debajo de ese control, cada altavoz del grupo tiene el suyo.
 **Aplicar a todo el grupo** pone a todos en el mismo valor, igual que la tecla **=** de
-la pestaña Reproducción.
+la pestaña Reproducción. Este bloque solo aparece cuando existe un grupo.
 
 Un grupo permanente se queda como lo compusiste. Poner uno de sus altavoces en reposo
 lo saca del grupo que suena sin quitarlo del grupo guardado: vuelve a unirse en la
 próxima reproducción. Y si un grupo permanente espera su próxima reproducción, la
 aplicación lo indica y pide confirmación antes de formar otro en su lugar.
+
+Si no suena ningún grupo, hay un grupo normal guardado y marcas **Grupo permanente**, la
+aplicación también pide confirmación: un grupo permanente que el agente guardara aparte
+detrás de él sería sustituido.
 
 ---
 
@@ -294,6 +306,20 @@ aplicación lo indica y pide confirmación antes de formar otro en su lugar.
 **Altavoz seleccionado**: nombre, dirección y modelo. Es el altavoz que has elegido — no
 necesariamente el que recibe las órdenes. Cuando sigue a un grupo, una línea ámbar
 indica adónde van realmente las órdenes, y por qué.
+
+**Alarmas**: las del altavoz seleccionado — una alarma solo hace sonar el altavoz en el
+que está guardada, incluso en un grupo. Cada alarma reproduce una tecla (1 a 6, o 1 a 6
+pulsada dos veces) a la hora y los días elegidos. También se ajusta su volumen (o se
+mantiene el del altavoz), el apagado automático y la duración de la repetición. La
+tarjeta muestra la próxima alarma tal como la prevé el altavoz, y avisa si su reloj aún
+no está en hora. Si la zona horaria del altavoz está vacía (UTC), se guarda la del
+teléfono con la siguiente alarma. Las alarmas cambiadas en otro lugar — página de
+teléfono de STR, aplicación de escritorio — no se sobrescriben: la aplicación solo guarda
+lo que usted cambió. Requiere el agente STR. La hora se ajusta en el reloj del teléfono. La papelera de una línea elimina la alarma, tras confirmación.
+
+**Volumen de inicio**: el nivel que toma el altavoz al encenderlo y empezar a sonar.
+Marque la casilla, elija el nivel y pulse **Guardar el volumen de inicio**. Un volumen
+ajustado durante la escucha nunca se modifica.
 
 **Idioma**: español, francés, inglés, alemán, neerlandés. El cambio es inmediato, sin
 reiniciar, y queda memorizado.
@@ -310,6 +336,10 @@ red móvil ni un túnel VPN.
 altavoz marcado **«Sin STR — listo para la instalación»** responde bien pero no tiene el
 agente; más abajo aparece entonces un bloque explicativo con un enlace al sitio del
 proyecto STR.
+
+Un altavoz cuyo agente es anterior a la versión 1.6.0 muestra un bloque parecido,
+**Agente STR demasiado antiguo**, y su tarjeta en la pestaña Reproducción indica
+«demasiado antiguo».
 
 **Diagnóstico**: *Consultar el altavoz* se refiere al altavoz **seleccionado** — nombre,
 modelo, identificador, versión del firmware, el agente con su puerto y su versión leída
@@ -378,8 +408,9 @@ Ajustes → Idioma. Tu elección prevalece sobre el idioma del teléfono.
 - **Solo Android.** No existe versión para iOS.
 - **La segunda fila, el temporizador y «guardar lo que suena» requieren un agente STR
   reciente.** Con un agente más antiguo, estos mandos no aparecen o se rechazan.
-- **Pares estéreo.** La aplicación no crea ni deshace pares estéreo, y se niega a añadir
-  un altavoz a un par.
+- **Pares estéreo.** La aplicación no crea ni deshace pares estéreo. Un par no puede
+  dirigir un grupo; con un agente STR 1.6.3 o posterior puede unirse a uno iniciado en
+  otro altavoz.
 
 ---
 

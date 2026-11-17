@@ -86,6 +86,30 @@ public sealed class StrPreset
     [JsonIgnore] public string DisplayName => string.IsNullOrWhiteSpace(Name) ? $"Présélection {Slot}" : Name!;
 }
 
+/// <summary>
+/// Une touche telle que l'enceinte la rapporte, vue par l'agent
+/// (GET /api/box/presets). Seules les marques de l'agent servent ici.
+/// </summary>
+public sealed class StrBoxPreset
+{
+    [JsonPropertyName("slot")] public int Slot { get; set; }
+    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("location")] public string? Location { get; set; }
+
+    /// <summary>La touche a été écrite par STR.</summary>
+    [JsonPropertyName("strOrigin")] public bool StrOrigin { get; set; }
+
+    /// <summary>
+    /// Agent v1.6.3 et suivants : la touche ne porte qu'une station sur son double
+    /// appui. L'agent y pose une présélection factice (« 2x ») pour que l'enceinte
+    /// signale l'appui ; ce n'est pas une station.
+    /// </summary>
+    [JsonPropertyName("row2Key")] public bool Row2Key { get; set; }
+
+    /// <summary>La marque n'a de sens que sur une touche écrite par STR, comme dans l'application de bureau.</summary>
+    [JsonIgnore] public bool IsRow2Placeholder => StrOrigin && Row2Key;
+}
+
 /// <summary>Enveloppe tolérée par STR : soit un tableau nu, soit {"presets":[...]}.</summary>
 public sealed class StrPresetEnvelope
 {

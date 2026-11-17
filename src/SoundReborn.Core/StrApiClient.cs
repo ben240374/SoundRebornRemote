@@ -608,6 +608,80 @@ public sealed class StrApiClient
         }
     }
 
+    /// <summary>
+    /// GET /api/box/presets — les touches telles que l'enceinte les rapporte (1 à 6),
+    /// avec les marques de l'agent. Liste vide tant que l'enceinte ne les a pas
+    /// encore rapportées.
+    /// </summary>
+    public async Task<IReadOnlyList<StrBoxPreset>> GetBoxPresetsAsync(CancellationToken ct = default)
+        => await GetJsonAsync<List<StrBoxPreset>>("/api/box/presets", ct).ConfigureAwait(false)
+           ?? new List<StrBoxPreset>();
+
+    // ---------------------------------------------------------------- Réveils
+
+    /// <summary>GET /api/alarms — le document des réveils de CETTE enceinte, avec son bloc d'état.</summary>
+    public async Task<StrAlarmDocument> GetAlarmsAsync(CancellationToken ct = default)
+        => StrAlarmDocument.Parse(await GetStringAsync("/api/alarms", ct).ConfigureAwait(false));
+
+    /// <summary>
+    /// PUT /api/alarms — remplace le document entier.
+    ///
+    /// Un 409 n'est pas une erreur : une autre application a enregistré depuis la
+    /// lecture, et l'agent renvoie le document actuel pour qu'on y refasse la
+    /// modification. Un 400 porte, en texte brut, la raison à montrer à
+    /// l'utilisateur ; il remonte en <see cref="SpeakerException"/>.
+    /// </summary>
+    public async Task<StrAlarmSaveResult> PutAlarmsAsync(StrAlarmDocument document, CancellationToken ct = default)
+    {
+        using var content = new StringContent(document.ToPutBody(), Encoding.UTF8, "application/json");
+        using var cts = Budget(null, ct);
+        using var response = await _http.PutAsync(BaseUrl + "/api/alarms", content, cts.Token).ConfigureAwait(false);
+
+        if (response.StatusCode == HttpStatusCode.Conflict)
+        {
+            var current = await response.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
+            return new StrAlarmSaveResult { Current = StrAlarmDocument.Parse(current) };
+        }
+
+        await EnsureSuccessAsync(response, "/api/alarms", cts.Token).ConfigureAwait(false);
+
+        var saved = await response.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
+        return new StrAlarmSaveResult { Saved = StrAlarmDocument.Parse(saved) };
+    }
+
+    // ---------------------------------------------------------------- Volume de départ
+
+    /// <summary>
+    /// GET /api/box/start-volume — le volume que prend l'enceinte quand on l'allume
+    /// et qu'elle se met à jouer. 0 = désactivé ; null quand l'agent ne le gère pas.
+    /// </summary>
+    public async Task<int?> GetStartVolumeAsync(CancellationToken ct = default)
+    {
+        using var document = await GetJsonDocumentAsync("/api/box/start-volume", ct).ConfigureAwait(false);
+
+        if (document is null || document.RootElement.ValueKind != JsonValueKind.Object)
+        {
+            return null;
+        }
+
+        var root = document.RootElement;
+
+        if (root.TryGetProperty("supported", out var supported) && supported.ValueKind == JsonValueKind.False)
+        {
+            return null;
+        }
+
+        return root.TryGetProperty("volume", out var volume) &&
+               volume.ValueKind == JsonValueKind.Number &&
+               volume.TryGetInt32(out var level)
+            ? Math.Clamp(level, 0, 100)
+            : null;
+    }
+
+    /// <summary>POST /api/box/start-volume — 1 à 100, ou 0 pour désactiver. Enregistré sur l'enceinte.</summary>
+    public Task SetStartVolumeAsync(int volume, CancellationToken ct = default)
+        => PostJsonAsync("/api/box/start-volume", new { volume = Math.Clamp(volume, 0, 100) }, ct);
+
     // ---------------------------------------------------------------- Plomberie
 
     private async Task<string> GetStringAsync(string path, CancellationToken ct, TimeSpan? timeout = null)

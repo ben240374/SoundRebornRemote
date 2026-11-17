@@ -486,6 +486,16 @@
                         </BindableLayout.ItemTemplate>
                     </FlexLayout>
 
+                    <!-- Groupement en cours, puis son résultat : visible là où l'on vient d'appuyer. -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8"
+                          IsVisible="{Binding GroupNote, Converter={StaticResource StringNotEmpty}}">
+                        <ActivityIndicator Grid.Column="0" WidthRequest="18" HeightRequest="18" VerticalOptions="Center"
+                                           IsRunning="{Binding IsGroupWorking}" IsVisible="{Binding IsGroupWorking}" />
+                        <Label Grid.Column="1" Text="{Binding GroupNote}" FontSize="13" LineBreakMode="WordWrap"
+                               TextColor="{Binding GroupNoteIsError, Converter={StaticResource ErrorColor}}"
+                               VerticalOptions="Center" />
+                    </Grid>
+
                     <Label Text="{DynamicResource L_TapToUngroup}" Style="{StaticResource CaptionLabel}"
                            IsVisible="{Binding ShowUngroupHint}" />
                 </VerticalStackLayout>

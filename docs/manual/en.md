@@ -1,6 +1,6 @@
 # SoundReborn Remote — User manual
 
-Version 1.6.1 · Android 7 and later
+Version 1.6.4 · Android 7 and later
 
 > Languages: [Français](fr.md) · **English** · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md)
 
@@ -29,7 +29,7 @@ SoundReborn Remote controls **Bose SoundTouch** speakers from an Android phone o
 tablet. Everything happens on your local network: no account, no online service, no data
 leaving your home.
 
-Three conditions:
+Four conditions:
 
 - **Phone and speakers on the same Wi-Fi.** Beware of guest networks and routers that
   isolate devices from each other — nothing will be found in that case.
@@ -39,6 +39,8 @@ Three conditions:
   search, assigning presets and reliable grouping all go through the agent.
   Installation is done with the STR tool for PC or Mac — <https://st-reborn.de>.
   **This app does not install it**; it only flags the speakers that lack it.
+- **An STR agent 1.6.0 or later to change groups.** With an older agent, the app says
+  so and leaves groups alone; everything else works.
 - **Android 7 or later.**
 
 ---
@@ -156,6 +158,8 @@ Bluetooth cannot be kept this way.
 One chip per speaker, other than the one the commands go to. Tap a chip to add that
 speaker to the group; a tick and a green outline appear. Tap it again to remove it.
 
+Grouping takes a few seconds: meanwhile the block shows *Grouping with …*, then the result — or the error, in red.
+
 **The master is found, not assumed.** In a group, one speaker streams and the others
 follow it. If you select a speaker that is following, the app says so — *Grouped with …*
 in amber — and sends transport, presets and volume to the master, because the
@@ -196,6 +200,9 @@ chips choose the row shown; the tiles keep their key number, ① to ⑥.
 
 The second row exists only in the agent: the chips do not appear on a speaker without
 the agent, or with an older one.
+
+A key that has a station only on its second row shows as empty under **Once**: a single
+press on the speaker then starts the second-row station (STR agent 1.6.3 and later).
 
 ### Find a station
 
@@ -273,12 +280,15 @@ longer turns a sticky group into an ordinary one.
 If the kitchen is at 60 and the living room at 30, raising the group by 10 gives 70 and
 40 — not 70 and 35. Below that slider, each speaker in the group has its own. **Apply to
 the whole group** sets everyone to the same value, which is what the **=** key does in
-the Play tab.
+the Play tab. This block appears only when a group exists.
 
 A permanent group stays the way you built it. Putting one of its speakers in standby
 takes it out of the group that is playing without removing it from the saved group: it
 joins again on the next play. And when a permanent group is waiting for its next play,
 the app says so and asks before forming a different one in its place.
+
+If no group is playing, an ordinary group is saved and you tick **Permanent group**, the
+app also asks first: a permanent group the agent keeps aside behind it would be replaced.
 
 ---
 
@@ -289,6 +299,19 @@ the app says so and asks before forming a different one in its place.
 **Selected speaker**: name, address and model. This is the speaker you picked — not
 necessarily the one receiving the commands. When it is following a group, a line in
 amber says where the commands actually go, and why.
+
+**Alarms**: those of the selected speaker — an alarm rings only the speaker it is saved
+on, even in a group. Each alarm plays a key (1 to 6, or 1 to 6 pressed twice) at the time
+and on the days you choose. You also set its volume (or keep the speaker's), the
+automatic switch-off and the snooze length. The card shows the next alarm as the speaker
+plans it, and warns when its clock is not set yet. If the speaker's time zone is empty
+(UTC), the phone's is saved with the next alarm. Alarms changed elsewhere — the STR phone
+page, the desktop app — are not overwritten: the app saves only what you changed. Needs
+the STR agent. The time is set on the phone's clock dial. The bin on a line deletes the alarm, after confirmation.
+
+**Start volume**: the level the speaker takes when it is switched on and starts playing.
+Tick the box, pick the level, then **Save the start volume**. A volume set while
+listening is never changed.
 
 **Language**: English, French, German, Dutch, Spanish. The change is immediate, with no
 restart, and is remembered.
@@ -303,6 +326,9 @@ address ranges, so it never reaches a mobile network or a VPN tunnel.
 **Known speakers**: the remembered list. **Use** switches to one, **✕** forgets it. A
 speaker marked **"No STR — ready for installation"** answers fine but has no agent; an
 explanatory block then appears further down, with a link to the STR project site.
+
+A speaker whose agent is older than version 1.6.0 brings up a similar block, **STR
+agent too old**, and its card in the Play tab reads "too old".
 
 **Diagnostics**: *Query the speaker* reports on the **selected** speaker — name, model,
 device ID, firmware version, the agent with its port and its version read live on both
@@ -368,8 +394,9 @@ Settings → Language. Your choice overrides the phone's language.
 - **Android only.** There is no iOS version.
 - **The second row, the sleep timer and “keep what's playing” need a recent STR agent.**
   On an older agent these commands do not appear or are refused.
-- **Stereo pairs.** The app neither creates nor undoes a stereo pair, and refuses to add
-  a speaker to one.
+- **Stereo pairs.** The app neither creates nor undoes a stereo pair. A pair cannot
+  lead a group; with an STR agent 1.6.3 or later it can join one started on another
+  speaker.
 
 ---
 

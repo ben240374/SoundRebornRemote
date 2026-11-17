@@ -107,7 +107,7 @@ footer a { color: var(--muted); }
 </div></header>
 <div class="wrap">
 <h1 id="soundreborn-remote--handleiding">SoundReborn Remote — Handleiding</h1>
-<p>Versie 1.6.1 · Android 7 en hoger</p>
+<p>Versie 1.6.4 · Android 7 en hoger</p>
 <ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html" aria-current="page">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
 <h2 id="inhoud">Inhoud</h2>
 <ol>
@@ -129,7 +129,7 @@ footer a { color: var(--muted); }
 <p>SoundReborn Remote bedient <strong>Bose SoundTouch</strong>-speakers vanaf een Android-telefoon of
 -tablet. Alles gebeurt op je eigen netwerk: geen account, geen onlinedienst, geen
 gegevens die het huis verlaten.</p>
-<p>Drie voorwaarden:</p>
+<p>Vier voorwaarden:</p>
 <ul>
 <li><strong>Telefoon en speakers op dezelfde wifi.</strong> Let op gastnetwerken en modems die apparaten
   van elkaar afschermen — dan wordt er niets gevonden.</li>
@@ -139,6 +139,8 @@ gegevens die het huis verlaten.</p>
   toewijzen en betrouwbaar groeperen lopen allemaal via de agent.
   Installeren gebeurt met het STR-programma voor pc of Mac — <a href="https://st-reborn.de">https://st-reborn.de</a>.
   <strong>Deze app installeert hem niet</strong>; ze wijst alleen de speakers aan die hem missen.</li>
+<li><strong>Een STR-agent 1.6.0 of nieuwer om groepen te wijzigen.</strong> Met een oudere agent meldt
+  de app dat en laat ze de groepen ongemoeid; de rest werkt.</li>
 <li><strong>Android 7 of hoger.</strong></li>
 </ul>
 <hr />
@@ -224,6 +226,7 @@ Spotify, AUX en Bluetooth kunnen zo niet worden bewaard.</p>
 <p>Eén chip per speaker, behalve die welke de opdrachten krijgt. Tik erop om die speaker
 aan de groep toe te voegen; een vinkje en een groene rand verschijnen. Nog een tik haalt
 hem er weer uit.</p>
+<p>Groeperen duurt enkele seconden: intussen toont het blok <em>Groeperen met …</em>, daarna het resultaat — of de fout, in het rood.</p>
 <p><strong>De master wordt opgezocht, niet aangenomen.</strong> In een groep speelt één speaker af en
 volgen de andere. Kies je een speaker die volgt, dan zegt de app dat — <em>Gegroepeerd met
 …</em>, in amber — en stuurt bediening, presets en volume naar de master, want die
@@ -250,6 +253,8 @@ zender geen bruikbare afbeelding, of antwoordt zijn server niet.</p>
 <strong>Twee keer</strong> kiezen de getoonde rij; de tegels houden hun toetsnummer, ① tot ⑥.</p>
 <p>De tweede rij bestaat alleen in de agent: op een speaker zonder agent, of met een
 oudere, verschijnen de knoppen niet.</p>
+<p>Een toets die alleen in de tweede rij een zender heeft, verschijnt leeg onder <strong>Eén keer</strong>:
+één druk op de speaker start dan de zender van de tweede rij (STR-agent 1.6.3 en nieuwer).</p>
 <h3 id="een-zender-vinden">Een zender vinden</h3>
 <p>Het zoekveld bevraagt <strong>radio-browser.info</strong>, een open gids die door vrijwilligers wordt
 bijgehouden. Twee keuzelijsten beperken de zoekactie tot een land en een taal, en
@@ -312,12 +317,28 @@ stand-by zetten haalt hem uit de groep die speelt, zonder hem uit de opgeslagen 
 verwijderen: bij de volgende weergave doet hij weer mee. En als een permanente groep op
 zijn volgende weergave wacht, meldt de app dat en vraagt hij om bevestiging voordat er
 een andere groep voor in de plaats komt.</p>
+<p>Speelt er geen groep, is er een gewone groep opgeslagen en vink je <strong>Permanente groep</strong>
+aan, dan vraagt de app ook eerst bevestiging: een permanente groep die de agent erachter
+apart houdt, zou vervangen worden.</p>
+<p>Het blok <strong>Groepsvolume</strong> verschijnt alleen wanneer er een groep bestaat.</p>
 <hr />
 <h2 id="8-het-tabblad-instellingen">8. Het tabblad Instellingen</h2>
 <p><img alt="Bekende speakers" src="../images/07-reglages-enceintes.jpg" /></p>
 <p><strong>Gekozen speaker</strong>: naam, adres en model. Dit is de speaker die jij hebt gekozen — niet
 per se degene die de opdrachten krijgt. Volgt hij een groep, dan zegt een amberkleurige
 regel waar de opdrachten werkelijk heen gaan, en waarom.</p>
+<p><strong>Wekkers</strong>: die van de gekozen speaker — een wekker laat alleen de speaker afgaan waarop
+hij is opgeslagen, ook in een groep. Elke wekker speelt een toets (1 tot 6, of 1 tot 6
+twee keer ingedrukt) op het gekozen uur en de gekozen dagen. Je stelt ook het volume in
+(of houdt dat van de speaker), het automatisch uitschakelen en de sluimerduur. De kaart
+toont de volgende wekker zoals de speaker hem plant, en waarschuwt als zijn klok nog niet
+goed staat. Is de tijdzone van de speaker leeg (UTC), dan wordt die van de telefoon met
+de volgende wekker opgeslagen. Elders gewijzigde wekkers — STR-telefoonpagina,
+desktopapp — worden niet overschreven: de app slaat alleen op wat jij hebt gewijzigd.
+Vereist de STR-agent. Het uur stel je in op de klok van de telefoon. Het prullenbakje van een regel verwijdert de wekker, na bevestiging.</p>
+<p><strong>Startvolume</strong>: het niveau dat de speaker krijgt wanneer hij wordt aangezet en begint te
+spelen. Vink het vakje aan, kies het niveau en tik op <strong>Startvolume opslaan</strong>. Een volume
+dat tijdens het luisteren is ingesteld, wordt nooit gewijzigd.</p>
 <p><strong>Taal</strong>: Nederlands, Frans, Engels, Duits, Spaans. De wijziging geldt meteen, zonder
 herstart, en wordt onthouden.</p>
 <p><strong>Thema</strong>: Systeem, Licht of Donker. "Systeem" volgt de weergave-instelling van de
@@ -329,6 +350,8 @@ tot privé-adresbereiken en bereikt dus nooit een mobiel netwerk of een VPN-tunn
 hem. Een speaker met de melding <strong>"Geen STR — klaar voor installatie"</strong> antwoordt prima
 maar heeft geen agent; verderop verschijnt dan een uitlegblok met een link naar de site
 van het STR-project.</p>
+<p>Een speaker waarvan de agent ouder is dan versie 1.6.0 toont een vergelijkbaar blok,
+<strong>STR-agent te oud</strong>, en zijn kaart in het tabblad Afspelen vermeldt "te oud".</p>
 <p><strong>Diagnose</strong>: <em>Speaker bevragen</em> gaat over de <strong>gekozen</strong> speaker — naam, model,
 apparaat-ID, firmwareversie, de agent met zijn poort en zijn live op 17008 en 8888
 gelezen versie, de staat van de meldingen, het bassbereik, de lijst met herkende
@@ -380,8 +403,9 @@ Instellingen → Taal. Jouw keuze gaat voor op de taal van de telefoon.</p>
 <li><strong>De tweede rij, de slaaptimer en ‘wat nu speelt op een toets zetten’ vereisen een
   recente STR-agent.</strong> Met een oudere agent verschijnen deze opdrachten niet of worden ze
   geweigerd.</li>
-<li><strong>Stereoparen.</strong> De app maakt geen stereopaar en heft er geen op, en weigert een
-  speaker aan een paar toe te voegen.</li>
+<li><strong>Stereoparen.</strong> De app maakt geen stereopaar en heft er geen op. Een paar kan geen
+  groep leiden; met een STR-agent 1.6.3 of nieuwer kan het aansluiten bij een groep die op
+  een andere speaker is gestart.</li>
 </ul>
 <hr />
 <h2 id="12-vermeldingen">12. Vermeldingen</h2>

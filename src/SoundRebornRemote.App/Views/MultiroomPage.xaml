@@ -78,7 +78,8 @@
                 </VerticalStackLayout>
             </Border>
 
-            <Border Style="{StaticResource Card}" IsVisible="{Binding CanUseGroupVolume}">
+            <!-- Seulement quand un groupe existe : sans lui, « Appliquer à tout le groupe » n'a rien à régler. -->
+            <Border Style="{StaticResource Card}" IsVisible="{Binding ShowGroupVolume}">
                 <VerticalStackLayout Spacing="10">
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Grid.Column="0" Text="{DynamicResource L_GroupVolume}"

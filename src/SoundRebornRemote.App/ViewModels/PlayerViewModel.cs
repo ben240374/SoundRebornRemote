@@ -370,105 +370,167 @@ public sealed partial class PlayerViewModel : BaseViewModel
             return;
         }
 
-        // Relevé ici, avant tout appel réseau : étend-on un groupe qui joue, ou en
-        // forme-t-on un nouveau ? La réponse décide de ce que vaut « permanent ».
-        var extendsLiveGroup = IsGroupActive || HasGroupVolume || GroupCandidates.Any(c => c.IsGrouped);
-
-        await RunAsync(async device =>
+        // Un appui pendant qu'un groupement est en cours est ignoré : deux demandes
+        // croisées publieraient deux listes de membres différentes.
+        if (IsGroupWorking)
         {
-            if (wasGrouped)
+            return;
+        }
+
+        // Le groupement prend plusieurs secondes. On le dit tout de suite, dans le
+        // bloc « Grouper avec » lui-même : le message de bas de page est hors de vue,
+        // et sans rien de visible on croit ne pas avoir appuyé.
+        IsGroupWorking = true;
+        var noteVersion = ++_groupNoteVersion;
+        GroupNoteIsError = false;
+        GroupNote = Localization.Get(wasGrouped ? "S_Ungrouping" : "S_Grouping", choice.Name);
+
+        string? report = null;
+        var failed = false;
+
+        try
+        {
+            // Relevé ici, avant tout appel réseau : étend-on un groupe qui joue, ou en
+            // forme-t-on un nouveau ? La réponse décide de ce que vaut « permanent ».
+            var extendsLiveGroup = IsGroupActive || HasGroupVolume || GroupCandidates.Any(c => c.IsGrouped);
+
+            await RunAsync(async device =>
             {
-                var self = Speakers.SelectedEndpoint ?? device.Endpoint;
-                await UngroupAsync(device, self, choice, MasterIdentity(device)).ConfigureAwait(false);
-                return;
-            }
-
-            if (device.Str is not null)
-            {
-                var slaves = GroupCandidates
-                    .Where(c => c.IsGrouped || ReferenceEquals(c, choice))
-                    .Select(c => new StrZoneMemberRef { DeviceId = c.Endpoint.DeviceId, Ip = c.Endpoint.Host })
-                    .ToList();
-
-                // L'agent enregistre le document tel qu'il le reçoit : omettre
-                // « permanent » sur un groupe qui l'était le rétrograde en groupe
-                // ordinaire, qui cesse de se reformer et qu'une dissolution efface
-                // définitivement. Même chose pour la paire stéréo et son nom.
-                // On relit donc la zone avant de republier — et si cette lecture
-                // échoue, on renonce : republier à l'aveugle détruirait ce que
-                // l'utilisateur a enregistré, pour un simple hoquet réseau.
-                var facts = await device.Str.GetZoneFactsAsync().ConfigureAwait(false);
-
-                if (facts is null)
+                if (wasGrouped)
                 {
-                    throw new InvalidOperationException(Localization.Get("S_ZoneUnreadable"));
+                    var self = Speakers.SelectedEndpoint ?? device.Endpoint;
+                    await UngroupAsync(device, self, choice, MasterIdentity(device)).ConfigureAwait(false);
+                    return;
                 }
 
-                // Une paire stéréo n'est pas un groupe multi-pièces, et l'agent ne
-                // sait pas encore lui adjoindre une troisième enceinte. On refuse
-                // plutôt que d'envoyer une formation dont l'issue est inconnue.
-                if (facts.Stereo)
+                if (device.Str is not null)
                 {
-                    throw new InvalidOperationException(Localization.Get("S_StereoCannotExtend"));
+                    // Un agent trop ancien écrase le groupe permanent qu'un autre groupe
+                    // recouvre, au lieu de le mettre de côté. On ne lui confie aucun groupe.
+                    if (device.AgentTooOld)
+                    {
+                        throw new InvalidOperationException(AgentTooOldForGroups(device));
+                    }
+
+                    var slaves = GroupCandidates
+                        .Where(c => c.IsGrouped || ReferenceEquals(c, choice))
+                        .Select(c => new StrZoneMemberRef { DeviceId = c.Endpoint.DeviceId, Ip = c.Endpoint.Host })
+                        .ToList();
+
+                    // L'agent enregistre le document tel qu'il le reçoit : omettre
+                    // « permanent » sur un groupe qui l'était le rétrograde en groupe
+                    // ordinaire, qui cesse de se reformer et qu'une dissolution efface
+                    // définitivement. Même chose pour la paire stéréo et son nom.
+                    // On relit donc la zone avant de republier — et si cette lecture
+                    // échoue, on renonce : republier à l'aveugle détruirait ce que
+                    // l'utilisateur a enregistré, pour un simple hoquet réseau.
+                    var facts = await device.Str.GetZoneFactsAsync().ConfigureAwait(false);
+
+                    if (facts is null)
+                    {
+                        throw new InvalidOperationException(Localization.Get("S_ZoneUnreadable"));
+                    }
+
+                    // Une paire stéréo n'est pas un groupe multi-pièces, et l'agent ne
+                    // sait pas encore lui adjoindre une troisième enceinte. On refuse
+                    // plutôt que d'envoyer une formation dont l'issue est inconnue.
+                    if (facts.Stereo)
+                    {
+                        throw new InvalidOperationException(Localization.Get("S_StereoCannotExtend"));
+                    }
+
+                    // Le maître est celui de la zone existante, pas l'enceinte qu'on
+                    // regarde : republier avec un autre maître déplacerait la diffusion
+                    // d'une pièce à l'autre sans que personne ne l'ait demandé.
+                    var identity = MasterIdentity(device);
+                    var master = new StrZoneMemberRef { DeviceId = identity.DeviceId, Ip = identity.Ip };
+
+                    // L'enceinte pilotée doit figurer parmi les suivantes si elle n'est
+                    // pas le maître : sinon republier la zone l'en exclurait.
+                    if (!string.Equals(identity.Ip, device.Host, StringComparison.OrdinalIgnoreCase) &&
+                        !slaves.Any(s => string.Equals(s.Ip, device.Host, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        slaves.Add(new StrZoneMemberRef { DeviceId = device.Endpoint.DeviceId, Ip = device.Host });
+                    }
+
+                    // Le maître ne doit pas figurer parmi ses propres suivantes.
+                    slaves.RemoveAll(s => string.Equals(s.Ip, identity.Ip, StringComparison.OrdinalIgnoreCase));
+
+                    // « permanent » se rend tel qu'on l'a lu quand on ÉTEND le groupe qui
+                    // joue : c'est le même groupe, avec une enceinte de plus.
+                    //
+                    // Sans groupe vivant, le drapeau lu décrit un AUTRE groupe : celui
+                    // que l'agent garde en mémoire et qui attend la prochaine lecture.
+                    // Le rendre ici remplacerait ce groupe durable par celui qu'on forme
+                    // d'un geste. On ne le rend donc que si l'on forme exactement ce
+                    // groupe-là ; sinon le nouveau groupe est ordinaire, et l'agent met
+                    // le groupe durable de côté pour le rétablir ensuite.
+                    var permanent = extendsLiveGroup
+                        ? facts.Permanent
+                        : facts.Permanent && facts.RemembersExactly(slaves.Select(s => s.Ip));
+
+                    await device.Str.FormZoneAsync(new StrZoneFormRequest
+                    {
+                        Master = master,
+                        Slaves = slaves,
+                        Mode = "native",
+                        Permanent = permanent,
+                    }).ConfigureAwait(false);
+
+                    return;
                 }
 
-                // Le maître est celui de la zone existante, pas l'enceinte qu'on
-                // regarde : republier avec un autre maître déplacerait la diffusion
-                // d'une pièce à l'autre sans que personne ne l'ait demandé.
-                var identity = MasterIdentity(device);
-                var master = new StrZoneMemberRef { DeviceId = identity.DeviceId, Ip = identity.Ip };
-
-                // L'enceinte pilotée doit figurer parmi les suivantes si elle n'est
-                // pas le maître : sinon republier la zone l'en exclurait.
-                if (!string.Equals(identity.Ip, device.Host, StringComparison.OrdinalIgnoreCase) &&
-                    !slaves.Any(s => string.Equals(s.Ip, device.Host, StringComparison.OrdinalIgnoreCase)))
+                if (string.IsNullOrWhiteSpace(choice.Endpoint.DeviceId))
                 {
-                    slaves.Add(new StrZoneMemberRef { DeviceId = device.Endpoint.DeviceId, Ip = device.Host });
+                    throw new InvalidOperationException(Localization.Get("S_MissingDeviceId", choice.Name));
                 }
 
-                // Le maître ne doit pas figurer parmi ses propres suivantes.
-                slaves.RemoveAll(s => string.Equals(s.Ip, identity.Ip, StringComparison.OrdinalIgnoreCase));
+                await device.Bose.AddZoneSlaveAsync(
+                    device.Endpoint.DeviceId,
+                    device.Host,
+                    new[] { new ZoneMember { DeviceId = choice.Endpoint.DeviceId, IpAddress = choice.Endpoint.Host } })
+                    .ConfigureAwait(false);
+            }, Localization.Get(wasGrouped ? "S_Ungrouped" : "S_GroupedWith", choice.Name));
 
-                // « permanent » se rend tel qu'on l'a lu quand on ÉTEND le groupe qui
-                // joue : c'est le même groupe, avec une enceinte de plus.
-                //
-                // Sans groupe vivant, le drapeau lu décrit un AUTRE groupe : celui
-                // que l'agent garde en mémoire et qui attend la prochaine lecture.
-                // Le rendre ici remplacerait ce groupe durable par celui qu'on forme
-                // d'un geste. On ne le rend donc que si l'on forme exactement ce
-                // groupe-là ; sinon le nouveau groupe est ordinaire, et l'agent met
-                // le groupe durable de côté pour le rétablir ensuite.
-                var permanent = extendsLiveGroup
-                    ? facts.Permanent
-                    : facts.Permanent && facts.RemembersExactly(slaves.Select(s => s.Ip));
+            report = StatusMessage;
+            failed = IsError;
 
-                await device.Str.FormZoneAsync(new StrZoneFormRequest
-                {
-                    Master = master,
-                    Slaves = slaves,
-                    Mode = "native",
-                    Permanent = permanent,
-                }).ConfigureAwait(false);
-
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(choice.Endpoint.DeviceId))
-            {
-                throw new InvalidOperationException(Localization.Get("S_MissingDeviceId", choice.Name));
-            }
-
-            await device.Bose.AddZoneSlaveAsync(
-                device.Endpoint.DeviceId,
-                device.Host,
-                new[] { new ZoneMember { DeviceId = choice.Endpoint.DeviceId, IpAddress = choice.Endpoint.Host } })
-                .ConfigureAwait(false);
-        }, Localization.Get(wasGrouped ? "S_Ungrouped" : "S_GroupedWith", choice.Name));
-
-        // Le firmware met un instant à publier la nouvelle zone.
-        await Task.Delay(600).ConfigureAwait(true);
-        await LoadZoneAsync().ConfigureAwait(true);
+            // Le firmware met un instant à publier la nouvelle zone.
+            await Task.Delay(600).ConfigureAwait(true);
+            await LoadZoneAsync().ConfigureAwait(true);
+        }
+        finally
+        {
+            IsGroupWorking = false;
+            GroupNoteIsError = failed;
+            GroupNote = report ?? "";
+            _ = ClearGroupNoteLaterAsync(noteVersion);
+        }
     }
+
+    /// <summary>Le compte rendu du groupement reste quelques secondes, puis s'efface — sauf une erreur.</summary>
+    private async Task ClearGroupNoteLaterAsync(int version)
+    {
+        await Task.Delay(TimeSpan.FromSeconds(6)).ConfigureAwait(true);
+
+        if (version == _groupNoteVersion && !GroupNoteIsError)
+        {
+            GroupNote = "";
+        }
+    }
+
+    /// <summary>Vrai pendant un groupement ou un dégroupement lancé depuis « Grouper avec ».</summary>
+    [ObservableProperty]
+    private bool _isGroupWorking;
+
+    /// <summary>« Groupement avec Bose Salon… », puis le résultat. Vide le reste du temps.</summary>
+    [ObservableProperty]
+    private string _groupNote = "";
+
+    [ObservableProperty]
+    private bool _groupNoteIsError;
+
+    private int _groupNoteVersion;
 
     /// <summary>
     /// Qui mène la zone, du plus sûr au moins sûr : ce que l'agent a décrit, puis ce
@@ -569,6 +631,11 @@ public sealed partial class PlayerViewModel : BaseViewModel
         // revenir ce qu'il venait de retirer.
         if (device.Str is not null)
         {
+            if (device.AgentTooOld)
+            {
+                throw new InvalidOperationException(AgentTooOldForGroups(device));
+            }
+
             var facts = await device.Str.GetZoneFactsAsync().ConfigureAwait(false);
 
             if (facts is null)
@@ -734,7 +801,7 @@ public sealed partial class PlayerViewModel : BaseViewModel
             {
                 Endpoint = speaker,
                 Model = speaker.Type,
-                AgentVersion = speaker.AgentVersion,
+                AgentVersion = AgentLabel(speaker.AgentVersion),
                 HasAgent = speaker.HasStr,
                 IsActive = isActive,
                 IsGrouped = grouped.Contains(speaker.Host),
@@ -2021,6 +2088,12 @@ public sealed partial class PlayerViewModel : BaseViewModel
     }
 
     public void OnDisappearing() => _pollTimer?.Stop();
+
+    /// <summary>« v1.6.3 » ; sous la version minimale, « v1.5.2 · trop ancien ».</summary>
+    private static string AgentLabel(string version)
+        => AgentRequirement.IsTooOld(version)
+            ? $"{version} · {Localization.Get("L_AgentTooOldShort")}"
+            : version;
 
     private async Task FillAgentVersionsAsync()
     {

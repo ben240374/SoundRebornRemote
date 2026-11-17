@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handbuch
 
-Version 1.6.1 · Android 7 und neuer
+Version 1.6.4 · Android 7 und neuer
 
 > Sprachen: [Français](fr.md) · [English](en.md) · **Deutsch** · [Nederlands](nl.md) · [Español](es.md)
 
@@ -29,7 +29,7 @@ SoundReborn Remote steuert **Bose-SoundTouch-Lautsprecher** von einem Android-Te
 oder -Tablet aus. Alles läuft im lokalen Netz: kein Konto, kein Onlinedienst, keine Daten,
 die das Haus verlassen.
 
-Drei Voraussetzungen:
+Vier Voraussetzungen:
 
 - **Telefon und Lautsprecher im selben WLAN.** Vorsicht bei Gastnetzen und Routern, die
   Geräte voneinander abschotten — dann wird nichts gefunden.
@@ -41,6 +41,8 @@ Drei Voraussetzungen:
   Installiert wird er mit dem STR-Werkzeug für PC oder Mac — <https://st-reborn.de>.
   **Diese App installiert ihn nicht**; sie weist lediglich auf Lautsprecher hin, denen er
   fehlt.
+- **Ein STR-Agent 1.6.0 oder neuer, um Gruppen zu ändern.** Bei einem älteren Agenten
+  weist die App darauf hin und lässt die Gruppen unverändert; alles andere funktioniert.
 - **Android 7 oder neuer.**
 
 ---
@@ -165,6 +167,8 @@ Ein Plättchen je Lautsprecher, außer dem, der die Befehle erhält. Tippe darau
 Lautsprecher der Gruppe hinzuzufügen; ein Haken und ein grüner Rand erscheinen. Noch
 einmal tippen nimmt ihn wieder heraus.
 
+Das Gruppieren dauert einige Sekunden: Währenddessen zeigt der Block *Gruppierung mit … läuft…*, danach das Ergebnis — oder den Fehler, in Rot.
+
 **Der Master wird ermittelt, nicht angenommen.** In einer Gruppe gibt ein Lautsprecher
 wieder, die anderen folgen ihm. Wählst du einen folgenden Lautsprecher, sagt die App es
 — *Gruppiert mit …*, in Bernstein — und schickt Transport, Presets und
@@ -206,6 +210,10 @@ behalten ihre Tastennummer, ① bis ⑥.
 
 Die zweite Reihe existiert nur im Agenten: Auf einem Lautsprecher ohne Agent oder mit
 einem älteren erscheinen die Schaltflächen nicht.
+
+Eine Taste, die nur in der zweiten Reihe einen Sender hat, erscheint unter **Einmal**
+leer: Ein einfacher Druck am Lautsprecher startet dann den Sender der zweiten Reihe
+(STR-Agent 1.6.3 und neuer).
 
 ### Einen Sender finden
 
@@ -286,13 +294,17 @@ Gruppe keine gewöhnliche mehr.
 ohne die Abstände anzutasten. Küche auf 60, Wohnzimmer auf 30 — die Gruppe um 10
 angehoben ergibt 70 und 40, nicht 70 und 35. Unter dem Regler hat jeder Lautsprecher der
 Gruppe seinen eigenen. **Auf die ganze Gruppe anwenden** setzt alle auf denselben Wert,
-genau wie die Taste **=** im Reiter Wiedergabe.
+genau wie die Taste **=** im Reiter Wiedergabe. Dieser Block erscheint nur, wenn eine Gruppe besteht.
 
 Eine permanente Gruppe bleibt so, wie du sie zusammengestellt hast. Einen ihrer
 Lautsprecher in den Standby zu schicken nimmt ihn aus der laufenden Gruppe, ohne ihn aus
 der gespeicherten Gruppe zu entfernen: Bei der nächsten Wiedergabe ist er wieder dabei.
 Und wartet eine permanente Gruppe auf ihre nächste Wiedergabe, weist die App darauf hin
 und fragt nach, bevor sie an ihrer Stelle eine andere bildet.
+
+Spielt keine Gruppe, ist eine normale Gruppe gespeichert und du setzt das Häkchen bei
+**Dauerhafte Gruppe**, fragt die App ebenfalls nach: Eine dauerhafte Gruppe, die der Agent
+dahinter zurückhält, würde ersetzt.
 
 ---
 
@@ -303,6 +315,20 @@ und fragt nach, bevor sie an ihrer Stelle eine andere bildet.
 **Ausgewählter Lautsprecher**: Name, Adresse und Modell. Das ist der Lautsprecher, den
 du gewählt hast — nicht zwingend der, der die Befehle erhält. Folgt er einer Gruppe,
 sagt eine bernsteinfarbene Zeile, wohin die Befehle tatsächlich gehen und warum.
+
+**Wecker**: die des ausgewählten Lautsprechers — ein Wecker klingelt nur auf dem
+Lautsprecher, auf dem er gespeichert ist, auch in einer Gruppe. Jeder Wecker spielt eine
+Taste (1 bis 6, oder 1 bis 6 zweimal gedrückt) zur gewählten Zeit an den gewählten Tagen.
+Dazu stellst du seine Lautstärke ein (oder behältst die des Lautsprechers), das
+automatische Ausschalten und die Schlummerdauer. Die Karte zeigt den nächsten Wecker so,
+wie ihn der Lautsprecher plant, und warnt, wenn seine Uhr noch nicht gestellt ist. Ist die
+Zeitzone des Lautsprechers leer (UTC), wird die des Telefons mit dem nächsten Wecker
+gespeichert. Anderswo geänderte Wecker — STR-Telefonseite, Desktop-App — werden nicht
+überschrieben: Die App speichert nur, was du geändert hast. Erfordert den STR-Agenten. Die Uhrzeit wird auf dem Ziffernblatt des Telefons eingestellt. Der Papierkorb einer Zeile löscht den Wecker nach Bestätigung.
+
+**Startlautstärke**: die Lautstärke, die der Lautsprecher beim Einschalten annimmt, sobald
+er spielt. Häkchen setzen, Lautstärke wählen, dann **Startlautstärke speichern**. Eine
+während des Hörens eingestellte Lautstärke wird nie geändert.
 
 **Sprache**: Deutsch, Französisch, Englisch, Niederländisch, Spanisch. Die Umstellung
 gilt sofort, ohne Neustart, und wird gemerkt.
@@ -319,6 +345,9 @@ oder einen VPN-Tunnel.
 vergisst ihn. Ein Lautsprecher mit dem Hinweis **„Kein STR — bereit zur Installation"**
 antwortet einwandfrei, hat aber keinen Agenten; weiter unten erscheint dann ein
 erklärender Block mit einem Link zur Seite des STR-Projekts.
+
+Ein Lautsprecher, dessen Agent älter als Version 1.6.0 ist, zeigt einen ähnlichen Block,
+**STR-Agent zu alt**, und seine Karte im Tab Wiedergabe trägt den Hinweis „zu alt".
 
 **Diagnose**: *Lautsprecher abfragen* betrifft den **ausgewählten** Lautsprecher — Name,
 Modell, Geräte-ID, Firmware-Version, den Agenten mit Port und live auf 17008 und 8888
@@ -388,8 +417,9 @@ Einstellungen → Sprache. Die Wahl hat Vorrang vor der Sprache des Telefons.
 - **Zweite Reihe, Sleeptimer und „Laufendes auf eine Taste legen“ erfordern einen
   aktuellen STR-Agenten.** Mit einem älteren Agenten erscheinen diese Befehle nicht oder
   werden abgelehnt.
-- **Stereopaare.** Die App bildet und löst keine Stereopaare und lehnt es ab, einem Paar
-  einen Lautsprecher hinzuzufügen.
+- **Stereopaare.** Die App bildet und löst keine Stereopaare. Ein Paar kann keine Gruppe
+  leiten; mit einem STR-Agenten 1.6.3 oder neuer kann es einer Gruppe beitreten, die auf
+  einem anderen Lautsprecher gestartet wurde.
 
 ---
 

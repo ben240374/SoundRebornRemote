@@ -70,8 +70,17 @@ public abstract partial class BaseViewModel : ObservableObject
             return LibraryOfflineMessage(refusal.Server);
         }
 
+        if (refusal.Code == StrRefusal.PairCannotLead)
+        {
+            return Localization.Get("S_StereoCannotExtend");
+        }
+
         return null;
     }
+
+    /// <summary>L'agent de cette enceinte est antérieur à la version minimale : pas de modification de groupe.</summary>
+    protected static string AgentTooOldForGroups(SpeakerDevice device)
+        => Localization.Get("S_AgentTooOldGroups", device.AgentVersionText, AgentRequirement.MinimumLabel);
 
     /// <summary>Le serveur de médias de la bibliothèque est éteint ou introuvable.</summary>
     protected static string LibraryOfflineMessage(string? server)

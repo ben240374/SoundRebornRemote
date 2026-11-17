@@ -39,6 +39,20 @@ public sealed class SpeakerDevice : IAsyncDisposable
     public AgentInfo? Agent { get; private set; }
 
     /// <summary>
+    /// La version de l'agent telle qu'on la connaît : celle lue à la connexion,
+    /// sinon la dernière enregistrée pour cette enceinte. Vide sans agent.
+    /// </summary>
+    public string AgentVersionText => Str is null
+        ? ""
+        : string.IsNullOrWhiteSpace(Agent?.Version) ? Endpoint.AgentVersion : Agent!.Version!;
+
+    /// <summary>
+    /// Vrai quand l'agent répond mais annonce une version antérieure à
+    /// <see cref="AgentRequirement.Minimum"/>. Faux sans agent ou sans version lisible.
+    /// </summary>
+    public bool AgentTooOld => Str is not null && AgentRequirement.IsTooOld(AgentVersionText);
+
+    /// <summary>
     /// Ouvre une session : détecte l'agent STR si son port n'est pas déjà connu,
     /// lit les capacités de graves et démarre le flux de notifications.
     /// </summary>

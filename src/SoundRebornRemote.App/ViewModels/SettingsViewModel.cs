@@ -26,6 +26,7 @@ public sealed partial class SettingsViewModel : BaseViewModel
         _discovery = discovery;
         _artwork = artwork;
         _zones = zones;
+        Alarms = new AlarmsViewModel(speakers);
 
         foreach (var speaker in Speakers.KnownSpeakers)
         {
@@ -82,7 +83,13 @@ public sealed partial class SettingsViewModel : BaseViewModel
             : "";
 
         Sync();
+
+        // Les réveils appartiennent à l'enceinte désignée : ils suivent la sélection.
+        _ = Alarms.LoadAsync();
     }
+
+    /// <summary>Réveils et volume de départ de l'enceinte désignée.</summary>
+    public AlarmsViewModel Alarms { get; }
 
     /// <summary>Vrai quand les commandes partent vers le maître du groupe, pas vers la sélection.</summary>
     [ObservableProperty]
@@ -159,7 +166,26 @@ public sealed partial class SettingsViewModel : BaseViewModel
             1 => Localization.Get("L_StrMissingOne"),
             _ => Localization.Get("L_StrMissingMany", missing),
         };
+
+        // Même bloc, pour un agent présent mais antérieur à la version minimale.
+        var outdated = KnownSpeakers.Count(s => s.HasStr && AgentRequirement.IsTooOld(s.AgentVersion));
+
+        HasOutdatedAgents = outdated > 0;
+
+        OutdatedAgentSummary = outdated switch
+        {
+            0 => "",
+            1 => Localization.Get("L_AgentOldOne", AgentRequirement.MinimumLabel),
+            _ => Localization.Get("L_AgentOldMany", outdated, AgentRequirement.MinimumLabel),
+        };
     }
+
+    /// <summary>Vrai dès qu'une enceinte connue annonce un agent STR antérieur à la version minimale.</summary>
+    [ObservableProperty]
+    private bool _hasOutdatedAgents;
+
+    [ObservableProperty]
+    private string _outdatedAgentSummary = "";
 
     [RelayCommand]
     private void ClearArtCache()
@@ -186,7 +212,7 @@ public sealed partial class SettingsViewModel : BaseViewModel
         _ => "https://st-reborn.de/",
     };
 
-    /// <summary>« SoundReborn Remote V1.6.1 » — le code de version Android n'intéresse personne.</summary>
+    /// <summary>« SoundReborn Remote V1.6.4 » — le code de version Android n'intéresse personne.</summary>
     public string AppVersion
     {
         get
@@ -434,9 +460,15 @@ public sealed partial class SettingsViewModel : BaseViewModel
                     endpoint.StrPort = found.Port;
                     endpoint.AgentVersion = found.Version;
                     Speakers.SaveKnownSpeakers();
+                    RefreshStrGap();
                 }
 
                 agent = Localization.Get("D_AgentYes", found.Port) + $", {found.Version}";
+
+                if (AgentRequirement.IsTooOld(found.Version))
+                {
+                    agent += $" — {Localization.Get("D_AgentTooOld", AgentRequirement.MinimumLabel)}";
+                }
             }
             else if (endpoint.HasStr)
             {
@@ -529,6 +561,7 @@ public sealed partial class SettingsViewModel : BaseViewModel
     {
         BuildThemeLabels();
         RefreshStrGap();
+        Alarms.RebuildLabels();
 
         // Le lien « Site du projet STR » suit la langue de l'interface.
         OnPropertyChanged(nameof(StrWebsite));

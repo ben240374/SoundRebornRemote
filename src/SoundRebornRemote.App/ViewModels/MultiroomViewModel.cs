@@ -63,10 +63,18 @@ public sealed partial class MultiroomViewModel : BaseViewModel
     public bool IsSlaveSpeaker => !IsMasterSpeaker;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowGroupVolume))]
     private bool _isGrouped;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowGroupVolume))]
     private bool _canUseGroupVolume;
+
+    /// <summary>
+    /// Le bloc « Volume du groupe » n'a de sens qu'avec un groupe : sans lui, l'agent
+    /// refuse le réglage (409) et l'utilisateur voyait une erreur en rouge.
+    /// </summary>
+    public bool ShowGroupVolume => CanUseGroupVolume && IsGrouped;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(GroupVolumeLabel))]
@@ -260,6 +268,15 @@ public sealed partial class MultiroomViewModel : BaseViewModel
 
         if (device.Str is not null)
         {
+            // Un agent trop ancien ne met pas de côté le groupe permanent qu'un
+            // autre groupe recouvre : il l'écrase. On ne lui confie aucun groupe.
+            if (device.AgentTooOld)
+            {
+                IsError = true;
+                StatusMessage = AgentTooOldForGroups(device);
+                return;
+            }
+
             // On relit la zone AVANT d'envoyer quoi que ce soit, et on renonce si
             // cette lecture échoue : republier à l'aveugle détruirait ce que
             // l'utilisateur a enregistré, pour un simple hoquet réseau.
@@ -302,6 +319,17 @@ public sealed partial class MultiroomViewModel : BaseViewModel
                     permanent = true;
                 }
                 else if (!await ConfirmOverSavedGroupAsync(facts.Remembered).ConfigureAwait(true))
+                {
+                    return;
+                }
+            }
+            else if (MakePermanent && facts.Remembered.Count > 0)
+            {
+                // Aucun groupe ne joue, et l'agent garde un groupe ORDINAIRE. S'il a
+                // été formé par-dessus un groupe permanent, l'agent a mis ce dernier
+                // de côté sans le signaler, et « permanent:true » le remplacerait.
+                // L'application ne peut pas savoir s'il existe : elle le dit.
+                if (!await ConfirmAsync(Localization.Get("L_SetAsideAsk")).ConfigureAwait(true))
                 {
                     return;
                 }
@@ -354,7 +382,7 @@ public sealed partial class MultiroomViewModel : BaseViewModel
             }
         }, Localization.Get("S_GroupFormed"));
 
-        await RefreshAsync();
+        await RefreshKeepingStatusAsync();
     }
 
     /// <summary>
@@ -370,6 +398,12 @@ public sealed partial class MultiroomViewModel : BaseViewModel
             ? Localization.Get("L_SavedGroupAsk")
             : Localization.Get("L_SavedGroupAskNamed", names);
 
+        return await ConfirmAsync(question).ConfigureAwait(true);
+    }
+
+    /// <summary>« Former ce groupe quand même » ou « Annuler ». Vrai seulement pour le premier.</summary>
+    private static async Task<bool> ConfirmAsync(string question)
+    {
         var proceed = Localization.Get("L_FormAnyway");
 
         var choice = await Shell.Current.DisplayActionSheetAsync(
@@ -393,6 +427,27 @@ public sealed partial class MultiroomViewModel : BaseViewModel
             string.Equals(k.Host, member.Ip, StringComparison.OrdinalIgnoreCase));
 
         return known?.DisplayName ?? member.Ip;
+    }
+
+    /// <summary>
+    /// Relit l'écran après une commande sans effacer son compte rendu. La relecture
+    /// remet le message à zéro ; appelée telle quelle, elle faisait disparaître
+    /// aussitôt « Groupe formé » comme le refus de l'agent, et l'utilisateur ne
+    /// voyait rien. Seule une relecture en échec après une commande réussie
+    /// garde son propre message.
+    /// </summary>
+    private async Task RefreshKeepingStatusAsync()
+    {
+        var commandFailed = IsError;
+        var report = StatusMessage;
+
+        await RefreshAsync();
+
+        if (!string.IsNullOrEmpty(report) && (commandFailed || !IsError))
+        {
+            IsError = commandFailed;
+            StatusMessage = report;
+        }
     }
 
     [RelayCommand]
@@ -429,11 +484,11 @@ public sealed partial class MultiroomViewModel : BaseViewModel
             ShowInfo(Localization.Get("S_StereoPairKept"));
         }
 
-        await RefreshAsync();
+        await RefreshKeepingStatusAsync();
     }
 
     [RelayCommand]
-    private Task ApplyGroupVolumeAsync() => RunAsync(async device =>
+    private Task ApplyGroupVolumeAsync() => !IsGrouped ? Task.CompletedTask : RunAsync(async device =>
     {
         if (device.Str is null)
         {
@@ -446,7 +501,7 @@ public sealed partial class MultiroomViewModel : BaseViewModel
     [RelayCommand]
     private Task SetMemberVolumeAsync(StrZoneMemberVolume? member)
     {
-        if (member?.Ip is null)
+        if (member?.Ip is null || !IsGrouped)
         {
             return Task.CompletedTask;
         }

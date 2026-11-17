@@ -32,6 +32,17 @@ public sealed class ArtworkCache
     private readonly Dictionary<string, string?> _resolved = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
+    /// Moment de chaque échec. Un échec n'est plus définitif pour la session : une
+    /// enceinte qui redémarre, un réseau qui hoquette, et un logo restait absent
+    /// jusqu'à la fermeture de l'application. L'agent STR a corrigé le même défaut
+    /// dans son application de bureau (v1.6.2) : nouvel essai une minute plus tard.
+    /// </summary>
+    private readonly Dictionary<string, DateTime> _failedAt = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Délai avant de retenter une image qui n'a pas pu être obtenue.</summary>
+    internal TimeSpan RetryFailedAfter { get; set; } = TimeSpan.FromMinutes(1);
+
+    /// <summary>
     /// Téléchargements en cours, par URL. Deux demandes de la même image — la tuile
     /// d'une station et la vignette « En ce moment » de cette même station, au
     /// lancement — partagent un seul téléchargement au lieu d'écrire toutes deux le
@@ -75,7 +86,19 @@ public sealed class ArtworkCache
         {
             if (_resolved.TryGetValue(url, out var known))
             {
-                return known;
+                if (known is not null)
+                {
+                    return known;
+                }
+
+                if (_failedAt.TryGetValue(url, out var when) && DateTime.UtcNow - when < RetryFailedAfter)
+                {
+                    return null;
+                }
+
+                // Échec ancien : on retente.
+                _resolved.Remove(url);
+                _failedAt.Remove(url);
             }
         }
 
@@ -238,6 +261,7 @@ public sealed class ArtworkCache
         lock (_resolved)
         {
             _resolved.Clear();
+            _failedAt.Clear();
         }
 
         try
@@ -364,6 +388,15 @@ public sealed class ArtworkCache
         lock (_resolved)
         {
             _resolved[url] = path;
+
+            if (path is null)
+            {
+                _failedAt[url] = DateTime.UtcNow;
+            }
+            else
+            {
+                _failedAt.Remove(url);
+            }
         }
     }
 

@@ -13,6 +13,37 @@ no service in between.
 > or supported by it. Report problems with this app
 > [here](https://github.com/ben240374/SoundRebornRemote/issues), not to the STR project.
 
+## Features
+
+**Play tab**
+- Volume, mute, standby and bass; play, pause, next and previous track; what is playing, with its artwork.
+- The six presets with their station logos, and the second row of six (a key pressed twice).
+- Keep what is playing on a key; sleep timer for the speaker or the whole group.
+- *Group with*: one tap adds a speaker to the group or removes it, with the progress shown in place.
+
+**Presets tab**
+- Internet station search (radio-browser.info) by name, country and language, with a filter for streams the speaker can play.
+- Assign a station to any of the twelve keys.
+
+**Sources tab**
+- Bluetooth, AUX and the speaker's own sources; play any stream address.
+- Listening history, replayed the right way: a station, a library track, or a whole album.
+
+**Groups tab**
+- Multi-room groups, including permanent groups that re-form on the next play.
+- Whole-group volume, per-speaker volume, levelling in one tap.
+- Safeguards: asks before replacing a saved permanent group; a stereo pair is never asked to lead a group.
+
+**Settings tab**
+- Alarms of each speaker: time on the phone's clock dial, days, key, volume, automatic switch-off, snooze. Changes made in other STR apps are kept.
+- Start volume: the level the speaker takes when it is switched on.
+- Speaker discovery (mDNS, then a network sweep) or manual address; flags speakers without the STR agent or with an agent older than 1.6.0.
+- Interface in English, French, German, Dutch and Spanish; light or dark theme; diagnostics.
+
+**Everywhere**
+- Commands follow the group's master, because the master is what plays.
+- Swipe between tabs. No account, no cloud.
+
 ## Thanks to STR
 
 When Bose shut down its cloud on 6 May 2026, SoundTouch speakers lost most of what made
@@ -32,7 +63,7 @@ done with the STR tool for PC or Mac. It simply flags speakers that do not have 
   <img src="docs/images/05-groupes.jpg" width="30%" alt="Groups tab" />
 </p>
 <p align="center">
-  <img src="docs/images/02-lecture-graves.jpg" width="30%" alt="Bass and presets" />
+  <img src="docs/images/07-reglages-enceintes.jpg" width="30%" alt="Speaker settings" />
   <img src="docs/images/04-sources.jpg" width="30%" alt="Sources tab" />
   <img src="docs/images/06-reglages.jpg" width="30%" alt="Settings tab" />
 </p>
@@ -57,10 +88,12 @@ attached to the latest release: [English](https://github.com/ben240374/SoundRebo
 | Volume, mute, standby/power | Play tab | `POST :8090/volume`, `MUTE` / `POWER` keys, or `PUT :8888/api/box/volume` |
 | Play / pause / next / previous | Play tab | `POST :8888/api/pause` `…/resume` `…/next` `…/prev`, falling back to `POST :8090/key` |
 | Bass | Play tab | `POST :8090/bass`, range read from `/bassCapabilities` |
-| Presets 1 to 6 | Presets tab | `POST :8888/api/play/<slot>`, falling back to the `PRESET_n` key |
+| Presets 1 to 6 | Presets tab | `POST :8888/api/play/<slot>`, falling back to the `PRESET_n` key; a key the agent marks `row2Key` in `GET :8888/api/box/presets` (station on the double press only) shows as empty |
 | Second preset row (keys pressed twice, slots 7 to 12) | Play and Presets tabs | `POST :8888/api/play/<slot>` — agent only, shown when `/api/agent/version` reports `presetRows` |
 | Keeping what is playing on a key | Play tab | `POST :8888/api/box/save-playing` |
 | Sleep timer | Play tab | `GET/POST/DELETE :8888/api/box/sleep` |
+| Alarms of the selected speaker (time, days, key, volume, switch-off, snooze) | Settings tab | `GET/PUT :8888/api/alarms` with `rev`; on `409` the user's change is applied again to the current document |
+| Start volume | Settings tab | `GET/POST :8888/api/box/start-volume` |
 | Now playing, artwork, source | everywhere | WebSocket `:8080` (subprotocol `gabbo`), falling back to `GET /now_playing` |
 | Sources, Bluetooth, AUX | Sources tab | `GET :8090/sources`, `POST :8090/select`, `PUT :8888/api/box/source` |
 | Playing an arbitrary URL | Sources tab | `POST :8888/api/play` |
@@ -69,7 +102,7 @@ attached to the latest release: [English](https://github.com/ben240374/SoundRebo
 | Per-speaker volume in a group | Play and Groups tabs | `GET/POST :8888/api/box/zone/volume` |
 | Speaker discovery | Settings tab | mDNS (`_streborn._tcp`, `_soundtouch._tcp`), falling back to a `/24` sweep on `GET :8090/info` |
 | Switching speakers | Play tab | cards at the top of the screen, with model and agent version |
-| STR agent version | Play tab | `GET :8888/api/agent/version` |
+| STR agent version | Play and Settings tabs | `GET :8888/api/agent/version` — below 1.6.0 the agent is flagged "too old" and group changes are refused |
 | Station search | Presets tab | radio-browser.info, queried by the application itself |
 | Assigning a station to a key (1 to 12) | Presets tab | `PUT :8888/api/presets/{slot}` |
 | Interface language | Settings tab | EN, FR, DE, NL, ES — applied immediately, no restart |
@@ -305,6 +338,37 @@ aucun service intermédiaire.
 > maintenue, ni prise en charge par lui. Signalez les problèmes rencontrés avec elle
 > [ici](https://github.com/ben240374/SoundRebornRemote/issues), pas au projet STR.
 
+## Fonctions
+
+**Onglet Lecture**
+- Volume, sourdine, marche/veille et graves ; lecture, pause, piste suivante et précédente ; ce qui joue, avec sa pochette.
+- Les six présélections avec le logo des stations, et la seconde rangée de six (touche pressée deux fois).
+- Garder ce qui joue sur une touche ; minuterie de sommeil pour l'enceinte ou tout le groupe.
+- *Grouper avec* : un appui ajoute une enceinte au groupe ou l'en retire, avec l'avancement affiché sur place.
+
+**Onglet Présélections**
+- Recherche de stations internet (radio-browser.info) par nom, pays et langue, avec un filtre pour les flux que l'enceinte sait lire.
+- Affectation d'une station à l'une des douze touches.
+
+**Onglet Sources**
+- Bluetooth, AUX et les sources de l'enceinte ; lecture de n'importe quelle adresse de flux.
+- Historique d'écoute, relancé comme il faut : une station, une piste de bibliothèque ou un album entier.
+
+**Onglet Groupes**
+- Groupes multi-pièces, y compris les groupes permanents qui se reforment à la lecture suivante.
+- Volume de tout le groupe, volume par enceinte, mise à niveau en un appui.
+- Garde-fous : confirmation avant de remplacer un groupe permanent enregistré ; une paire stéréo n'est jamais appelée à diriger un groupe.
+
+**Onglet Réglages**
+- Réveils de chaque enceinte : heure sur le cadran du téléphone, jours, touche, volume, arrêt automatique, répétition. Les modifications faites dans les autres applications STR sont conservées.
+- Volume de départ : le niveau que prend l'enceinte quand on l'allume.
+- Découverte des enceintes (mDNS, puis balayage du réseau) ou adresse manuelle ; signale les enceintes sans agent STR ou avec un agent antérieur à 1.6.0.
+- Interface en français, anglais, allemand, néerlandais et espagnol ; thème clair ou foncé ; diagnostic.
+
+**Partout**
+- Les commandes suivent le maître du groupe, puisque c'est lui qui diffuse.
+- Navigation par glissement entre les onglets. Aucun compte, aucun cloud.
+
 ## Grâce à STR
 
 Quand Bose a coupé son cloud le 6 mai 2026, les enceintes SoundTouch ont perdu
@@ -325,7 +389,7 @@ l'ont pas encore.
   <img src="docs/images/05-groupes.jpg" width="30%" alt="Page Groupes" />
 </p>
 <p align="center">
-  <img src="docs/images/02-lecture-graves.jpg" width="30%" alt="Graves et présélections" />
+  <img src="docs/images/07-reglages-enceintes.jpg" width="30%" alt="Réglages des enceintes" />
   <img src="docs/images/04-sources.jpg" width="30%" alt="Page Sources" />
   <img src="docs/images/06-reglages.jpg" width="30%" alt="Page Réglages" />
 </p>
@@ -350,10 +414,12 @@ jointes à la dernière release : [Français](https://github.com/ben240374/Sound
 | Volume, sourdine, marche/veille | onglet Lecture | `POST :8090/volume`, touches `MUTE` / `POWER`, ou `PUT :8888/api/box/volume` |
 | Lecture / pause / suivant / précédent | onglet Lecture | `POST :8888/api/pause` `…/resume` `…/next` `…/prev`, repli sur `POST :8090/key` |
 | Graves | onglet Lecture | `POST :8090/bass`, plage lue dans `/bassCapabilities` |
-| Présélections 1 à 6 | onglet Présélections | `POST :8888/api/play/<slot>`, repli sur la touche `PRESET_n` |
+| Présélections 1 à 6 | onglet Présélections | `POST :8888/api/play/<slot>`, repli sur la touche `PRESET_n` ; une touche que l'agent marque `row2Key` dans `GET :8888/api/box/presets` (station sur le double appui seulement) s'affiche vide |
 | Seconde rangée de touches (pressées deux fois, emplacements 7 à 12) | onglets Lecture et Présélections | `POST :8888/api/play/<slot>` — agent seul, affichée quand `/api/agent/version` annonce `presetRows` |
 | Garder ce qui joue sur une touche | onglet Lecture | `POST :8888/api/box/save-playing` |
 | Minuterie de sommeil | onglet Lecture | `GET/POST/DELETE :8888/api/box/sleep` |
+| Réveils de l'enceinte sélectionnée (heure, jours, touche, volume, arrêt, répétition) | onglet Réglages | `GET/PUT :8888/api/alarms` avec `rev` ; sur un `409`, la modification de l'utilisateur est refaite sur le document actuel |
+| Volume de départ | onglet Réglages | `GET/POST :8888/api/box/start-volume` |
 | Titre en cours, pochette, source | partout | WebSocket `:8080` (sous-protocole `gabbo`), repli sur `GET /now_playing` |
 | Sources, Bluetooth, AUX | onglet Sources | `GET :8090/sources`, `POST :8090/select`, `PUT :8888/api/box/source` |
 | Lecture d'une URL quelconque | onglet Sources | `POST :8888/api/play` |
@@ -362,7 +428,7 @@ jointes à la dernière release : [Français](https://github.com/ben240374/Sound
 | Volume par enceinte du groupe | onglets Lecture et Groupes | `GET/POST :8888/api/box/zone/volume` |
 | Découverte des enceintes | onglet Réglages | mDNS (`_streborn._tcp`, `_soundtouch._tcp`), repli sur le balayage du `/24` sur `GET :8090/info` |
 | Bascule d'une enceinte à l'autre | onglet Lecture | cartes en haut de l'écran, avec modèle et version de l'agent |
-| Version de l'agent STR | onglet Lecture | `GET :8888/api/agent/version` |
+| Version de l'agent STR | onglets Lecture et Réglages | `GET :8888/api/agent/version` — sous 1.6.0, l'agent est signalé « trop ancien » et les modifications de groupe sont refusées |
 | Recherche de stations | onglet Présélections | radio-browser.info, interrogé directement par l'application |
 | Affectation à une touche (1 à 12) | onglet Présélections | `PUT :8888/api/presets/{slot}` |
 | Langue de l'interface | onglet Réglages | FR, EN, DE, NL, ES — changement immédiat, sans redémarrage |
