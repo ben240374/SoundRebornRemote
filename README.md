@@ -24,10 +24,12 @@ no service in between.
 **Presets tab**
 - Internet station search (radio-browser.info) by name, country and language, with a filter for streams the speaker can play.
 - Assign a station to any of the twelve keys.
+- Copy all the keys to another STR speaker, or to all of them (STR agent 1.6.5 or later).
 
 **Sources tab**
 - Bluetooth, AUX and the speaker's own sources; play any stream address.
 - Listening history, replayed the right way: a station, a library track, or a whole album.
+- Record the internet radio that is playing (up to 5 minutes) on the phone; keep the last 10, play them back, share them (WhatsApp, e-mail…) or delete them, even when no speaker is reachable.
 
 **Groups tab**
 - Multi-room groups, including permanent groups that re-form on the next play.
@@ -349,10 +351,12 @@ aucun service intermédiaire.
 **Onglet Présélections**
 - Recherche de stations internet (radio-browser.info) par nom, pays et langue, avec un filtre pour les flux que l'enceinte sait lire.
 - Affectation d'une station à l'une des douze touches.
+- Copie de toutes les touches vers une autre enceinte STR, ou vers toutes (agent STR 1.6.5 ou plus récent).
 
 **Onglet Sources**
 - Bluetooth, AUX et les sources de l'enceinte ; lecture de n'importe quelle adresse de flux.
 - Historique d'écoute, relancé comme il faut : une station, une piste de bibliothèque ou un album entier.
+- Enregistrement sur le téléphone de la radio internet qui joue (5 minutes au plus) ; les 10 derniers enregistrements se réécoutent, se partagent (WhatsApp, e-mail…) ou se suppriment, même sans enceinte joignable.
 
 **Onglet Groupes**
 - Groupes multi-pièces, y compris les groupes permanents qui se reforment à la lecture suivante.

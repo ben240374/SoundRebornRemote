@@ -107,7 +107,7 @@ footer a { color: var(--muted); }
 </div></header>
 <div class="wrap">
 <h1 id="soundreborn-remote--handbuch">SoundReborn Remote — Handbuch</h1>
-<p>Version 1.6.4 · Android 7 und neuer</p>
+<p>Version 1.8.0 · Android 7 und neuer</p>
 <ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html" aria-current="page">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
 <h2 id="inhalt">Inhalt</h2>
 <ol>
@@ -263,6 +263,14 @@ einem älteren erscheinen die Schaltflächen nicht.</p>
 <p>Eine Taste, die nur in der zweiten Reihe einen Sender hat, erscheint unter <strong>Einmal</strong>
 leer: Ein einfacher Druck am Lautsprecher startet dann den Sender der zweiten Reihe
 (STR-Agent 1.6.3 und neuer).</p>
+<h3 id="tasten-auf-einen-anderen-lautsprecher-kopieren">Tasten auf einen anderen Lautsprecher kopieren</h3>
+<p>Die Karte <strong>Tasten kopieren</strong> kopiert alle Tasten des gewählten Lautsprechers auf einen
+anderen STR-Lautsprecher oder auf alle. Tippe auf <strong>Kopieren nach…</strong>, wähle das Ziel und
+bestätige. Jede hier belegte Taste ersetzt die des Ziels; die übrigen Tasten des Ziels
+bleiben. Beide Reihen gehen an ein Ziel, das zwei hat. Gehört eine Spotify-Taste zur
+Kopie, wird das Spotify-Konto dieses Lautsprechers an das Ziel übertragen: Die Rückfrage
+weist darauf hin. Das Ergebnis erscheint pro Lautsprecher.</p>
+<p>Das Kopieren braucht den STR-Agenten 1.6.5 oder neuer auf dem gewählten Lautsprecher.</p>
 <h3 id="einen-sender-finden">Einen Sender finden</h3>
 <p>Das Suchfeld fragt <strong>radio-browser.info</strong> ab, ein offenes, von Freiwilligen gepflegtes
 Verzeichnis. Zwei Auswahllisten grenzen auf Land und Sprache ein, und <strong>Top-Liste</strong> zeigt
@@ -297,6 +305,23 @@ mehr erreichbar ist.</p>
 <p><strong>Einen Stream abspielen</strong> nimmt die Adresse eines direkten Audiostreams entgegen — eine
 <code>.mp3</code> oder eine <code>.m3u8</code> — und startet ihn auf dem Lautsprecher. Nützlich für ein
 Webradio, das im Verzeichnis fehlt. Dafür ist der STR-Agent nötig.</p>
+<p><strong>Aufnehmen</strong> speichert einen Ausschnitt des Internetradios, das der Lautsprecher
+spielt, auf dem Telefon – zum erneuten Anhören oder zum Versenden (WhatsApp, E-Mail…).
+Tippe auf <strong>Aufnehmen</strong>: Die Aufnahme endet, wenn du <strong>Stoppen</strong> tippst, oder von selbst
+nach 5 Minuten. Sie läuft bei ausgeschaltetem Bildschirm weiter: Eine Benachrichtigung
+„Aufnahme läuft“ zeigt den Zähler und eine Taste <strong>Stoppen</strong>. Bei der ersten Aufnahme fragt
+Android 13 und neuer, ob Benachrichtigungen erlaubt sind; lehnst du ab, wird trotzdem
+aufgenommen, nur ohne Benachrichtigung.</p>
+<p>Aufgenommen werden nur Internetradios, deren Stream erreichbar ist: STR-Speicherplätze,
+im Verzeichnis gefundene Sender, von Hand gestartete Streams. Spotify, Deezer, Bluetooth
+und AUX laufen nicht über das Telefon und lassen sich nicht aufnehmen, HLS-Streams
+(<code>.m3u8</code>) ebenfalls nicht. Das Telefon öffnet den Stream des Senders parallel zum
+Lautsprecher: Die Wiedergabe wird nicht gestört, aber die Aufnahme verbraucht Daten, etwa
+1 MB pro Minute.</p>
+<p>Die Liste behält die letzten 10 Aufnahmen mit Sender, Datum und Dauer. ▶ spielt sie auf dem
+Telefon ab, ⤴ öffnet das Teilen-Menü von Android, der Papierkorb löscht nach Rückfrage. Bei
+10 Aufnahmen verweigert die App eine neue: Lösche zuerst die, die du nicht mehr brauchst.
+Die Aufnahmen bleiben in der App und verschwinden, wenn du sie deinstallierst. Die Liste bleibt verfügbar, auch wenn kein Lautsprecher antwortet: Nur das Aufnehmen ist dann nicht möglich.</p>
 <p><strong>Zuletzt gehört</strong> zeigt den vom Agenten geführten Verlauf: Tippe auf eine Zeile, um
 erneut zu starten.</p>
 <p>Ein Album oder Ordner aus der Bibliothek wird vollständig erneut abgespielt, nicht nur
@@ -402,6 +427,10 @@ läuft das Gruppieren über die Firmware — weniger zuverlässig und mitunter o
 abgelehnt.</p>
 <p><strong>Die App ist in der falschen Sprache.</strong>
 Einstellungen → Sprache. Die Wahl hat Vorrang vor der Sprache des Telefons.</p>
+<p><strong>Die Taste Aufnehmen ist ausgegraut.</strong>
+Die Meldung unter dem Titel nennt den Grund: Es läuft nichts, die Quelle ist kein
+Internetradio, oder die Stream-Adresse dieses Senders ist unbekannt. Starte den Sender
+erneut über einen Speicherplatz oder das Verzeichnis und öffne dann den Reiter Quellen neu.</p>
 <hr />
 <h2 id="11-bekannte-grenzen">11. Bekannte Grenzen</h2>
 <ul>
@@ -417,6 +446,11 @@ Einstellungen → Sprache. Die Wahl hat Vorrang vor der Sprache des Telefons.</p
 <li><strong>Stereopaare.</strong> Die App bildet und löst keine Stereopaare. Ein Paar kann keine Gruppe
   leiten; mit einem STR-Agenten 1.6.3 oder neuer kann es einer Gruppe beitreten, die auf
   einem anderen Lautsprecher gestartet wurde.</li>
+<li><strong>Aufnahme: nur Internetradios</strong>, höchstens 5 Minuten pro Aufnahme, 10 Aufnahmen
+  werden behalten.</li>
+<li><strong>Tasten kopieren: STR-Agent 1.6.5 oder neuer</strong> auf dem Quell-Lautsprecher.</li>
+<li><strong>Die Spotify-Tasten „Daumen hoch“ und „Daumen runter“</strong> funktionieren nur auf der
+  Fernbedienung des Lautsprechers (STR-Agent 1.8.0): Der Agent bietet sie Apps nicht an.</li>
 </ul>
 <hr />
 <h2 id="12-hinweise">12. Hinweise</h2>

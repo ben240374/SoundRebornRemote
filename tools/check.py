@@ -113,11 +113,14 @@ for m in re.finditer(r'Add\("([^"]+)"\s*,(.*?)\);', loc, re.S):
 program = (APP / "MauiProgram.cs").read_text(encoding="utf-8")
 registered = set(re.findall(r"AddSingleton<(\w+)>", program))
 registered |= {"HttpClient"}
+# Un type inscrit par une fabrique (« AddSingleton<X>(services => new X(...)) »)
+# reçoit ses paramètres de la fabrique elle-même : rien à vérifier pour lui.
+factory_built = set(re.findall(r"AddSingleton<(\w+)>\(\s*\w+\s*=>", program))
 
 for f, text in text_of.items():
     for m in re.finditer(r"public\s+(\w+)\s*\(([^)]*)\)\s*(?::\s*base\([^)]*\)\s*)?\{", text):
         cls, args = m.group(1), m.group(2)
-        if cls not in registered:
+        if cls not in registered or cls in factory_built:
             continue
         for arg in args.split(","):
             parts = arg.strip().split()

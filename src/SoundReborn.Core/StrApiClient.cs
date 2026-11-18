@@ -682,6 +682,32 @@ public sealed class StrApiClient
     public Task SetStartVolumeAsync(int volume, CancellationToken ct = default)
         => PostJsonAsync("/api/box/start-volume", new { volume = Math.Clamp(volume, 0, 100) }, ct);
 
+    // ---------------------------------------------------------------- Copie des touches
+
+    /// <summary>
+    /// Délai pour une copie : l'agent écrit les touches sur chaque cible, une par une
+    /// sur une cible ancienne, et transmet le compte Spotify si besoin.
+    /// </summary>
+    public static TimeSpan CopyTimeout { get; set; } = TimeSpan.FromSeconds(120);
+
+    /// <summary>
+    /// POST /api/box/preset-copy (agent 1.6.5 et suivants) : copie les touches de
+    /// cette enceinte vers les cibles nommées par leur adresse IP, ou vers toutes
+    /// celles que l'agent connaît (<paramref name="targets"/> null). Répond quand
+    /// chaque cible a été traitée. Un refus global (409 busy, no-presets,
+    /// no-targets) ou un agent trop ancien (404) remonte en
+    /// <see cref="SpeakerException"/> ; <see cref="StrRefusal.From"/> en lit le code.
+    /// </summary>
+    public async Task<StrPresetCopyResult> CopyPresetsAsync(IReadOnlyList<string>? targets, CancellationToken ct = default)
+    {
+        object body = targets is null
+            ? new { all = true }
+            : new { targets = targets.ToArray() };
+
+        var text = await PostJsonReadAsync("/api/box/preset-copy", body, ct, CopyTimeout).ConfigureAwait(false);
+        return string.IsNullOrWhiteSpace(text) ? StrPresetCopyResult.Parse("{}") : StrPresetCopyResult.Parse(text);
+    }
+
     // ---------------------------------------------------------------- Plomberie
 
     private async Task<string> GetStringAsync(string path, CancellationToken ct, TimeSpan? timeout = null)

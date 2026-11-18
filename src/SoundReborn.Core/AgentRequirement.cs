@@ -17,6 +17,9 @@ public static class AgentRequirement
     /// <summary>« 1.6.0 », pour les messages.</summary>
     public static string MinimumLabel => $"{Minimum.Major}.{Minimum.Minor}.{Minimum.Build}";
 
+    /// <summary>Copie des touches vers une autre enceinte (POST /api/box/preset-copy) : agent 1.6.5.</summary>
+    public static Version PresetCopy { get; } = new(1, 6, 5);
+
     /// <summary>
     /// Lit « v1.6.3 », « 1.6.3 », « 1.6.3-beta » ou « 1.6 ». Null quand le texte
     /// ne commence pas par au moins deux nombres séparés par un point : une version
@@ -70,5 +73,11 @@ public static class AgentRequirement
     /// Vrai seulement pour une version LUE et inférieure au minimum. Une version
     /// inconnue ou illisible ne bloque rien.
     /// </summary>
-    public static bool IsTooOld(string? version) => Parse(version) is { } read && read < Minimum;
+    public static bool IsTooOld(string? version) => IsBelow(version, Minimum);
+
+    /// <summary>
+    /// Vrai seulement pour une version LUE et inférieure à <paramref name="minimum"/>.
+    /// Une version inconnue ne bloque rien : l'agent dira lui-même s'il ne sait pas.
+    /// </summary>
+    public static bool IsBelow(string? version, Version minimum) => Parse(version) is { } read && read < minimum;
 }

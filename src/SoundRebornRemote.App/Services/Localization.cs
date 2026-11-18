@@ -283,6 +283,278 @@ public static class Localization
             "Der Agent wandelt eine HTTPS-Adresse in HTTP um: der UPnP-Renderer des Lautsprechers lehnt TLS ab.",
             "De agent zet een HTTPS-adres om naar HTTP: de UPnP-renderer van de speaker weigert TLS.",
             "El agente convierte una dirección HTTPS en HTTP: el motor UPnP del altavoz rechaza TLS.");
+        // ---------------------------------------------------------- Enregistrement (Sources)
+        Add("L_RecTitle", "ENREGISTRER", "RECORD", "AUFNEHMEN", "OPNEMEN", "GRABAR");
+        Add("L_RecButton", "Enregistrer", "Record", "Aufnehmen", "Opnemen", "Grabar");
+        Add("L_RecStop", "Arrêter", "Stop", "Stoppen", "Stoppen", "Detener");
+        Add("L_RecMax", "max 5 min", "max 5 min", "max. 5 Min.", "max. 5 min", "máx. 5 min");
+        Add("L_RecReady",
+            "{0} — flux disponible",
+            "{0} — stream available",
+            "{0} — Stream verfügbar",
+            "{0} — stream beschikbaar",
+            "{0} — flujo disponible");
+        Add("L_RecDelete", "Supprimer", "Delete", "Löschen", "Verwijderen", "Eliminar");
+        Add("L_RecDeleteAsk",
+            "Supprimer l'enregistrement {0} du {1} à {2} ?",
+            "Delete the recording {0} of {1} at {2}?",
+            "Die Aufnahme {0} vom {1} um {2} löschen?",
+            "De opname {0} van {1} om {2} verwijderen?",
+            "¿Eliminar la grabación {0} del {1} a las {2}?");
+        Add("L_RecNotifTitle",
+            "Enregistrement en cours",
+            "Recording",
+            "Aufnahme läuft",
+            "Opname bezig",
+            "Grabando");
+        Add("L_RecMinSec", "{0} min {1:00}", "{0} min {1:00}", "{0} Min. {1:00}", "{0} min {1:00}", "{0} min {1:00}");
+        Add("L_RecNone",
+            "Aucun enregistrement pour l'instant.",
+            "No recordings yet.",
+            "Noch keine Aufnahmen.",
+            "Nog geen opnames.",
+            "Todavía no hay grabaciones.");
+        Add("S_RecNeedAgent",
+            "Il faut l'agent STR sur cette enceinte pour enregistrer.",
+            "Recording needs the STR agent on this speaker.",
+            "Zum Aufnehmen braucht dieser Lautsprecher den STR-Agenten.",
+            "Opnemen vereist de STR-agent op deze speaker.",
+            "Para grabar, este altavoz necesita el agente STR.");
+        Add("L_CopyTitle",
+            "COPIER LES TOUCHES",
+            "COPY THE KEYS",
+            "TASTEN KOPIEREN",
+            "TOETSEN KOPIËREN",
+            "COPIAR LAS TECLAS");
+        Add("L_CopyHint",
+            "Copie les touches de {0} vers une autre enceinte STR.",
+            "Copies the keys of {0} to another STR speaker.",
+            "Kopiert die Tasten von {0} auf einen anderen STR-Lautsprecher.",
+            "Kopieert de toetsen van {0} naar een andere STR-speaker.",
+            "Copia las teclas de {0} a otro altavoz STR.");
+        Add("L_CopyButton",
+            "Copier vers…",
+            "Copy to…",
+            "Kopieren nach…",
+            "Kopiëren naar…",
+            "Copiar a…");
+        Add("L_CopyChoose",
+            "Copier les touches de {0} vers :",
+            "Copy the keys of {0} to:",
+            "Tasten von {0} kopieren nach:",
+            "De toetsen van {0} kopiëren naar:",
+            "Copiar las teclas de {0} a:");
+        Add("L_CopyAll",
+            "Toutes les enceintes",
+            "All speakers",
+            "Alle Lautsprecher",
+            "Alle speakers",
+            "Todos los altavoces");
+        Add("L_CopyAllTargets",
+            "toutes les enceintes STR",
+            "all STR speakers",
+            "alle STR-Lautsprecher",
+            "alle STR-speakers",
+            "todos los altavoces STR");
+        Add("L_CopyConfirm",
+            "Copier vers {0} ? Chaque touche réglée sur {1} remplace celle de la cible ; les autres touches de la cible restent. Une touche Spotify transmet aussi le compte Spotify de {1}.",
+            "Copy to {0}? Each key set on {1} replaces the target's; the target's other keys stay. A Spotify key also hands on the Spotify account of {1}.",
+            "Nach {0} kopieren? Jede auf {1} belegte Taste ersetzt die des Ziels; die übrigen Tasten des Ziels bleiben. Eine Spotify-Taste überträgt auch das Spotify-Konto von {1}.",
+            "Kopiëren naar {0}? Elke toets die op {1} is ingesteld, vervangt die van het doel; de andere toetsen van het doel blijven. Een Spotify-toets geeft ook het Spotify-account van {1} door.",
+            "¿Copiar a {0}? Cada tecla configurada en {1} sustituye a la del destino; las demás teclas del destino se mantienen. Una tecla de Spotify también transmite la cuenta de Spotify de {1}.");
+        Add("L_CopyGo",
+            "Copier",
+            "Copy",
+            "Kopieren",
+            "Kopiëren",
+            "Copiar");
+        Add("S_CopyRunning",
+            "Copie en cours…",
+            "Copying…",
+            "Wird kopiert…",
+            "Bezig met kopiëren…",
+            "Copiando…");
+        Add("S_CopyDone",
+            "{0} : touches copiées ({1}).",
+            "{0}: keys copied ({1}).",
+            "{0}: Tasten kopiert ({1}).",
+            "{0}: toetsen gekopieerd ({1}).",
+            "{0}: teclas copiadas ({1}).");
+        Add("S_CopyRow1Only",
+            "Seconde rangée non copiée : cette enceinte n'en a pas.",
+            "Second row not copied: this speaker has none.",
+            "Zweite Reihe nicht kopiert: Dieser Lautsprecher hat keine.",
+            "Tweede rij niet gekopieerd: deze speaker heeft er geen.",
+            "Segunda fila no copiada: este altavoz no la tiene.");
+        Add("S_CopySpotify",
+            "Compte Spotify transmis.",
+            "Spotify account handed on.",
+            "Spotify-Konto übertragen.",
+            "Spotify-account doorgegeven.",
+            "Cuenta de Spotify transmitida.");
+        Add("S_CopyConflict",
+            "{0} : « {1} » y est déjà sur la touche {2}. Rien n'a été écrit sur cette enceinte.",
+            "{0}: “{1}” is already on key {2} there. Nothing was written to this speaker.",
+            "{0}: „{1}“ liegt dort schon auf Taste {2}. Auf diesen Lautsprecher wurde nichts geschrieben.",
+            "{0}: “{1}” staat daar al op toets {2}. Er is niets naar deze speaker geschreven.",
+            "{0}: «{1}» ya está allí en la tecla {2}. No se ha escrito nada en este altavoz.");
+        Add("S_CopyUnreachable",
+            "{0} : injoignable, rien n'a été copié.",
+            "{0}: unreachable, nothing was copied.",
+            "{0}: nicht erreichbar, nichts wurde kopiert.",
+            "{0}: onbereikbaar, er is niets gekopieerd.",
+            "{0}: inaccesible, no se ha copiado nada.");
+        Add("S_CopyRefused",
+            "{0} : copie refusée par l'enceinte.",
+            "{0}: the speaker refused the copy.",
+            "{0}: Der Lautsprecher hat das Kopieren abgelehnt.",
+            "{0}: de speaker weigerde de kopie.",
+            "{0}: el altavoz rechazó la copia.");
+        Add("S_CopyUnknown",
+            "{0} : {1} ne la connaît pas encore. Réessaie dans quelques minutes.",
+            "{0}: {1} does not know it yet. Try again in a few minutes.",
+            "{0}: {1} kennt ihn noch nicht. Versuche es in ein paar Minuten erneut.",
+            "{0}: {1} kent hem nog niet. Probeer het over een paar minuten opnieuw.",
+            "{0}: {1} todavía no lo conoce. Vuelve a intentarlo dentro de unos minutos.");
+        Add("S_CopyFailed",
+            "{0} : échec ({1}).",
+            "{0}: failed ({1}).",
+            "{0}: fehlgeschlagen ({1}).",
+            "{0}: mislukt ({1}).",
+            "{0}: error ({1}).");
+        Add("S_CopyBusy",
+            "Une copie est déjà en cours sur cette enceinte.",
+            "A copy is already running on this speaker.",
+            "Auf diesem Lautsprecher läuft bereits ein Kopiervorgang.",
+            "Er loopt al een kopie op deze speaker.",
+            "Ya hay una copia en curso en este altavoz.");
+        Add("S_CopyNoPresets",
+            "Cette enceinte n'a aucune touche réglée à copier.",
+            "This speaker has no key set to copy.",
+            "Dieser Lautsprecher hat keine belegte Taste zum Kopieren.",
+            "Deze speaker heeft geen ingestelde toets om te kopiëren.",
+            "Este altavoz no tiene ninguna tecla configurada que copiar.");
+        Add("S_CopyNoTargets",
+            "Aucune enceinte cible n'a répondu.",
+            "No target speaker answered.",
+            "Kein Ziellautsprecher hat geantwortet.",
+            "Geen enkele doelspeaker antwoordde.",
+            "Ningún altavoz de destino respondió.");
+        Add("S_CopyTooOld",
+            "La copie des touches demande l'agent STR 1.6.5 ou plus récent sur {0}.",
+            "Copying the keys needs STR agent 1.6.5 or later on {0}.",
+            "Das Kopieren der Tasten braucht den STR-Agenten 1.6.5 oder neuer auf {0}.",
+            "Toetsen kopiëren vereist STR-agent 1.6.5 of nieuwer op {0}.",
+            "Copiar las teclas requiere el agente STR 1.6.5 o posterior en {0}.");
+        Add("S_CopyNoOther",
+            "Aucune autre enceinte STR connue. Lance un balayage dans Réglages.",
+            "No other STR speaker known. Run a scan in Settings.",
+            "Kein anderer STR-Lautsprecher bekannt. Starte eine Suche in den Einstellungen.",
+            "Geen andere STR-speaker bekend. Start een scan in Instellingen.",
+            "No se conoce ningún otro altavoz STR. Lanza una búsqueda en Ajustes.");
+        Add("S_CopyTimeout",
+            "La copie continue sur l'enceinte ; vérifie les touches dans un moment.",
+            "The copy goes on on the speaker; check the keys in a moment.",
+            "Das Kopieren läuft auf dem Lautsprecher weiter; prüfe die Tasten gleich.",
+            "De kopie loopt verder op de speaker; controleer de toetsen zo meteen.",
+            "La copia continúa en el altavoz; comprueba las teclas dentro de un momento.");
+        Add("S_RecSizeLimit",
+            "Enregistrement arrêté : le flux arrive anormalement vite et remplirait le téléphone. {0} gardées.",
+            "Recording stopped: the stream arrives abnormally fast and would fill the phone. {0} kept.",
+            "Aufnahme gestoppt: Der Stream kommt ungewöhnlich schnell und würde das Telefon füllen. {0} behalten.",
+            "Opname gestopt: de stream komt abnormaal snel binnen en zou de telefoon vullen. {0} bewaard.",
+            "Grabación detenida: el flujo llega anormalmente rápido y llenaría el teléfono. Se conservan {0}.");
+        Add("S_RecOffline",
+            "Enceinte injoignable : l'enregistrement n'est pas possible pour l'instant. Tes enregistrements restent disponibles.",
+            "Speaker unreachable: recording is not possible for now. Your recordings stay available.",
+            "Lautsprecher nicht erreichbar: Aufnehmen ist im Moment nicht möglich. Deine Aufnahmen bleiben verfügbar.",
+            "Speaker onbereikbaar: opnemen is nu niet mogelijk. Je opnames blijven beschikbaar.",
+            "Altavoz inaccesible: por ahora no se puede grabar. Tus grabaciones siguen disponibles.");
+        Add("S_RecNoSpeaker",
+            "Aucune enceinte connectée : l'enregistrement n'est pas possible. Tes enregistrements restent disponibles.",
+            "No speaker connected: recording is not possible. Your recordings stay available.",
+            "Kein Lautsprecher verbunden: Aufnehmen ist nicht möglich. Deine Aufnahmen bleiben verfügbar.",
+            "Geen speaker verbonden: opnemen is niet mogelijk. Je opnames blijven beschikbaar.",
+            "Ningún altavoz conectado: no se puede grabar. Tus grabaciones siguen disponibles.");
+        Add("S_RecNotPlaying",
+            "Aucune radio internet en cours.",
+            "No internet radio playing.",
+            "Es läuft kein Internetradio.",
+            "Er speelt geen internetradio.",
+            "No se está reproduciendo ninguna radio por internet.");
+        Add("S_RecNotRadio",
+            "{0} : enregistrement impossible.",
+            "{0}: recording not possible.",
+            "{0}: Aufnahme nicht möglich.",
+            "{0}: opnemen niet mogelijk.",
+            "{0}: no se puede grabar.");
+        Add("S_RecNoUrl",
+            "Le flux de cette station n'est pas accessible.",
+            "This station's stream is not reachable.",
+            "Der Stream dieses Senders ist nicht erreichbar.",
+            "De stream van deze zender is niet bereikbaar.",
+            "El flujo de esta emisora no está accesible.");
+        Add("S_RecHls",
+            "Flux HLS non pris en charge.",
+            "HLS streams are not supported.",
+            "HLS-Streams werden nicht unterstützt.",
+            "HLS-streams worden niet ondersteund.",
+            "Los flujos HLS no son compatibles.");
+        Add("S_RecNotAudio",
+            "Ce flux n'est pas un fichier audio.",
+            "This stream is not audio.",
+            "Dieser Stream ist kein Audio.",
+            "Deze stream is geen audio.",
+            "Este flujo no es audio.");
+        Add("S_RecFull",
+            "10 enregistrements : supprime-en un pour en faire un nouveau.",
+            "10 recordings: delete one to make a new one.",
+            "10 Aufnahmen: Lösche eine, um eine neue zu machen.",
+            "10 opnames: verwijder er een om een nieuwe te maken.",
+            "10 grabaciones: elimina una para hacer otra.");
+        Add("S_RecNetwork",
+            "Impossible d'ouvrir le flux.",
+            "Could not open the stream.",
+            "Der Stream konnte nicht geöffnet werden.",
+            "De stream kon niet worden geopend.",
+            "No se pudo abrir el flujo.");
+        Add("S_RecBusy",
+            "Un enregistrement est déjà en cours.",
+            "A recording is already in progress.",
+            "Es läuft bereits eine Aufnahme.",
+            "Er loopt al een opname.",
+            "Ya hay una grabación en curso.");
+        Add("S_RecSaved",
+            "Enregistré : {0}.",
+            "Recorded: {0}.",
+            "Aufgenommen: {0}.",
+            "Opgenomen: {0}.",
+            "Grabado: {0}.");
+        Add("S_RecSavedMax",
+            "Enregistré : 5 min (maximum atteint).",
+            "Recorded: 5 min (maximum reached).",
+            "Aufgenommen: 5 Min. (Maximum erreicht).",
+            "Opgenomen: 5 min (maximum bereikt).",
+            "Grabado: 5 min (máximo alcanzado).");
+        Add("S_RecInterrupted",
+            "Enregistrement interrompu (réseau) – {0} gardées.",
+            "Recording interrupted (network) – {0} kept.",
+            "Aufnahme unterbrochen (Netzwerk) – {0} behalten.",
+            "Opname onderbroken (netwerk) – {0} bewaard.",
+            "Grabación interrumpida (red): se conservan {0}.");
+        Add("S_RecTooShort",
+            "Enregistrement trop court, il n'a pas été gardé.",
+            "Recording too short, it was not kept.",
+            "Aufnahme zu kurz, sie wurde nicht behalten.",
+            "Opname te kort, ze is niet bewaard.",
+            "Grabación demasiado corta, no se ha conservado.");
+        Add("S_RecDeleted",
+            "Enregistrement supprimé.",
+            "Recording deleted.",
+            "Aufnahme gelöscht.",
+            "Opname verwijderd.",
+            "Grabación eliminada.");
+
         Add("L_Recent", "ÉCOUTÉ RÉCEMMENT", "RECENTLY PLAYED", "ZULETZT GEHÖRT", "ONLANGS AFGESPEELD", "ESCUCHADO RECIENTEMENTE");
         Add("L_NoRecent",
             "Rien dans l'historique de l'agent.",

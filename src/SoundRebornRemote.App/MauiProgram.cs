@@ -45,6 +45,19 @@ public static class MauiProgram
         builder.Services.AddSingleton<RadioBrowserClient>();
         builder.Services.AddSingleton<ZoneLocator>();
 
+        // Enregistrement d'une radio : le service lui-même ne dépend pas d'Android ;
+        // la notification, la lecture et le partage passent par IRecordingPlatform.
+#if ANDROID
+        builder.Services.AddSingleton<IRecordingPlatform, AndroidRecordingPlatform>();
+#else
+        builder.Services.AddSingleton<IRecordingPlatform, NoRecordingPlatform>();
+#endif
+        builder.Services.AddSingleton<RecordingService>(services => new RecordingService(
+            services.GetRequiredService<HttpClient>(),
+            services.GetRequiredService<IRecordingPlatform>(),
+            Path.Combine(FileSystem.AppDataDirectory, "recordings"),
+            TimeProvider.System));
+
         builder.Services.AddSingleton<PlayerViewModel>();
         builder.Services.AddSingleton<PresetsViewModel>();
         builder.Services.AddSingleton<SourcesViewModel>();

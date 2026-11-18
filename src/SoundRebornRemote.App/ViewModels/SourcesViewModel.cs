@@ -36,11 +36,15 @@ public sealed partial class SourcesViewModel : BaseViewModel
 {
     private readonly ArtworkCache _artwork;
 
-    public SourcesViewModel(SpeakerManager speakers, ArtworkCache artwork) : base(speakers)
+    public SourcesViewModel(SpeakerManager speakers, ArtworkCache artwork, RecordingService recordings) : base(speakers)
     {
         _artwork = artwork;
+        Recordings = new RecordingsViewModel(speakers, recordings);
         Speakers.DeviceChanged += (_, _) => OnMainThread(() => _ = RefreshAsync());
     }
+
+    /// <summary>La carte « Enregistrer » : sa propre vue-modèle, comme les réveils dans Réglages.</summary>
+    public RecordingsViewModel Recordings { get; }
 
     public ObservableCollection<SourceItem> Sources { get; } = new();
 
@@ -60,12 +64,16 @@ public sealed partial class SourcesViewModel : BaseViewModel
     {
         var device = Device;
 
+        // Les enregistrements sont sur le téléphone : leur liste n'attend pas l'enceinte.
+        Recordings.ReloadList();
+
         Sources.Clear();
         Recent.Clear();
 
         if (device is null)
         {
             HasStrAgent = false;
+            await Recordings.RefreshAsync().ConfigureAwait(true);
             return;
         }
 
@@ -112,6 +120,9 @@ public sealed partial class SourcesViewModel : BaseViewModel
         {
             IsRefreshing = false;
         }
+
+        // Après le reste : un souci côté enregistrement ne doit rien changer aux sources.
+        await Recordings.RefreshAsync().ConfigureAwait(true);
     }
 
     [RelayCommand]

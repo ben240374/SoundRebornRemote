@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handbuch
 
-Version 1.6.4 · Android 7 und neuer
+Version 1.8.0 · Android 7 und neuer
 
 > Sprachen: [Français](fr.md) · [English](en.md) · **Deutsch** · [Nederlands](nl.md) · [Español](es.md)
 
@@ -215,6 +215,17 @@ Eine Taste, die nur in der zweiten Reihe einen Sender hat, erscheint unter **Ein
 leer: Ein einfacher Druck am Lautsprecher startet dann den Sender der zweiten Reihe
 (STR-Agent 1.6.3 und neuer).
 
+### Tasten auf einen anderen Lautsprecher kopieren
+
+Die Karte **Tasten kopieren** kopiert alle Tasten des gewählten Lautsprechers auf einen
+anderen STR-Lautsprecher oder auf alle. Tippe auf **Kopieren nach…**, wähle das Ziel und
+bestätige. Jede hier belegte Taste ersetzt die des Ziels; die übrigen Tasten des Ziels
+bleiben. Beide Reihen gehen an ein Ziel, das zwei hat. Gehört eine Spotify-Taste zur
+Kopie, wird das Spotify-Konto dieses Lautsprechers an das Ziel übertragen: Die Rückfrage
+weist darauf hin. Das Ergebnis erscheint pro Lautsprecher.
+
+Das Kopieren braucht den STR-Agenten 1.6.5 oder neuer auf dem gewählten Lautsprecher.
+
 ### Einen Sender finden
 
 Das Suchfeld fragt **radio-browser.info** ab, ein offenes, von Freiwilligen gepflegtes
@@ -260,6 +271,26 @@ mehr erreichbar ist.
 **Einen Stream abspielen** nimmt die Adresse eines direkten Audiostreams entgegen — eine
 `.mp3` oder eine `.m3u8` — und startet ihn auf dem Lautsprecher. Nützlich für ein
 Webradio, das im Verzeichnis fehlt. Dafür ist der STR-Agent nötig.
+
+**Aufnehmen** speichert einen Ausschnitt des Internetradios, das der Lautsprecher
+spielt, auf dem Telefon – zum erneuten Anhören oder zum Versenden (WhatsApp, E-Mail…).
+Tippe auf **Aufnehmen**: Die Aufnahme endet, wenn du **Stoppen** tippst, oder von selbst
+nach 5 Minuten. Sie läuft bei ausgeschaltetem Bildschirm weiter: Eine Benachrichtigung
+„Aufnahme läuft“ zeigt den Zähler und eine Taste **Stoppen**. Bei der ersten Aufnahme fragt
+Android 13 und neuer, ob Benachrichtigungen erlaubt sind; lehnst du ab, wird trotzdem
+aufgenommen, nur ohne Benachrichtigung.
+
+Aufgenommen werden nur Internetradios, deren Stream erreichbar ist: STR-Speicherplätze,
+im Verzeichnis gefundene Sender, von Hand gestartete Streams. Spotify, Deezer, Bluetooth
+und AUX laufen nicht über das Telefon und lassen sich nicht aufnehmen, HLS-Streams
+(`.m3u8`) ebenfalls nicht. Das Telefon öffnet den Stream des Senders parallel zum
+Lautsprecher: Die Wiedergabe wird nicht gestört, aber die Aufnahme verbraucht Daten, etwa
+1 MB pro Minute.
+
+Die Liste behält die letzten 10 Aufnahmen mit Sender, Datum und Dauer. ▶ spielt sie auf dem
+Telefon ab, ⤴ öffnet das Teilen-Menü von Android, der Papierkorb löscht nach Rückfrage. Bei
+10 Aufnahmen verweigert die App eine neue: Lösche zuerst die, die du nicht mehr brauchst.
+Die Aufnahmen bleiben in der App und verschwinden, wenn du sie deinstallierst. Die Liste bleibt verfügbar, auch wenn kein Lautsprecher antwortet: Nur das Aufnehmen ist dann nicht möglich.
 
 **Zuletzt gehört** zeigt den vom Agenten geführten Verlauf: Tippe auf eine Zeile, um
 erneut zu starten.
@@ -404,6 +435,11 @@ abgelehnt.
 **Die App ist in der falschen Sprache.**
 Einstellungen → Sprache. Die Wahl hat Vorrang vor der Sprache des Telefons.
 
+**Die Taste Aufnehmen ist ausgegraut.**
+Die Meldung unter dem Titel nennt den Grund: Es läuft nichts, die Quelle ist kein
+Internetradio, oder die Stream-Adresse dieses Senders ist unbekannt. Starte den Sender
+erneut über einen Speicherplatz oder das Verzeichnis und öffne dann den Reiter Quellen neu.
+
 ---
 
 ## 11. Bekannte Grenzen
@@ -420,6 +456,11 @@ Einstellungen → Sprache. Die Wahl hat Vorrang vor der Sprache des Telefons.
 - **Stereopaare.** Die App bildet und löst keine Stereopaare. Ein Paar kann keine Gruppe
   leiten; mit einem STR-Agenten 1.6.3 oder neuer kann es einer Gruppe beitreten, die auf
   einem anderen Lautsprecher gestartet wurde.
+- **Aufnahme: nur Internetradios**, höchstens 5 Minuten pro Aufnahme, 10 Aufnahmen
+  werden behalten.
+- **Tasten kopieren: STR-Agent 1.6.5 oder neuer** auf dem Quell-Lautsprecher.
+- **Die Spotify-Tasten „Daumen hoch“ und „Daumen runter“** funktionieren nur auf der
+  Fernbedienung des Lautsprechers (STR-Agent 1.8.0): Der Agent bietet sie Apps nicht an.
 
 ---
 

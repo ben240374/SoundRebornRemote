@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manuel d'utilisation
 
-Version 1.6.4 · Android 7 et suivants
+Version 1.8.0 · Android 7 et suivants
 
 > Langues : **Français** · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md)
 
@@ -216,6 +216,17 @@ Une touche qui n'a de station que sur sa seconde rangée apparaît vide en **Une
 une seule pression sur l'enceinte lance alors la station de la seconde rangée (agent
 STR 1.6.3 et suivants).
 
+### Copier les touches vers une autre enceinte
+
+La carte **Copier les touches** copie toutes les touches de l'enceinte sélectionnée vers
+une autre enceinte STR, ou vers toutes. Touche **Copier vers…**, choisis la cible, puis
+confirme. Chaque touche réglée ici remplace celle de la cible ; les autres touches de la
+cible restent. Les deux rangées partent vers une cible qui en a deux. Quand une touche
+Spotify fait partie de la copie, le compte Spotify de cette enceinte est transmis à la
+cible : la question de confirmation le rappelle. Le résultat s'affiche par enceinte.
+
+La copie demande l'agent STR 1.6.5 ou plus récent sur l'enceinte sélectionnée.
+
 ### Trouver une station
 
 Le champ de recherche interroge **radio-browser.info**, un annuaire ouvert tenu par des
@@ -261,6 +272,26 @@ du cloud.
 **Jouer un flux** accepte l'adresse d'un flux audio direct — un `.mp3` ou un `.m3u8` —
 et le lance sur l'enceinte. Utile pour une webradio absente de l'annuaire. Cette
 fonction demande l'agent STR.
+
+**Enregistrer** garde sur le téléphone un extrait de la radio internet que joue
+l'enceinte, pour le réécouter ou l'envoyer (WhatsApp, e-mail…). Touche **Enregistrer** :
+l'enregistrement s'arrête quand tu touches **Arrêter**, ou tout seul après 5 minutes. Il
+continue écran éteint : une notification « Enregistrement en cours » affiche le compteur et
+un bouton **Arrêter**. Au premier enregistrement, Android 13 et suivants demandent
+d'autoriser les notifications ; si tu refuses, l'enregistrement se fait quand même, sans
+notification.
+
+Seules les radios internet dont le flux est accessible s'enregistrent : présélections STR,
+stations trouvées dans l'annuaire, flux lancés à la main. Spotify, Deezer, Bluetooth et AUX
+ne passent pas par le téléphone et ne peuvent pas être enregistrés, pas plus que les flux
+HLS (`.m3u8`). Le téléphone ouvre le flux de la radio en parallèle de l'enceinte : l'écoute
+n'est pas perturbée, mais l'enregistrement consomme des données, environ 1 Mo par minute.
+
+La liste garde les 10 derniers enregistrements, avec la station, la date et la durée.
+▶ les écoute sur le téléphone, ⤴ ouvre le partage d'Android, la corbeille supprime après
+confirmation. Au-delà de 10, l'application refuse d'en faire un nouveau : supprime d'abord
+celui dont tu n'as plus besoin. Les enregistrements restent dans l'application et
+disparaissent si tu la désinstalles. La liste reste disponible même quand aucune enceinte ne répond : seul l'enregistrement est alors impossible.
 
 **Écouté récemment** reprend l'historique tenu par l'agent : touche une ligne pour
 relancer.
@@ -402,6 +433,11 @@ STR, le groupage passe par le firmware, moins fiable et parfois refusé sans mes
 **L'application est dans la mauvaise langue.**
 Réglages → Langue. Le choix prime sur la langue du téléphone.
 
+**Le bouton Enregistrer est grisé.**
+Le message sous le titre en donne la raison : rien ne joue, la source n'est pas une radio
+internet, ou l'adresse du flux de cette station n'est pas connue. Relance la station depuis
+une présélection ou l'annuaire, puis rouvre l'onglet Sources.
+
 ---
 
 ## 11. Limites connues
@@ -417,6 +453,11 @@ Réglages → Langue. Le choix prime sur la langue du téléphone.
 - **Paires stéréo.** L'application ne crée ni ne défait de paire stéréo. Une paire ne
   peut pas diriger un groupe ; avec un agent STR 1.6.3 ou plus récent, elle peut en
   rejoindre un, lancé depuis une autre enceinte.
+- **Enregistrement : radios internet seulement**, 5 minutes au plus par enregistrement,
+  10 enregistrements gardés.
+- **Copie des touches : agent STR 1.6.5 ou plus récent** sur l'enceinte source.
+- **Les touches « J'aime » et « Je n'aime pas » de Spotify** ne fonctionnent que sur la
+  télécommande de l'enceinte (agent STR 1.8.0) : l'agent ne les propose pas aux applications.
 
 ---
 

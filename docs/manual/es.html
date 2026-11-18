@@ -107,7 +107,7 @@ footer a { color: var(--muted); }
 </div></header>
 <div class="wrap">
 <h1 id="soundreborn-remote--manual-de-uso">SoundReborn Remote — Manual de uso</h1>
-<p>Versión 1.6.4 · Android 7 y posteriores</p>
+<p>Versión 1.8.0 · Android 7 y posteriores</p>
 <ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html" aria-current="page">Español</a></li></ul><hr />
 <h2 id="índice">Índice</h2>
 <ol>
@@ -257,6 +257,14 @@ agente, o con uno más antiguo.</p>
 <p>Una tecla que solo tiene emisora en su segunda fila aparece vacía en <strong>Una vez</strong>: una
 sola pulsación en el altavoz inicia entonces la emisora de la segunda fila (agente STR
 1.6.3 y posteriores).</p>
+<h3 id="copiar-las-teclas-a-otro-altavoz">Copiar las teclas a otro altavoz</h3>
+<p>La tarjeta <strong>Copiar las teclas</strong> copia todas las teclas del altavoz seleccionado a otro
+altavoz STR, o a todos. Toca <strong>Copiar a…</strong>, elige el destino y confirma. Cada tecla
+configurada aquí sustituye a la del destino; las demás teclas del destino se mantienen.
+Las dos filas van a un destino que tiene dos. Cuando una tecla de Spotify forma parte de
+la copia, la cuenta de Spotify de este altavoz se transmite al destino: la pregunta de
+confirmación lo recuerda. El resultado se muestra por altavoz.</p>
+<p>La copia requiere el agente STR 1.6.5 o posterior en el altavoz seleccionado.</p>
 <h3 id="encontrar-una-emisora">Encontrar una emisora</h3>
 <p>El campo de búsqueda consulta <strong>radio-browser.info</strong>, un directorio abierto mantenido por
 voluntarios. Dos listas desplegables acotan la búsqueda a un país y a un idioma, y <strong>Top
@@ -290,6 +298,21 @@ servicio de streaming cuya cuenta ya no es accesible desde el cierre de la nube.
 <p><strong>Reproducir un flujo</strong> acepta la dirección de un flujo de audio directo — un <code>.mp3</code> o un
 <code>.m3u8</code> — y lo lanza en el altavoz. Útil para una radio en línea ausente del directorio.
 Requiere el agente STR.</p>
+<p><strong>Grabar</strong> guarda en el teléfono un fragmento de la radio por internet que reproduce el
+altavoz, para volver a escucharlo o enviarlo (WhatsApp, correo…). Toca <strong>Grabar</strong>: la
+grabación se detiene cuando tocas <strong>Detener</strong>, o sola a los 5 minutos. Continúa con la
+pantalla apagada: una notificación «Grabando» muestra el contador y un botón <strong>Detener</strong>.
+En la primera grabación, Android 13 y posteriores piden permitir las notificaciones; si te
+niegas, se graba igualmente, sin notificación.</p>
+<p>Solo se graban las radios por internet cuyo flujo es accesible: presintonías STR, emisoras
+del directorio, flujos lanzados a mano. Spotify, Deezer, Bluetooth y AUX no pasan por el
+teléfono y no se pueden grabar, como tampoco los flujos HLS (<code>.m3u8</code>). El teléfono abre el
+flujo de la emisora en paralelo al altavoz: la escucha no se altera, pero la grabación
+consume datos, alrededor de 1 MB por minuto.</p>
+<p>La lista guarda las últimas 10 grabaciones, con la emisora, la fecha y la duración. ▶ las
+reproduce en el teléfono, ⤴ abre el menú de compartir de Android, la papelera elimina tras
+confirmar. Con 10 grabaciones, la aplicación no hace una nueva: elimina primero la que ya no
+necesites. Las grabaciones se quedan en la aplicación y desaparecen si la desinstalas. La lista sigue disponible aunque ningún altavoz responda: solo la grabación es entonces imposible.</p>
 <p><strong>Escuchado recientemente</strong> recoge el historial que lleva el agente: toca una línea para
 volver a empezar.</p>
 <p>Un álbum o una carpeta de la biblioteca se reproduce de nuevo por completo, no solo su
@@ -394,6 +417,10 @@ Los dos altavoces deben estar encendidos y accesibles. Si a uno le falta el agen
 agrupación pasa por el firmware: menos fiable y a veces rechazada sin mensaje.</p>
 <p><strong>La aplicación está en el idioma equivocado.</strong>
 Ajustes → Idioma. Tu elección prevalece sobre el idioma del teléfono.</p>
+<p><strong>El botón Grabar está en gris.</strong>
+El mensaje bajo el título indica el motivo: no suena nada, la fuente no es una radio por
+internet, o se desconoce la dirección del flujo de esta emisora. Vuelve a lanzar la emisora
+desde una presintonía o el directorio y abre de nuevo la pestaña Fuentes.</p>
 <hr />
 <h2 id="11-límites-conocidos">11. Límites conocidos</h2>
 <ul>
@@ -408,6 +435,11 @@ Ajustes → Idioma. Tu elección prevalece sobre el idioma del teléfono.</p>
 <li><strong>Pares estéreo.</strong> La aplicación no crea ni deshace pares estéreo. Un par no puede
   dirigir un grupo; con un agente STR 1.6.3 o posterior puede unirse a uno iniciado en
   otro altavoz.</li>
+<li><strong>Grabación: solo radios por internet</strong>, 5 minutos como máximo por grabación,
+  10 grabaciones guardadas.</li>
+<li><strong>Copia de teclas: agente STR 1.6.5 o posterior</strong> en el altavoz de origen.</li>
+<li><strong>Las teclas de Spotify «me gusta» y «no me gusta»</strong> solo funcionan con el mando a
+  distancia del altavoz (agente STR 1.8.0): el agente no las ofrece a las aplicaciones.</li>
 </ul>
 <hr />
 <h2 id="12-avisos">12. Avisos</h2>

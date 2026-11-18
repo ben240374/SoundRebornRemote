@@ -107,7 +107,7 @@ footer a { color: var(--muted); }
 </div></header>
 <div class="wrap">
 <h1 id="soundreborn-remote--manuel-dutilisation">SoundReborn Remote — Manuel d'utilisation</h1>
-<p>Version 1.6.4 · Android 7 et suivants</p>
+<p>Version 1.8.0 · Android 7 et suivants</p>
 <ul class="langbar"><li><a href="fr.html" aria-current="page">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
 <h2 id="sommaire">Sommaire</h2>
 <ol>
@@ -264,6 +264,14 @@ enceinte sans agent, ou dont l'agent est plus ancien.</p>
 <p>Une touche qui n'a de station que sur sa seconde rangée apparaît vide en <strong>Une fois</strong> :
 une seule pression sur l'enceinte lance alors la station de la seconde rangée (agent
 STR 1.6.3 et suivants).</p>
+<h3 id="copier-les-touches-vers-une-autre-enceinte">Copier les touches vers une autre enceinte</h3>
+<p>La carte <strong>Copier les touches</strong> copie toutes les touches de l'enceinte sélectionnée vers
+une autre enceinte STR, ou vers toutes. Touche <strong>Copier vers…</strong>, choisis la cible, puis
+confirme. Chaque touche réglée ici remplace celle de la cible ; les autres touches de la
+cible restent. Les deux rangées partent vers une cible qui en a deux. Quand une touche
+Spotify fait partie de la copie, le compte Spotify de cette enceinte est transmis à la
+cible : la question de confirmation le rappelle. Le résultat s'affiche par enceinte.</p>
+<p>La copie demande l'agent STR 1.6.5 ou plus récent sur l'enceinte sélectionnée.</p>
 <h3 id="trouver-une-station">Trouver une station</h3>
 <p>Le champ de recherche interroge <strong>radio-browser.info</strong>, un annuaire ouvert tenu par des
 bénévoles. Deux listes déroulantes limitent la recherche à un pays et à une langue, et
@@ -298,6 +306,23 @@ du cloud.</p>
 <p><strong>Jouer un flux</strong> accepte l'adresse d'un flux audio direct — un <code>.mp3</code> ou un <code>.m3u8</code> —
 et le lance sur l'enceinte. Utile pour une webradio absente de l'annuaire. Cette
 fonction demande l'agent STR.</p>
+<p><strong>Enregistrer</strong> garde sur le téléphone un extrait de la radio internet que joue
+l'enceinte, pour le réécouter ou l'envoyer (WhatsApp, e-mail…). Touche <strong>Enregistrer</strong> :
+l'enregistrement s'arrête quand tu touches <strong>Arrêter</strong>, ou tout seul après 5 minutes. Il
+continue écran éteint : une notification « Enregistrement en cours » affiche le compteur et
+un bouton <strong>Arrêter</strong>. Au premier enregistrement, Android 13 et suivants demandent
+d'autoriser les notifications ; si tu refuses, l'enregistrement se fait quand même, sans
+notification.</p>
+<p>Seules les radios internet dont le flux est accessible s'enregistrent : présélections STR,
+stations trouvées dans l'annuaire, flux lancés à la main. Spotify, Deezer, Bluetooth et AUX
+ne passent pas par le téléphone et ne peuvent pas être enregistrés, pas plus que les flux
+HLS (<code>.m3u8</code>). Le téléphone ouvre le flux de la radio en parallèle de l'enceinte : l'écoute
+n'est pas perturbée, mais l'enregistrement consomme des données, environ 1 Mo par minute.</p>
+<p>La liste garde les 10 derniers enregistrements, avec la station, la date et la durée.
+▶ les écoute sur le téléphone, ⤴ ouvre le partage d'Android, la corbeille supprime après
+confirmation. Au-delà de 10, l'application refuse d'en faire un nouveau : supprime d'abord
+celui dont tu n'as plus besoin. Les enregistrements restent dans l'application et
+disparaissent si tu la désinstalles. La liste reste disponible même quand aucune enceinte ne répond : seul l'enregistrement est alors impossible.</p>
 <p><strong>Écouté récemment</strong> reprend l'historique tenu par l'agent : touche une ligne pour
 relancer.</p>
 <p>Un album ou un dossier de la bibliothèque est relancé en entier, pas seulement sa
@@ -400,6 +425,10 @@ Les deux enceintes doivent être allumées et joignables. Si l'une d'elles n'a p
 STR, le groupage passe par le firmware, moins fiable et parfois refusé sans message.</p>
 <p><strong>L'application est dans la mauvaise langue.</strong>
 Réglages → Langue. Le choix prime sur la langue du téléphone.</p>
+<p><strong>Le bouton Enregistrer est grisé.</strong>
+Le message sous le titre en donne la raison : rien ne joue, la source n'est pas une radio
+internet, ou l'adresse du flux de cette station n'est pas connue. Relance la station depuis
+une présélection ou l'annuaire, puis rouvre l'onglet Sources.</p>
 <hr />
 <h2 id="11-limites-connues">11. Limites connues</h2>
 <ul>
@@ -414,6 +443,11 @@ Réglages → Langue. Le choix prime sur la langue du téléphone.</p>
 <li><strong>Paires stéréo.</strong> L'application ne crée ni ne défait de paire stéréo. Une paire ne
   peut pas diriger un groupe ; avec un agent STR 1.6.3 ou plus récent, elle peut en
   rejoindre un, lancé depuis une autre enceinte.</li>
+<li><strong>Enregistrement : radios internet seulement</strong>, 5 minutes au plus par enregistrement,
+  10 enregistrements gardés.</li>
+<li><strong>Copie des touches : agent STR 1.6.5 ou plus récent</strong> sur l'enceinte source.</li>
+<li><strong>Les touches « J'aime » et « Je n'aime pas » de Spotify</strong> ne fonctionnent que sur la
+  télécommande de l'enceinte (agent STR 1.8.0) : l'agent ne les propose pas aux applications.</li>
 </ul>
 <hr />
 <h2 id="12-mentions">12. Mentions</h2>

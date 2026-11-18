@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manual de uso
 
-Versión 1.6.4 · Android 7 y posteriores
+Versión 1.8.0 · Android 7 y posteriores
 
 > Idiomas: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · **Español**
 
@@ -209,6 +209,17 @@ Una tecla que solo tiene emisora en su segunda fila aparece vacía en **Una vez*
 sola pulsación en el altavoz inicia entonces la emisora de la segunda fila (agente STR
 1.6.3 y posteriores).
 
+### Copiar las teclas a otro altavoz
+
+La tarjeta **Copiar las teclas** copia todas las teclas del altavoz seleccionado a otro
+altavoz STR, o a todos. Toca **Copiar a…**, elige el destino y confirma. Cada tecla
+configurada aquí sustituye a la del destino; las demás teclas del destino se mantienen.
+Las dos filas van a un destino que tiene dos. Cuando una tecla de Spotify forma parte de
+la copia, la cuenta de Spotify de este altavoz se transmite al destino: la pregunta de
+confirmación lo recuerda. El resultado se muestra por altavoz.
+
+La copia requiere el agente STR 1.6.5 o posterior en el altavoz seleccionado.
+
 ### Encontrar una emisora
 
 El campo de búsqueda consulta **radio-browser.info**, un directorio abierto mantenido por
@@ -253,6 +264,24 @@ servicio de streaming cuya cuenta ya no es accesible desde el cierre de la nube.
 **Reproducir un flujo** acepta la dirección de un flujo de audio directo — un `.mp3` o un
 `.m3u8` — y lo lanza en el altavoz. Útil para una radio en línea ausente del directorio.
 Requiere el agente STR.
+
+**Grabar** guarda en el teléfono un fragmento de la radio por internet que reproduce el
+altavoz, para volver a escucharlo o enviarlo (WhatsApp, correo…). Toca **Grabar**: la
+grabación se detiene cuando tocas **Detener**, o sola a los 5 minutos. Continúa con la
+pantalla apagada: una notificación «Grabando» muestra el contador y un botón **Detener**.
+En la primera grabación, Android 13 y posteriores piden permitir las notificaciones; si te
+niegas, se graba igualmente, sin notificación.
+
+Solo se graban las radios por internet cuyo flujo es accesible: presintonías STR, emisoras
+del directorio, flujos lanzados a mano. Spotify, Deezer, Bluetooth y AUX no pasan por el
+teléfono y no se pueden grabar, como tampoco los flujos HLS (`.m3u8`). El teléfono abre el
+flujo de la emisora en paralelo al altavoz: la escucha no se altera, pero la grabación
+consume datos, alrededor de 1 MB por minuto.
+
+La lista guarda las últimas 10 grabaciones, con la emisora, la fecha y la duración. ▶ las
+reproduce en el teléfono, ⤴ abre el menú de compartir de Android, la papelera elimina tras
+confirmar. Con 10 grabaciones, la aplicación no hace una nueva: elimina primero la que ya no
+necesites. Las grabaciones se quedan en la aplicación y desaparecen si la desinstalas. La lista sigue disponible aunque ningún altavoz responda: solo la grabación es entonces imposible.
 
 **Escuchado recientemente** recoge el historial que lleva el agente: toca una línea para
 volver a empezar.
@@ -396,6 +425,11 @@ agrupación pasa por el firmware: menos fiable y a veces rechazada sin mensaje.
 **La aplicación está en el idioma equivocado.**
 Ajustes → Idioma. Tu elección prevalece sobre el idioma del teléfono.
 
+**El botón Grabar está en gris.**
+El mensaje bajo el título indica el motivo: no suena nada, la fuente no es una radio por
+internet, o se desconoce la dirección del flujo de esta emisora. Vuelve a lanzar la emisora
+desde una presintonía o el directorio y abre de nuevo la pestaña Fuentes.
+
 ---
 
 ## 11. Límites conocidos
@@ -411,6 +445,11 @@ Ajustes → Idioma. Tu elección prevalece sobre el idioma del teléfono.
 - **Pares estéreo.** La aplicación no crea ni deshace pares estéreo. Un par no puede
   dirigir un grupo; con un agente STR 1.6.3 o posterior puede unirse a uno iniciado en
   otro altavoz.
+- **Grabación: solo radios por internet**, 5 minutos como máximo por grabación,
+  10 grabaciones guardadas.
+- **Copia de teclas: agente STR 1.6.5 o posterior** en el altavoz de origen.
+- **Las teclas de Spotify «me gusta» y «no me gusta»** solo funcionan con el mando a
+  distancia del altavoz (agente STR 1.8.0): el agente no las ofrece a las aplicaciones.
 
 ---
 

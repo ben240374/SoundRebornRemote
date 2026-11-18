@@ -73,6 +73,98 @@
                 </VerticalStackLayout>
             </Border>
 
+            <!--
+                Enregistrer la radio en cours. Comme pour les réveils dans Réglages,
+                la carte a sa propre vue-modèle : le BindingContext est posé sur le
+                ContentView et le type compilé (x:DataType) sur le bloc enfant.
+            -->
+            <ContentView BindingContext="{Binding Recordings}">
+                <Border x:DataType="vm:RecordingsViewModel" Style="{StaticResource Card}" IsVisible="{Binding ShowCard}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{DynamicResource L_RecTitle}" Style="{StaticResource SectionLabel}" />
+                        <Label Text="{Binding RecordHint}" Style="{StaticResource SubtitleLabel}" LineBreakMode="WordWrap" />
+
+                        <!-- Avant l'enregistrement -->
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10" IsVisible="{Binding ShowRecordButton}">
+                            <Button Grid.Column="0" Text="{DynamicResource L_RecButton}" Style="{StaticResource AccentButton}"
+                                    Command="{Binding RecordCommand}" IsEnabled="{Binding CanRecord}" />
+                            <Label Grid.Column="1" Text="{DynamicResource L_RecMax}" Style="{StaticResource CaptionLabel}"
+                                   VerticalOptions="Center" />
+                        </Grid>
+
+                        <!-- Pendant l'enregistrement -->
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" IsVisible="{Binding IsRecording}">
+                            <Ellipse Grid.Column="0" WidthRequest="12" HeightRequest="12" Fill="{StaticResource DangerBrush}"
+                                     VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{Binding ProgressText}" FontSize="17" FontAttributes="Bold"
+                                   VerticalOptions="Center" />
+                            <Button Grid.Column="2" Text="{DynamicResource L_RecStop}" Command="{Binding StopCommand}" />
+                        </Grid>
+
+                        <Label Text="{Binding StatusMessage}"
+                               TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                               FontSize="13" LineBreakMode="WordWrap"
+                               IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+
+                        <Label Text="{DynamicResource L_RecNone}" Style="{StaticResource CaptionLabel}"
+                               IsVisible="{Binding HasItems, Converter={StaticResource InvertedBool}}" />
+
+                        <!-- Les enregistrements : écouter, partager, supprimer -->
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Items}" Spacing="6">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:RecordingRow">
+                                    <Border Style="{StaticResource TileCard}" Padding="10,8">
+                                        <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
+                                            <VerticalStackLayout Grid.Column="0" Spacing="1" VerticalOptions="Center">
+                                                <Label Text="{Binding Title}" FontSize="15" LineBreakMode="TailTruncation" MaxLines="1" />
+                                                <Label Text="{Binding Subtitle}" Style="{StaticResource CaptionLabel}" />
+                                            </VerticalStackLayout>
+
+                                            <!-- ▶ écouter / ■ arrêter -->
+                                            <Border Grid.Column="1" Style="{StaticResource IconSquareSmall}" VerticalOptions="Center">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:RecordingsViewModel}}, Path=PlayCommand}"
+                                                        CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                                <Grid>
+                                                    <Path Style="{StaticResource IconPathSmall}" Data="M8,5 V19 L19,12 Z"
+                                                          IsVisible="{Binding IsPlaying, Converter={StaticResource InvertedBool}}" />
+                                                    <Path Style="{StaticResource IconPathSmall}" Data="M7,7 H17 V17 H7 Z"
+                                                          IsVisible="{Binding IsPlaying}" />
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Partager -->
+                                            <Border Grid.Column="2" Style="{StaticResource IconSquareSmall}" VerticalOptions="Center">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:RecordingsViewModel}}, Path=ShareCommand}"
+                                                        CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                                <Path Style="{StaticResource IconPathSmall}"
+                                                      Data="M18,16 C17.2,16 16.5,16.3 16,16.8 L8.9,12.7 C9,12.5 9,12.2 9,12 C9,11.8 9,11.5 8.9,11.3 L16,7.2 C16.5,7.7 17.2,8 18,8 A3,3 0 1 0 15,5 C15,5.2 15,5.5 15.1,5.7 L8,9.8 C7.5,9.3 6.8,9 6,9 A3,3 0 1 0 6,15 C6.8,15 7.5,14.7 8,14.2 L15.1,18.3 C15.1,18.5 15,18.7 15,19 A3,3 0 1 0 18,16 Z" />
+                                            </Border>
+
+                                            <!-- Corbeille : supprime après confirmation. -->
+                                            <Border Grid.Column="3" Style="{StaticResource IconSquareSmall}" VerticalOptions="Center">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:RecordingsViewModel}}, Path=DeleteCommand}"
+                                                        CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                                <Path Style="{StaticResource IconPathSmall}" Fill="{StaticResource DangerBrush}"
+                                                      Data="M9,3 H15 V5 H20 V7 H4 V5 H9 Z M6,8 H18 L17,21 H7 Z" />
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+            </ContentView>
+
             <!-- Historique -->
             <Border Style="{StaticResource Card}" IsVisible="{Binding HasStrAgent}">
                 <VerticalStackLayout Spacing="10">

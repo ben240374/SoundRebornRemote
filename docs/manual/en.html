@@ -107,7 +107,7 @@ footer a { color: var(--muted); }
 </div></header>
 <div class="wrap">
 <h1 id="soundreborn-remote--user-manual">SoundReborn Remote — User manual</h1>
-<p>Version 1.6.4 · Android 7 and later</p>
+<p>Version 1.8.0 · Android 7 and later</p>
 <ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html" aria-current="page">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
 <h2 id="contents">Contents</h2>
 <ol>
@@ -252,6 +252,14 @@ chips choose the row shown; the tiles keep their key number, ① to ⑥.</p>
 the agent, or with an older one.</p>
 <p>A key that has a station only on its second row shows as empty under <strong>Once</strong>: a single
 press on the speaker then starts the second-row station (STR agent 1.6.3 and later).</p>
+<h3 id="copy-the-keys-to-another-speaker">Copy the keys to another speaker</h3>
+<p>The <strong>Copy the keys</strong> card copies all the keys of the selected speaker to another STR
+speaker, or to all of them. Tap <strong>Copy to…</strong>, choose the target, then confirm. Each key
+set here replaces the target's; the target's other keys stay. Both rows go to a target
+that keeps two. When a Spotify key is part of the copy, this speaker's Spotify account is
+handed on to the target: the confirmation question says so. The result is shown per
+speaker.</p>
+<p>Copying needs STR agent 1.6.5 or later on the selected speaker.</p>
 <h3 id="find-a-station">Find a station</h3>
 <p>The search box queries <strong>radio-browser.info</strong>, an open directory maintained by
 volunteers. Two drop-downs narrow the search to a country and a language, and <strong>Top
@@ -285,6 +293,21 @@ streaming service whose account is no longer reachable since the cloud shutdown.
 <p><strong>Play a stream</strong> accepts the address of a direct audio stream — an <code>.mp3</code> or an
 <code>.m3u8</code> — and starts it on the speaker. Useful for a web radio missing from the
 directory. This needs the STR agent.</p>
+<p><strong>Record</strong> keeps an extract of the internet radio the speaker is playing on your phone,
+to listen to it again or send it (WhatsApp, e-mail…). Tap <strong>Record</strong>: recording stops when
+you tap <strong>Stop</strong>, or on its own after 5 minutes. It goes on with the screen off: a
+"Recording" notification shows the counter and a <strong>Stop</strong> button. On the first recording,
+Android 13 and later ask you to allow notifications; if you refuse, recording still works,
+without the notification.</p>
+<p>Only internet radios whose stream can be reached are recorded: STR presets, stations found
+in the directory, streams started by hand. Spotify, Deezer, Bluetooth and AUX do not go
+through the phone and cannot be recorded, nor can HLS streams (<code>.m3u8</code>). The phone opens
+the station's stream alongside the speaker: listening is not disturbed, but recording uses
+data, about 1 MB per minute.</p>
+<p>The list keeps the last 10 recordings, with the station, date and length. ▶ plays them on
+the phone, ⤴ opens Android's share menu, the bin deletes after confirmation. Beyond 10, the
+app will not make a new one: first delete the one you no longer need. Recordings stay
+inside the app and are removed if you uninstall it. The list stays available even when no speaker answers: only recording is then impossible.</p>
 <p><strong>Recently played</strong> shows the history kept by the agent: tap a line to start it again.</p>
 <p>A library album or folder is replayed in full, not just its first track. If the media
 server is switched off, the app says so instead of announcing playback that never
@@ -380,6 +403,10 @@ Both speakers must be on and reachable. If one of them has no STR agent, groupin
 back to the firmware, which is less reliable and sometimes refuses without a message.</p>
 <p><strong>The app is in the wrong language.</strong>
 Settings → Language. Your choice overrides the phone's language.</p>
+<p><strong>The Record button is greyed out.</strong>
+The message under the title gives the reason: nothing is playing, the source is not an
+internet radio, or the stream address of this station is unknown. Start the station again
+from a preset or the directory, then reopen the Sources tab.</p>
 <hr />
 <h2 id="11-known-limits">11. Known limits</h2>
 <ul>
@@ -394,6 +421,11 @@ Settings → Language. Your choice overrides the phone's language.</p>
 <li><strong>Stereo pairs.</strong> The app neither creates nor undoes a stereo pair. A pair cannot
   lead a group; with an STR agent 1.6.3 or later it can join one started on another
   speaker.</li>
+<li><strong>Recording: internet radios only</strong>, 5 minutes at most per recording, 10 recordings
+  kept.</li>
+<li><strong>Copying the keys: STR agent 1.6.5 or later</strong> on the source speaker.</li>
+<li><strong>Spotify's thumbs up and thumbs down keys</strong> work only on the speaker's remote control
+  (STR agent 1.8.0): the agent does not offer them to apps.</li>
 </ul>
 <hr />
 <h2 id="12-notices">12. Notices</h2>

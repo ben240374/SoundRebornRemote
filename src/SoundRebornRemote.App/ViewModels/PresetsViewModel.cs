@@ -167,11 +167,15 @@ public sealed partial class PresetsViewModel : BaseViewModel
     /// <summary>Dernier état de lecture reçu, pour replacer la mise en avant après un changement de rangée.</summary>
     private (string Source, string? Station, string? Location, bool IsIdle)? _lastSync;
 
+    /// <summary>La carte « Copier les touches » (agent 1.6.5 et suivants) : sa propre vue-modèle.</summary>
+    public PresetCopyViewModel Copy { get; }
+
     public PresetsViewModel(SpeakerManager speakers, ArtworkCache artwork, RadioBrowserClient radio) : base(speakers)
     {
         _artwork = artwork;
         _radio = radio;
         _artCache = LoadArtCache();
+        Copy = new PresetCopyViewModel(speakers);
 
         for (var slot = 1; slot <= 6; slot++)
         {

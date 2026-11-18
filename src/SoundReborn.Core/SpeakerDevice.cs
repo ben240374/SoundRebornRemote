@@ -52,6 +52,9 @@ public sealed class SpeakerDevice : IAsyncDisposable
     /// </summary>
     public bool AgentTooOld => Str is not null && AgentRequirement.IsTooOld(AgentVersionText);
 
+    /// <summary>Vrai quand l'agent annonce une version qui ne sait pas copier les touches vers une autre enceinte.</summary>
+    public bool AgentTooOldForPresetCopy => Str is not null && AgentRequirement.IsBelow(AgentVersionText, AgentRequirement.PresetCopy);
+
     /// <summary>
     /// Ouvre une session : détecte l'agent STR si son port n'est pas déjà connu,
     /// lit les capacités de graves et démarre le flux de notifications.

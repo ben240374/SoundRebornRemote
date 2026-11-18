@@ -1,6 +1,6 @@
 # SoundReborn Remote — User manual
 
-Version 1.6.4 · Android 7 and later
+Version 1.8.0 · Android 7 and later
 
 > Languages: [Français](fr.md) · **English** · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md)
 
@@ -204,6 +204,17 @@ the agent, or with an older one.
 A key that has a station only on its second row shows as empty under **Once**: a single
 press on the speaker then starts the second-row station (STR agent 1.6.3 and later).
 
+### Copy the keys to another speaker
+
+The **Copy the keys** card copies all the keys of the selected speaker to another STR
+speaker, or to all of them. Tap **Copy to…**, choose the target, then confirm. Each key
+set here replaces the target's; the target's other keys stay. Both rows go to a target
+that keeps two. When a Spotify key is part of the copy, this speaker's Spotify account is
+handed on to the target: the confirmation question says so. The result is shown per
+speaker.
+
+Copying needs STR agent 1.6.5 or later on the selected speaker.
+
 ### Find a station
 
 The search box queries **radio-browser.info**, an open directory maintained by
@@ -248,6 +259,24 @@ streaming service whose account is no longer reachable since the cloud shutdown.
 **Play a stream** accepts the address of a direct audio stream — an `.mp3` or an
 `.m3u8` — and starts it on the speaker. Useful for a web radio missing from the
 directory. This needs the STR agent.
+
+**Record** keeps an extract of the internet radio the speaker is playing on your phone,
+to listen to it again or send it (WhatsApp, e-mail…). Tap **Record**: recording stops when
+you tap **Stop**, or on its own after 5 minutes. It goes on with the screen off: a
+"Recording" notification shows the counter and a **Stop** button. On the first recording,
+Android 13 and later ask you to allow notifications; if you refuse, recording still works,
+without the notification.
+
+Only internet radios whose stream can be reached are recorded: STR presets, stations found
+in the directory, streams started by hand. Spotify, Deezer, Bluetooth and AUX do not go
+through the phone and cannot be recorded, nor can HLS streams (`.m3u8`). The phone opens
+the station's stream alongside the speaker: listening is not disturbed, but recording uses
+data, about 1 MB per minute.
+
+The list keeps the last 10 recordings, with the station, date and length. ▶ plays them on
+the phone, ⤴ opens Android's share menu, the bin deletes after confirmation. Beyond 10, the
+app will not make a new one: first delete the one you no longer need. Recordings stay
+inside the app and are removed if you uninstall it. The list stays available even when no speaker answers: only recording is then impossible.
 
 **Recently played** shows the history kept by the agent: tap a line to start it again.
 
@@ -382,6 +411,11 @@ back to the firmware, which is less reliable and sometimes refuses without a mes
 **The app is in the wrong language.**
 Settings → Language. Your choice overrides the phone's language.
 
+**The Record button is greyed out.**
+The message under the title gives the reason: nothing is playing, the source is not an
+internet radio, or the stream address of this station is unknown. Start the station again
+from a preset or the directory, then reopen the Sources tab.
+
 ---
 
 ## 11. Known limits
@@ -397,6 +431,11 @@ Settings → Language. Your choice overrides the phone's language.
 - **Stereo pairs.** The app neither creates nor undoes a stereo pair. A pair cannot
   lead a group; with an STR agent 1.6.3 or later it can join one started on another
   speaker.
+- **Recording: internet radios only**, 5 minutes at most per recording, 10 recordings
+  kept.
+- **Copying the keys: STR agent 1.6.5 or later** on the source speaker.
+- **Spotify's thumbs up and thumbs down keys** work only on the speaker's remote control
+  (STR agent 1.8.0): the agent does not offer them to apps.
 
 ---
 

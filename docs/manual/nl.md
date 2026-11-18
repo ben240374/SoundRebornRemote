@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handleiding
 
-Versie 1.6.4 · Android 7 en hoger
+Versie 1.8.0 · Android 7 en hoger
 
 > Talen: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · **Nederlands** · [Español](es.md)
 
@@ -207,6 +207,17 @@ oudere, verschijnen de knoppen niet.
 Een toets die alleen in de tweede rij een zender heeft, verschijnt leeg onder **Eén keer**:
 één druk op de speaker start dan de zender van de tweede rij (STR-agent 1.6.3 en nieuwer).
 
+### De toetsen naar een andere speaker kopiëren
+
+De kaart **Toetsen kopiëren** kopieert alle toetsen van de gekozen speaker naar een andere
+STR-speaker, of naar allemaal. Tik op **Kopiëren naar…**, kies het doel en bevestig. Elke
+toets die hier is ingesteld, vervangt die van het doel; de andere toetsen van het doel
+blijven. Beide rijen gaan naar een doel dat er twee heeft. Hoort er een Spotify-toets bij
+de kopie, dan wordt het Spotify-account van deze speaker aan het doel doorgegeven: de
+bevestigingsvraag zegt het. Het resultaat verschijnt per speaker.
+
+Kopiëren vereist STR-agent 1.6.5 of nieuwer op de gekozen speaker.
+
 ### Een zender vinden
 
 Het zoekveld bevraagt **radio-browser.info**, een open gids die door vrijwilligers wordt
@@ -251,6 +262,24 @@ streamingdienst waarvan het account sinds de cloud-afsluiting onbereikbaar is.
 **Een stream afspelen** aanvaardt het adres van een rechtstreekse audiostream — een
 `.mp3` of een `.m3u8` — en start die op de speaker. Handig voor een webradio die in de
 gids ontbreekt. Hiervoor is de STR-agent nodig.
+
+**Opnemen** bewaart een fragment van de internetradio die de speaker afspeelt op je
+telefoon, om het opnieuw te beluisteren of door te sturen (WhatsApp, e-mail…). Tik op
+**Opnemen**: de opname stopt wanneer je op **Stoppen** tikt, of vanzelf na 5 minuten. Ze
+loopt door met het scherm uit: een melding "Opname bezig" toont de teller en een knop
+**Stoppen**. Bij de eerste opname vragen Android 13 en later om meldingen toe te staan; weiger
+je, dan wordt er toch opgenomen, alleen zonder melding.
+
+Alleen internetradio's waarvan de stream bereikbaar is, kunnen worden opgenomen:
+STR-voorkeuzes, zenders uit de gids, met de hand gestarte streams. Spotify, Deezer,
+Bluetooth en AUX lopen niet via de telefoon en kunnen niet worden opgenomen, HLS-streams
+(`.m3u8`) evenmin. De telefoon opent de stream van de zender naast de speaker: het
+luisteren wordt niet verstoord, maar de opname verbruikt data, ongeveer 1 MB per minuut.
+
+De lijst bewaart de laatste 10 opnames, met zender, datum en duur. ▶ speelt ze af op de
+telefoon, ⤴ opent het deelmenu van Android, de prullenbak verwijdert na bevestiging. Boven
+10 weigert de app een nieuwe opname: verwijder eerst die je niet meer nodig hebt. De opnames
+blijven in de app en verdwijnen als je de app verwijdert. De lijst blijft beschikbaar, ook als geen enkele speaker antwoordt: alleen opnemen is dan niet mogelijk.
 
 **Onlangs afgespeeld** toont de geschiedenis die de agent bijhoudt: tik op een regel om
 opnieuw te starten.
@@ -394,6 +423,11 @@ het groeperen via de firmware: minder betrouwbaar, en soms zonder melding geweig
 **De app staat in de verkeerde taal.**
 Instellingen → Taal. Jouw keuze gaat voor op de taal van de telefoon.
 
+**De knop Opnemen is grijs.**
+De melding onder de titel geeft de reden: er speelt niets, de bron is geen internetradio,
+of het streamadres van deze zender is onbekend. Start de zender opnieuw via een voorkeuze of
+de gids en open daarna het tabblad Bronnen opnieuw.
+
 ---
 
 ## 11. Bekende beperkingen
@@ -410,6 +444,11 @@ Instellingen → Taal. Jouw keuze gaat voor op de taal van de telefoon.
 - **Stereoparen.** De app maakt geen stereopaar en heft er geen op. Een paar kan geen
   groep leiden; met een STR-agent 1.6.3 of nieuwer kan het aansluiten bij een groep die op
   een andere speaker is gestart.
+- **Opnemen: alleen internetradio**, hoogstens 5 minuten per opname, 10 opnames
+  bewaard.
+- **Toetsen kopiëren: STR-agent 1.6.5 of nieuwer** op de bronspeaker.
+- **De Spotify-toetsen duim omhoog en duim omlaag** werken alleen op de afstandsbediening
+  van de speaker (STR-agent 1.8.0): de agent biedt ze niet aan apps aan.
 
 ---
 

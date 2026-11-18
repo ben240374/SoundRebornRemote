@@ -108,6 +108,33 @@
                 </VerticalStackLayout>
             </Border>
 
+            <!--
+                ================================================= Copier les touches
+                Agent 1.6.5 et suivants. Sa propre vue-modèle, comme les réveils dans
+                Réglages : le BindingContext est posé sur le ContentView et le type
+                compilé (x:DataType) sur le bloc enfant.
+            -->
+            <ContentView BindingContext="{Binding Copy}">
+                <Border x:DataType="vm:PresetCopyViewModel" Style="{StaticResource Card}" IsVisible="{Binding ShowCard}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{DynamicResource L_CopyTitle}" Style="{StaticResource SectionLabel}" />
+                        <Label Text="{Binding Hint}" Style="{StaticResource SubtitleLabel}" LineBreakMode="WordWrap" />
+
+                        <Button Text="{DynamicResource L_CopyButton}" Style="{StaticResource AccentButton}"
+                                Command="{Binding CopyCommand}" IsEnabled="{Binding CanCopy}"
+                                IsVisible="{Binding ShowButton}" />
+
+                        <ActivityIndicator IsRunning="{Binding IsCopying}" IsVisible="{Binding IsCopying}"
+                                           HorizontalOptions="Start" HeightRequest="24" />
+
+                        <Label Text="{Binding StatusMessage}"
+                               TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                               FontSize="13" LineBreakMode="WordWrap"
+                               IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+                    </VerticalStackLayout>
+                </Border>
+            </ContentView>
+
             <!-- ================================================= Recherche -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Spacing="10">
