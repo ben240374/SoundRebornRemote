@@ -1,6 +1,6 @@
 # SoundReborn Remote — User manual
 
-Version 1.8.0 · Android 7 and later
+Version 1.8.1 · Android 7 and later
 
 > Languages: [Français](fr.md) · **English** · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md)
 
@@ -103,6 +103,12 @@ change made from another remote takes a second or two to appear.
 The artwork, title and source of what is playing. For a radio station, its logo and
 name; for Spotify, the album cover.
 
+When Spotify plays and the STR agent is version 1.8.1 or later, two buttons appear under
+the title: **Like** adds the current song to Liked Songs, **Dislike** removes it, like the
+thumbs keys of the remote. The song goes to the Spotify account the **speaker** is logged
+in with, which is not necessarily the one on your phone. A speaker with a display shows
+"LIKED" or "REMOVED".
+
 ### Controls
 
 Four keys: stop, previous, play/pause, next. Depending on the source some have no
@@ -177,6 +183,11 @@ plays, which you can group again.
 
 The **Refresh** link at the bottom re-reads everything: current title, artwork, volume,
 group state.
+
+If the speaker you add is playing something else, or is paused, the app says so before
+grouping: "Salon is playing Radio Contact. Adding it to the group stops that to play Bel
+RTL." Nothing changes until you tap **Add**. A speaker in standby, or already playing the
+same thing, is added without a question.
 
 ---
 
@@ -434,8 +445,8 @@ from a preset or the directory, then reopen the Sources tab.
 - **Recording: internet radios only**, 5 minutes at most per recording, 10 recordings
   kept.
 - **Copying the keys: STR agent 1.6.5 or later** on the source speaker.
-- **Spotify's thumbs up and thumbs down keys** work only on the speaker's remote control
-  (STR agent 1.8.0): the agent does not offer them to apps.
+- **Like and Dislike: STR agent 1.8.1 or later.** The song goes to the Spotify account the
+  speaker is logged in with.
 
 ---
 

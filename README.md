@@ -19,7 +19,8 @@ no service in between.
 - Volume, mute, standby and bass; play, pause, next and previous track; what is playing, with its artwork.
 - The six presets with their station logos, and the second row of six (a key pressed twice).
 - Keep what is playing on a key; sleep timer for the speaker or the whole group.
-- *Group with*: one tap adds a speaker to the group or removes it, with the progress shown in place.
+- *Group with*: one tap adds a speaker to the group or removes it, with the progress shown in place; asks first when the speaker you add is playing something else.
+- Like or dislike the Spotify song that is playing (STR agent 1.8.1 or later).
 
 **Presets tab**
 - Internet station search (radio-browser.info) by name, country and language, with a filter for streams the speaker can play.
@@ -346,7 +347,8 @@ aucun service intermédiaire.
 - Volume, sourdine, marche/veille et graves ; lecture, pause, piste suivante et précédente ; ce qui joue, avec sa pochette.
 - Les six présélections avec le logo des stations, et la seconde rangée de six (touche pressée deux fois).
 - Garder ce qui joue sur une touche ; minuterie de sommeil pour l'enceinte ou tout le groupe.
-- *Grouper avec* : un appui ajoute une enceinte au groupe ou l'en retire, avec l'avancement affiché sur place.
+- *Grouper avec* : un appui ajoute une enceinte au groupe ou l'en retire, avec l'avancement affiché sur place ; demande d'abord quand l'enceinte ajoutée joue autre chose.
+- « J'aime » ou « Je n'aime pas » sur le titre Spotify en cours (agent STR 1.8.1 ou plus récent).
 
 **Onglet Présélections**
 - Recherche de stations internet (radio-browser.info) par nom, pays et langue, avec un filtre pour les flux que l'enceinte sait lire.

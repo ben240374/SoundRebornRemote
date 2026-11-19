@@ -682,6 +682,20 @@ public sealed class StrApiClient
     public Task SetStartVolumeAsync(int volume, CancellationToken ct = default)
         => PostJsonAsync("/api/box/start-volume", new { volume = Math.Clamp(volume, 0, 100) }, ct);
 
+    // ---------------------------------------------------------------- Titres likés Spotify
+
+    /// <summary>
+    /// POST /api/spotify/liked (agent 1.8.1 et suivants) : ajoute le titre Spotify en
+    /// cours aux Titres likés, ou l'en retire. Le titre va dans le compte Spotify avec
+    /// lequel l'ENCEINTE est connectée. Un refus (409, 400, 502) remonte en
+    /// <see cref="SpeakerException"/> ; <see cref="StrLikedResult.ReasonOf"/> en lit la raison.
+    /// </summary>
+    public async Task<StrLikedResult> SetSpotifyLikedAsync(bool liked, CancellationToken ct = default)
+    {
+        var text = await PostJsonReadAsync("/api/spotify/liked", new { liked }, ct).ConfigureAwait(false);
+        return StrLikedResult.Parse(text);
+    }
+
     // ---------------------------------------------------------------- Copie des touches
 
     /// <summary>

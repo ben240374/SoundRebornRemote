@@ -52,6 +52,9 @@ public sealed class SpeakerDevice : IAsyncDisposable
     /// </summary>
     public bool AgentTooOld => Str is not null && AgentRequirement.IsTooOld(AgentVersionText);
 
+    /// <summary>Vrai quand l'agent sait ajouter le titre Spotify en cours aux Titres likés (agent 1.8.1+).</summary>
+    public bool SupportsSpotifyLiked => Str is not null && Agent?.SupportsSpotifyLiked == true;
+
     /// <summary>Vrai quand l'agent annonce une version qui ne sait pas copier les touches vers une autre enceinte.</summary>
     public bool AgentTooOldForPresetCopy => Str is not null && AgentRequirement.IsBelow(AgentVersionText, AgentRequirement.PresetCopy);
 

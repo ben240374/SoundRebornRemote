@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manual de uso
 
-Versión 1.8.0 · Android 7 y posteriores
+Versión 1.8.1 · Android 7 y posteriores
 
 > Idiomas: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · **Español**
 
@@ -106,6 +106,12 @@ modo sondeo, un cambio hecho desde otro mando tarda uno o dos segundos en aparec
 La carátula, el título y la fuente de lo que suena. Para una emisora, su logotipo y su
 nombre; para Spotify, la portada del álbum.
 
+Cuando suena Spotify y el agente STR es la versión 1.8.1 o posterior, aparecen dos botones
+bajo el título: **Me gusta** añade la canción actual a Tus me gusta, **No me gusta** la
+quita, como las teclas de pulgar del mando. La canción va a la cuenta de Spotify con la que
+el **altavoz** ha iniciado sesión, que no es necesariamente la de tu teléfono. Un altavoz
+con pantalla muestra «LIKED» o «REMOVED».
+
 ### Mandos
 
 Cuatro teclas: parar, anterior, reproducir/pausar, siguiente. Según la fuente, algunas no
@@ -179,6 +185,11 @@ agrupar de nuevo.
 
 El enlace **Actualizar**, abajo, relee todo: título en curso, carátula, volumen y estado
 del grupo.
+
+Si el altavoz que añades está reproduciendo otra cosa, o está en pausa, la aplicación lo
+dice antes de agrupar: «Salon está reproduciendo Radio Contact. Añadirlo al grupo detiene
+eso para reproducir Bel RTL». No cambia nada hasta que tocas **Añadir**. Un altavoz en
+reposo, o que ya reproduce lo mismo, se añade sin preguntar.
 
 ---
 
@@ -448,8 +459,8 @@ desde una presintonía o el directorio y abre de nuevo la pestaña Fuentes.
 - **Grabación: solo radios por internet**, 5 minutos como máximo por grabación,
   10 grabaciones guardadas.
 - **Copia de teclas: agente STR 1.6.5 o posterior** en el altavoz de origen.
-- **Las teclas de Spotify «me gusta» y «no me gusta»** solo funcionan con el mando a
-  distancia del altavoz (agente STR 1.8.0): el agente no las ofrece a las aplicaciones.
+- **Me gusta y No me gusta: agente STR 1.8.1 o posterior.** La canción va a la cuenta de
+  Spotify con la que el altavoz ha iniciado sesión.
 
 ---
 

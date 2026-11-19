@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handbuch
 
-Version 1.8.0 · Android 7 und neuer
+Version 1.8.1 · Android 7 und neuer
 
 > Sprachen: [Français](fr.md) · [English](en.md) · **Deutsch** · [Nederlands](nl.md) · [Español](es.md)
 
@@ -109,6 +109,12 @@ Sekunden.
 Cover, Titel und Quelle des Laufenden. Bei einem Radiosender dessen Logo und Name, bei
 Spotify das Albumcover.
 
+Wenn Spotify läuft und der STR-Agent Version 1.8.1 oder neuer hat, erscheinen unter dem
+Titel zwei Tasten: **Gefällt mir** fügt den laufenden Song zu den Lieblingssongs hinzu,
+**Gefällt mir nicht** entfernt ihn, wie die Daumentasten der Fernbedienung. Der Song landet
+im Spotify-Konto, mit dem der **Lautsprecher** angemeldet ist, nicht unbedingt in dem auf
+deinem Telefon. Ein Lautsprecher mit Display zeigt „LIKED“ oder „REMOVED“.
+
 ### Steuerung
 
 Vier Tasten: Stopp, zurück, Wiedergabe/Pause, vor. Je nach Quelle bleiben manche ohne
@@ -186,6 +192,11 @@ er wiederzugeben hat, und kann erneut gruppiert werden.
 
 Der Link **Aktualisieren** unten liest alles neu: laufender Titel, Cover, Lautstärke,
 Zustand der Gruppe.
+
+Spielt der Lautsprecher, den du hinzufügst, etwas anderes oder ist er pausiert, sagt die
+App das vor dem Gruppieren: „Salon spielt Radio Contact. Beim Hinzufügen zur Gruppe endet
+das, und Bel RTL läuft.“ Nichts ändert sich, bis du **Hinzufügen** tippst. Ein Lautsprecher
+im Standby, oder einer, der schon dasselbe spielt, wird ohne Rückfrage hinzugefügt.
 
 ---
 
@@ -459,8 +470,8 @@ erneut über einen Speicherplatz oder das Verzeichnis und öffne dann den Reiter
 - **Aufnahme: nur Internetradios**, höchstens 5 Minuten pro Aufnahme, 10 Aufnahmen
   werden behalten.
 - **Tasten kopieren: STR-Agent 1.6.5 oder neuer** auf dem Quell-Lautsprecher.
-- **Die Spotify-Tasten „Daumen hoch“ und „Daumen runter“** funktionieren nur auf der
-  Fernbedienung des Lautsprechers (STR-Agent 1.8.0): Der Agent bietet sie Apps nicht an.
+- **„Gefällt mir“ und „Gefällt mir nicht“: STR-Agent 1.8.1 oder neuer.** Der Titel landet
+  im Spotify-Konto, mit dem der Lautsprecher angemeldet ist.
 
 ---
 

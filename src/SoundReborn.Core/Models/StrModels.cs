@@ -18,6 +18,20 @@ public sealed class AgentInfo
     /// </summary>
     [JsonPropertyName("presetRows")] public JsonElement PresetRows { get; set; }
 
+    /// <summary>
+    /// « true » sur un agent 1.8.1 et suivants qui sait ajouter le titre Spotify en
+    /// cours aux Titres likés (POST /api/spotify/liked). Lu tel quel, comme presetRows.
+    /// </summary>
+    [JsonPropertyName("spotifyLiked")] public JsonElement SpotifyLiked { get; set; }
+
+    [JsonIgnore]
+    public bool SupportsSpotifyLiked => SpotifyLiked.ValueKind switch
+    {
+        JsonValueKind.True => true,
+        JsonValueKind.String => string.Equals(SpotifyLiked.GetString(), "true", StringComparison.OrdinalIgnoreCase),
+        _ => false,
+    };
+
     /// <summary>Vrai quand les touches 7 à 12 existent sur cet agent.</summary>
     [JsonIgnore]
     public bool HasSecondPresetRow

@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manuel d'utilisation
 
-Version 1.8.0 · Android 7 et suivants
+Version 1.8.1 · Android 7 et suivants
 
 > Langues : **Français** · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md)
 
@@ -110,6 +110,12 @@ seconde ou deux à apparaître.
 La pochette, le titre et la source de ce qui joue. Pour une radio, le logo de la station
 et son nom ; pour Spotify, la pochette de l'album.
 
+Quand Spotify joue et que l'agent STR est en version 1.8.1 ou plus récente, deux boutons
+apparaissent sous le titre : **J'aime** ajoute le morceau en cours aux Titres likés,
+**Je n'aime pas** l'en retire, comme les touches pouce de la télécommande. Le morceau va
+dans le compte Spotify avec lequel l'**enceinte** est connectée, qui n'est pas forcément
+celui de ton téléphone. Une enceinte avec écran affiche « LIKED » ou « REMOVED ».
+
 ### Commandes
 
 Quatre touches : arrêt, précédent, lecture/pause, suivant. Selon la source, certaines
@@ -186,6 +192,11 @@ diffuser, et que tu peux regrouper.
 
 Le lien **Rafraîchir**, en bas, relit tout : titre en cours, pochette, volume, état du
 groupe.
+
+Si l'enceinte que tu ajoutes joue autre chose, ou est en pause, l'application le dit avant
+de grouper : « Le Salon joue Radio Contact. L'ajouter au groupe arrête cette écoute pour
+jouer Bel RTL. » Rien ne change tant que tu n'as pas touché **Ajouter**. Une enceinte en
+veille, ou qui joue déjà la même chose, est ajoutée sans question.
 
 ---
 
@@ -456,8 +467,8 @@ une présélection ou l'annuaire, puis rouvre l'onglet Sources.
 - **Enregistrement : radios internet seulement**, 5 minutes au plus par enregistrement,
   10 enregistrements gardés.
 - **Copie des touches : agent STR 1.6.5 ou plus récent** sur l'enceinte source.
-- **Les touches « J'aime » et « Je n'aime pas » de Spotify** ne fonctionnent que sur la
-  télécommande de l'enceinte (agent STR 1.8.0) : l'agent ne les propose pas aux applications.
+- **« J'aime » et « Je n'aime pas » : agent STR 1.8.1 ou plus récent.** Le titre va dans le
+  compte Spotify avec lequel l'enceinte est connectée.
 
 ---
 

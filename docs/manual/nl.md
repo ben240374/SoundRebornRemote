@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handleiding
 
-Versie 1.8.0 · Android 7 en hoger
+Versie 1.8.1 · Android 7 en hoger
 
 > Talen: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · **Nederlands** · [Español](es.md)
 
@@ -106,6 +106,12 @@ zichtbaar wordt.
 De hoes, de titel en de bron van wat er speelt. Bij een radiozender diens logo en naam,
 bij Spotify de albumhoes.
 
+Als Spotify speelt en de STR-agent versie 1.8.1 of nieuwer heeft, verschijnen onder de
+titel twee knoppen: **Vind ik leuk** voegt het huidige nummer toe aan Gelikete nummers,
+**Vind ik niet leuk** haalt het eruit, zoals de duimtoetsen van de afstandsbediening. Het
+nummer gaat naar het Spotify-account waarmee de **speaker** is aangemeld, niet per se dat
+op je telefoon. Een speaker met scherm toont “LIKED” of “REMOVED”.
+
 ### Bediening
 
 Vier toetsen: stoppen, vorige, afspelen/pauzeren, volgende. Afhankelijk van de bron doen
@@ -180,6 +186,11 @@ spelen heeft, en kun je hem opnieuw groeperen.
 
 De link **Vernieuwen** onderaan leest alles opnieuw: lopende titel, hoes, volume, staat
 van de groep.
+
+Speelt de speaker die je toevoegt iets anders, of staat hij op pauze, dan zegt de app dat
+vóór het groeperen: “Salon speelt Radio Contact. Toevoegen aan de groep stopt dat om Bel RTL
+te spelen.” Er verandert niets tot je op **Toevoegen** tikt. Een speaker in stand-by, of
+een die al hetzelfde speelt, wordt zonder vraag toegevoegd.
 
 ---
 
@@ -447,8 +458,8 @@ de gids en open daarna het tabblad Bronnen opnieuw.
 - **Opnemen: alleen internetradio**, hoogstens 5 minuten per opname, 10 opnames
   bewaard.
 - **Toetsen kopiëren: STR-agent 1.6.5 of nieuwer** op de bronspeaker.
-- **De Spotify-toetsen duim omhoog en duim omlaag** werken alleen op de afstandsbediening
-  van de speaker (STR-agent 1.8.0): de agent biedt ze niet aan apps aan.
+- **Vind ik leuk en Vind ik niet leuk: STR-agent 1.8.1 of nieuwer.** Het nummer gaat naar
+  het Spotify-account waarmee de speaker is aangemeld.
 
 ---
 

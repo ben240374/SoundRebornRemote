@@ -110,6 +110,28 @@
                         </VerticalStackLayout>
 
                     </Grid>
+
+                    <!--
+                        « J'aime » / « Je n'aime pas » pour le titre Spotify en cours
+                        (agent 1.8.1+). Sa propre vue-modèle : BindingContext sur le
+                        ContentView, type compilé sur le bloc enfant.
+                    -->
+                    <ContentView BindingContext="{Binding Like}">
+                        <VerticalStackLayout x:DataType="vm:SpotifyLikeViewModel" Spacing="6" IsVisible="{Binding ShowButtons}">
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <Button Grid.Column="0" Text="{DynamicResource L_Like}" Style="{StaticResource AccentButton}"
+                                        Command="{Binding LikeCommand}" />
+                                <Button Grid.Column="1" Text="{DynamicResource L_Unlike}"
+                                        Command="{Binding UnlikeCommand}" />
+                            </Grid>
+                            <Label Text="{Binding Note}"
+                                   TextColor="{Binding NoteIsError, Converter={StaticResource ErrorColor}}"
+                                   FontSize="13" LineBreakMode="WordWrap"
+                                   IsVisible="{Binding Note, Converter={StaticResource StringNotEmpty}}" />
+                            <Label Text="{DynamicResource L_LikedAccount}" Style="{StaticResource CaptionLabel}"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </ContentView>
                 </VerticalStackLayout>
             </Border>
 

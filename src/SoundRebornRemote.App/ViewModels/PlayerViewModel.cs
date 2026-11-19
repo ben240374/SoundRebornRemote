@@ -239,12 +239,16 @@ public sealed partial class PlayerViewModel : BaseViewModel
 
     private double _groupBaseline;
 
+    /// <summary>« J'aime » / « Je n'aime pas » pour le titre Spotify en cours (agent 1.8.1+).</summary>
+    public SpotifyLikeViewModel Like { get; }
+
     public PlayerViewModel(SpeakerManager speakers, PresetsViewModel presets, ArtworkCache artwork, ZoneLocator zones)
         : base(speakers)
     {
         _presetsViewModel = presets;
         _artwork = artwork;
         _zones = zones;
+        Like = new SpotifyLikeViewModel(speakers);
 
         Speakers.DeviceChanged += (_, device) => OnMainThread(() =>
         {
@@ -373,6 +377,13 @@ public sealed partial class PlayerViewModel : BaseViewModel
         // Un appui pendant qu'un groupement est en cours est ignoré : deux demandes
         // croisées publieraient deux listes de membres différentes.
         if (IsGroupWorking)
+        {
+            return;
+        }
+
+        // Ajouter une enceinte qui joue autre chose arrête son écoute, peut-être dans
+        // une autre pièce : on le dit avant, et on n'ajoute qu'après accord.
+        if (!wasGrouped && !await ConfirmJoinAsync(choice).ConfigureAwait(true))
         {
             return;
         }
@@ -507,6 +518,74 @@ public sealed partial class PlayerViewModel : BaseViewModel
             _ = ClearGroupNoteLaterAsync(noteVersion);
         }
     }
+
+    /// <summary>
+    /// Avant d'ajouter <paramref name="choice"/> au groupe : si elle joue (ou est en
+    /// pause sur) autre chose que ce que joue le groupe, demande confirmation en
+    /// disant ce qui s'arrête et ce qui va jouer. Vrai pour continuer.
+    ///
+    /// « Autre chose » se juge sur la source et l'adresse, pas sur le nom : deux
+    /// flux du même nom peuvent être deux émissions différentes. Une enceinte en
+    /// veille, à l'arrêt ou dont l'état ne se lit pas ne bloque rien : la question
+    /// ne doit jamais empêcher un groupement qui aurait marché.
+    /// </summary>
+    private async Task<bool> ConfirmJoinAsync(SpeakerChoice choice)
+    {
+        NowPlaying theirs;
+
+        try
+        {
+            // Court : une enceinte qui tarde ne doit pas retenir le groupement.
+            using var quick = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            theirs = await new BoseApiClient(choice.Host, Speakers.Http).GetNowPlayingAsync(quick.Token).ConfigureAwait(true);
+        }
+        catch (Exception)
+        {
+            return true;
+        }
+
+        var paused = theirs.PlayStatus == PlayStatus.Pause;
+
+        if (theirs.IsIdle || !(theirs.IsPlaying || paused || theirs.PlayStatus == PlayStatus.Buffering))
+        {
+            return true;
+        }
+
+        var ours = _lastNowPlaying;
+
+        if (SameMusic(ours, theirs))
+        {
+            return true;
+        }
+
+        var question = Localization.Get(paused ? "L_JoinPaused" : "L_JoinPlaying", choice.Name, Describe(theirs)) + " " +
+                       (ours.IsIdle
+                           ? Localization.Get("L_JoinThenStops")
+                           : Localization.Get("L_JoinThenPlays", Describe(ours)));
+
+        var go = Localization.Get("L_JoinGo");
+
+        var answer = await Shell.Current.DisplayActionSheetAsync(
+            question,
+            Localization.Get("L_Cancel"),
+            null,
+            go).ConfigureAwait(true);
+
+        return answer == go;
+    }
+
+    /// <summary>Même source et même adresse de flux. Sans adresse des deux côtés, on ne peut pas l'affirmer.</summary>
+    private static bool SameMusic(NowPlaying a, NowPlaying b)
+        => !a.IsIdle && !b.IsIdle &&
+           string.Equals(a.Source, b.Source, StringComparison.OrdinalIgnoreCase) &&
+           !string.IsNullOrWhiteSpace(a.Content?.Location) &&
+           string.Equals(a.Content?.Location, b.Content?.Location, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Ce qui joue, en quelques mots : la station, sinon le contenu, le titre ou la source.</summary>
+    private static string Describe(NowPlaying nowPlaying)
+        => new[] { nowPlaying.StationName, nowPlaying.Content?.ItemName, nowPlaying.Track }
+               .FirstOrDefault(v => !string.IsNullOrWhiteSpace(v))
+           ?? FriendlySource(nowPlaying.Source);
 
     /// <summary>Le compte rendu du groupement reste quelques secondes, puis s'efface — sauf une erreur.</summary>
     private async Task ClearGroupNoteLaterAsync(int version)
@@ -2253,6 +2332,7 @@ public sealed partial class PlayerViewModel : BaseViewModel
     private async Task ApplyNowPlayingAsync(NowPlaying nowPlaying)
     {
         _lastNowPlaying = nowPlaying;
+        Like.Update(Device, nowPlaying);
 
         Title = nowPlaying.IsIdle && string.IsNullOrWhiteSpace(nowPlaying.Track)
             ? Localization.Get(nowPlaying.IsStandby ? "L_Standby" : "L_NothingPlaying")
