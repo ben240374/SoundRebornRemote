@@ -94,12 +94,15 @@ attached to the latest release: [English](https://github.com/ben240374/SoundRebo
 | Presets 1 to 6 | Presets tab | `POST :8888/api/play/<slot>`, falling back to the `PRESET_n` key; a key the agent marks `row2Key` in `GET :8888/api/box/presets` (station on the double press only) shows as empty |
 | Second preset row (keys pressed twice, slots 7 to 12) | Play and Presets tabs | `POST :8888/api/play/<slot>` — agent only, shown when `/api/agent/version` reports `presetRows` |
 | Keeping what is playing on a key | Play tab | `POST :8888/api/box/save-playing` |
+| Like / Dislike the Spotify song that is playing | Play tab | `POST :8888/api/spotify/liked` — shown only when `/api/agent/version` reports `spotifyLiked` and Spotify plays |
+| Asking before grouping a speaker that plays something else | Play tab | its `GET :8090/now_playing`, compared by source and stream address |
 | Sleep timer | Play tab | `GET/POST/DELETE :8888/api/box/sleep` |
 | Alarms of the selected speaker (time, days, key, volume, switch-off, snooze) | Settings tab | `GET/PUT :8888/api/alarms` with `rev`; on `409` the user's change is applied again to the current document |
 | Start volume | Settings tab | `GET/POST :8888/api/box/start-volume` |
 | Now playing, artwork, source | everywhere | WebSocket `:8080` (subprotocol `gabbo`), falling back to `GET /now_playing` |
 | Sources, Bluetooth, AUX | Sources tab | `GET :8090/sources`, `POST :8090/select`, `PUT :8888/api/box/source` |
 | Playing an arbitrary URL | Sources tab | `POST :8888/api/play` |
+| Recording the internet radio that plays (5 min, last 10 kept, play, share, delete) | Sources tab | stream address from `GET :8888/api/recent`, the STR presets or `now_playing`; the phone opens the station's own stream, never the agent's relay; Android foreground service |
 | Listening history, replayed by kind (station, library track, whole album) | Sources tab | `GET :8888/api/recent`, then `POST :8888/api/play` or `POST :8888/api/queue/replay-card` |
 | Multi-room groups | Groups tab | `POST :8888/api/box/zone`, falling back to `POST :8090/setZone` |
 | Per-speaker volume in a group | Play and Groups tabs | `GET/POST :8888/api/box/zone/volume` |
@@ -108,6 +111,7 @@ attached to the latest release: [English](https://github.com/ben240374/SoundRebo
 | STR agent version | Play and Settings tabs | `GET :8888/api/agent/version` — below 1.6.0 the agent is flagged "too old" and group changes are refused |
 | Station search | Presets tab | radio-browser.info, queried by the application itself |
 | Assigning a station to a key (1 to 12) | Presets tab | `PUT :8888/api/presets/{slot}` |
+| Copying all keys to another speaker, or to all | Presets tab | `POST :8888/api/box/preset-copy` (agent 1.6.5 or later) |
 | Interface language | Settings tab | EN, FR, DE, NL, ES — applied immediately, no restart |
 | Light or dark theme | Settings tab | System, Light or Dark — switches immediately |
 | Swipe navigation | everywhere | horizontal gesture recognised in `MainActivity`, without touching scrolling |
@@ -169,7 +173,9 @@ dotnet publish src\SoundRebornRemote.App\SoundRebornRemote.App.csproj -f net10.0
 The debug-signed APK lands in
 `src\SoundRebornRemote.App\bin\Release\net10.0-android\publish\`.
 For sideloading, that file is enough: copy it to the phone and allow installation from
-an unknown source.
+an unknown source. The APKs of the GitHub releases are signed with the project's own key,
+so a self-built debug APK cannot update over them (and the other way round): uninstall
+first.
 
 To sign with your own key, pass the keystore on the command line rather than writing it
 into the `.csproj` — passwords do not belong in a versioned file:
@@ -212,15 +218,19 @@ SoundRebornRemote.sln
 │   ├── SpeakerDevice.cs                  façade: picks STR or firmware, handles fallbacks
 │   ├── RemoteKey.cs                      key enumeration and protocol names
 │   ├── Internal/XmlParsing.cs            reading and building XML bodies
+│   ├── Recording/                        radio recording: stream address, copy, file library
 │   └── Models/                           data models
 └── src/SoundRebornRemote.App/            MAUI Android application
     ├── MauiProgram.cs                    dependency injection
     ├── AppShell.xaml                     the five tabs
     ├── Services/                         SpeakerManager, ZoneLocator, ArtworkCache,
-    │                                     ThemeService, Localization, Debouncer
-    ├── ViewModels/                       one per tab, MVVM with CommunityToolkit
+    │                                     ThemeService, Localization, Debouncer,
+    │                                     RecordingService
+    ├── ViewModels/                       one per tab, plus alarms, recordings, key copy
+    │                                     and Spotify like; MVVM with CommunityToolkit
     ├── Views/                            the XAML pages
-    └── Platforms/Android/                manifest, permissions, cleartext traffic
+    └── Platforms/Android/                manifest, permissions, cleartext traffic,
+                                          recording foreground service and player
 ```
 
 `SoundReborn.Core` depends on nothing but the framework. You can reference it as-is from
@@ -423,12 +433,15 @@ jointes à la dernière release : [Français](https://github.com/ben240374/Sound
 | Présélections 1 à 6 | onglet Présélections | `POST :8888/api/play/<slot>`, repli sur la touche `PRESET_n` ; une touche que l'agent marque `row2Key` dans `GET :8888/api/box/presets` (station sur le double appui seulement) s'affiche vide |
 | Seconde rangée de touches (pressées deux fois, emplacements 7 à 12) | onglets Lecture et Présélections | `POST :8888/api/play/<slot>` — agent seul, affichée quand `/api/agent/version` annonce `presetRows` |
 | Garder ce qui joue sur une touche | onglet Lecture | `POST :8888/api/box/save-playing` |
+| « J'aime » / « Je n'aime pas » sur le titre Spotify en cours | onglet Lecture | `POST :8888/api/spotify/liked` — affiché seulement quand `/api/agent/version` annonce `spotifyLiked` et que Spotify joue |
+| Question avant de grouper une enceinte qui joue autre chose | onglet Lecture | son `GET :8090/now_playing`, comparé par source et adresse du flux |
 | Minuterie de sommeil | onglet Lecture | `GET/POST/DELETE :8888/api/box/sleep` |
 | Réveils de l'enceinte sélectionnée (heure, jours, touche, volume, arrêt, répétition) | onglet Réglages | `GET/PUT :8888/api/alarms` avec `rev` ; sur un `409`, la modification de l'utilisateur est refaite sur le document actuel |
 | Volume de départ | onglet Réglages | `GET/POST :8888/api/box/start-volume` |
 | Titre en cours, pochette, source | partout | WebSocket `:8080` (sous-protocole `gabbo`), repli sur `GET /now_playing` |
 | Sources, Bluetooth, AUX | onglet Sources | `GET :8090/sources`, `POST :8090/select`, `PUT :8888/api/box/source` |
 | Lecture d'une URL quelconque | onglet Sources | `POST :8888/api/play` |
+| Enregistrement de la radio internet qui joue (5 min, 10 derniers gardés, écoute, partage, suppression) | onglet Sources | adresse du flux tirée de `GET :8888/api/recent`, des présélections STR ou de `now_playing` ; le téléphone ouvre le flux de la station elle-même, jamais le relais de l'agent ; service Android au premier plan |
 | Historique d'écoute, relancé selon sa nature (station, piste, album entier) | onglet Sources | `GET :8888/api/recent`, puis `POST :8888/api/play` ou `POST :8888/api/queue/replay-card` |
 | Groupes multi-pièces | onglet Groupes | `POST :8888/api/box/zone`, repli sur `POST :8090/setZone` |
 | Volume par enceinte du groupe | onglets Lecture et Groupes | `GET/POST :8888/api/box/zone/volume` |
@@ -437,6 +450,7 @@ jointes à la dernière release : [Français](https://github.com/ben240374/Sound
 | Version de l'agent STR | onglets Lecture et Réglages | `GET :8888/api/agent/version` — sous 1.6.0, l'agent est signalé « trop ancien » et les modifications de groupe sont refusées |
 | Recherche de stations | onglet Présélections | radio-browser.info, interrogé directement par l'application |
 | Affectation à une touche (1 à 12) | onglet Présélections | `PUT :8888/api/presets/{slot}` |
+| Copie de toutes les touches vers une autre enceinte, ou vers toutes | onglet Présélections | `POST :8888/api/box/preset-copy` (agent 1.6.5 ou plus récent) |
 | Langue de l'interface | onglet Réglages | FR, EN, DE, NL, ES — changement immédiat, sans redémarrage |
 | Thème clair ou foncé | onglet Réglages | Système, Clair ou Foncé — bascule immédiate |
 | Navigation par balayage | partout | geste horizontal reconnu dans `MainActivity`, sans toucher au défilement |
@@ -500,7 +514,9 @@ dotnet publish src\SoundRebornRemote.App\SoundRebornRemote.App.csproj -f net10.0
 L'APK signé en debug sort dans
 `src\SoundRebornRemote.App\bin\Release\net10.0-android\publish\`.
 Pour une installation hors Play Store, ce fichier suffit : transfère-le sur le téléphone
-et autorise l'installation depuis une source inconnue.
+et autorise l'installation depuis une source inconnue. Les APK des releases GitHub sont
+signés avec la clé du projet : un APK de débogage compilé soi-même ne peut pas les mettre
+à jour (ni l'inverse), il faut d'abord désinstaller.
 
 Pour signer avec ta propre clé, passe le keystore en ligne de commande plutôt que de
 l'écrire dans le `.csproj` — un mot de passe n'a rien à faire dans un fichier versionné :
@@ -545,15 +561,19 @@ SoundRebornRemote.sln
 │   ├── SpeakerDevice.cs                  façade : choisit STR ou firmware, gère les replis
 │   ├── RemoteKey.cs                      énumération des touches et leur nom protocolaire
 │   ├── Internal/XmlParsing.cs            lecture et construction des corps XML
+│   ├── Recording/                        enregistrement radio : adresse du flux, copie, fichiers
 │   └── Models/                           modèles de données
 └── src/SoundRebornRemote.App/            application MAUI Android
     ├── MauiProgram.cs                    injection de dépendances
     ├── AppShell.xaml                     les cinq onglets
     ├── Services/                         SpeakerManager, ZoneLocator, ArtworkCache,
-    │                                     ThemeService, Localization, Debouncer
-    ├── ViewModels/                       un par onglet, MVVM avec CommunityToolkit
+    │                                     ThemeService, Localization, Debouncer,
+    │                                     RecordingService
+    ├── ViewModels/                       un par onglet, plus réveils, enregistrements,
+    │                                     copie des touches et « J'aime » ; MVVM
     ├── Views/                            les pages XAML
-    └── Platforms/Android/                manifeste, autorisations, trafic en clair
+    └── Platforms/Android/                manifeste, autorisations, trafic en clair,
+                                          service d'enregistrement et lecteur
 ```
 
 `SoundReborn.Core` ne dépend de rien d'autre que du framework. Tu peux la référencer telle
