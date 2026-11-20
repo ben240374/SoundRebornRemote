@@ -100,13 +100,13 @@ for text in xaml_of.values():
 for key in sorted(used - declared):
     problems.append(f"Clé de traduction absente : {key}")
 
-# chaque Add doit porter exactement cinq libellés
+# chaque Add doit porter exactement six libellés (fr, en, de, nl, es, it)
 for m in re.finditer(r'Add\("([^"]+)"\s*,(.*?)\);', loc, re.S):
     # Les guillemets échappés à l'intérieur d'un libellé — « \"System\" » — ne
     # délimitent rien : les retirer avant de compter, sinon une traduction
     # parfaitement complète paraît en compter sept.
     body = m.group(2).replace('\\"', "")
-    if body.count('"') // 2 != 5:
+    if body.count('"') // 2 != 6:
         problems.append(f"Traduction incomplète : {m.group(1)} ({body.count(chr(34)) // 2} libellés)")
 
 # ------------------------------------------------------------ 3. injection résolue
@@ -159,7 +159,7 @@ for f, text in text_of.items():
             problems.append(f"API supprimée encore appelée : {f.name} -> {name}")
 
 # ---------------------------------------------- 6. gabarits de traduction cohérents
-# Le nombre de {n} doit être le même dans les cinq langues d'une clé.
+# Le nombre de {n} doit être le même dans les six langues d'une clé.
 for m in re.finditer(r'Add\("([^"]+)"\s*,(.*?)\);', loc, re.S):
     labels = re.findall(r'"((?:[^"\\]|\\.)*)"', m.group(2))
     holes = [tuple(sorted(set(re.findall(r"\{(\d)\}", label)))) for label in labels]

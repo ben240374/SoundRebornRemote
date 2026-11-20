@@ -18,7 +18,7 @@ def slug(value, separator):
     return re.sub(r"\s", separator, value)
 
 
-for lang in ("fr", "en", "de", "nl", "es"):
+for lang in ("fr", "en", "de", "nl", "es", "it"):
     md_path = docs / "manual" / f"{lang}.md"
     html_path = docs / "manual" / f"{lang}.html"
 

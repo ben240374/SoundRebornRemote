@@ -8,7 +8,7 @@ const path = require('path');
   const page = await browser.newPage();
   await page.emulateMedia({ media: 'print', colorScheme: 'light' });
 
-  for (const lang of ['fr', 'en', 'de', 'nl', 'es']) {
+  for (const lang of ['fr', 'en', 'de', 'nl', 'es', 'it']) {
     await page.goto('file://' + path.join(docs, 'manual', lang + '.html'), { waitUntil: 'load' });
     await page.pdf({
       path: path.join(docs, 'manual', 'pdf', `SoundRebornRemote-manual-${lang}.pdf`),

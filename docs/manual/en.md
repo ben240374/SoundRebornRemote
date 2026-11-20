@@ -1,8 +1,8 @@
 # SoundReborn Remote — User manual
 
-Version 1.8.1 · Android 7 and later
+Version 1.8.2 · Android 7 and later
 
-> Languages: [Français](fr.md) · **English** · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md)
+> Languages: [Français](fr.md) · **English** · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md) · [Italiano](it.md)
 
 ---
 
@@ -39,7 +39,7 @@ Four conditions:
   search, assigning presets and reliable grouping all go through the agent.
   Installation is done with the STR tool for PC or Mac — <https://st-reborn.de>.
   **This app does not install it**; it only flags the speakers that lack it.
-- **An STR agent 1.6.0 or later to change groups.** With an older agent, the app says
+- **An STR agent 1.8.0 or later to change groups.** With an older agent, the app says
   so and leaves groups alone; everything else works.
 - **Android 7 or later.**
 
@@ -63,7 +63,7 @@ nor location, nor storage.
 ## 3. First run
 
 The app starts in the phone's language when it knows it — French, English, German,
-Dutch, Spanish — and in English otherwise. You can change this at any time.
+Dutch, Spanish, Italian — and in English otherwise. You can change this at any time.
 
 On first launch no speaker is known. Go to **Settings**, then **Scan the local network**.
 
@@ -109,6 +109,10 @@ thumbs keys of the remote. The song goes to the Spotify account the **speaker** 
 in with, which is not necessarily the one on your phone. A speaker with a display shows
 "LIKED" or "REMOVED".
 
+During a Spotify key (a preset that plays a Spotify playlist), the speaker itself only knows
+the playlist name. With STR agent 1.8.2 or later, the app shows the song, the artist and the
+cover instead, with "Spotify · playlist" as the source; the song is read again every five seconds or so.
+
 ### Controls
 
 Four keys: stop, previous, play/pause, next. Depending on the source some have no
@@ -153,7 +157,8 @@ the one playing.
 
 When the STR agent handles the second row, two chips, **Once** and **Twice**, appear
 above the tiles: the second shows the six stations the speaker starts when a key is
-pressed twice. The choice applies to both tabs.
+pressed twice. The choice applies to both tabs. Each tile shows the name of its key at the top ("Key 1" to "Key 6", in both rows), and the
+**Twice** chip carries a small number: how many keys of the second row hold a station.
 
 **Keep what's playing on a key**, below the tiles, stores what the speaker is playing
 right now — station, album or library track — on the key you pick. Spotify, AUX and
@@ -214,6 +219,17 @@ the agent, or with an older one.
 
 A key that has a station only on its second row shows as empty under **Once**: a single
 press on the speaker then starts the second-row station (STR agent 1.6.3 and later).
+
+### Renaming and clearing a key
+
+Each tile shows the name of its key at the top. On a key stored by the STR agent, two small
+buttons sit next to it: **✎** renames the key and **✕** clears it, after confirmation.
+Renaming changes only the name shown: the station, its picture and the playlist of a Spotify
+key stay. Names are limited to 64 characters. The **Twice** chip shows how many keys of the
+second row hold a station.
+
+A key that only the speaker's firmware knows, and an empty key, have no buttons: there is
+nothing the agent could rename or clear.
 
 ### Copy the keys to another speaker
 
@@ -289,6 +305,9 @@ the phone, ⤴ opens Android's share menu, the bin deletes after confirmation. B
 app will not make a new one: first delete the one you no longer need. Recordings stay
 inside the app and are removed if you uninstall it. The list stays available even when no speaker answers: only recording is then impossible.
 
+While a recording plays, a slider and a counter appear under it: "01:23 / 04:50", position
+and length. Drag the slider to move within the recording.
+
 **Recently played** shows the history kept by the agent: tap a line to start it again.
 
 A library album or folder is replayed in full, not just its first track. If the media
@@ -353,7 +372,7 @@ the STR agent. The time is set on the phone's clock dial. The bin on a line dele
 Tick the box, pick the level, then **Save the start volume**. A volume set while
 listening is never changed.
 
-**Language**: English, French, German, Dutch, Spanish. The change is immediate, with no
+**Language**: English, French, German, Dutch, Spanish, Italian. The change is immediate, with no
 restart, and is remembered.
 
 **Theme**: System, Light or Dark. "System" follows the phone's display setting,
@@ -367,7 +386,7 @@ address ranges, so it never reaches a mobile network or a VPN tunnel.
 speaker marked **"No STR — ready for installation"** answers fine but has no agent; an
 explanatory block then appears further down, with a link to the STR project site.
 
-A speaker whose agent is older than version 1.6.0 brings up a similar block, **STR
+A speaker whose agent is older than version 1.8.0 brings up a similar block, **STR
 agent too old**, and its card in the Play tab reads "too old".
 
 **Diagnostics**: *Query the speaker* reports on the **selected** speaker — name, model,
@@ -447,6 +466,8 @@ from a preset or the directory, then reopen the Sources tab.
 - **Copying the keys: STR agent 1.6.5 or later** on the source speaker.
 - **Like and Dislike: STR agent 1.8.1 or later.** The song goes to the Spotify account the
   speaker is logged in with.
+- **Renaming and clearing keys: STR agent 1.8.0 or later; the song of a Spotify key: 1.8.2
+  or later.**
 
 ---
 

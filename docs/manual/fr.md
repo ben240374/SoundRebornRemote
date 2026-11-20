@@ -1,8 +1,8 @@
 # SoundReborn Remote — Manuel d'utilisation
 
-Version 1.8.1 · Android 7 et suivants
+Version 1.8.2 · Android 7 et suivants
 
-> Langues : **Français** · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md)
+> Langues : **Français** · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md) · [Italiano](it.md)
 
 ---
 
@@ -41,7 +41,7 @@ Quatre conditions :
   L'installation se fait avec l'outil STR pour PC ou Mac — <https://st-reborn.de>.
   **Cette application ne l'installe pas** ; elle se contente de signaler les enceintes
   qui ne l'ont pas.
-- **Un agent STR 1.6.0 ou plus récent pour modifier les groupes.** Avec un agent plus
+- **Un agent STR 1.8.0 ou plus récent pour modifier les groupes.** Avec un agent plus
   ancien, l'application le signale et ne touche pas aux groupes ; le reste fonctionne.
 - **Android 7 ou plus récent.**
 
@@ -66,7 +66,7 @@ n'accède ni aux contacts, ni à la position, ni au stockage.
 ## 3. Premier démarrage
 
 L'application s'ouvre dans la langue du téléphone si elle la connaît — français,
-anglais, allemand, néerlandais, espagnol — et en anglais sinon. Tu pourras en changer à
+anglais, allemand, néerlandais, espagnol, italien — et en anglais sinon. Tu pourras en changer à
 tout moment.
 
 Au premier lancement, aucune enceinte n'est connue. Va dans **Réglages**, puis
@@ -116,6 +116,11 @@ apparaissent sous le titre : **J'aime** ajoute le morceau en cours aux Titres li
 dans le compte Spotify avec lequel l'**enceinte** est connectée, qui n'est pas forcément
 celui de ton téléphone. Une enceinte avec écran affiche « LIKED » ou « REMOVED ».
 
+Pendant une touche Spotify (une présélection qui joue une playlist Spotify), l'enceinte ne
+connaît que le nom de la playlist. Avec l'agent STR 1.8.2 ou plus récent, l'application
+affiche à la place le morceau, l'artiste et la pochette, avec « Spotify · playlist » comme
+source ; le morceau est relu toutes les cinq secondes environ.
+
 ### Commandes
 
 Quatre touches : arrêt, précédent, lecture/pause, suivant. Selon la source, certaines
@@ -161,7 +166,9 @@ encadrée de vert est celle qui joue.
 
 Quand l'agent STR gère la seconde rangée, deux pastilles **Une fois** et **Deux fois**
 apparaissent au-dessus des tuiles : la seconde montre les six stations que l'enceinte
-lance quand on presse deux fois une touche. Le choix vaut pour les deux onglets.
+lance quand on presse deux fois une touche. Le choix vaut pour les deux onglets. Chaque tuile porte en haut le nom de sa touche (« Touche 1 » à « Touche 6 », dans les deux
+rangées), et la pastille **Deux fois** affiche un petit nombre : combien de touches de la
+seconde rangée portent une station.
 
 **Garder ce qui joue sur une touche**, sous les tuiles, range sur la touche de ton choix
 ce que l'enceinte joue en ce moment — station, album ou piste de la bibliothèque.
@@ -226,6 +233,17 @@ enceinte sans agent, ou dont l'agent est plus ancien.
 Une touche qui n'a de station que sur sa seconde rangée apparaît vide en **Une fois** :
 une seule pression sur l'enceinte lance alors la station de la seconde rangée (agent
 STR 1.6.3 et suivants).
+
+### Renommer et effacer une touche
+
+Chaque tuile porte en haut le nom de sa touche. Sur une touche rangée par l'agent STR, deux
+petits boutons l'accompagnent : **✎** renomme la touche et **✕** l'efface, après
+confirmation. Renommer ne change que le nom affiché : la station, son image et la playlist
+d'une touche Spotify restent. Un nom compte 64 caractères au plus. La pastille **Deux fois**
+indique combien de touches de la seconde rangée portent une station.
+
+Une touche que seul le firmware de l'enceinte connaît, et une touche vide, n'ont pas ces
+boutons : l'agent n'aurait rien à renommer ni à effacer.
 
 ### Copier les touches vers une autre enceinte
 
@@ -304,6 +322,10 @@ confirmation. Au-delà de 10, l'application refuse d'en faire un nouveau : suppr
 celui dont tu n'as plus besoin. Les enregistrements restent dans l'application et
 disparaissent si tu la désinstalles. La liste reste disponible même quand aucune enceinte ne répond : seul l'enregistrement est alors impossible.
 
+Pendant l'écoute d'un enregistrement, une barre et un compteur apparaissent sous lui :
+« 01:23 / 04:50 », la position et la durée. Fais glisser la barre pour te déplacer dans
+l'enregistrement.
+
 **Écouté récemment** reprend l'historique tenu par l'agent : touche une ligne pour
 relancer.
 
@@ -371,7 +393,7 @@ n'enregistre que ce que tu as changé. Agent STR requis. L'heure se règle sur l
 à jouer. Coche la case, choisis le niveau, puis **Enregistrer le volume de départ**. Un
 volume réglé pendant l'écoute n'est jamais modifié.
 
-**Langue** : français, anglais, allemand, néerlandais, espagnol. Le changement est
+**Langue** : français, anglais, allemand, néerlandais, espagnol, italien. Le changement est
 immédiat, sans redémarrage, et il est mémorisé.
 
 **Thème** : Système, Clair ou Foncé. « Système » suit le réglage d'affichage du
@@ -387,7 +409,7 @@ Une enceinte marquée **« Pas de STR — prête pour l'installation »** répon
 mais n'a pas l'agent ; un bloc explicatif apparaît alors plus bas, avec un lien vers le
 site du projet STR.
 
-Une enceinte dont l'agent est antérieur à la version 1.6.0 fait apparaître un bloc
+Une enceinte dont l'agent est antérieur à la version 1.8.0 fait apparaître un bloc
 semblable, **Agent STR trop ancien**, et sa carte dans l'onglet Lecture porte la mention
 « trop ancien ».
 
@@ -469,6 +491,8 @@ une présélection ou l'annuaire, puis rouvre l'onglet Sources.
 - **Copie des touches : agent STR 1.6.5 ou plus récent** sur l'enceinte source.
 - **« J'aime » et « Je n'aime pas » : agent STR 1.8.1 ou plus récent.** Le titre va dans le
   compte Spotify avec lequel l'enceinte est connectée.
+- **Renommer et effacer une touche : agent STR 1.8.0 ou plus récent ; le morceau d'une
+  touche Spotify : 1.8.2 ou plus récent.**
 
 ---
 

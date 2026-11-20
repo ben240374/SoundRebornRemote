@@ -20,9 +20,42 @@ public sealed partial class RecordingRow : ObservableObject
     /// <summary>« 17/11 14:32 · 3 min 20 ».</summary>
     public required string Subtitle { get; init; }
 
-    /// <summary>Vrai pendant l'écoute de ce fichier : le bouton ▶ devient ■.</summary>
+    /// <summary>Vrai pendant l'écoute de ce fichier : le bouton ▶ devient ■, la barre de défilement apparaît.</summary>
     [ObservableProperty]
     private bool _isPlaying;
+
+    /// <summary>
+    /// Position de la barre, en secondes : elle suit le lecteur, ou le doigt
+    /// pendant un glissé.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TimeText))]
+    private double _positionSeconds;
+
+    /// <summary>Fin de la barre : la durée du fichier, une seconde au moins.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TimeText))]
+    private double _durationSeconds = 1;
+
+    /// <summary>« 01:23 / 04:50 » : position et durée de l'enregistrement.</summary>
+    public string TimeText => $"{Clock(PositionSeconds, round: false)} / {Clock(DurationSeconds, round: true)}";
+
+    /// <summary>Vrai pendant que le doigt tient la barre : le lecteur ne la déplace plus.</summary>
+    public bool IsSeeking { get; set; }
+
+    /// <summary>
+    /// Début et fin d'un glissé sur la barre. Le Slider n'a pas de paramètre de
+    /// commande : chaque ligne porte donc les siennes, reliées à la vue-modèle.
+    /// </summary>
+    public IRelayCommand? StartSeek { get; set; }
+
+    public IRelayCommand? EndSeek { get; set; }
+
+    private static string Clock(double seconds, bool round)
+    {
+        var whole = Math.Max(0, round ? (int)Math.Round(seconds) : (int)Math.Floor(seconds));
+        return $"{whole / 60:00}:{whole % 60:00}";
+    }
 }
 
 /// <summary>
@@ -38,6 +71,12 @@ public sealed partial class RecordingsViewModel : BaseViewModel
 {
     private readonly RecordingService _service;
     private StreamResolution? _resolution;
+
+    /// <summary>Rythme de mise à jour du compteur et de la barre pendant l'écoute.</summary>
+    private static readonly TimeSpan PlaybackTick = TimeSpan.FromMilliseconds(250);
+
+    /// <summary>Boucle de mise à jour pendant l'écoute ; null le reste du temps.</summary>
+    private CancellationTokenSource? _ticker;
 
     /// <summary>L'enceinte n'a pas répondu à la dernière recherche : seul l'enregistrement est impossible.</summary>
     private bool _offline;
@@ -201,11 +240,16 @@ public sealed partial class RecordingsViewModel : BaseViewModel
             return;
         }
 
-        var refusal = await _service.StartAsync(url, _resolution.Station).ConfigureAwait(true);
+        var urls = _resolution.Candidates.Count > 0 ? _resolution.Candidates : new[] { url };
+        var refusal = await _service.StartAsync(urls, _resolution.Station).ConfigureAwait(true);
 
         if (refusal is null)
         {
             ShowInfo(null);
+        }
+        else if (refusal == RecordingRefusal.Network && !string.IsNullOrWhiteSpace(_service.LastFailureDetail))
+        {
+            ShowWarning(Localization.Get("S_RecNetworkDetail", _service.LastFailureDetail!));
         }
         else
         {
@@ -251,6 +295,81 @@ public sealed partial class RecordingsViewModel : BaseViewModel
 
         ApplyPlaying();
         return Task.CompletedTask;
+    }
+
+    /// <summary>Le doigt prend la barre : le lecteur ne la déplace plus jusqu'au lâcher.</summary>
+    [RelayCommand]
+    private void SeekStarted(RecordingRow? row)
+    {
+        if (row is not null)
+        {
+            row.IsSeeking = true;
+        }
+    }
+
+    /// <summary>
+    /// Le doigt lâche la barre : la lecture saute à cet endroit, borné à la durée
+    /// du fichier. Sans effet sur une ligne qui n'est pas en lecture.
+    /// </summary>
+    [RelayCommand]
+    private void SeekCompleted(RecordingRow? row)
+    {
+        if (row is null)
+        {
+            return;
+        }
+
+        row.IsSeeking = false;
+        var platform = _service.Platform;
+
+        if (!row.IsPlaying || !platform.IsPlaying || !SamePath(platform.PlayingPath, row.Entry.Path))
+        {
+            UpdatePlayback();
+            return;
+        }
+
+        var target = Math.Clamp(row.PositionSeconds, 0, row.DurationSeconds);
+
+        try
+        {
+            platform.SeekTo(TimeSpan.FromSeconds(target));
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+
+        row.PositionSeconds = target;
+    }
+
+    /// <summary>
+    /// Met à jour le compteur et la barre de la ligne en lecture ; remet les autres
+    /// au début. Appelée à chaque changement de lecture et quatre fois par seconde
+    /// pendant l'écoute.
+    /// </summary>
+    public void UpdatePlayback()
+    {
+        var platform = _service.Platform;
+
+        foreach (var row in Items)
+        {
+            if (row.IsPlaying)
+            {
+                var duration = platform.PlaybackDuration > TimeSpan.Zero ? platform.PlaybackDuration : row.Entry.Duration;
+                row.DurationSeconds = Math.Max(1, duration.TotalSeconds);
+
+                if (!row.IsSeeking)
+                {
+                    row.PositionSeconds = Math.Clamp(platform.PlaybackPosition.TotalSeconds, 0, row.DurationSeconds);
+                }
+            }
+            else
+            {
+                row.IsSeeking = false;
+                row.DurationSeconds = Math.Max(1, row.Entry.Duration.TotalSeconds);
+                row.PositionSeconds = 0;
+            }
+        }
     }
 
     [RelayCommand]
@@ -411,12 +530,17 @@ public sealed partial class RecordingsViewModel : BaseViewModel
         {
             var local = entry.Started.ToLocalTime();
 
-            Items.Add(new RecordingRow
+            var row = new RecordingRow
             {
                 Entry = entry,
                 Title = string.IsNullOrWhiteSpace(entry.Station) ? "Radio" : entry.Station,
                 Subtitle = $"{local.ToString("dd/MM HH:mm", CultureInfo.InvariantCulture)} · {FormatDuration(entry.Duration)}",
-            });
+                DurationSeconds = Math.Max(1, entry.Duration.TotalSeconds),
+            };
+
+            row.StartSeek = new RelayCommand(() => SeekStarted(row));
+            row.EndSeek = new RelayCommand(() => SeekCompleted(row));
+            Items.Add(row);
         }
 
         HasItems = Items.Count > 0;
@@ -430,6 +554,65 @@ public sealed partial class RecordingsViewModel : BaseViewModel
         foreach (var row in Items)
         {
             row.IsPlaying = platform.IsPlaying && SamePath(platform.PlayingPath, row.Entry.Path);
+        }
+
+        UpdatePlayback();
+
+        if (platform.IsPlaying)
+        {
+            StartTicker();
+        }
+        else
+        {
+            StopTicker();
+        }
+    }
+
+    private void StartTicker()
+    {
+        if (_ticker is not null)
+        {
+            return;
+        }
+
+        var cts = new CancellationTokenSource();
+        _ticker = cts;
+        _ = TickAsync(cts.Token);
+    }
+
+    private void StopTicker()
+    {
+        _ticker?.Cancel();
+        _ticker?.Dispose();
+        _ticker = null;
+    }
+
+    private async Task TickAsync(CancellationToken ct)
+    {
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                await Task.Delay(PlaybackTick, ct).ConfigureAwait(false);
+
+                // Une lecture arrêtée sans passer par ici (fin de fichier ratée,
+                // arrêt par le système) remet aussi le bouton et la barre en place.
+                OnMainThread(() =>
+                {
+                    if (_service.Platform.IsPlaying)
+                    {
+                        UpdatePlayback();
+                    }
+                    else
+                    {
+                        ApplyPlaying();
+                    }
+                });
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Écoute terminée.
         }
     }
 

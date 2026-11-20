@@ -52,6 +52,12 @@ public sealed class SpeakerDevice : IAsyncDisposable
     /// </summary>
     public bool AgentTooOld => Str is not null && AgentRequirement.IsTooOld(AgentVersionText);
 
+    /// <summary>
+    /// Vrai quand on peut renommer ou effacer les touches du magasin de l'agent
+    /// (PATCH et DELETE /api/presets/n) : un agent à la version minimale (1.8.0).
+    /// </summary>
+    public bool CanEditPresets => Str is not null && !AgentTooOld;
+
     /// <summary>Vrai quand l'agent sait ajouter le titre Spotify en cours aux Titres likés (agent 1.8.1+).</summary>
     public bool SupportsSpotifyLiked => Str is not null && Agent?.SupportsSpotifyLiked == true;
 

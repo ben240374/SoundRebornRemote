@@ -1,8 +1,8 @@
 # SoundReborn Remote — Manual de uso
 
-Versión 1.8.1 · Android 7 y posteriores
+Versión 1.8.2 · Android 7 y posteriores
 
-> Idiomas: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · **Español**
+> Idiomas: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · **Español** · [Italiano](it.md)
 
 ---
 
@@ -40,7 +40,7 @@ Cuatro condiciones:
   el agente.
   La instalación se hace con la herramienta STR para PC o Mac — <https://st-reborn.de>.
   **Esta aplicación no lo instala**; solo señala los altavoces que no lo tienen.
-- **Un agente STR 1.6.0 o posterior para cambiar grupos.** Con un agente más antiguo,
+- **Un agente STR 1.8.0 o posterior para cambiar grupos.** Con un agente más antiguo,
   la aplicación lo indica y no toca los grupos; todo lo demás funciona.
 - **Android 7 o posterior.**
 
@@ -64,7 +64,7 @@ contactos, ni a la ubicación, ni al almacenamiento.
 ## 3. Primer arranque
 
 La aplicación se abre en el idioma del teléfono si lo conoce — francés, inglés, alemán,
-neerlandés, español — y en inglés en caso contrario. Podrás cambiarlo cuando quieras.
+neerlandés, español, italiano — y en inglés en caso contrario. Podrás cambiarlo cuando quieras.
 
 En el primer arranque no hay ningún altavoz conocido. Ve a **Ajustes** y luego a
 **Escanear la red local**.
@@ -112,6 +112,11 @@ quita, como las teclas de pulgar del mando. La canción va a la cuenta de Spotif
 el **altavoz** ha iniciado sesión, que no es necesariamente la de tu teléfono. Un altavoz
 con pantalla muestra «LIKED» o «REMOVED».
 
+Durante una tecla de Spotify (una presintonía que reproduce una lista de Spotify), el altavoz
+solo conoce el nombre de la lista. Con el agente STR 1.8.2 o posterior, la aplicación muestra
+en su lugar la canción, el artista y la carátula, con «Spotify · lista» como fuente; la
+canción se vuelve a leer cada cinco segundos aproximadamente.
+
 ### Mandos
 
 Cuatro teclas: parar, anterior, reproducir/pausar, siguiente. Según la fuente, algunas no
@@ -156,7 +161,9 @@ borde verde es la que suena.
 
 Cuando el agente STR admite la segunda fila, aparecen sobre las tarjetas dos botones,
 **Una vez** y **Dos veces**: el segundo muestra las seis emisoras que el altavoz inicia
-al pulsar una tecla dos veces. La elección vale para las dos pestañas.
+al pulsar una tecla dos veces. La elección vale para las dos pestañas. Cada tarjeta muestra arriba el nombre de su tecla («Tecla 1» a «Tecla 6», en las dos
+filas), y el botón **Dos veces** lleva un pequeño número: cuántas teclas de la segunda fila
+tienen una emisora.
 
 **Guardar lo que suena en una tecla**, bajo las tarjetas, guarda en la tecla que elijas
 lo que el altavoz reproduce en este momento — emisora, álbum o pista de la biblioteca.
@@ -219,6 +226,17 @@ agente, o con uno más antiguo.
 Una tecla que solo tiene emisora en su segunda fila aparece vacía en **Una vez**: una
 sola pulsación en el altavoz inicia entonces la emisora de la segunda fila (agente STR
 1.6.3 y posteriores).
+
+### Renombrar y borrar una tecla
+
+Cada tarjeta muestra arriba el nombre de su tecla. En una tecla guardada por el agente STR hay
+dos pequeños botones a su lado: **✎** renombra la tecla y **✕** la borra, tras confirmar.
+Renombrar solo cambia el nombre mostrado: la emisora, su imagen y la lista de una tecla de
+Spotify se mantienen. Un nombre tiene como máximo 64 caracteres. El botón **Dos veces** indica
+cuántas teclas de la segunda fila tienen una emisora.
+
+Una tecla que solo conoce el firmware del altavoz, y una tecla vacía, no tienen esos botones:
+el agente no tendría nada que renombrar ni borrar.
 
 ### Copiar las teclas a otro altavoz
 
@@ -294,6 +312,9 @@ reproduce en el teléfono, ⤴ abre el menú de compartir de Android, la papeler
 confirmar. Con 10 grabaciones, la aplicación no hace una nueva: elimina primero la que ya no
 necesites. Las grabaciones se quedan en la aplicación y desaparecen si la desinstalas. La lista sigue disponible aunque ningún altavoz responda: solo la grabación es entonces imposible.
 
+Mientras suena una grabación, aparecen debajo una barra y un contador: «01:23 / 04:50», la
+posición y la duración. Desliza la barra para moverte por la grabación.
+
 **Escuchado recientemente** recoge el historial que lleva el agente: toca una línea para
 volver a empezar.
 
@@ -361,7 +382,7 @@ lo que usted cambió. Requiere el agente STR. La hora se ajusta en el reloj del 
 Marque la casilla, elija el nivel y pulse **Guardar el volumen de inicio**. Un volumen
 ajustado durante la escucha nunca se modifica.
 
-**Idioma**: español, francés, inglés, alemán, neerlandés. El cambio es inmediato, sin
+**Idioma**: español, francés, inglés, alemán, neerlandés, italiano. El cambio es inmediato, sin
 reiniciar, y queda memorizado.
 
 **Tema**: Sistema, Claro u Oscuro. «Sistema» sigue el ajuste de pantalla del teléfono,
@@ -377,7 +398,7 @@ altavoz marcado **«Sin STR — listo para la instalación»** responde bien per
 agente; más abajo aparece entonces un bloque explicativo con un enlace al sitio del
 proyecto STR.
 
-Un altavoz cuyo agente es anterior a la versión 1.6.0 muestra un bloque parecido,
+Un altavoz cuyo agente es anterior a la versión 1.8.0 muestra un bloque parecido,
 **Agente STR demasiado antiguo**, y su tarjeta en la pestaña Reproducción indica
 «demasiado antiguo».
 
@@ -461,6 +482,8 @@ desde una presintonía o el directorio y abre de nuevo la pestaña Fuentes.
 - **Copia de teclas: agente STR 1.6.5 o posterior** en el altavoz de origen.
 - **Me gusta y No me gusta: agente STR 1.8.1 o posterior.** La canción va a la cuenta de
   Spotify con la que el altavoz ha iniciado sesión.
+- **Renombrar y borrar teclas: agente STR 1.8.0 o posterior; la canción de una tecla de
+  Spotify: 1.8.2 o posterior.**
 
 ---
 

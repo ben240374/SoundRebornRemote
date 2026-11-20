@@ -130,6 +130,26 @@ public static class StreamPreparer
     }
 
     /// <summary>La première adresse http(s) d'une liste .pls (« FileN=… ») ou .m3u (une adresse par ligne).</summary>
+    /// <summary>
+    /// Ce qu'on peut dire d'un flux qui n'a pas pu s'ouvrir : « HTTP 403 »,
+    /// « timeout », le type d'erreur réseau… Null quand on ne sait rien de plus.
+    /// </summary>
+    public static string? Describe(RecordingException ex)
+    {
+        if (!string.IsNullOrWhiteSpace(ex.Detail))
+        {
+            return ex.Detail;
+        }
+
+        return ex.InnerException switch
+        {
+            OperationCanceledException => "timeout",
+            HttpRequestException { HttpRequestError: not HttpRequestError.Unknown } http => http.HttpRequestError.ToString(),
+            null => null,
+            var inner => inner.GetType().Name,
+        };
+    }
+
     public static string? FirstUrlInPlaylist(string text)
     {
         foreach (var raw in text.Split('\n'))
@@ -180,8 +200,9 @@ public static class StreamPreparer
 
         if (!response.IsSuccessStatusCode)
         {
+            var status = (int)response.StatusCode;
             response.Dispose();
-            throw new RecordingException(RecordingRefusal.Network);
+            throw new RecordingException(RecordingRefusal.Network, null, $"HTTP {status}");
         }
 
         return response;

@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SoundReborn Remote — Manuale d'uso</title>
+<meta name="description" content="Manuale d'uso — SoundReborn Remote, telecomando Android per diffusori Bose SoundTouch.">
+<style>
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --raised: #edf1f6; --border: #d6dee8;
+  --text: #141a21; --muted: #53616f; --faint: #7c8a99; --accent: #2f7ff0;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1218; --surface: #171d25; --raised: #212a34; --border: #2e3945;
+    --text: #f3f6f9; --muted: #9daab8; --faint: #6b7886; --accent: #5b9bf5;
+  }
+}
+* { box-sizing: border-box; }
+.switch { margin: -6px 0 18px; font-size: 15px; }
+.switch a { color: var(--accent); }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 72px; }
+header.top {
+  border-bottom: 1px solid var(--border); background: var(--surface);
+  padding: 14px 0; margin-bottom: 40px;
+}
+header.top .wrap { padding-bottom: 0; display: flex; gap: 16px;
+  align-items: baseline; flex-wrap: wrap; }
+header.top a { color: var(--muted); text-decoration: none; font-size: 14px; }
+header.top a:hover { color: var(--accent); }
+header.top .name { color: var(--text); font-weight: 600; font-size: 15px; }
+
+h1 { font-size: 30px; line-height: 1.22; margin: 0 0 6px; letter-spacing: -0.4px; }
+h2 { font-size: 21px; margin: 44px 0 10px; padding-bottom: 7px;
+     border-bottom: 1px solid var(--border); }
+h3 { font-size: 16.5px; margin: 26px 0 6px; color: var(--accent); }
+p { margin: 0 0 14px; }
+ul, ol { margin: 0 0 16px; padding-left: 22px; }
+li { margin-bottom: 6px; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+/* Les URL nues des manuels sont plus larges qu'un écran de téléphone. */
+p, li, td, th, blockquote { overflow-wrap: break-word; }
+code { background: var(--raised); padding: 2px 5px; border-radius: 4px;
+       font-size: 13.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--border);
+             color: var(--muted); font-size: 15px; background: var(--surface);
+             border-radius: 0 6px 6px 0; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
+img { display: block; margin: 22px auto; max-width: 260px; width: 100%;
+      border: 1px solid var(--border); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; margin: 0 0 18px; font-size: 14.5px;
+        display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left;
+         vertical-align: top; }
+th { background: var(--raised); }
+.sub { color: var(--muted); margin-bottom: 30px; }
+
+.langbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 34px; padding: 0;
+           list-style: none; }
+.langbar a {
+  display: inline-block; padding: 6px 13px; border: 1px solid var(--border);
+  border-radius: 999px; background: var(--surface); text-decoration: none;
+  font-size: 14px; color: var(--muted);
+}
+.langbar a:hover { border-color: var(--accent); color: var(--accent); }
+.langbar a[aria-current] { background: var(--accent); border-color: var(--accent);
+                           color: #fff; }
+
+.cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+         margin: 0 0 32px; padding: 0; list-style: none; }
+.cards a {
+  display: block; padding: 15px 17px; background: var(--surface); text-decoration: none;
+  border: 1px solid var(--border); border-radius: 11px; color: var(--text);
+}
+.cards a:hover { border-color: var(--accent); }
+.cards strong { display: block; font-size: 16px; margin-bottom: 2px; }
+.cards span { color: var(--muted); font-size: 14px; }
+
+.shots { display: flex; gap: 12px; overflow-x: auto; margin: 0 0 32px; padding-bottom: 6px; }
+.shots img { margin: 0; flex: 0 0 auto; width: 190px; max-width: 45vw; }
+
+.cta {
+  display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+  padding: 11px 20px; border-radius: 9px; font-weight: 600; margin: 0 10px 12px 0;
+}
+.cta.ghost { background: transparent; color: var(--accent);
+             border: 1px solid var(--accent); }
+.note { background: var(--surface); border: 1px solid var(--border);
+        border-left: 3px solid var(--accent); border-radius: 0 9px 9px 0;
+        padding: 13px 16px; margin: 0 0 28px; font-size: 15px; }
+footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--border);
+         color: var(--faint); font-size: 13.5px; }
+footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="name" href="../index.html">SoundReborn Remote</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote">GitHub</a>
+  <a href="https://github.com/ben240374/SoundRebornRemote/releases">Scarica</a>
+  <a href="https://st-reborn.de">STR</a>
+</div></header>
+<div class="wrap">
+<h1 id="soundreborn-remote--manuale-duso">SoundReborn Remote — Manuale d'uso</h1>
+<p>Versione 1.8.2 · Android 7 e successivi</p>
+<ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li><li><a href="it.html" aria-current="page">Italiano</a></li></ul><hr />
+<h2 id="indice">Indice</h2>
+<ol>
+<li><a href="#1-cosa-serve-prima">Cosa serve prima</a></li>
+<li><a href="#2-installazione">Installazione</a></li>
+<li><a href="#3-primo-avvio">Primo avvio</a></li>
+<li><a href="#4-la-scheda-riproduzione">La scheda Riproduzione</a></li>
+<li><a href="#5-la-scheda-preselezioni">La scheda Preselezioni</a></li>
+<li><a href="#6-la-scheda-sorgenti">La scheda Sorgenti</a></li>
+<li><a href="#7-la-scheda-gruppi">La scheda Gruppi</a></li>
+<li><a href="#8-la-scheda-impostazioni">La scheda Impostazioni</a></li>
+<li><a href="#9-gesti">Gesti</a></li>
+<li><a href="#10-cosa-fare-se">Cosa fare se…</a></li>
+<li><a href="#11-limiti-noti">Limiti noti</a></li>
+<li><a href="#12-note-legali">Note legali</a></li>
+</ol>
+<hr />
+<h2 id="1-cosa-serve-prima">1. Cosa serve prima</h2>
+<p>SoundReborn Remote comanda i diffusori <strong>Bose SoundTouch</strong> da un telefono o da un tablet
+Android. Tutto avviene sulla tua rete locale: nessun account, nessun servizio online,
+nessun dato che esce da casa.</p>
+<p>Quattro condizioni:</p>
+<ul>
+<li><strong>Telefono e diffusori sulla stessa rete Wi-Fi.</strong> Attenzione alle reti ospiti e ai
+  router che isolano i dispositivi tra loro: in quel caso non verrà trovato nulla.</li>
+<li><strong>L'agente STR installato sui diffusori.</strong> Sostituisce ciò che forniva il cloud Bose fino
+  alla sua chiusura, il 6 maggio 2026. Senza di esso l'app funziona ancora, ma si limita a
+  ciò che espone il solo firmware: volume, bassi, preselezioni già memorizzate. La ricerca
+  delle stazioni, l'assegnazione delle preselezioni e i gruppi affidabili passano tutti
+  dall'agente. L'installazione si fa con lo strumento STR per PC o Mac —
+  <a href="https://st-reborn.de">https://st-reborn.de</a>. <strong>Questa app non lo installa</strong>; segnala soltanto i diffusori che
+  ne sono privi.</li>
+<li><strong>Un agente STR 1.8.0 o successivo per modificare i gruppi.</strong> Con un agente più vecchio,
+  l'app lo dice e non tocca i gruppi; tutto il resto funziona.</li>
+<li><strong>Android 7 o successivo.</strong></li>
+</ul>
+<hr />
+<h2 id="2-installazione">2. Installazione</h2>
+<p>L'app non è distribuita tramite il Play Store. Scaricala dalla pagina <em>Releases</em> del
+progetto: <a href="https://github.com/ben240374/SoundRebornRemote/releases">https://github.com/ben240374/SoundRebornRemote/releases</a></p>
+<ol>
+<li>Scarica il file <code>.apk</code> sul telefono.</li>
+<li>Aprilo. Android chiederà il permesso di installare da una fonte sconosciuta: concedilo
+   all'app che ha fatto il download, di solito il browser.</li>
+<li>Installa, poi apri.</li>
+</ol>
+<p>Al primo avvio non viene chiesto nessun permesso particolare: l'app non tocca né i
+contatti, né la posizione, né la memoria.</p>
+<hr />
+<h2 id="3-primo-avvio">3. Primo avvio</h2>
+<p>L'app si apre nella lingua del telefono se la conosce — francese, inglese, tedesco,
+olandese, spagnolo, italiano — e in inglese altrimenti. Puoi cambiarla in qualsiasi
+momento.</p>
+<p>Al primo avvio non è conosciuto nessun diffusore. Vai in <strong>Impostazioni</strong>, poi <strong>Cerca
+nella rete locale</strong>.</p>
+<p><img alt="Impostazioni" src="../images/06-reglages.jpg" /></p>
+<p>La ricerca avviene in due tempi. Prima chiede ai dispositivi di annunciarsi (mDNS): è la
+via rapida, due o tre secondi. Se nessuno risponde, interroga uno per uno i 254 indirizzi
+della sottorete sulla porta 8090 — qualche secondo in più, ma funziona anche dove il
+multicast è filtrato.</p>
+<p>I diffusori trovati compaiono sotto <strong>DIFFUSORI CONOSCIUTI</strong>. Tocca <strong>Usa</strong> su quello che
+vuoi comandare. Viene ricordato: al prossimo avvio l'app vi si ricollega da sola.</p>
+<p>Se la ricerca non trova nulla ma conosci l'indirizzo IP del diffusore, scrivilo nel campo
+previsto e tocca <strong>Aggiungi</strong>.</p>
+<hr />
+<h2 id="4-la-scheda-riproduzione">4. La scheda Riproduzione</h2>
+<p>La schermata principale, quella che apri per agire in fretta.</p>
+<p><img alt="Riproduzione" src="../images/01-lecture.jpg" /></p>
+<h3 id="scegliere-il-diffusore">Scegliere il diffusore</h3>
+<p>In alto, una scheda per ogni diffusore conosciuto, con il modello e la versione
+dell'agente STR. La scheda bordata di blu è quella comandata; tocca un'altra scheda per
+cambiare, senza passare dalle impostazioni.</p>
+<p>Il pallino a destra indica il collegamento: <strong>in diretta</strong> significa che il diffusore
+invia i suoi cambiamenti in tempo reale, <strong>interrogazione</strong> che l'app li rilegge a
+intervalli. In questo secondo caso, una modifica fatta da un altro telecomando impiega un
+secondo o due a comparire.</p>
+<h3 id="ora">Ora</h3>
+<p>La copertina, il titolo e la sorgente di ciò che suona. Per una radio, il suo logo e il
+suo nome; per Spotify, la copertina dell'album.</p>
+<p>Quando suona Spotify e l'agente STR è alla versione 1.8.1 o successiva, sotto il titolo
+compaiono due pulsanti: <strong>Mi piace</strong> aggiunge il brano in corso ai Brani che ti piacciono,
+<strong>Non mi piace</strong> lo toglie, come i tasti con il pollice del telecomando. Il brano va
+nell'account Spotify con cui è collegato il <strong>diffusore</strong>, che non è per forza quello del
+tuo telefono. Un diffusore con display mostra «LIKED» o «REMOVED».</p>
+<p>Durante un tasto Spotify (una preselezione che riproduce una playlist Spotify), il
+diffusore conosce solo il nome della playlist. Con l'agente STR 1.8.2 o successivo, l'app
+mostra al suo posto il brano, l'artista e la copertina, con «Spotify · playlist» come
+sorgente; il brano viene riletto circa ogni cinque secondi.</p>
+<h3 id="comandi">Comandi</h3>
+<p>Quattro tasti: stop, precedente, riproduci/pausa, successivo. A seconda della sorgente
+alcuni non hanno effetto: un flusso radio in diretta non si può riavvolgere.</p>
+<p>La barra verde <strong>Standby</strong> spegne il diffusore; una volta spento, diventa <strong>Accendi</strong>.</p>
+<p>Sotto la barra, <strong>Timer di spegnimento</strong> manda il diffusore in standby dopo un tempo da 15
+a 120 minuti. Mentre è attivo, il collegamento mostra il tempo rimanente; toccalo per
+cambiare la durata o annullare. In un gruppo, l'app chiede se spegnere tutto il gruppo o
+solo il diffusore selezionato. Il timer vive nell'agente STR del diffusore: continua se
+chiudi l'app, ma un riavvio del diffusore lo annulla. Il collegamento compare solo se
+l'agente conosce il timer.</p>
+<h3 id="volume">Volume</h3>
+<p>Muto, livello, meno, cursore, più. La percentuale è indicata a destra.</p>
+<p>Quando il diffusore fa parte di un gruppo, questo cursore diventa <strong>il volume di tutto il
+gruppo</strong>: spostarlo sposta ogni diffusore della stessa quantità, e così l'equilibrio che hai
+impostato tra loro resta. Se la cucina è a 60 e il soggiorno a 30, alzare il gruppo di 10 dà
+70 e 40, non 70 e 35.</p>
+<p>Il tasto <strong>=</strong>, tra muto e meno, fa il contrario: porta <em>ogni</em> diffusore del gruppo al
+valore indicato. Gruppo a 25, tutti a 25. Compare solo quando un gruppo è attivo: da solo,
+un diffusore non ha nulla da livellare.</p>
+<p>Sotto il cursore, <strong>Per diffusore</strong> elenca ogni membro del gruppo con il suo cursore e i
+suoi tasti − e +, così puoi abbassare la cucina senza toccare il soggiorno. Un diffusore
+spento appare attenuato e non reagisce: mandargli un comando farebbe solo aspettare l'app
+per niente.</p>
+<h3 id="bassi-e-preselezioni">Bassi e preselezioni</h3>
+<p><img alt="Bassi e preselezioni" src="../images/02-lecture-graves.jpg" /></p>
+<p>I bassi vanno da -10 a +10 a seconda del modello. <strong>Non c'è regolazione degli acuti</strong>:
+l'API del diffusore non ne offre — non è una dimenticanza dell'app.</p>
+<p>Le sei preselezioni sono ripetute qui per risparmiare un cambio di scheda. Il riquadro
+bordato di verde è quello che suona.</p>
+<p>Quando l'agente STR gestisce la seconda fila, sopra i riquadri compaiono due pulsanti,
+<strong>Una volta</strong> e <strong>Due volte</strong>: il secondo mostra le sei stazioni che il diffusore avvia
+quando si preme due volte un tasto. La scelta vale per entrambe le schede. Ogni riquadro
+porta in alto il nome del suo tasto («Tasto 1» – «Tasto 6», in entrambe le file), e il
+pulsante <strong>Due volte</strong> porta un piccolo numero: quanti tasti della seconda fila hanno una
+stazione.</p>
+<p><strong>Salva su un tasto ciò che suona</strong>, sotto i riquadri, memorizza sul tasto che scegli ciò
+che il diffusore riproduce in questo momento — stazione, album o brano della libreria.
+Spotify, AUX e Bluetooth non si possono salvare in questo modo.</p>
+<h3 id="raggruppa-con">Raggruppa con</h3>
+<p>Un pulsante per ogni diffusore, tranne quello a cui vanno i comandi. Tocca un pulsante per
+aggiungere quel diffusore al gruppo; compaiono una spunta e un bordo verde. Toccalo di
+nuovo per toglierlo.</p>
+<p>Il raggruppamento richiede qualche secondo: nel frattempo il riquadro mostra
+<em>Raggruppamento con …</em>, poi il risultato — o l'errore, in rosso.</p>
+<p><strong>Il diffusore principale viene trovato, non presunto.</strong> In un gruppo, un diffusore
+trasmette e gli altri lo seguono. Se selezioni un diffusore che segue, l'app lo dice —
+<em>Raggruppato con …</em> in ambra — e invia trasporto, preselezioni e volume al principale,
+perché è lui che suona. Selezionare un diffusore quindi non interrompe mai ciò che stai
+ascoltando. Standby e timer di spegnimento fanno eccezione: agiscono sul diffusore
+selezionato.</p>
+<p>Su un diffusore che segue, il pulsante spuntato è il diffusore stesso: toccarlo lo fa
+uscire dal gruppo. Il gruppo si allarga dal diffusore principale, perché è lui che lo
+compone.</p>
+<p><strong>Spegnere un diffusore lo toglie prima dal gruppo</strong>, e scioglie il gruppo se era l'ultimo
+membro. Riaccenderlo ti restituisce un diffusore da solo, che suona ciò che suona, e che
+puoi raggruppare di nuovo.</p>
+<p>Il collegamento <strong>Aggiorna</strong> in fondo rilegge tutto: titolo in corso, copertina, volume,
+stato del gruppo.</p>
+<p>Se il diffusore che aggiungi suona qualcos'altro, o è in pausa, l'app lo dice prima di
+raggruppare: «Salon sta riproducendo Radio Contact. Aggiungerlo al gruppo interrompe questo
+ascolto per riprodurre Bel RTL.» Non cambia nulla finché non tocchi <strong>Aggiungi</strong>. Un
+diffusore in standby, o che suona già la stessa cosa, viene aggiunto senza domanda.</p>
+<hr />
+<h2 id="5-la-scheda-preselezioni">5. La scheda Preselezioni</h2>
+<p><img alt="Preselezioni" src="../images/03-preselections.jpg" /></p>
+<h3 id="i-sei-tasti">I sei tasti</h3>
+<p>Gli stessi sei dei tasti fisici del diffusore. Ogni riquadro mostra il logo della stazione
+e il suo bitrate. Tocca per avviare la riproduzione; il bordo verde indica quello che suona.</p>
+<p>I loghi vengono scaricati e poi conservati sul telefono. Quando ne manca uno, la stazione
+non pubblica un'immagine utilizzabile, oppure il suo server non risponde.</p>
+<h3 id="una-volta-due-volte">Una volta, due volte</h3>
+<p>Con un agente STR recente (v1.6 e successivi), ogni tasto del diffusore porta due
+stazioni: una pressione avvia la prima, due pressioni rapide la seconda. I pulsanti <strong>Una
+volta</strong> e <strong>Due volte</strong> scelgono la fila mostrata; i riquadri mantengono il numero del
+tasto, da ① a ⑥.</p>
+<p>La seconda fila esiste solo nell'agente: i pulsanti non compaiono su un diffusore senza
+agente, o con un agente più vecchio.</p>
+<p>Un tasto che ha una stazione solo sulla seconda fila appare vuoto sotto <strong>Una volta</strong>: una
+sola pressione sul diffusore avvia allora la stazione della seconda fila (agente STR 1.6.3
+e successivi).</p>
+<h3 id="rinominare-e-cancellare-un-tasto">Rinominare e cancellare un tasto</h3>
+<p>Ogni riquadro porta in alto il nome del suo tasto. Su un tasto memorizzato dall'agente STR,
+accanto ci sono due piccoli pulsanti: <strong>✎</strong> rinomina il tasto e <strong>✕</strong> lo cancella, dopo
+conferma. Rinominare cambia solo il nome mostrato: la stazione, la sua immagine e la
+playlist di un tasto Spotify restano. Un nome conta al massimo 64 caratteri. Il pulsante
+<strong>Due volte</strong> indica quanti tasti della seconda fila hanno una stazione.</p>
+<p>Un tasto che conosce solo il firmware del diffusore, e un tasto vuoto, non hanno questi
+pulsanti: l'agente non avrebbe nulla da rinominare né da cancellare.</p>
+<h3 id="copiare-i-tasti-su-un-altro-diffusore">Copiare i tasti su un altro diffusore</h3>
+<p>Il riquadro <strong>Copia i tasti</strong> copia tutti i tasti del diffusore selezionato su un altro
+diffusore STR, o su tutti. Tocca <strong>Copia su…</strong>, scegli la destinazione, poi conferma. Ogni
+tasto impostato qui sostituisce quello di destinazione; gli altri tasti di destinazione
+restano. Entrambe le file vanno a una destinazione che ne ha due. Quando un tasto Spotify fa
+parte della copia, l'account Spotify di questo diffusore viene trasmesso alla destinazione:
+la domanda di conferma lo dice. Il risultato è mostrato per diffusore.</p>
+<p>La copia richiede l'agente STR 1.6.5 o successivo sul diffusore selezionato.</p>
+<h3 id="trovare-una-stazione">Trovare una stazione</h3>
+<p>La casella di ricerca interroga <strong>radio-browser.info</strong>, un elenco aperto curato da
+volontari. Due menu a tendina restringono la ricerca a un paese e a una lingua, e <strong>Le più
+ascoltate</strong> mostra le stazioni più ascoltate senza scrivere nulla.</p>
+<p>La casella <strong>Solo compatibili Bose</strong> è spuntata in partenza, ed è meglio lasciarla così:
+esclude i formati che i diffusori SoundTouch non sanno decodificare (Ogg, Opus, FLAC), che
+darebbero silenzio senza alcun messaggio d'errore.</p>
+<p>Tocca un risultato e si apre un menu con</p>
+<ul>
+<li><strong>Ascolta ora</strong> — riproduce subito la stazione, senza memorizzare nulla;</li>
+<li><strong>① Assegna a questo tasto</strong> se il tasto è libero, oppure <strong>① Sostituisci Bel RTL</strong> se è
+  occupato — il nome della stazione già presente è indicato, così non sovrascrivi quella a
+  cui tenevi.</li>
+</ul>
+<p><strong>L'assegnazione richiede l'agente STR.</strong> Senza di esso è possibile solo l'ascolto
+immediato; la memorizzazione si fa allora tenendo premuto il tasto sul diffusore stesso,
+oppure dall'app STR per computer.</p>
+<p>Con la seconda fila, il menu offre dodici tasti: da <strong>①</strong> a <strong>⑥</strong>, poi da <strong>①×2</strong> a
+<strong>⑥×2</strong>. Una stazione occupa un solo tasto: se è già memorizzata altrove, l'agente rifiuta
+e l'app indica il tasto che la porta.</p>
+<hr />
+<h2 id="6-la-scheda-sorgenti">6. La scheda Sorgenti</h2>
+<p><img alt="Sorgenti" src="../images/04-sources.jpg" /></p>
+<p><strong>Bluetooth</strong>, <strong>AUX</strong> e <strong>Standby</strong> in alto: tre scorciatoie dirette.</p>
+<p><strong>Spotify</strong> non si comanda da questa app. Apri Spotify sul telefono e scegli il diffusore
+nel selettore dei dispositivi (Spotify Connect): compare lì non appena l'agente STR è in
+funzione.</p>
+<p><strong>Sorgenti del diffusore</strong> elenca ciò che il diffusore dichiara, con il suo stato: <code>READY</code>
+significa disponibile, <code>UNAVAILABLE</code> che la sorgente esiste ma non si può usare — di solito
+un servizio di streaming il cui account non è più raggiungibile dalla chiusura del cloud.</p>
+<p><strong>Riprodurre un flusso</strong> accetta l'indirizzo di un flusso audio diretto — un <code>.mp3</code> o un
+<code>.m3u8</code> — e lo avvia sul diffusore. Utile per una web radio assente dall'elenco. Richiede
+l'agente STR.</p>
+<p><strong>Registra</strong> conserva sul telefono un estratto della radio internet che suona sul
+diffusore, per riascoltarlo o inviarlo (WhatsApp, e-mail…). Tocca <strong>Registra</strong>: la
+registrazione si ferma quando tocchi <strong>Ferma</strong>, o da sola dopo 5 minuti. Continua anche a
+schermo spento: una notifica «Registrazione» mostra il contatore e un pulsante <strong>Ferma</strong>.
+Alla prima registrazione, Android 13 e successivi chiedono di consentire le notifiche; se
+rifiuti, la registrazione funziona comunque, senza la notifica.</p>
+<p>Si registrano solo le radio internet il cui flusso è raggiungibile: preselezioni STR,
+stazioni trovate nell'elenco, flussi avviati a mano. Spotify, Deezer, Bluetooth e AUX non
+passano dal telefono e non si possono registrare, come pure i flussi HLS (<code>.m3u8</code>). Il
+telefono apre il flusso della stazione accanto al diffusore: l'ascolto non viene
+disturbato, ma la registrazione consuma dati, circa 1 MB al minuto.</p>
+<p>L'elenco conserva le ultime 10 registrazioni, con la stazione, la data e la durata. ▶ le
+riproduce sul telefono, ⤴ apre il menu di condivisione di Android, il cestino elimina dopo
+conferma. Oltre 10, l'app non ne fa una nuova: elimina prima quella che non ti serve più. Le
+registrazioni restano nell'app e vengono eliminate se la disinstalli. L'elenco resta
+disponibile anche quando nessun diffusore risponde: è impossibile solo registrare.</p>
+<p>Durante l'ascolto di una registrazione, sotto di essa compaiono una barra e un contatore:
+«01:23 / 04:50», la posizione e la durata. Trascina la barra per spostarti nella
+registrazione.</p>
+<p><strong>Ascoltati di recente</strong> mostra la cronologia conservata dall'agente: tocca una riga per
+riavviarla.</p>
+<p>Un album o una cartella della libreria vengono riprodotti per intero, non solo il primo
+brano. Se il server multimediale è spento, l'app lo dice invece di annunciare una
+riproduzione che non parte mai.</p>
+<hr />
+<h2 id="7-la-scheda-gruppi">7. La scheda Gruppi</h2>
+<p><img alt="Gruppi" src="../images/05-groupes.jpg" /></p>
+<p><strong>Diffusore principale</strong> indica quello che trasmette davvero — letto dai diffusori stessi,
+non presunto come quello che hai selezionato.</p>
+<p><strong>Diffusori da raggruppare</strong>: spunta quelli che devono seguire, poi <strong>Raggruppa</strong>.
+<strong>Sciogli</strong> scioglie tutto il gruppo.</p>
+<p>Un diffusore appartiene a un solo gruppo alla volta, ed è il principale che lo compone. Se
+il diffusore che hai selezionato ne segue un altro, <strong>Raggruppa</strong> è disattivato e un
+messaggio ti indirizza al principale.</p>
+<p>L'opzione <strong>Gruppo permanente</strong> chiede all'agente di ricomporre il gruppo alla prossima
+riproduzione, invece di lasciarlo sciogliere quando la musica si ferma. Prima di allargare
+un gruppo esistente, l'app rilegge questa opzione e la ripassa invariata: aggiungere un
+diffusore non trasforma più un gruppo permanente in un gruppo normale.</p>
+<p><strong>Volume del gruppo</strong> agisce su tutti i diffusori insieme, spostando i volumi e mantenendo
+le differenze. Se la cucina è a 60 e il soggiorno a 30, alzare il gruppo di 10 dà 70 e 40 —
+non 70 e 35. Sotto quel cursore, ogni diffusore del gruppo ha il suo. <strong>Applica a tutto il
+gruppo</strong> porta tutti allo stesso valore, come fa il tasto <strong>=</strong> nella scheda Riproduzione.
+Questo riquadro compare solo quando esiste un gruppo.</p>
+<p>Un gruppo permanente resta come l'hai costruito. Mettere in standby uno dei suoi diffusori
+lo toglie dal gruppo che suona senza toglierlo dal gruppo salvato: rientra alla prossima
+riproduzione. E quando un gruppo permanente aspetta la sua prossima riproduzione, l'app lo
+dice e chiede conferma prima di formarne un altro al suo posto.</p>
+<p>Se nessun gruppo suona, è salvato un gruppo normale e tu spunti <strong>Gruppo permanente</strong>,
+l'app chiede anche in questo caso: un gruppo permanente che l'agente tiene da parte dietro
+di esso verrebbe sostituito.</p>
+<hr />
+<h2 id="8-la-scheda-impostazioni">8. La scheda Impostazioni</h2>
+<p><img alt="Diffusori conosciuti" src="../images/07-reglages-enceintes.jpg" /></p>
+<p><strong>Diffusore selezionato</strong>: nome, indirizzo e modello. È il diffusore che hai scelto — non
+per forza quello che riceve i comandi. Quando segue un gruppo, una riga in ambra dice dove
+vanno davvero i comandi, e perché.</p>
+<p><strong>Sveglie</strong>: quelle del diffusore selezionato — una sveglia suona solo sul diffusore su cui
+è salvata, anche in un gruppo. Ogni sveglia riproduce un tasto (da 1 a 6, o da 1 a 6 premuto
+due volte) all'ora e nei giorni che scegli. Imposti anche il suo volume (o mantieni quello
+del diffusore), lo spegnimento automatico e la durata del posticipo. La scheda mostra la
+prossima sveglia come la prevede il diffusore, e avvisa quando il suo orologio non è ancora
+impostato. Se il fuso orario del diffusore è vuoto (UTC), quello del telefono viene salvato
+con la prossima sveglia. Le sveglie modificate altrove — la pagina STR del telefono, l'app
+per computer — non vengono sovrascritte: l'app salva solo ciò che hai cambiato. Richiede
+l'agente STR. L'ora si imposta sul quadrante dell'orologio del telefono. Il cestino su una
+riga elimina la sveglia, dopo conferma.</p>
+<p><strong>Volume di avvio</strong>: il livello che il diffusore assume quando viene acceso e inizia a
+suonare. Spunta la casella, scegli il livello, poi <strong>Salva il volume di avvio</strong>. Un volume
+regolato durante l'ascolto non viene mai modificato.</p>
+<p><strong>Lingua</strong>: italiano, francese, inglese, tedesco, olandese, spagnolo. La modifica è
+immediata, senza riavvio, e viene ricordata.</p>
+<p><strong>Tema</strong>: Sistema, Chiaro o Scuro. «Sistema» segue l'impostazione di visualizzazione del
+telefono, compreso il passaggio automatico della sera.</p>
+<p><strong>Ricerca</strong>: la ricerca nella rete, e l'inserimento manuale per indirizzo IP. La scoperta
+interroga prima mDNS e scandisce la sottorete solo se non trova nulla. La scansione è
+limitata agli intervalli di indirizzi privati, quindi non raggiunge mai una rete mobile o
+un tunnel VPN.</p>
+<p><strong>Diffusori conosciuti</strong>: l'elenco memorizzato. <strong>Usa</strong> passa a uno di essi, <strong>✕</strong> lo
+dimentica. Un diffusore segnato <strong>«Senza STR — pronto per l'installazione»</strong> risponde bene
+ma non ha l'agente; più in basso compare allora un riquadro esplicativo, con un
+collegamento al sito del progetto STR.</p>
+<p>Un diffusore il cui agente è precedente alla versione 1.8.0 fa comparire un riquadro
+simile, <strong>Agente STR troppo vecchio</strong>, e la sua scheda nella scheda Riproduzione indica
+«troppo vecchio».</p>
+<p><strong>Diagnostica</strong>: <em>Interroga il diffusore attivo</em> riporta i dati del diffusore
+<strong>selezionato</strong> — nome, modello, identificativo, versione del firmware, l'agente con la sua
+porta e la sua versione lette in diretta su 17008 e 8888, lo stato delle notifiche,
+l'intervallo dei bassi, l'elenco degli endpoint API riconosciuti, e ciò che ogni diffusore
+conosciuto dichiara sulla zona attuale. Sono le informazioni da allegare a una
+segnalazione. <em>Svuota la cache dei loghi</em> obbliga a scaricare di nuovo le immagini delle
+stazioni.</p>
+<p><strong>Informazioni</strong>: la versione, il ringraziamento al progetto STR con un collegamento al suo
+sito, e le note legali.</p>
+<hr />
+<h2 id="9-gesti">9. Gesti</h2>
+<p><strong>Uno scorrimento orizzontale</strong> passa alla scheda successiva o precedente: Riproduzione →
+Preselezioni → Sorgenti → Gruppi → Impostazioni. Il gesto deve essere deciso; un
+trascinamento lento non viene letto come un cambio di scheda.</p>
+<p>Uno scorrimento che parte <strong>su un cursore</strong> viene preso dal cursore: è voluto, altrimenti
+il volume diventerebbe impossibile da regolare. Inizia il gesto su una zona neutra.</p>
+<hr />
+<h2 id="10-cosa-fare-se">10. Cosa fare se…</h2>
+<p><strong>La ricerca non trova nessun diffusore.</strong>
+Verifica che il telefono sia sulla stessa rete Wi-Fi dei diffusori, non sulla rete ospiti
+né sui dati mobili. Alcuni router isolano i dispositivi tra loro — l'impostazione si chiama
+di solito <em>isolamento AP</em> o <em>modalità client</em>. Se conosci l'indirizzo IP, inseriscilo a
+mano nelle Impostazioni.</p>
+<p><strong>Il diffusore compare ma non risponde nulla.</strong>
+Probabilmente è in standby profondo. Riattivalo con il pulsante di accensione della scheda
+Riproduzione, o premi un tasto fisico sul diffusore.</p>
+<p><strong>Una preselezione non fa nulla.</strong>
+Un tasto vuoto non ha nulla da avviare. Verifica anche che il diffusore non sia spento.</p>
+<p><strong>Non compare nessun logo delle stazioni.</strong>
+Svuota la cache dei loghi nella diagnostica. Se il problema resta per una stazione in
+particolare, la causa è il suo server di immagini.</p>
+<p><strong>Su un diffusore manca la versione dell'agente.</strong>
+O l'agente non è installato, o è troppo vecchio per pubblicare il suo numero di versione.
+Avvia di nuovo la ricerca.</p>
+<p><strong>Il gruppo non si forma.</strong>
+Entrambi i diffusori devono essere accesi e raggiungibili. Se uno dei due non ha l'agente
+STR, il raggruppamento passa dal firmware, meno affidabile, che a volte rifiuta senza
+messaggio.</p>
+<p><strong>L'app è nella lingua sbagliata.</strong>
+Impostazioni → Lingua. La tua scelta prevale sulla lingua del telefono.</p>
+<p><strong>Il pulsante Registra è disattivato.</strong>
+Il messaggio sotto il titolo ne dà il motivo: non suona nulla, la sorgente non è una radio
+internet, oppure l'indirizzo del flusso di questa stazione è sconosciuto. Riavvia la
+stazione da una preselezione o dall'elenco, poi riapri la scheda Sorgenti.</p>
+<hr />
+<h2 id="11-limiti-noti">11. Limiti noti</h2>
+<ul>
+<li><strong>Nessuna regolazione degli acuti.</strong> L'API del diffusore non ne offre.</li>
+<li><strong>L'app non installa l'agente STR.</strong> Servono un accesso di sistema al diffusore e un
+  riavvio; è il compito dello strumento STR per PC o Mac.</li>
+<li><strong>Spotify si comanda da Spotify</strong>, tramite Spotify Connect.</li>
+<li><strong>Nessuna navigazione nella libreria DLNA</strong> per ora.</li>
+<li><strong>Solo Android.</strong> Non esiste una versione iOS.</li>
+<li><strong>La seconda fila, il timer di spegnimento e «salva ciò che suona» richiedono un agente
+  STR recente.</strong> Con un agente più vecchio questi comandi non compaiono o vengono rifiutati.</li>
+<li><strong>Coppie stereo.</strong> L'app non crea né scioglie una coppia stereo. Una coppia non può
+  guidare un gruppo; con un agente STR 1.6.3 o successivo può unirsi a un gruppo avviato su
+  un altro diffusore.</li>
+<li><strong>Registrazione: solo radio internet</strong>, al massimo 5 minuti per registrazione, 10
+  registrazioni conservate.</li>
+<li><strong>Copia dei tasti: agente STR 1.6.5 o successivo</strong> sul diffusore di origine.</li>
+<li><strong>Mi piace e Non mi piace: agente STR 1.8.1 o successivo.</strong> Il brano va nell'account
+  Spotify con cui è collegato il diffusore.</li>
+<li><strong>Rinominare e cancellare i tasti: agente STR 1.8.0 o successivo; il brano di un tasto
+  Spotify: 1.8.2 o successivo.</strong></li>
+</ul>
+<hr />
+<h2 id="12-note-legali">12. Note legali</h2>
+<p>SoundReborn Remote è un progetto personale, distribuito con licenza MIT.</p>
+<p><strong>Non è prodotto né approvato da Bose Corporation.</strong> «Bose» e «SoundTouch» sono marchi di
+Bose Corporation, citati qui solo per indicare la compatibilità.</p>
+<p>È <strong>indipendente dal progetto STR</strong>: non è realizzato, mantenuto né supportato da esso. I
+problemi di questa app vanno segnalati
+<a href="https://github.com/ben240374/SoundRebornRemote/issues">sul suo repository</a>, non al
+progetto STR.</p>
+<p>L'agente <strong>STR (SoundTouch Reborn)</strong> è opera di Jens Roggenfelder
+(<a href="https://github.com/JRpersonal/streborn">JRpersonal</a>) — <a href="https://st-reborn.de">https://st-reborn.de</a>. Senza di
+esso, questa app non avrebbe nulla da comandare.</p>
+<p>L'elenco delle stazioni è fornito da <a href="https://www.radio-browser.info">radio-browser.info</a>.</p>
+<p>Il codice è stato scritto con Claude (Anthropic).</p>
+<footer>
+  <p>SoundReborn Remote — licenza MIT. Progetto personale, non affiliato a Bose Corporation. «Bose» e «SoundTouch» sono marchi di Bose Corporation, citati qui per indicare la compatibilità. Indipendente dal progetto <a href="https://st-reborn.de">STR</a>, che non lo supporta.</p>
+</footer>
+</div>
+</body>
+</html>

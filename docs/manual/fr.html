@@ -107,8 +107,8 @@ footer a { color: var(--muted); }
 </div></header>
 <div class="wrap">
 <h1 id="soundreborn-remote--manuel-dutilisation">SoundReborn Remote — Manuel d'utilisation</h1>
-<p>Version 1.8.1 · Android 7 et suivants</p>
-<ul class="langbar"><li><a href="fr.html" aria-current="page">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
+<p>Version 1.8.2 · Android 7 et suivants</p>
+<ul class="langbar"><li><a href="fr.html" aria-current="page">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li><li><a href="it.html">Italiano</a></li></ul><hr />
 <h2 id="sommaire">Sommaire</h2>
 <ol>
 <li><a href="#1-ce-quil-faut-avant-de-commencer">Ce qu'il faut avant de commencer</a></li>
@@ -141,7 +141,7 @@ ligne, aucune donnée qui sort de chez toi.</p>
   L'installation se fait avec l'outil STR pour PC ou Mac — <a href="https://st-reborn.de">https://st-reborn.de</a>.
   <strong>Cette application ne l'installe pas</strong> ; elle se contente de signaler les enceintes
   qui ne l'ont pas.</li>
-<li><strong>Un agent STR 1.6.0 ou plus récent pour modifier les groupes.</strong> Avec un agent plus
+<li><strong>Un agent STR 1.8.0 ou plus récent pour modifier les groupes.</strong> Avec un agent plus
   ancien, l'application le signale et ne touche pas aux groupes ; le reste fonctionne.</li>
 <li><strong>Android 7 ou plus récent.</strong></li>
 </ul>
@@ -161,7 +161,7 @@ n'accède ni aux contacts, ni à la position, ni au stockage.</p>
 <hr />
 <h2 id="3-premier-démarrage">3. Premier démarrage</h2>
 <p>L'application s'ouvre dans la langue du téléphone si elle la connaît — français,
-anglais, allemand, néerlandais, espagnol — et en anglais sinon. Tu pourras en changer à
+anglais, allemand, néerlandais, espagnol, italien — et en anglais sinon. Tu pourras en changer à
 tout moment.</p>
 <p>Au premier lancement, aucune enceinte n'est connue. Va dans <strong>Réglages</strong>, puis
 <strong>Balayer le réseau local</strong>.</p>
@@ -195,6 +195,10 @@ apparaissent sous le titre : <strong>J'aime</strong> ajoute le morceau en cours 
 <strong>Je n'aime pas</strong> l'en retire, comme les touches pouce de la télécommande. Le morceau va
 dans le compte Spotify avec lequel l'<strong>enceinte</strong> est connectée, qui n'est pas forcément
 celui de ton téléphone. Une enceinte avec écran affiche « LIKED » ou « REMOVED ».</p>
+<p>Pendant une touche Spotify (une présélection qui joue une playlist Spotify), l'enceinte ne
+connaît que le nom de la playlist. Avec l'agent STR 1.8.2 ou plus récent, l'application
+affiche à la place le morceau, l'artiste et la pochette, avec « Spotify · playlist » comme
+source ; le morceau est relu toutes les cinq secondes environ.</p>
 <h3 id="commandes">Commandes</h3>
 <p>Quatre touches : arrêt, précédent, lecture/pause, suivant. Selon la source, certaines
 n'ont pas d'effet — une radio en direct ne se rembobine pas.</p>
@@ -227,7 +231,9 @@ l'application.</p>
 encadrée de vert est celle qui joue.</p>
 <p>Quand l'agent STR gère la seconde rangée, deux pastilles <strong>Une fois</strong> et <strong>Deux fois</strong>
 apparaissent au-dessus des tuiles : la seconde montre les six stations que l'enceinte
-lance quand on presse deux fois une touche. Le choix vaut pour les deux onglets.</p>
+lance quand on presse deux fois une touche. Le choix vaut pour les deux onglets. Chaque tuile porte en haut le nom de sa touche (« Touche 1 » à « Touche 6 », dans les deux
+rangées), et la pastille <strong>Deux fois</strong> affiche un petit nombre : combien de touches de la
+seconde rangée portent une station.</p>
 <p><strong>Garder ce qui joue sur une touche</strong>, sous les tuiles, range sur la touche de ton choix
 ce que l'enceinte joue en ce moment — station, album ou piste de la bibliothèque.
 Spotify, l'AUX et le Bluetooth ne se gardent pas ainsi.</p>
@@ -273,6 +279,14 @@ enceinte sans agent, ou dont l'agent est plus ancien.</p>
 <p>Une touche qui n'a de station que sur sa seconde rangée apparaît vide en <strong>Une fois</strong> :
 une seule pression sur l'enceinte lance alors la station de la seconde rangée (agent
 STR 1.6.3 et suivants).</p>
+<h3 id="renommer-et-effacer-une-touche">Renommer et effacer une touche</h3>
+<p>Chaque tuile porte en haut le nom de sa touche. Sur une touche rangée par l'agent STR, deux
+petits boutons l'accompagnent : <strong>✎</strong> renomme la touche et <strong>✕</strong> l'efface, après
+confirmation. Renommer ne change que le nom affiché : la station, son image et la playlist
+d'une touche Spotify restent. Un nom compte 64 caractères au plus. La pastille <strong>Deux fois</strong>
+indique combien de touches de la seconde rangée portent une station.</p>
+<p>Une touche que seul le firmware de l'enceinte connaît, et une touche vide, n'ont pas ces
+boutons : l'agent n'aurait rien à renommer ni à effacer.</p>
 <h3 id="copier-les-touches-vers-une-autre-enceinte">Copier les touches vers une autre enceinte</h3>
 <p>La carte <strong>Copier les touches</strong> copie toutes les touches de l'enceinte sélectionnée vers
 une autre enceinte STR, ou vers toutes. Touche <strong>Copier vers…</strong>, choisis la cible, puis
@@ -332,6 +346,9 @@ n'est pas perturbée, mais l'enregistrement consomme des données, environ 1 Mo 
 confirmation. Au-delà de 10, l'application refuse d'en faire un nouveau : supprime d'abord
 celui dont tu n'as plus besoin. Les enregistrements restent dans l'application et
 disparaissent si tu la désinstalles. La liste reste disponible même quand aucune enceinte ne répond : seul l'enregistrement est alors impossible.</p>
+<p>Pendant l'écoute d'un enregistrement, une barre et un compteur apparaissent sous lui :
+« 01:23 / 04:50 », la position et la durée. Fais glisser la barre pour te déplacer dans
+l'enregistrement.</p>
 <p><strong>Écouté récemment</strong> reprend l'historique tenu par l'agent : touche une ligne pour
 relancer.</p>
 <p>Un album ou un dossier de la bibliothèque est relancé en entier, pas seulement sa
@@ -381,7 +398,7 @@ n'enregistre que ce que tu as changé. Agent STR requis. L'heure se règle sur l
 <p><strong>Volume de départ</strong> : le niveau que prend l'enceinte quand on l'allume et qu'elle se met
 à jouer. Coche la case, choisis le niveau, puis <strong>Enregistrer le volume de départ</strong>. Un
 volume réglé pendant l'écoute n'est jamais modifié.</p>
-<p><strong>Langue</strong> : français, anglais, allemand, néerlandais, espagnol. Le changement est
+<p><strong>Langue</strong> : français, anglais, allemand, néerlandais, espagnol, italien. Le changement est
 immédiat, sans redémarrage, et il est mémorisé.</p>
 <p><strong>Thème</strong> : Système, Clair ou Foncé. « Système » suit le réglage d'affichage du
 téléphone, y compris sa bascule automatique le soir.</p>
@@ -393,7 +410,7 @@ un réseau mobile ni un tunnel VPN.</p>
 Une enceinte marquée <strong>« Pas de STR — prête pour l'installation »</strong> répond correctement
 mais n'a pas l'agent ; un bloc explicatif apparaît alors plus bas, avec un lien vers le
 site du projet STR.</p>
-<p>Une enceinte dont l'agent est antérieur à la version 1.6.0 fait apparaître un bloc
+<p>Une enceinte dont l'agent est antérieur à la version 1.8.0 fait apparaître un bloc
 semblable, <strong>Agent STR trop ancien</strong>, et sa carte dans l'onglet Lecture porte la mention
 « trop ancien ».</p>
 <p><strong>Diagnostic</strong> : <em>Interroger l'enceinte</em> porte sur l'enceinte <strong>sélectionnée</strong> — nom,
@@ -457,6 +474,8 @@ une présélection ou l'annuaire, puis rouvre l'onglet Sources.</p>
 <li><strong>Copie des touches : agent STR 1.6.5 ou plus récent</strong> sur l'enceinte source.</li>
 <li><strong>« J'aime » et « Je n'aime pas » : agent STR 1.8.1 ou plus récent.</strong> Le titre va dans le
   compte Spotify avec lequel l'enceinte est connectée.</li>
+<li><strong>Renommer et effacer une touche : agent STR 1.8.0 ou plus récent ; le morceau d'une
+  touche Spotify : 1.8.2 ou plus récent.</strong></li>
 </ul>
 <hr />
 <h2 id="12-mentions">12. Mentions</h2>

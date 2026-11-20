@@ -16,6 +16,13 @@ namespace SoundReborn.Core.Recording;
 /// 1. l'historique de l'agent : sa dernière entrée, si c'est la station en cours ;
 /// 2. le magasin de présélections STR : la présélection du même nom ;
 /// 3. la « location » que rapporte l'enceinte, si c'est une vraie adresse de flux.
+///
+/// La première adresse trouvée est l'adresse principale. Les autres sont gardées
+/// derrière elle, puis la variante https de chaque adresse http (l'agent ramène
+/// le https au http pour l'enceinte, qui refuse le TLS ; un serveur qui ne sert
+/// plus que du https répond alors au téléphone sous l'autre forme). Une adresse
+/// qui ne répond pas cède ainsi la place à la suivante au lieu de faire échouer
+/// l'enregistrement.
 /// </summary>
 public static class StreamUrlResolver
 {
@@ -64,8 +71,60 @@ public static class StreamUrlResolver
             return new StreamResolution(null, station, RecordingRefusal.Hls, now.Source);
         }
 
-        return new StreamResolution(url, station, null, now.Source);
+        return new StreamResolution(url, station, null, now.Source)
+        {
+            Candidates = Candidates(url, recent, presets, now.Content?.Location, station, speakerHost),
+        };
     }
+
+    /// <summary>L'adresse principale d'abord, puis les autres adresses connues, puis leurs variantes https.</summary>
+    private static List<string> Candidates(
+        string first,
+        IReadOnlyList<RecentEntry> recent,
+        IReadOnlyList<StrPreset> presets,
+        string? location,
+        string station,
+        string speakerHost)
+    {
+        var raw = new List<string?> { first };
+
+        if (recent.Count > 0 && SameName(recent[0].CardName, station) && !recent[0].IsLibrary)
+        {
+            raw.Add(recent[0].CardUrl);
+        }
+
+        raw.AddRange(presets.Where(p => SameName(p.Name, station)).Select(p => p.StreamUrl));
+        raw.Add(location);
+
+        var found = new List<string>();
+
+        foreach (var value in raw)
+        {
+            foreach (var part in SplitUrls(value))
+            {
+                if (IsDirect(part, speakerHost) && !IsHls(part) &&
+                    !found.Contains(part, StringComparer.OrdinalIgnoreCase))
+                {
+                    found.Add(part);
+                }
+            }
+        }
+
+        var secure = found
+            .Where(u => u.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+            .Select(u => "https://" + u["http://".Length..])
+            .Where(u => !found.Contains(u, StringComparer.OrdinalIgnoreCase))
+            .ToList();
+
+        found.AddRange(secure);
+        return found;
+    }
+
+    /// <summary>Une adresse, ou plusieurs séparées par « | » comme l'agent range ses candidats.</summary>
+    private static IEnumerable<string> SplitUrls(string? value)
+        => string.IsNullOrWhiteSpace(value)
+            ? Enumerable.Empty<string>()
+            : value.Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
     /// <summary>Vrai pour une adresse HLS (« .m3u8 »), sans tenir compte de la query.</summary>
     public static bool IsHls(string url)
@@ -93,7 +152,7 @@ public static class StreamUrlResolver
             return null;
         }
 
-        return IsDirect(last.CardUrl, speakerHost) ? last.CardUrl : null;
+        return SplitUrls(last.CardUrl).FirstOrDefault(u => IsDirect(u, speakerHost));
     }
 
     private static string? FromPresets(IReadOnlyList<StrPreset> presets, string station, string speakerHost)
@@ -104,13 +163,13 @@ public static class StreamUrlResolver
         }
 
         return presets
-            .Where(p => SameName(p.Name, station) && IsDirect(p.StreamUrl, speakerHost))
-            .Select(p => p.StreamUrl)
-            .FirstOrDefault();
+            .Where(p => SameName(p.Name, station))
+            .SelectMany(p => SplitUrls(p.StreamUrl))
+            .FirstOrDefault(u => IsDirect(u, speakerHost));
     }
 
     private static string? FromLocation(string? location, string speakerHost)
-        => IsDirect(location, speakerHost) ? location : null;
+        => SplitUrls(location).FirstOrDefault(u => IsDirect(u, speakerHost));
 
     /// <summary>
     /// Une adresse http(s) qui n'est ni l'enceinte, ni le téléphone lui-même, ni

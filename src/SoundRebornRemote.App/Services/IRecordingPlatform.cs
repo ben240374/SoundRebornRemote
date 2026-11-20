@@ -37,6 +37,15 @@ public interface IRecordingPlatform
     /// <summary>Le fichier en cours de lecture, ou null.</summary>
     string? PlayingPath { get; }
 
+    /// <summary>Position de la lecture en cours ; zéro sans lecture.</summary>
+    TimeSpan PlaybackPosition { get; }
+
+    /// <summary>Durée du fichier en cours de lecture ; zéro sans lecture ou quand le lecteur ne la connaît pas.</summary>
+    TimeSpan PlaybackDuration { get; }
+
+    /// <summary>Déplace la lecture en cours (barre de défilement) ; sans effet sans lecture.</summary>
+    void SeekTo(TimeSpan position);
+
     /// <summary>Ouvre le menu de partage du système avec ce fichier.</summary>
     Task ShareAsync(string path, string contentType, string title);
 }
@@ -59,6 +68,12 @@ public sealed class NoRecordingPlatform : IRecordingPlatform
     public bool IsPlaying => false;
 
     public string? PlayingPath => null;
+
+    public TimeSpan PlaybackPosition => TimeSpan.Zero;
+
+    public TimeSpan PlaybackDuration => TimeSpan.Zero;
+
+    public void SeekTo(TimeSpan position) { }
 
     public Task ShareAsync(string path, string contentType, string title) => Task.CompletedTask;
 }

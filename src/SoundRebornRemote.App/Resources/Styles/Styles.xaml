@@ -138,6 +138,39 @@
         <Setter Property="MinimumHeightRequest" Value="46" />
     </Style>
 
+    <!-- Petits boutons d'une tuile de touche : renommer (✎), effacer (✕). -->
+    <Style x:Key="TileIconButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="TextColor"
+                Value="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="WidthRequest" Value="30" />
+        <Setter Property="HeightRequest" Value="28" />
+        <Setter Property="MinimumWidthRequest" Value="30" />
+        <Setter Property="MinimumHeightRequest" Value="28" />
+        <Setter Property="CornerRadius" Value="6" />
+    </Style>
+
+    <!-- Pastille ronde avec un nombre : touches garnies de la seconde rangée. -->
+    <Style x:Key="CountBadge" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource Accent}" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 9" />
+        <Setter Property="MinimumWidthRequest" Value="18" />
+        <Setter Property="HeightRequest" Value="18" />
+        <Setter Property="Padding" Value="5,0" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
+
+    <Style x:Key="CountBadgeLabel" TargetType="Label">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{StaticResource OnAccent}" />
+        <Setter Property="HorizontalOptions" Value="Center" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
+
     <Style x:Key="QuietButton" TargetType="Button">
         <Setter Property="BackgroundColor" Value="Transparent" />
         <Setter Property="TextColor" Value="{StaticResource Accent}" />

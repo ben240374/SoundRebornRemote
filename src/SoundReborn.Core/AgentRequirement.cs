@@ -6,15 +6,16 @@ namespace SoundReborn.Core;
 ///
 /// Avant la v1.4.0, un groupe formé sans « permanent » par-dessus un groupe
 /// permanent écrasait ce dernier au lieu de le mettre de côté ; plusieurs règles
-/// de l'application reposent sur ce comportement. La v1.6.0 est la version pour
-/// laquelle l'application est écrite et vérifiée : c'est le seuil retenu.
+/// de l'application reposent sur ce comportement. Depuis l'application 1.8.2, le
+/// seuil est la v1.8.0 : c'est la version pour laquelle l'application est écrite
+/// et vérifiée (renommer et effacer une touche en font partie).
 /// </summary>
 public static class AgentRequirement
 {
-    /// <summary>1.6.0.</summary>
-    public static Version Minimum { get; } = new(1, 6, 0);
+    /// <summary>1.8.0.</summary>
+    public static Version Minimum { get; } = new(1, 8, 0);
 
-    /// <summary>« 1.6.0 », pour les messages.</summary>
+    /// <summary>« 1.8.0 », pour les messages.</summary>
     public static string MinimumLabel => $"{Minimum.Major}.{Minimum.Minor}.{Minimum.Build}";
 
     /// <summary>Copie des touches vers une autre enceinte (POST /api/box/preset-copy) : agent 1.6.5.</summary>

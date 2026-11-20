@@ -46,16 +46,27 @@ public static class RecordingRefusal
 public sealed record StreamResolution(string? Url, string Station, string? Refusal, string? Source)
 {
     public bool CanRecord => Url is not null && Refusal is null;
+
+    /// <summary>
+    /// Toutes les adresses connues de la station, dans l'ordre où les essayer ;
+    /// la première est <see cref="Url"/>. Si elle ne répond pas, les suivantes
+    /// prennent le relais.
+    /// </summary>
+    public IReadOnlyList<string> Candidates { get; init; } = Array.Empty<string>();
 }
 
 /// <summary>Un enregistrement impossible, avec l'un des codes de <see cref="RecordingRefusal"/>.</summary>
 public sealed class RecordingException : Exception
 {
-    public RecordingException(string code, Exception? inner = null)
+    public RecordingException(string code, Exception? inner = null, string? detail = null)
         : base(code, inner)
     {
         Code = code;
+        Detail = detail;
     }
 
     public string Code { get; }
+
+    /// <summary>Ce qui a échoué, pour le message : « HTTP 403 »… Null quand on ne sait pas mieux.</summary>
+    public string? Detail { get; }
 }

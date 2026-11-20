@@ -107,8 +107,8 @@ footer a { color: var(--muted); }
 </div></header>
 <div class="wrap">
 <h1 id="soundreborn-remote--handbuch">SoundReborn Remote — Handbuch</h1>
-<p>Version 1.8.1 · Android 7 und neuer</p>
-<ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html" aria-current="page">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li></ul><hr />
+<p>Version 1.8.2 · Android 7 und neuer</p>
+<ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html" aria-current="page">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li><li><a href="it.html">Italiano</a></li></ul><hr />
 <h2 id="inhalt">Inhalt</h2>
 <ol>
 <li><a href="#1-was-vorher-da-sein-muss">Was vorher da sein muss</a></li>
@@ -141,7 +141,7 @@ die das Haus verlassen.</p>
   Installiert wird er mit dem STR-Werkzeug für PC oder Mac — <a href="https://st-reborn.de">https://st-reborn.de</a>.
   <strong>Diese App installiert ihn nicht</strong>; sie weist lediglich auf Lautsprecher hin, denen er
   fehlt.</li>
-<li><strong>Ein STR-Agent 1.6.0 oder neuer, um Gruppen zu ändern.</strong> Bei einem älteren Agenten
+<li><strong>Ein STR-Agent 1.8.0 oder neuer, um Gruppen zu ändern.</strong> Bei einem älteren Agenten
   weist die App darauf hin und lässt die Gruppen unverändert; alles andere funktioniert.</li>
 <li><strong>Android 7 oder neuer.</strong></li>
 </ul>
@@ -160,7 +160,7 @@ Kontakte noch auf Standort noch auf Speicher zu.</p>
 <hr />
 <h2 id="3-erster-start">3. Erster Start</h2>
 <p>Die App startet in der Sprache des Telefons, sofern sie sie kennt — Französisch,
-Englisch, Deutsch, Niederländisch, Spanisch — sonst auf Englisch. Ändern lässt sich das
+Englisch, Deutsch, Niederländisch, Spanisch, Italienisch — sonst auf Englisch. Ändern lässt sich das
 jederzeit.</p>
 <p>Beim ersten Start ist kein Lautsprecher bekannt. Gehe zu <strong>Einstellungen</strong> und dann auf
 <strong>Lokales Netzwerk durchsuchen</strong>.</p>
@@ -194,6 +194,10 @@ Titel zwei Tasten: <strong>Gefällt mir</strong> fügt den laufenden Song zu den
 <strong>Gefällt mir nicht</strong> entfernt ihn, wie die Daumentasten der Fernbedienung. Der Song landet
 im Spotify-Konto, mit dem der <strong>Lautsprecher</strong> angemeldet ist, nicht unbedingt in dem auf
 deinem Telefon. Ein Lautsprecher mit Display zeigt „LIKED“ oder „REMOVED“.</p>
+<p>Während einer Spotify-Taste (ein Preset, das eine Spotify-Playlist spielt) kennt der
+Lautsprecher nur den Namen der Playlist. Mit dem STR-Agenten 1.8.2 oder neuer zeigt die App
+stattdessen den Titel, den Interpreten und das Cover, mit „Spotify · Playlist“ als Quelle;
+der Titel wird etwa alle fünf Sekunden neu gelesen.</p>
 <h3 id="steuerung">Steuerung</h3>
 <p>Vier Tasten: Stopp, zurück, Wiedergabe/Pause, vor. Je nach Quelle bleiben manche ohne
 Wirkung — ein Livestream lässt sich nicht zurückspulen.</p>
@@ -227,7 +231,9 @@ umrandete Kachel ist die laufende.</p>
 <p>Wenn der STR-Agent die zweite Reihe unterstützt, erscheinen über den Kacheln zwei
 Schaltflächen, <strong>Einmal</strong> und <strong>Zweimal</strong>: Die zweite zeigt die sechs Sender, die der
 Lautsprecher startet, wenn eine Taste zweimal gedrückt wird. Die Wahl gilt für beide
-Reiter.</p>
+Reiter. Jede Kachel trägt oben den Namen ihrer Taste („Taste 1“ bis „Taste 6“, in beiden Reihen),
+und die Schaltfläche <strong>Zweimal</strong> zeigt eine kleine Zahl: wie viele Tasten der zweiten Reihe
+einen Sender tragen.</p>
 <p><strong>Laufendes auf eine Taste legen</strong>, unter den Kacheln, speichert das, was der
 Lautsprecher gerade spielt — Sender, Album oder Titel aus der Bibliothek — auf der Taste
 deiner Wahl. Spotify, AUX und Bluetooth lassen sich so nicht speichern.</p>
@@ -272,6 +278,14 @@ einem älteren erscheinen die Schaltflächen nicht.</p>
 <p>Eine Taste, die nur in der zweiten Reihe einen Sender hat, erscheint unter <strong>Einmal</strong>
 leer: Ein einfacher Druck am Lautsprecher startet dann den Sender der zweiten Reihe
 (STR-Agent 1.6.3 und neuer).</p>
+<h3 id="eine-taste-umbenennen-und-löschen">Eine Taste umbenennen und löschen</h3>
+<p>Jede Kachel trägt oben den Namen ihrer Taste. Bei einer Taste, die der STR-Agent gespeichert
+hat, stehen daneben zwei kleine Schaltflächen: <strong>✎</strong> benennt die Taste um, <strong>✕</strong> löscht sie
+nach Rückfrage. Umbenennen ändert nur den angezeigten Namen: Sender, Bild und die Playlist
+einer Spotify-Taste bleiben. Ein Name hat höchstens 64 Zeichen. Die Schaltfläche <strong>Zweimal</strong>
+zeigt, wie viele Tasten der zweiten Reihe einen Sender tragen.</p>
+<p>Eine Taste, die nur die Firmware des Lautsprechers kennt, und eine leere Taste haben diese
+Schaltflächen nicht: Der Agent hätte nichts umzubenennen oder zu löschen.</p>
 <h3 id="tasten-auf-einen-anderen-lautsprecher-kopieren">Tasten auf einen anderen Lautsprecher kopieren</h3>
 <p>Die Karte <strong>Tasten kopieren</strong> kopiert alle Tasten des gewählten Lautsprechers auf einen
 anderen STR-Lautsprecher oder auf alle. Tippe auf <strong>Kopieren nach…</strong>, wähle das Ziel und
@@ -331,6 +345,8 @@ Lautsprecher: Die Wiedergabe wird nicht gestört, aber die Aufnahme verbraucht D
 Telefon ab, ⤴ öffnet das Teilen-Menü von Android, der Papierkorb löscht nach Rückfrage. Bei
 10 Aufnahmen verweigert die App eine neue: Lösche zuerst die, die du nicht mehr brauchst.
 Die Aufnahmen bleiben in der App und verschwinden, wenn du sie deinstallierst. Die Liste bleibt verfügbar, auch wenn kein Lautsprecher antwortet: Nur das Aufnehmen ist dann nicht möglich.</p>
+<p>Während eine Aufnahme läuft, erscheinen darunter ein Schieberegler und ein Zähler:
+„01:23 / 04:50“, Position und Dauer. Zieh den Regler, um dich in der Aufnahme zu bewegen.</p>
 <p><strong>Zuletzt gehört</strong> zeigt den vom Agenten geführten Verlauf: Tippe auf eine Zeile, um
 erneut zu starten.</p>
 <p>Ein Album oder Ordner aus der Bibliothek wird vollständig erneut abgespielt, nicht nur
@@ -382,7 +398,7 @@ gespeichert. Anderswo geänderte Wecker — STR-Telefonseite, Desktop-App — we
 <p><strong>Startlautstärke</strong>: die Lautstärke, die der Lautsprecher beim Einschalten annimmt, sobald
 er spielt. Häkchen setzen, Lautstärke wählen, dann <strong>Startlautstärke speichern</strong>. Eine
 während des Hörens eingestellte Lautstärke wird nie geändert.</p>
-<p><strong>Sprache</strong>: Deutsch, Französisch, Englisch, Niederländisch, Spanisch. Die Umstellung
+<p><strong>Sprache</strong>: Deutsch, Französisch, Englisch, Niederländisch, Spanisch, Italienisch. Die Umstellung
 gilt sofort, ohne Neustart, und wird gemerkt.</p>
 <p><strong>Thema</strong>: System, Hell oder Dunkel. „System" folgt der Anzeigeeinstellung des Telefons,
 einschließlich der automatischen Umschaltung am Abend.</p>
@@ -394,7 +410,7 @@ oder einen VPN-Tunnel.</p>
 vergisst ihn. Ein Lautsprecher mit dem Hinweis <strong>„Kein STR — bereit zur Installation"</strong>
 antwortet einwandfrei, hat aber keinen Agenten; weiter unten erscheint dann ein
 erklärender Block mit einem Link zur Seite des STR-Projekts.</p>
-<p>Ein Lautsprecher, dessen Agent älter als Version 1.6.0 ist, zeigt einen ähnlichen Block,
+<p>Ein Lautsprecher, dessen Agent älter als Version 1.8.0 ist, zeigt einen ähnlichen Block,
 <strong>STR-Agent zu alt</strong>, und seine Karte im Tab Wiedergabe trägt den Hinweis „zu alt".</p>
 <p><strong>Diagnose</strong>: <em>Lautsprecher abfragen</em> betrifft den <strong>ausgewählten</strong> Lautsprecher — Name,
 Modell, Geräte-ID, Firmware-Version, den Agenten mit Port und live auf 17008 und 8888
@@ -460,6 +476,8 @@ erneut über einen Speicherplatz oder das Verzeichnis und öffne dann den Reiter
 <li><strong>Tasten kopieren: STR-Agent 1.6.5 oder neuer</strong> auf dem Quell-Lautsprecher.</li>
 <li><strong>„Gefällt mir“ und „Gefällt mir nicht“: STR-Agent 1.8.1 oder neuer.</strong> Der Titel landet
   im Spotify-Konto, mit dem der Lautsprecher angemeldet ist.</li>
+<li><strong>Tasten umbenennen und löschen: STR-Agent 1.8.0 oder neuer; der Titel einer
+  Spotify-Taste: 1.8.2 oder neuer.</strong></li>
 </ul>
 <hr />
 <h2 id="12-hinweise">12. Hinweise</h2>

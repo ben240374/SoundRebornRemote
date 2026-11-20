@@ -45,6 +45,22 @@ public sealed partial class PresetTile : ObservableObject
     [ObservableProperty]
     private int _slot;
 
+    /// <summary>« Touche 2 » : le nom de la touche physique, au-dessus de la station, dans les deux rangées.</summary>
+    [ObservableProperty]
+    private string _header = "";
+
+    /// <summary>
+    /// Vrai quand la touche peut être renommée ou effacée : elle est garnie dans le
+    /// magasin de l'agent, et l'agent est à la version minimale (1.8.0).
+    /// </summary>
+    [ObservableProperty]
+    private bool _canEdit;
+
+    partial void OnSlotChanged(int value) => RefreshHeader();
+
+    /// <summary>Recalcule « Touche n » : au changement d'emplacement ou de langue.</summary>
+    public void RefreshHeader() => Header = Localization.Get("L_KeyNumber", PresetKeys.Number(Slot));
+
     [ObservableProperty]
     private string _name = "";
 
@@ -196,6 +212,11 @@ public sealed partial class PresetsViewModel : BaseViewModel
         {
             RelabelEmptyTiles();
             BuildFilters();
+
+            foreach (var tile in Presets)
+            {
+                tile.RefreshHeader();
+            }
         });
     }
 
@@ -209,7 +230,16 @@ public sealed partial class PresetsViewModel : BaseViewModel
     /// deux fois). Sans cela le sélecteur de rangée reste caché et rien ne change.
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowSecondRowCount))]
     private bool _hasSecondRow;
+
+    /// <summary>Nombre de touches garnies dans la seconde rangée (7 à 12), pour la pastille de « Deux fois ».</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowSecondRowCount))]
+    private int _secondRowCount;
+
+    /// <summary>La pastille n'apparaît qu'avec la seconde rangée et au moins une touche garnie.</summary>
+    public bool ShowSecondRowCount => HasSecondRow && SecondRowCount > 0;
 
     /// <summary>Vrai quand la grille montre la seconde rangée, emplacements 7 à 12.</summary>
     [ObservableProperty]
@@ -339,6 +369,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
             _snapshotHost = device.Host;
 
             ApplyRowSupport(await DetectSecondRowAsync(device, store, storeRead).ConfigureAwait(true));
+            UpdateSecondRowCount();
 
             // La seconde rangée ne vit que dans l'agent. S'il n'a pas répondu cette
             // fois-ci, ses touches restent telles qu'elles sont : même règle que
@@ -390,6 +421,109 @@ public sealed partial class PresetsViewModel : BaseViewModel
         MarkActive(tile, optimistic: true);
 
         return RunAsync(d => d.RecallPresetAsync(tile.Slot), Localization.Get("S_PresetStarted", tile.Name));
+    }
+
+    // ================================================================ Renommer, effacer (agent 1.8.0)
+
+    /// <summary>
+    /// Renomme une touche du magasin de l'agent. Seul le nom change : la station,
+    /// son image et la playlist d'une touche Spotify restent. Annuler, garder le
+    /// même nom ou ne rien taper n'envoie rien.
+    /// </summary>
+    [RelayCommand]
+    private async Task RenameKeyAsync(PresetTile? tile)
+    {
+        if (tile is null || !tile.CanEdit || Device is not { CanEditPresets: true, Str: { } str } || IsBusy)
+        {
+            return;
+        }
+
+        var slot = tile.Slot;
+        var current = tile.Name;
+
+        var typed = await Shell.Current.DisplayPromptAsync(
+            Localization.Get("L_KeyRenameTitle", PresetKeys.Label(slot)),
+            Localization.Get("L_KeyRenameMessage"),
+            Localization.Get("L_KeyRenameGo"),
+            Localization.Get("L_Cancel"),
+            maxLength: StrApiClient.MaxPresetNameLength,
+            initialValue: current).ConfigureAwait(true);
+
+        var name = (typed ?? "").Trim();
+
+        if (name.Length == 0 || string.Equals(name, current, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        await EditKeyAsync(
+            slot,
+            () => str.RenamePresetAsync(slot, name),
+            Localization.Get("S_KeyRenamed", PresetKeys.Label(slot))).ConfigureAwait(true);
+    }
+
+    /// <summary>Efface une touche du magasin de l'agent, après confirmation.</summary>
+    [RelayCommand]
+    private async Task ClearKeyAsync(PresetTile? tile)
+    {
+        if (tile is null || !tile.CanEdit || Device is not { CanEditPresets: true, Str: { } str } || IsBusy)
+        {
+            return;
+        }
+
+        var slot = tile.Slot;
+        var go = Localization.Get("L_KeyClearGo");
+
+        var answer = await Shell.Current.DisplayActionSheetAsync(
+            Localization.Get("L_KeyClearConfirm", PresetKeys.Label(slot), tile.Name),
+            Localization.Get("L_Cancel"),
+            null,
+            go).ConfigureAwait(true);
+
+        if (answer != go)
+        {
+            return;
+        }
+
+        await EditKeyAsync(
+            slot,
+            () => str.DeletePresetAsync(slot),
+            Localization.Get("S_KeyCleared", PresetKeys.Label(slot))).ConfigureAwait(true);
+    }
+
+    /// <summary>
+    /// Envoie la modification, puis relit les touches : la grille, la pastille et
+    /// l'onglet Lecture montrent ce que l'agent a réellement retenu.
+    /// </summary>
+    private async Task EditKeyAsync(int slot, Func<Task> send, string done)
+    {
+        IsBusy = true;
+        string? message = null;
+        var failed = false;
+
+        try
+        {
+            await send().ConfigureAwait(true);
+            message = done;
+        }
+        catch (SpeakerException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            // La touche a été vidée ailleurs entre-temps (autre téléphone, appli PC).
+            failed = true;
+            message = Localization.Get("S_KeyGone", PresetKeys.Label(slot));
+        }
+        catch (Exception ex)
+        {
+            IsBusy = false;
+            ShowError(ex);
+            return;
+        }
+
+        IsBusy = false;
+        await RefreshAsync().ConfigureAwait(true);
+
+        IsError = failed;
+        StatusMessage = message;
     }
 
     /// <summary>
@@ -477,6 +611,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
         {
             tile.Name = store.DisplayName;
             tile.IsEmpty = false;
+            tile.CanEdit = Device?.CanEditPresets == true;
 
             tile.Detail = store.Type?.ToLowerInvariant() switch
             {
@@ -497,6 +632,9 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
         if (hardware is { IsEmpty: false })
         {
+            // Une touche que seul le firmware connaît n'est pas dans le magasin de
+            // l'agent : il ne saurait ni la renommer ni l'effacer.
+            tile.CanEdit = false;
             tile.Name = hardware.Name;
             tile.Detail = hardware.Source;
             tile.IsEmpty = false;
@@ -511,6 +649,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
         // IsEmpty doit redevenir vrai : une tuile réutilisée — touche vidée, ou
         // changement de rangée — resterait sinon cliquable sur un emplacement vide.
         tile.IsEmpty = true;
+        tile.CanEdit = false;
         tile.Name = Localization.Get("L_PresetNumber", PresetKeys.Number(tile.Slot));
         tile.Detail = Localization.Get("L_PresetEmpty");
         tile.Glyph = SlotNumber(tile.Slot);
@@ -630,6 +769,10 @@ public sealed partial class PresetsViewModel : BaseViewModel
         }
     }
 
+    /// <summary>La pastille de « Deux fois » : touches 7 à 12 garnies dans le dernier magasin lu.</summary>
+    private void UpdateSecondRowCount()
+        => SecondRowCount = HasSecondRow ? _lastStore.Keys.Count(PresetKeys.InSecondRow) : 0;
+
     private async Task ResetAsync()
     {
         foreach (var tile in Presets)
@@ -741,6 +884,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
             tile.Slot = offset + index + 1;
             tile.IsEmpty = true;
+            tile.CanEdit = false;
             tile.IsActive = false;
             tile.Name = Localization.Get("L_PresetNumber", PresetKeys.Number(tile.Slot));
             tile.Detail = Localization.Get("L_PresetEmpty");
@@ -758,6 +902,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
     private void ApplyRowSupport(bool supported)
     {
         HasSecondRow = supported;
+        UpdateSecondRowCount();
 
         if (!supported && IsSecondRow)
         {

@@ -62,7 +62,23 @@ public sealed class RecordingService
     /// <see cref="RecordingRefusal"/>. Au 11ᵉ enregistrement : refus, rien n'est
     /// supprimé d'office.
     /// </summary>
-    public async Task<string?> StartAsync(string url, string station)
+    public Task<string?> StartAsync(string url, string station) => StartAsync(new[] { url }, station);
+
+    /// <summary>Pause avant le second essai de la première adresse, quand aucune n'a répondu.</summary>
+    private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(1.5);
+
+    /// <summary>
+    /// Ce qui a empêché d'ouvrir le flux au dernier refus « network » : « HTTP 403 »,
+    /// « timeout »… Null quand on ne sait rien de plus.
+    /// </summary>
+    public string? LastFailureDetail { get; private set; }
+
+    /// <summary>
+    /// Démarre l'enregistrement sur la première adresse qui répond, dans l'ordre
+    /// donné. Si aucune ne répond, la première est réessayée une fois après une
+    /// courte pause : un serveur de radio a parfois un raté passager.
+    /// </summary>
+    public async Task<string?> StartAsync(IReadOnlyList<string> urls, string station)
     {
         lock (_gate)
         {
@@ -85,13 +101,52 @@ public sealed class RecordingService
 
             await _platform.RequestNotificationPermissionAsync().ConfigureAwait(false);
 
-            try
+            LastFailureDetail = null;
+            RecordingException? failure = null;
+            var attempts = urls.Where(u => !string.IsNullOrWhiteSpace(u)).ToList();
+
+            if (attempts.Count > 0)
             {
-                prepared = await StreamPreparer.OpenAsync(_http, url, CancellationToken.None).ConfigureAwait(false);
+                attempts.Add(attempts[0]);
             }
-            catch (RecordingException ex)
+
+            for (var i = 0; i < attempts.Count && prepared is null; i++)
             {
-                return Release(ex.Code);
+                if (i == attempts.Count - 1 && i > 0)
+                {
+                    await Task.Delay(RetryDelay).ConfigureAwait(false);
+                }
+
+                try
+                {
+                    prepared = await StreamPreparer.OpenAsync(_http, attempts[i], CancellationToken.None).ConfigureAwait(false);
+                }
+                catch (RecordingException ex)
+                {
+                    // Le premier refus qui n'est pas réseau (HLS, pas de l'audio) dit
+                    // mieux le problème que les essais suivants.
+                    if (failure is null || failure.Code == RecordingRefusal.Network)
+                    {
+                        failure = ex;
+                    }
+
+                    if (ex.Code == RecordingRefusal.Hls && i == 0)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (prepared is null)
+            {
+                failure ??= new RecordingException(RecordingRefusal.NoUrl);
+
+                if (failure.Code == RecordingRefusal.Network)
+                {
+                    LastFailureDetail = StreamPreparer.Describe(failure);
+                }
+
+                return Release(failure.Code);
             }
 
             // Une écoute en cours s'arrête : on ne lit pas un fichier pendant qu'on en enregistre un autre.

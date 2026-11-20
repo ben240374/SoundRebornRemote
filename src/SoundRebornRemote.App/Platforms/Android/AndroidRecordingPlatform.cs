@@ -143,6 +143,64 @@ public sealed class AndroidRecordingPlatform : IRecordingPlatform
         }
     }
 
+    public TimeSpan PlaybackPosition
+    {
+        get
+        {
+            lock (_gate)
+            {
+                try
+                {
+                    return _player is null ? TimeSpan.Zero : TimeSpan.FromMilliseconds(Math.Max(0, _player.CurrentPosition));
+                }
+                catch (Exception)
+                {
+                    // Lecteur en cours d'arrêt : on ne sait plus.
+                    return TimeSpan.Zero;
+                }
+            }
+        }
+    }
+
+    public TimeSpan PlaybackDuration
+    {
+        get
+        {
+            lock (_gate)
+            {
+                try
+                {
+                    // MediaPlayer renvoie -1 quand la durée est inconnue.
+                    return _player is null || _player.Duration <= 0 ? TimeSpan.Zero : TimeSpan.FromMilliseconds(_player.Duration);
+                }
+                catch (Exception)
+                {
+                    return TimeSpan.Zero;
+                }
+            }
+        }
+    }
+
+    public void SeekTo(TimeSpan position)
+    {
+        lock (_gate)
+        {
+            if (_player is null)
+            {
+                return;
+            }
+
+            try
+            {
+                _player.SeekTo((int)Math.Clamp(position.TotalMilliseconds, 0, int.MaxValue));
+            }
+            catch (Exception)
+            {
+                // Lecteur en cours d'arrêt : le déplacement n'a plus d'objet.
+            }
+        }
+    }
+
     public void Play(string path, Action onEnded)
     {
         StopPlayback();

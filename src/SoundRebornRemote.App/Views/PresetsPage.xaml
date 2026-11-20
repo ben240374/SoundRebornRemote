@@ -50,7 +50,13 @@
                                 <TapGestureRecognizer Command="{Binding ShowRowCommand}" CommandParameter="2" />
                             </Border.GestureRecognizers>
 
-                            <Label Text="{DynamicResource L_RowTwice}" FontSize="13" />
+                            <!-- Pastille : nombre de touches garnies dans cette rangée. -->
+                            <HorizontalStackLayout Spacing="6">
+                                <Label Text="{DynamicResource L_RowTwice}" FontSize="13" VerticalOptions="Center" />
+                                <Border Style="{StaticResource CountBadge}" IsVisible="{Binding ShowSecondRowCount}">
+                                    <Label Text="{Binding SecondRowCount}" Style="{StaticResource CountBadgeLabel}" />
+                                </Border>
+                            </HorizontalStackLayout>
 
                             <Border.Triggers>
                                 <DataTrigger TargetType="Border" Binding="{Binding IsSecondRow}" Value="True">
@@ -61,7 +67,7 @@
                         </Border>
                     </HorizontalStackLayout>
 
-                    <CollectionView ItemsSource="{Binding Presets}" HeightRequest="268">
+                    <CollectionView ItemsSource="{Binding Presets}" HeightRequest="308">
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout Orientation="Vertical" Span="3"
                                              HorizontalItemSpacing="8" VerticalItemSpacing="8" />
@@ -69,23 +75,46 @@
 
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="vm:PresetTile">
-                                <Border Style="{StaticResource TileCard}" HeightRequest="126">
+                                <Border Style="{StaticResource TileCard}" HeightRequest="146">
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PresetsViewModel}}, Path=RecallCommand}"
                                             CommandParameter="{Binding .}" />
                                     </Border.GestureRecognizers>
 
-                                    <Grid RowDefinitions="*,Auto">
-                                        <Image Grid.Row="0" Source="{Binding ArtSource}" Aspect="AspectFit"
-                                               Margin="10,10,10,2" IsVisible="{Binding HasArt}" />
+                                    <Grid RowDefinitions="28,*,Auto">
+                                        <!--
+                                            Le nom de la touche, et pour une touche du magasin de
+                                            l'agent (1.8.0+) : renommer et effacer. Des boutons et
+                                            non des gestes : ils prennent l'appui pour eux, la
+                                            touche n'est pas lancée par la même occasion.
+                                        -->
+                                        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Padding="8,0,0,0">
+                                            <Label Grid.Column="0" Text="{Binding Header}" Style="{StaticResource CaptionLabel}"
+                                                   FontSize="11" VerticalOptions="Center"
+                                                   LineBreakMode="TailTruncation" MaxLines="1" />
+                                            <Button Grid.Column="1" Text="✎" Style="{StaticResource TileIconButton}"
+                                                    IsVisible="{Binding CanEdit}"
+                                                    SemanticProperties.Description="{DynamicResource L_KeyRenameGo}"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PresetsViewModel}}, Path=RenameKeyCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            <Button Grid.Column="2" Text="✕" Style="{StaticResource TileIconButton}"
+                                                    TextColor="{StaticResource Danger}"
+                                                    IsVisible="{Binding CanEdit}"
+                                                    SemanticProperties.Description="{DynamicResource L_KeyClearGo}"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PresetsViewModel}}, Path=ClearKeyCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                        </Grid>
 
-                                        <Label Grid.Row="0" Text="{Binding Glyph}" FontSize="30"
+                                        <Image Grid.Row="1" Source="{Binding ArtSource}" Aspect="AspectFit"
+                                               Margin="10,2,10,2" IsVisible="{Binding HasArt}" />
+
+                                        <Label Grid.Row="1" Text="{Binding Glyph}" FontSize="30"
                                                HorizontalOptions="Center" VerticalOptions="Center"
                                                IsVisible="{Binding HasArt, Converter={StaticResource InvertedBool}}"
                                                TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
 
-                                        <VerticalStackLayout Grid.Row="1" Padding="6,5" Spacing="0">
+                                        <VerticalStackLayout Grid.Row="2" Padding="6,5" Spacing="0">
                                             <Label Text="{Binding Name}" FontSize="12" FontAttributes="Bold"
                                                    LineBreakMode="TailTruncation" MaxLines="1"
                                                    HorizontalTextAlignment="Center" />

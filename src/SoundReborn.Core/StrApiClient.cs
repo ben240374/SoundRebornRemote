@@ -362,6 +362,46 @@ public sealed class StrApiClient
         return PutJsonAsync($"/api/presets/{preset.Slot}", preset, ct);
     }
 
+    /// <summary>Longueur maximale d'un nom de touche : l'agent coupe au-delà.</summary>
+    public const int MaxPresetNameLength = 64;
+
+    /// <summary>
+    /// Renomme une touche du magasin de l'agent (PATCH /api/presets/{slot},
+    /// agent 1.8.0). Seul le nom change : la station, son image et la playlist
+    /// d'une touche Spotify restent. Le nom est nettoyé et coupé à 64 caractères,
+    /// comme l'agent le ferait ; un nom vide est refusé avant tout envoi. L'agent
+    /// répond 404 quand la touche est vide.
+    /// </summary>
+    public Task RenamePresetAsync(int slot, string name, CancellationToken ct = default)
+    {
+        if (slot is < 1 or > 12)
+        {
+            throw new ArgumentOutOfRangeException(nameof(slot), slot, "Présélection 1 à 12 uniquement");
+        }
+
+        var clean = (name ?? "").Trim();
+
+        if (clean.Length == 0)
+        {
+            throw new ArgumentException("Nom de touche vide", nameof(name));
+        }
+
+        if (clean.Length > MaxPresetNameLength)
+        {
+            clean = clean[..MaxPresetNameLength];
+        }
+
+        return PatchJsonAsync($"/api/presets/{slot}", new { name = clean }, ct);
+    }
+
+    /// <summary>
+    /// Le titre en direct du flux que l'agent relaie (GET /api/stream/title).
+    /// Pendant une touche Spotify, l'agent 1.8.2 y ajoute le morceau, l'artiste et
+    /// la pochette. Un agent plus ancien répond 404 : une SpeakerException.
+    /// </summary>
+    public async Task<StrStreamTitle> GetStreamTitleAsync(CancellationToken ct = default)
+        => StrStreamTitle.Parse(await GetStringAsync("/api/stream/title", ct).ConfigureAwait(false));
+
     /// <summary>Vide une présélection du magasin de l'agent.</summary>
     public async Task DeletePresetAsync(int slot, CancellationToken ct = default)
     {
@@ -775,6 +815,15 @@ public sealed class StrApiClient
         using var content = new StringContent(JsonSerializer.Serialize(body, JsonOptions), Encoding.UTF8, "application/json");
         using var cts = Budget(timeout, ct);
         using var response = await _http.PutAsync(BaseUrl + path, content, cts.Token).ConfigureAwait(false);
+        await EnsureSuccessAsync(response, path, cts.Token).ConfigureAwait(false);
+    }
+
+    private async Task PatchJsonAsync<T>(string path, T body, CancellationToken ct, TimeSpan? timeout = null)
+    {
+        using var content = new StringContent(JsonSerializer.Serialize(body, JsonOptions), Encoding.UTF8, "application/json");
+        using var request = new HttpRequestMessage(HttpMethod.Patch, BaseUrl + path) { Content = content };
+        using var cts = Budget(timeout, ct);
+        using var response = await _http.SendAsync(request, cts.Token).ConfigureAwait(false);
         await EnsureSuccessAsync(response, path, cts.Token).ConfigureAwait(false);
     }
 

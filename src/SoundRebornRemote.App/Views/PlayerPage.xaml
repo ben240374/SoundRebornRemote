@@ -397,7 +397,13 @@
                                 <TapGestureRecognizer Command="{Binding ShowPresetRowCommand}" CommandParameter="2" />
                             </Border.GestureRecognizers>
 
-                            <Label Text="{DynamicResource L_RowTwice}" FontSize="13" />
+                            <!-- Pastille : nombre de touches garnies dans cette rangée. -->
+                            <HorizontalStackLayout Spacing="6">
+                                <Label Text="{DynamicResource L_RowTwice}" FontSize="13" VerticalOptions="Center" />
+                                <Border Style="{StaticResource CountBadge}" IsVisible="{Binding ShowSecondRowCount}">
+                                    <Label Text="{Binding SecondRowCount}" Style="{StaticResource CountBadgeLabel}" />
+                                </Border>
+                            </HorizontalStackLayout>
 
                             <Border.Triggers>
                                 <DataTrigger TargetType="Border" Binding="{Binding IsSecondRow}" Value="True">
@@ -408,7 +414,7 @@
                         </Border>
                     </HorizontalStackLayout>
 
-                    <CollectionView ItemsSource="{Binding Presets}" HeightRequest="252">
+                    <CollectionView ItemsSource="{Binding Presets}" HeightRequest="284">
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout Orientation="Vertical" Span="3"
                                              HorizontalItemSpacing="8" VerticalItemSpacing="8" />
@@ -416,23 +422,28 @@
 
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="vm:PresetTile">
-                                <Border Style="{StaticResource TileCard}" HeightRequest="118">
+                                <Border Style="{StaticResource TileCard}" HeightRequest="134">
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlayerViewModel}}, Path=RecallPresetCommand}"
                                             CommandParameter="{Binding .}" />
                                     </Border.GestureRecognizers>
 
-                                    <Grid RowDefinitions="*,Auto">
-                                        <Image Grid.Row="0" Source="{Binding ArtSource}" Aspect="AspectFit"
-                                               Margin="10,10,10,2" IsVisible="{Binding HasArt}" />
+                                    <Grid RowDefinitions="Auto,*,Auto">
+                                        <!-- Le nom de la touche, seul : on renomme et on efface dans l'onglet Présélections. -->
+                                        <Label Grid.Row="0" Text="{Binding Header}" Style="{StaticResource CaptionLabel}"
+                                               FontSize="11" Padding="8,5,8,0"
+                                               LineBreakMode="TailTruncation" MaxLines="1" />
 
-                                        <Label Grid.Row="0" Text="{Binding Glyph}" FontSize="30"
+                                        <Image Grid.Row="1" Source="{Binding ArtSource}" Aspect="AspectFit"
+                                               Margin="10,4,10,2" IsVisible="{Binding HasArt}" />
+
+                                        <Label Grid.Row="1" Text="{Binding Glyph}" FontSize="30"
                                                HorizontalOptions="Center" VerticalOptions="Center"
                                                IsVisible="{Binding HasArt, Converter={StaticResource InvertedBool}}"
                                                TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
 
-                                        <Label Grid.Row="1" Text="{Binding Name}" FontSize="12"
+                                        <Label Grid.Row="2" Text="{Binding Name}" FontSize="12"
                                                Padding="6,6" LineBreakMode="TailTruncation" MaxLines="1"
                                                HorizontalTextAlignment="Center">
                                             <Label.Triggers>

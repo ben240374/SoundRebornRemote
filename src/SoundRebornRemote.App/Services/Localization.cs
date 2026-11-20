@@ -9,6 +9,7 @@ public enum AppLanguage
     German,
     Dutch,
     Spanish,
+    Italian,
 }
 
 /// <summary>
@@ -52,6 +53,7 @@ public static class Localization
         AppLanguage.German,
         AppLanguage.Dutch,
         AppLanguage.Spanish,
+        AppLanguage.Italian,
     };
 
     /// <summary>Nom de la langue dans la langue elle-même — on ne le traduit pas.</summary>
@@ -62,6 +64,7 @@ public static class Localization
         AppLanguage.German => "Deutsch",
         AppLanguage.Dutch => "Nederlands",
         AppLanguage.Spanish => "Español",
+        AppLanguage.Italian => "Italiano",
         _ => language.ToString(),
     };
 
@@ -77,7 +80,9 @@ public static class Localization
                 return value;
             }
 
-            return values[0];
+            // Libellé manquant dans cette langue : l'anglais, compris du plus grand
+            // nombre, sinon le français.
+            return index != 0 && values.Length > 1 && !string.IsNullOrEmpty(values[1]) ? values[1] : values[0];
         }
 
         // Clé absente : on renvoie la clé, ce qui saute aux yeux pendant les tests.
@@ -118,6 +123,7 @@ public static class Localization
         AppLanguage.German => "de",
         AppLanguage.Dutch => "nl",
         AppLanguage.Spanish => "es",
+        AppLanguage.Italian => "it",
         _ => "fr",
     });
 
@@ -185,7 +191,7 @@ public static class Localization
 
         // Pas de choix enregistré : on suit la langue du téléphone si elle est gérée,
         // et l'anglais sert de repli pour toutes les autres — c'est la convention,
-        // et un utilisateur italien ou polonais comprendra mieux l'anglais que le
+        // et un utilisateur polonais ou portugais comprendra mieux l'anglais que le
         // français. Dès qu'une langue est choisie dans les réglages, elle prime.
         return CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.ToLowerInvariant() switch
         {
@@ -193,53 +199,56 @@ public static class Localization
             "de" => AppLanguage.German,
             "nl" => AppLanguage.Dutch,
             "es" => AppLanguage.Spanish,
+            "it" => AppLanguage.Italian,
             _ => AppLanguage.English,
         };
     }
 
-    private static void Add(string key, string fr, string en, string de, string nl, string es)
-        => Table[key] = new[] { fr, en, de, nl, es };
+    private static void Add(string key, string fr, string en, string de, string nl, string es, string it)
+        => Table[key] = new[] { fr, en, de, nl, es, it };
 
     private static void Fill()
     {
         // ---------------------------------------------------------- Onglets
-        Add("L_TabPlayer", "Lecture", "Now playing", "Wiedergabe", "Afspelen", "Reproducción");
+        Add("L_TabPlayer", "Lecture", "Now playing", "Wiedergabe", "Afspelen", "Reproducción", "Riproduzione");
         // Libellés courts : la barre d'onglets d'Android tronque au-delà.
-        Add("L_TabPresets", "Présélections", "Presets", "Presets", "Presets", "Presintonías");
-        Add("L_TabSources", "Sources", "Sources", "Quellen", "Bronnen", "Fuentes");
-        Add("L_TabMultiroom", "Groupes", "Groups", "Gruppen", "Groepen", "Grupos");
-        Add("L_TabSettings", "Réglages", "Settings", "Einstellungen", "Instellingen", "Ajustes");
+        Add("L_TabPresets", "Présélections", "Presets", "Presets", "Presets", "Presintonías", "Preselezioni");
+        Add("L_TabSources", "Sources", "Sources", "Quellen", "Bronnen", "Fuentes", "Sorgenti");
+        Add("L_TabMultiroom", "Groupes", "Groups", "Gruppen", "Groepen", "Grupos", "Gruppi");
+        Add("L_TabSettings", "Réglages", "Settings", "Einstellungen", "Instellingen", "Ajustes", "Impostazioni");
 
         // ---------------------------------------------------------- Page Lecture
-        Add("L_Speaker", "ENCEINTE", "SPEAKER", "LAUTSPRECHER", "SPEAKER", "ALTAVOZ");
-        Add("L_Live", "direct", "live", "live", "live", "en vivo");
-        Add("L_Polling", "sondage", "polling", "Abfrage", "polling", "sondeo");
-        Add("L_Volume", "VOLUME", "VOLUME", "LAUTSTÄRKE", "VOLUME", "VOLUMEN");
-        Add("L_Bass", "GRAVES", "BASS", "BÄSSE", "LAGE TONEN", "GRAVES");
+        Add("L_Speaker", "ENCEINTE", "SPEAKER", "LAUTSPRECHER", "SPEAKER", "ALTAVOZ", "DIFFUSORE");
+        Add("L_Live", "direct", "live", "live", "live", "en vivo", "in diretta");
+        Add("L_Polling", "sondage", "polling", "Abfrage", "polling", "sondeo", "interrogazione");
+        Add("L_Volume", "VOLUME", "VOLUME", "LAUTSTÄRKE", "VOLUME", "VOLUMEN", "VOLUME");
+        Add("L_Bass", "GRAVES", "BASS", "BÄSSE", "LAGE TONEN", "GRAVES", "BASSI");
         Add("L_BassNote",
             "L'API SoundTouch n'expose pas de réglage d'aigus — seuls les graves sont pilotables.",
             "The SoundTouch API exposes no treble control — only bass can be adjusted.",
             "Die SoundTouch-API bietet keine Höhenregelung — nur die Bässe lassen sich einstellen.",
             "De SoundTouch-API kent geen regeling voor hoge tonen — alleen de lage tonen zijn instelbaar.",
-            "La API de SoundTouch no ofrece control de agudos — solo se pueden ajustar los graves.");
-        Add("L_Presets", "PRÉSÉLECTIONS", "PRESETS", "PRESETS", "PRESETS", "PRESINTONÍAS");
-        Add("L_Refresh", "Rafraîchir", "Refresh", "Aktualisieren", "Vernieuwen", "Actualizar");
-        Add("L_PowerButton", "Veille / Allumer", "Standby / Power on", "Standby / Einschalten", "Stand-by / Aanzetten", "Reposo / Encender");
-        Add("L_NoSpeakerTitle", "Aucune enceinte", "No speaker", "Kein Lautsprecher", "Geen speaker", "Sin altavoz");
+            "La API de SoundTouch no ofrece control de agudos — solo se pueden ajustar los graves.",
+            "L'API SoundTouch non offre la regolazione degli acuti — si possono regolare solo i bassi.");
+        Add("L_Presets", "PRÉSÉLECTIONS", "PRESETS", "PRESETS", "PRESETS", "PRESINTONÍAS", "PRESELEZIONI");
+        Add("L_Refresh", "Rafraîchir", "Refresh", "Aktualisieren", "Vernieuwen", "Actualizar", "Aggiorna");
+        Add("L_PowerButton", "Veille / Allumer", "Standby / Power on", "Standby / Einschalten", "Stand-by / Aanzetten", "Reposo / Encender", "Standby / Accensione");
+        Add("L_NoSpeakerTitle", "Aucune enceinte", "No speaker", "Kein Lautsprecher", "Geen speaker", "Sin altavoz", "Nessun diffusore");
         Add("L_NoSpeakerDetail",
             "Choisis une enceinte dans Réglages",
             "Pick a speaker in Settings",
             "Wähle einen Lautsprecher unter Einstellungen",
             "Kies een speaker bij Instellingen",
-            "Elige un altavoz en Ajustes");
-        Add("L_Standby", "En veille", "Standby", "Standby", "Stand-by", "En reposo");
-        Add("L_NothingPlaying", "Rien en lecture", "Nothing playing", "Nichts in Wiedergabe", "Niets aan het afspelen", "Nada en reproducción");
+            "Elige un altavoz en Ajustes",
+            "Scegli un diffusore nelle Impostazioni");
+        Add("L_Standby", "En veille", "Standby", "Standby", "Stand-by", "En reposo", "Standby");
+        Add("L_NothingPlaying", "Rien en lecture", "Nothing playing", "Nichts in Wiedergabe", "Niets aan het afspelen", "Nada en reproducción", "Niente in riproduzione");
 
         // ---------------------------------------------------------- Sources (noms affichés)
-        Add("L_SrcRadio", "Radio Internet", "Internet radio", "Internetradio", "Internetradio", "Radio por Internet");
-        Add("L_SrcLibrary", "Bibliothèque réseau", "Network library", "Netzwerkbibliothek", "Netwerkbibliotheek", "Biblioteca de red");
-        Add("L_SrcAux", "Entrée AUX", "AUX input", "AUX-Eingang", "AUX-ingang", "Entrada AUX");
-        Add("L_SrcNotification", "Annonce", "Announcement", "Ansage", "Melding", "Aviso");
+        Add("L_SrcRadio", "Radio Internet", "Internet radio", "Internetradio", "Internetradio", "Radio por Internet", "Radio internet");
+        Add("L_SrcLibrary", "Bibliothèque réseau", "Network library", "Netzwerkbibliothek", "Netwerkbibliotheek", "Biblioteca de red", "Libreria di rete");
+        Add("L_SrcAux", "Entrée AUX", "AUX input", "AUX-Eingang", "AUX-ingang", "Entrada AUX", "Ingresso AUX");
+        Add("L_SrcNotification", "Annonce", "Announcement", "Ansage", "Melding", "Aviso", "Annuncio");
 
         // ---------------------------------------------------------- Page Présélections
         Add("L_PresetsHint",
@@ -247,509 +256,594 @@ public static class Localization
             "Tap a tile to start a preset. To store one, hold the key on the speaker itself or use the STR desktop app.",
             "Tippe auf eine Kachel, um ein Preset zu starten. Zum Speichern die Taste am Lautsprecher gedrückt halten oder die STR-Desktop-App verwenden.",
             "Tik op een tegel om een preset te starten. Opslaan doe je door de toets op de speaker ingedrukt te houden of via de STR-desktopapp.",
-            "Toca una tarjeta para lanzar una presintonía. Para guardarla, mantén pulsada la tecla en el altavoz o usa la app STR de escritorio.");
-        Add("L_PresetEmpty", "vide", "empty", "leer", "leeg", "vacía");
-        Add("L_PresetNumber", "Présélection {0}", "Preset {0}", "Preset {0}", "Preset {0}", "Presintonía {0}");
+            "Toca una tarjeta para lanzar una presintonía. Para guardarla, mantén pulsada la tecla en el altavoz o usa la app STR de escritorio.",
+            "Tocca un riquadro per avviare una preselezione. Per memorizzarne una, tieni premuto il tasto sul diffusore oppure usa l'app STR per computer.");
+        Add("L_PresetEmpty", "vide", "empty", "leer", "leeg", "vacía", "vuota");
+        Add("L_PresetNumber", "Présélection {0}", "Preset {0}", "Preset {0}", "Preset {0}", "Presintonía {0}", "Preselezione {0}");
 
         // ---------------------------------------------------------- Page Sources
-        Add("L_Bluetooth", "Bluetooth", "Bluetooth", "Bluetooth", "Bluetooth", "Bluetooth");
-        Add("L_Aux", "AUX", "AUX", "AUX", "AUX", "AUX");
-        Add("L_StandbyButton", "Veille", "Standby", "Standby", "Stand-by", "Reposo");
-        Add("L_Spotify", "SPOTIFY", "SPOTIFY", "SPOTIFY", "SPOTIFY", "SPOTIFY");
+        Add("L_Bluetooth", "Bluetooth", "Bluetooth", "Bluetooth", "Bluetooth", "Bluetooth", "Bluetooth");
+        Add("L_Aux", "AUX", "AUX", "AUX", "AUX", "AUX", "AUX");
+        Add("L_StandbyButton", "Veille", "Standby", "Standby", "Stand-by", "Reposo", "Standby");
+        Add("L_Spotify", "SPOTIFY", "SPOTIFY", "SPOTIFY", "SPOTIFY", "SPOTIFY", "SPOTIFY");
         Add("L_SpotifyHint",
             "Sélectionne l'enceinte dans l'application Spotify (Spotify Connect). Elle apparaît dès que l'agent STR tourne.",
             "Pick the speaker inside the Spotify app (Spotify Connect). It shows up as soon as the STR agent is running.",
             "Wähle den Lautsprecher in der Spotify-App (Spotify Connect). Er erscheint, sobald der STR-Agent läuft.",
             "Kies de speaker in de Spotify-app (Spotify Connect). Hij verschijnt zodra de STR-agent draait.",
-            "Selecciona el altavoz en la aplicación Spotify (Spotify Connect). Aparece en cuanto el agente STR está activo.");
+            "Selecciona el altavoz en la aplicación Spotify (Spotify Connect). Aparece en cuanto el agente STR está activo.",
+            "Scegli il diffusore nell'app Spotify (Spotify Connect). Compare non appena l'agente STR è in funzione.");
         Add("L_SpotifyNoAgent",
             "Aucun agent STR détecté sur cette enceinte : Spotify Connect ne fonctionnera pas, le cloud Bose qui l'assurait est arrêté.",
             "No STR agent on this speaker: Spotify Connect will not work, the Bose cloud that provided it is shut down.",
             "Kein STR-Agent auf diesem Lautsprecher: Spotify Connect funktioniert nicht, die Bose-Cloud dafür ist abgeschaltet.",
             "Geen STR-agent op deze speaker: Spotify Connect werkt niet, de Bose-cloud die dit verzorgde is gestopt.",
-            "Sin agente STR en este altavoz: Spotify Connect no funcionará, la nube de Bose que lo proporcionaba está apagada.");
-        Add("L_SpeakerSources", "SOURCES DE L'ENCEINTE", "SPEAKER SOURCES", "QUELLEN DES LAUTSPRECHERS", "BRONNEN VAN DE SPEAKER", "FUENTES DEL ALTAVOZ");
+            "Sin agente STR en este altavoz: Spotify Connect no funcionará, la nube de Bose que lo proporcionaba está apagada.",
+            "Nessun agente STR su questo diffusore: Spotify Connect non funzionerà, il cloud Bose che lo forniva è stato chiuso.");
+        Add("L_SpeakerSources", "SOURCES DE L'ENCEINTE", "SPEAKER SOURCES", "QUELLEN DES LAUTSPRECHERS", "BRONNEN VAN DE SPEAKER", "FUENTES DEL ALTAVOZ", "SORGENTI DEL DIFFUSORE");
         Add("L_NoSources",
             "Aucune source listée. Rafraîchis, ou réveille l'enceinte.",
             "No sources listed. Refresh, or wake the speaker.",
             "Keine Quellen gelistet. Aktualisiere, oder wecke den Lautsprecher.",
             "Geen bronnen gevonden. Vernieuw, of wek de speaker.",
-            "No hay fuentes. Actualiza, o despierta el altavoz.");
-        Add("L_PlayStream", "JOUER UN FLUX", "PLAY A STREAM", "STREAM ABSPIELEN", "STREAM AFSPELEN", "REPRODUCIR UN FLUJO");
-        Add("L_PlayStreamButton", "Lancer", "Play", "Abspielen", "Afspelen", "Reproducir");
+            "No hay fuentes. Actualiza, o despierta el altavoz.",
+            "Nessuna sorgente elencata. Aggiorna o riattiva il diffusore.");
+        Add("L_PlayStream", "JOUER UN FLUX", "PLAY A STREAM", "STREAM ABSPIELEN", "STREAM AFSPELEN", "REPRODUCIR UN FLUJO", "RIPRODURRE UN FLUSSO");
+        Add("L_PlayStreamButton", "Lancer", "Play", "Abspielen", "Afspelen", "Reproducir", "Riproduci");
         Add("L_PlayStreamNote",
             "L'agent convertit une adresse HTTPS en HTTP : le moteur UPnP de l'enceinte refuse TLS.",
             "The agent rewrites an HTTPS address to HTTP: the speaker's UPnP renderer rejects TLS.",
             "Der Agent wandelt eine HTTPS-Adresse in HTTP um: der UPnP-Renderer des Lautsprechers lehnt TLS ab.",
             "De agent zet een HTTPS-adres om naar HTTP: de UPnP-renderer van de speaker weigert TLS.",
-            "El agente convierte una dirección HTTPS en HTTP: el motor UPnP del altavoz rechaza TLS.");
+            "El agente convierte una dirección HTTPS en HTTP: el motor UPnP del altavoz rechaza TLS.",
+            "L'agente riscrive un indirizzo HTTPS in HTTP: il renderer UPnP del diffusore rifiuta il TLS.");
         // ---------------------------------------------------------- Enregistrement (Sources)
-        Add("L_RecTitle", "ENREGISTRER", "RECORD", "AUFNEHMEN", "OPNEMEN", "GRABAR");
-        Add("L_RecButton", "Enregistrer", "Record", "Aufnehmen", "Opnemen", "Grabar");
-        Add("L_RecStop", "Arrêter", "Stop", "Stoppen", "Stoppen", "Detener");
-        Add("L_RecMax", "max 5 min", "max 5 min", "max. 5 Min.", "max. 5 min", "máx. 5 min");
+        Add("L_RecTitle", "ENREGISTRER", "RECORD", "AUFNEHMEN", "OPNEMEN", "GRABAR", "REGISTRA");
+        Add("L_RecButton", "Enregistrer", "Record", "Aufnehmen", "Opnemen", "Grabar", "Registra");
+        Add("L_RecStop", "Arrêter", "Stop", "Stoppen", "Stoppen", "Detener", "Ferma");
+        Add("L_RecMax", "max 5 min", "max 5 min", "max. 5 Min.", "max. 5 min", "máx. 5 min", "max 5 min");
         Add("L_RecReady",
             "{0} — flux disponible",
             "{0} — stream available",
             "{0} — Stream verfügbar",
             "{0} — stream beschikbaar",
-            "{0} — flujo disponible");
-        Add("L_RecDelete", "Supprimer", "Delete", "Löschen", "Verwijderen", "Eliminar");
+            "{0} — flujo disponible",
+            "{0} — flusso disponibile");
+        Add("L_RecDelete", "Supprimer", "Delete", "Löschen", "Verwijderen", "Eliminar", "Elimina");
         Add("L_RecDeleteAsk",
             "Supprimer l'enregistrement {0} du {1} à {2} ?",
             "Delete the recording {0} of {1} at {2}?",
             "Die Aufnahme {0} vom {1} um {2} löschen?",
             "De opname {0} van {1} om {2} verwijderen?",
-            "¿Eliminar la grabación {0} del {1} a las {2}?");
+            "¿Eliminar la grabación {0} del {1} a las {2}?",
+            "Eliminare la registrazione {0} del {1} alle {2}?");
         Add("L_RecNotifTitle",
             "Enregistrement en cours",
             "Recording",
             "Aufnahme läuft",
             "Opname bezig",
-            "Grabando");
-        Add("L_RecMinSec", "{0} min {1:00}", "{0} min {1:00}", "{0} Min. {1:00}", "{0} min {1:00}", "{0} min {1:00}");
+            "Grabando",
+            "Registrazione");
+        Add("L_RecMinSec", "{0} min {1:00}", "{0} min {1:00}", "{0} Min. {1:00}", "{0} min {1:00}", "{0} min {1:00}", "{0} min {1:00}");
         Add("L_RecNone",
             "Aucun enregistrement pour l'instant.",
             "No recordings yet.",
             "Noch keine Aufnahmen.",
             "Nog geen opnames.",
-            "Todavía no hay grabaciones.");
+            "Todavía no hay grabaciones.",
+            "Ancora nessuna registrazione.");
         Add("S_RecNeedAgent",
             "Il faut l'agent STR sur cette enceinte pour enregistrer.",
             "Recording needs the STR agent on this speaker.",
             "Zum Aufnehmen braucht dieser Lautsprecher den STR-Agenten.",
             "Opnemen vereist de STR-agent op deze speaker.",
-            "Para grabar, este altavoz necesita el agente STR.");
+            "Para grabar, este altavoz necesita el agente STR.",
+            "La registrazione richiede l'agente STR su questo diffusore.");
         Add("L_CopyTitle",
             "COPIER LES TOUCHES",
             "COPY THE KEYS",
             "TASTEN KOPIEREN",
             "TOETSEN KOPIËREN",
-            "COPIAR LAS TECLAS");
+            "COPIAR LAS TECLAS",
+            "COPIA I TASTI");
         Add("L_CopyHint",
             "Copie les touches de {0} vers une autre enceinte STR.",
             "Copies the keys of {0} to another STR speaker.",
             "Kopiert die Tasten von {0} auf einen anderen STR-Lautsprecher.",
             "Kopieert de toetsen van {0} naar een andere STR-speaker.",
-            "Copia las teclas de {0} a otro altavoz STR.");
+            "Copia las teclas de {0} a otro altavoz STR.",
+            "Copia i tasti di {0} su un altro diffusore STR.");
         Add("L_CopyButton",
             "Copier vers…",
             "Copy to…",
             "Kopieren nach…",
             "Kopiëren naar…",
-            "Copiar a…");
+            "Copiar a…",
+            "Copia su…");
         Add("L_CopyChoose",
             "Copier les touches de {0} vers :",
             "Copy the keys of {0} to:",
             "Tasten von {0} kopieren nach:",
             "De toetsen van {0} kopiëren naar:",
-            "Copiar las teclas de {0} a:");
+            "Copiar las teclas de {0} a:",
+            "Copia i tasti di {0} su:");
         Add("L_CopyAll",
             "Toutes les enceintes",
             "All speakers",
             "Alle Lautsprecher",
             "Alle speakers",
-            "Todos los altavoces");
+            "Todos los altavoces",
+            "Tutti i diffusori");
         Add("L_CopyAllTargets",
             "toutes les enceintes STR",
             "all STR speakers",
             "alle STR-Lautsprecher",
             "alle STR-speakers",
-            "todos los altavoces STR");
+            "todos los altavoces STR",
+            "tutti i diffusori STR");
         Add("L_CopyConfirm",
             "Copier vers {0} ? Chaque touche réglée sur {1} remplace celle de la cible ; les autres touches de la cible restent. Une touche Spotify transmet aussi le compte Spotify de {1}.",
             "Copy to {0}? Each key set on {1} replaces the target's; the target's other keys stay. A Spotify key also hands on the Spotify account of {1}.",
             "Nach {0} kopieren? Jede auf {1} belegte Taste ersetzt die des Ziels; die übrigen Tasten des Ziels bleiben. Eine Spotify-Taste überträgt auch das Spotify-Konto von {1}.",
             "Kopiëren naar {0}? Elke toets die op {1} is ingesteld, vervangt die van het doel; de andere toetsen van het doel blijven. Een Spotify-toets geeft ook het Spotify-account van {1} door.",
-            "¿Copiar a {0}? Cada tecla configurada en {1} sustituye a la del destino; las demás teclas del destino se mantienen. Una tecla de Spotify también transmite la cuenta de Spotify de {1}.");
+            "¿Copiar a {0}? Cada tecla configurada en {1} sustituye a la del destino; las demás teclas del destino se mantienen. Una tecla de Spotify también transmite la cuenta de Spotify de {1}.",
+            "Copiare su {0}? Ogni tasto impostato su {1} sostituisce quello di destinazione; gli altri tasti di destinazione restano. Un tasto Spotify trasmette anche l'account Spotify di {1}.");
         Add("L_CopyGo",
             "Copier",
             "Copy",
             "Kopieren",
             "Kopiëren",
-            "Copiar");
+            "Copiar",
+            "Copia");
         Add("S_CopyRunning",
             "Copie en cours…",
             "Copying…",
             "Wird kopiert…",
             "Bezig met kopiëren…",
-            "Copiando…");
+            "Copiando…",
+            "Copia in corso…");
         Add("S_CopyDone",
             "{0} : touches copiées ({1}).",
             "{0}: keys copied ({1}).",
             "{0}: Tasten kopiert ({1}).",
             "{0}: toetsen gekopieerd ({1}).",
-            "{0}: teclas copiadas ({1}).");
+            "{0}: teclas copiadas ({1}).",
+            "{0}: tasti copiati ({1}).");
         Add("S_CopyRow1Only",
             "Seconde rangée non copiée : cette enceinte n'en a pas.",
             "Second row not copied: this speaker has none.",
             "Zweite Reihe nicht kopiert: Dieser Lautsprecher hat keine.",
             "Tweede rij niet gekopieerd: deze speaker heeft er geen.",
-            "Segunda fila no copiada: este altavoz no la tiene.");
+            "Segunda fila no copiada: este altavoz no la tiene.",
+            "Seconda fila non copiata: questo diffusore non ne ha.");
         Add("S_CopySpotify",
             "Compte Spotify transmis.",
             "Spotify account handed on.",
             "Spotify-Konto übertragen.",
             "Spotify-account doorgegeven.",
-            "Cuenta de Spotify transmitida.");
+            "Cuenta de Spotify transmitida.",
+            "Account Spotify trasmesso.");
         Add("S_CopyConflict",
             "{0} : « {1} » y est déjà sur la touche {2}. Rien n'a été écrit sur cette enceinte.",
             "{0}: “{1}” is already on key {2} there. Nothing was written to this speaker.",
             "{0}: „{1}“ liegt dort schon auf Taste {2}. Auf diesen Lautsprecher wurde nichts geschrieben.",
             "{0}: “{1}” staat daar al op toets {2}. Er is niets naar deze speaker geschreven.",
-            "{0}: «{1}» ya está allí en la tecla {2}. No se ha escrito nada en este altavoz.");
+            "{0}: «{1}» ya está allí en la tecla {2}. No se ha escrito nada en este altavoz.",
+            "{0}: “{1}” è già sul tasto {2} di quel diffusore. Su questo diffusore non è stato scritto nulla.");
         Add("S_CopyUnreachable",
             "{0} : injoignable, rien n'a été copié.",
             "{0}: unreachable, nothing was copied.",
             "{0}: nicht erreichbar, nichts wurde kopiert.",
             "{0}: onbereikbaar, er is niets gekopieerd.",
-            "{0}: inaccesible, no se ha copiado nada.");
+            "{0}: inaccesible, no se ha copiado nada.",
+            "{0}: irraggiungibile, non è stato copiato nulla.");
         Add("S_CopyRefused",
             "{0} : copie refusée par l'enceinte.",
             "{0}: the speaker refused the copy.",
             "{0}: Der Lautsprecher hat das Kopieren abgelehnt.",
             "{0}: de speaker weigerde de kopie.",
-            "{0}: el altavoz rechazó la copia.");
+            "{0}: el altavoz rechazó la copia.",
+            "{0}: il diffusore ha rifiutato la copia.");
         Add("S_CopyUnknown",
             "{0} : {1} ne la connaît pas encore. Réessaie dans quelques minutes.",
             "{0}: {1} does not know it yet. Try again in a few minutes.",
             "{0}: {1} kennt ihn noch nicht. Versuche es in ein paar Minuten erneut.",
             "{0}: {1} kent hem nog niet. Probeer het over een paar minuten opnieuw.",
-            "{0}: {1} todavía no lo conoce. Vuelve a intentarlo dentro de unos minutos.");
+            "{0}: {1} todavía no lo conoce. Vuelve a intentarlo dentro de unos minutos.",
+            "{0}: {1} non lo conosce ancora. Riprova tra qualche minuto.");
         Add("S_CopyFailed",
             "{0} : échec ({1}).",
             "{0}: failed ({1}).",
             "{0}: fehlgeschlagen ({1}).",
             "{0}: mislukt ({1}).",
-            "{0}: error ({1}).");
+            "{0}: error ({1}).",
+            "{0}: non riuscita ({1}).");
         Add("S_CopyBusy",
             "Une copie est déjà en cours sur cette enceinte.",
             "A copy is already running on this speaker.",
             "Auf diesem Lautsprecher läuft bereits ein Kopiervorgang.",
             "Er loopt al een kopie op deze speaker.",
-            "Ya hay una copia en curso en este altavoz.");
+            "Ya hay una copia en curso en este altavoz.",
+            "Su questo diffusore è già in corso una copia.");
         Add("S_CopyNoPresets",
             "Cette enceinte n'a aucune touche réglée à copier.",
             "This speaker has no key set to copy.",
             "Dieser Lautsprecher hat keine belegte Taste zum Kopieren.",
             "Deze speaker heeft geen ingestelde toets om te kopiëren.",
-            "Este altavoz no tiene ninguna tecla configurada que copiar.");
+            "Este altavoz no tiene ninguna tecla configurada que copiar.",
+            "Questo diffusore non ha tasti impostati da copiare.");
         Add("S_CopyNoTargets",
             "Aucune enceinte cible n'a répondu.",
             "No target speaker answered.",
             "Kein Ziellautsprecher hat geantwortet.",
             "Geen enkele doelspeaker antwoordde.",
-            "Ningún altavoz de destino respondió.");
+            "Ningún altavoz de destino respondió.",
+            "Nessun diffusore di destinazione ha risposto.");
         Add("S_CopyTooOld",
             "La copie des touches demande l'agent STR 1.6.5 ou plus récent sur {0}.",
             "Copying the keys needs STR agent 1.6.5 or later on {0}.",
             "Das Kopieren der Tasten braucht den STR-Agenten 1.6.5 oder neuer auf {0}.",
             "Toetsen kopiëren vereist STR-agent 1.6.5 of nieuwer op {0}.",
-            "Copiar las teclas requiere el agente STR 1.6.5 o posterior en {0}.");
+            "Copiar las teclas requiere el agente STR 1.6.5 o posterior en {0}.",
+            "La copia dei tasti richiede l'agente STR 1.6.5 o successivo su {0}.");
         Add("S_CopyNoOther",
             "Aucune autre enceinte STR connue. Lance un balayage dans Réglages.",
             "No other STR speaker known. Run a scan in Settings.",
             "Kein anderer STR-Lautsprecher bekannt. Starte eine Suche in den Einstellungen.",
             "Geen andere STR-speaker bekend. Start een scan in Instellingen.",
-            "No se conoce ningún otro altavoz STR. Lanza una búsqueda en Ajustes.");
+            "No se conoce ningún otro altavoz STR. Lanza una búsqueda en Ajustes.",
+            "Nessun altro diffusore STR conosciuto. Avvia una ricerca nelle Impostazioni.");
         Add("S_CopyTimeout",
             "La copie continue sur l'enceinte ; vérifie les touches dans un moment.",
             "The copy goes on on the speaker; check the keys in a moment.",
             "Das Kopieren läuft auf dem Lautsprecher weiter; prüfe die Tasten gleich.",
             "De kopie loopt verder op de speaker; controleer de toetsen zo meteen.",
-            "La copia continúa en el altavoz; comprueba las teclas dentro de un momento.");
+            "La copia continúa en el altavoz; comprueba las teclas dentro de un momento.",
+            "La copia prosegue sul diffusore; controlla i tasti tra un momento.");
         Add("L_Like",
             "J'aime",
             "Like",
             "Gefällt mir",
             "Vind ik leuk",
-            "Me gusta");
+            "Me gusta",
+            "Mi piace");
         Add("L_Unlike",
             "Je n'aime pas",
             "Dislike",
             "Gefällt mir nicht",
             "Vind ik niet leuk",
-            "No me gusta");
+            "No me gusta",
+            "Non mi piace");
         Add("L_LikedAccount",
             "Le titre va dans les Titres likés du compte Spotify de l'enceinte.",
             "The song goes to the Liked Songs of the speaker's Spotify account.",
             "Der Titel landet in den Lieblingssongs des Spotify-Kontos des Lautsprechers.",
             "Het nummer gaat naar de Gelikete nummers van het Spotify-account van de speaker.",
-            "La canción va a las canciones que te gustan de la cuenta de Spotify del altavoz.");
+            "La canción va a las canciones que te gustan de la cuenta de Spotify del altavoz.",
+            "Il brano va nei Brani che ti piacciono dell'account Spotify del diffusore.");
         Add("S_LikedSaved",
             "Ajouté aux Titres likés : {0}.",
             "Added to Liked Songs: {0}.",
             "Zu den Lieblingssongs hinzugefügt: {0}.",
             "Toegevoegd aan Gelikete nummers: {0}.",
-            "Añadida a Tus me gusta: {0}.");
+            "Añadida a Tus me gusta: {0}.",
+            "Aggiunto ai Brani che ti piacciono: {0}.");
         Add("S_LikedRemoved",
             "Retiré des Titres likés : {0}.",
             "Removed from Liked Songs: {0}.",
             "Aus den Lieblingssongs entfernt: {0}.",
             "Verwijderd uit Gelikete nummers: {0}.",
-            "Quitada de Tus me gusta: {0}.");
+            "Quitada de Tus me gusta: {0}.",
+            "Rimosso dai Brani che ti piacciono: {0}.");
         Add("S_LikedNotPlaying",
             "Spotify ne joue plus sur cette enceinte.",
             "Spotify is no longer playing on this speaker.",
             "Spotify spielt auf diesem Lautsprecher nicht mehr.",
             "Spotify speelt niet meer op deze speaker.",
-            "Spotify ya no suena en este altavoz.");
+            "Spotify ya no suena en este altavoz.",
+            "Spotify non è più in riproduzione su questo diffusore.");
         Add("S_LikedNoTrack",
             "Aucun titre Spotify en cours.",
             "No Spotify song is playing.",
             "Es läuft kein Spotify-Titel.",
             "Er speelt geen Spotify-nummer.",
-            "No suena ninguna canción de Spotify.");
+            "No suena ninguna canción de Spotify.",
+            "Nessun brano Spotify in riproduzione.");
         Add("S_LikedNotSong",
             "Ce qui joue n'est pas un morceau (podcast, publicité…).",
             "What is playing is not a song (podcast, ad…).",
             "Was läuft, ist kein Song (Podcast, Werbung…).",
             "Wat er speelt is geen nummer (podcast, advertentie…).",
-            "Lo que suena no es una canción (pódcast, anuncio…).");
+            "Lo que suena no es una canción (pódcast, anuncio…).",
+            "Ciò che è in riproduzione non è un brano (podcast, pubblicità…).");
         Add("S_LikedNoEngine",
             "Cette enceinte n'a pas le moteur Spotify de STR.",
             "This speaker does not have STR's Spotify engine.",
             "Dieser Lautsprecher hat die Spotify-Engine von STR nicht.",
             "Deze speaker heeft de Spotify-engine van STR niet.",
-            "Este altavoz no tiene el motor de Spotify de STR.");
+            "Este altavoz no tiene el motor de Spotify de STR.",
+            "Questo diffusore non ha il motore Spotify di STR.");
         Add("S_LikedEngineOld",
             "Le moteur Spotify de l'enceinte est trop ancien : mets STR à jour.",
             "The speaker's Spotify engine is too old: update STR.",
             "Die Spotify-Engine des Lautsprechers ist zu alt: Aktualisiere STR.",
             "De Spotify-engine van de speaker is te oud: werk STR bij.",
-            "El motor de Spotify del altavoz es demasiado antiguo: actualiza STR.");
+            "El motor de Spotify del altavoz es demasiado antiguo: actualiza STR.",
+            "Il motore Spotify del diffusore è troppo vecchio: aggiorna STR.");
         Add("S_LikedNoSession",
             "Le moteur Spotify de l'enceinte n'est connecté à aucun compte.",
             "The speaker's Spotify engine is not logged in to any account.",
             "Die Spotify-Engine des Lautsprechers ist bei keinem Konto angemeldet.",
             "De Spotify-engine van de speaker is bij geen enkel account aangemeld.",
-            "El motor de Spotify del altavoz no ha iniciado sesión en ninguna cuenta.");
+            "El motor de Spotify del altavoz no ha iniciado sesión en ninguna cuenta.",
+            "Il motore Spotify del diffusore non è collegato a nessun account.");
         Add("S_LikedRefusedBySpotify",
             "Spotify a refusé la demande.",
             "Spotify refused the request.",
             "Spotify hat die Anfrage abgelehnt.",
             "Spotify weigerde het verzoek.",
-            "Spotify rechazó la solicitud.");
+            "Spotify rechazó la solicitud.",
+            "Spotify ha rifiutato la richiesta.");
         Add("S_LikedRateLimited",
             "Trop de demandes à Spotify : réessaie dans un instant.",
             "Too many requests to Spotify: try again in a moment.",
             "Zu viele Anfragen an Spotify: Versuche es gleich noch einmal.",
             "Te veel verzoeken aan Spotify: probeer het zo opnieuw.",
-            "Demasiadas solicitudes a Spotify: vuelve a intentarlo en un momento.");
+            "Demasiadas solicitudes a Spotify: vuelve a intentarlo en un momento.",
+            "Troppe richieste a Spotify: riprova tra un momento.");
         Add("S_LikedTimeout",
             "Spotify n'a pas répondu à temps.",
             "Spotify did not answer in time.",
             "Spotify hat nicht rechtzeitig geantwortet.",
             "Spotify antwoordde niet op tijd.",
-            "Spotify no respondió a tiempo.");
+            "Spotify no respondió a tiempo.",
+            "Spotify non ha risposto in tempo.");
         Add("S_LikedFailed",
             "Échec ({0}).",
             "Failed ({0}).",
             "Fehlgeschlagen ({0}).",
             "Mislukt ({0}).",
-            "Error ({0}).");
+            "Error ({0}).",
+            "Non riuscito ({0}).");
         Add("S_LikedUnreachable",
             "L'enceinte ne répond pas.",
             "The speaker does not answer.",
             "Der Lautsprecher antwortet nicht.",
             "De speaker antwoordt niet.",
-            "El altavoz no responde.");
+            "El altavoz no responde.",
+            "Il diffusore non risponde.");
         Add("L_JoinPlaying",
             "{0} joue « {1} ».",
             "{0} is playing “{1}”.",
             "{0} spielt „{1}“.",
             "{0} speelt “{1}”.",
-            "{0} está reproduciendo «{1}».");
+            "{0} está reproduciendo «{1}».",
+            "{0} sta riproducendo “{1}”.");
         Add("L_JoinPaused",
             "{0} est en pause sur « {1} ».",
             "{0} is paused on “{1}”.",
             "{0} ist bei „{1}“ pausiert.",
             "{0} staat gepauzeerd op “{1}”.",
-            "{0} está en pausa en «{1}».");
+            "{0} está en pausa en «{1}».",
+            "{0} è in pausa su “{1}”.");
         Add("L_JoinThenPlays",
             "L'ajouter au groupe arrête cette écoute pour jouer « {0} ».",
             "Adding it to the group stops that to play “{0}”.",
             "Beim Hinzufügen zur Gruppe endet das, und „{0}“ läuft.",
             "Toevoegen aan de groep stopt dat om “{0}” te spelen.",
-            "Añadirlo al grupo detiene eso para reproducir «{0}».");
+            "Añadirlo al grupo detiene eso para reproducir «{0}».",
+            "Aggiungerlo al gruppo interrompe questo ascolto per riprodurre “{0}”.");
         Add("L_JoinThenStops",
             "L'ajouter au groupe arrête cette écoute.",
             "Adding it to the group stops that.",
             "Beim Hinzufügen zur Gruppe endet das.",
             "Toevoegen aan de groep stopt dat.",
-            "Añadirlo al grupo detiene eso.");
+            "Añadirlo al grupo detiene eso.",
+            "Aggiungerlo al gruppo interrompe questo ascolto.");
         Add("L_JoinGo",
             "Ajouter",
             "Add",
             "Hinzufügen",
             "Toevoegen",
-            "Añadir");
+            "Añadir",
+            "Aggiungi");
         Add("S_RecSizeLimit",
             "Enregistrement arrêté : le flux arrive anormalement vite et remplirait le téléphone. {0} gardées.",
             "Recording stopped: the stream arrives abnormally fast and would fill the phone. {0} kept.",
             "Aufnahme gestoppt: Der Stream kommt ungewöhnlich schnell und würde das Telefon füllen. {0} behalten.",
             "Opname gestopt: de stream komt abnormaal snel binnen en zou de telefoon vullen. {0} bewaard.",
-            "Grabación detenida: el flujo llega anormalmente rápido y llenaría el teléfono. Se conservan {0}.");
+            "Grabación detenida: el flujo llega anormalmente rápido y llenaría el teléfono. Se conservan {0}.",
+            "Registrazione fermata: il flusso arriva in modo anomalo e riempirebbe il telefono. {0} conservati.");
         Add("S_RecOffline",
             "Enceinte injoignable : l'enregistrement n'est pas possible pour l'instant. Tes enregistrements restent disponibles.",
             "Speaker unreachable: recording is not possible for now. Your recordings stay available.",
             "Lautsprecher nicht erreichbar: Aufnehmen ist im Moment nicht möglich. Deine Aufnahmen bleiben verfügbar.",
             "Speaker onbereikbaar: opnemen is nu niet mogelijk. Je opnames blijven beschikbaar.",
-            "Altavoz inaccesible: por ahora no se puede grabar. Tus grabaciones siguen disponibles.");
+            "Altavoz inaccesible: por ahora no se puede grabar. Tus grabaciones siguen disponibles.",
+            "Diffusore irraggiungibile: per ora non è possibile registrare. Le tue registrazioni restano disponibili.");
         Add("S_RecNoSpeaker",
             "Aucune enceinte connectée : l'enregistrement n'est pas possible. Tes enregistrements restent disponibles.",
             "No speaker connected: recording is not possible. Your recordings stay available.",
             "Kein Lautsprecher verbunden: Aufnehmen ist nicht möglich. Deine Aufnahmen bleiben verfügbar.",
             "Geen speaker verbonden: opnemen is niet mogelijk. Je opnames blijven beschikbaar.",
-            "Ningún altavoz conectado: no se puede grabar. Tus grabaciones siguen disponibles.");
+            "Ningún altavoz conectado: no se puede grabar. Tus grabaciones siguen disponibles.",
+            "Nessun diffusore collegato: non è possibile registrare. Le tue registrazioni restano disponibili.");
         Add("S_RecNotPlaying",
             "Aucune radio internet en cours.",
             "No internet radio playing.",
             "Es läuft kein Internetradio.",
             "Er speelt geen internetradio.",
-            "No se está reproduciendo ninguna radio por internet.");
+            "No se está reproduciendo ninguna radio por internet.",
+            "Nessuna radio internet in riproduzione.");
         Add("S_RecNotRadio",
             "{0} : enregistrement impossible.",
             "{0}: recording not possible.",
             "{0}: Aufnahme nicht möglich.",
             "{0}: opnemen niet mogelijk.",
-            "{0}: no se puede grabar.");
+            "{0}: no se puede grabar.",
+            "{0}: registrazione non possibile.");
         Add("S_RecNoUrl",
             "Le flux de cette station n'est pas accessible.",
             "This station's stream is not reachable.",
             "Der Stream dieses Senders ist nicht erreichbar.",
             "De stream van deze zender is niet bereikbaar.",
-            "El flujo de esta emisora no está accesible.");
+            "El flujo de esta emisora no está accesible.",
+            "Il flusso di questa stazione non è raggiungibile.");
         Add("S_RecHls",
             "Flux HLS non pris en charge.",
             "HLS streams are not supported.",
             "HLS-Streams werden nicht unterstützt.",
             "HLS-streams worden niet ondersteund.",
-            "Los flujos HLS no son compatibles.");
+            "Los flujos HLS no son compatibles.",
+            "I flussi HLS non sono supportati.");
         Add("S_RecNotAudio",
             "Ce flux n'est pas un fichier audio.",
             "This stream is not audio.",
             "Dieser Stream ist kein Audio.",
             "Deze stream is geen audio.",
-            "Este flujo no es audio.");
+            "Este flujo no es audio.",
+            "Questo flusso non è audio.");
         Add("S_RecFull",
             "10 enregistrements : supprime-en un pour en faire un nouveau.",
             "10 recordings: delete one to make a new one.",
             "10 Aufnahmen: Lösche eine, um eine neue zu machen.",
             "10 opnames: verwijder er een om een nieuwe te maken.",
-            "10 grabaciones: elimina una para hacer otra.");
+            "10 grabaciones: elimina una para hacer otra.",
+            "10 registrazioni: eliminane una per farne una nuova.");
+        Add("S_RecNetworkDetail",
+            "Impossible d'ouvrir le flux ({0}).",
+            "Could not open the stream ({0}).",
+            "Der Stream ließ sich nicht öffnen ({0}).",
+            "De stream kon niet worden geopend ({0}).",
+            "No se pudo abrir el flujo ({0}).",
+            "Impossibile aprire il flusso ({0}).");
         Add("S_RecNetwork",
             "Impossible d'ouvrir le flux.",
             "Could not open the stream.",
             "Der Stream konnte nicht geöffnet werden.",
             "De stream kon niet worden geopend.",
-            "No se pudo abrir el flujo.");
+            "No se pudo abrir el flujo.",
+            "Impossibile aprire il flusso.");
         Add("S_RecBusy",
             "Un enregistrement est déjà en cours.",
             "A recording is already in progress.",
             "Es läuft bereits eine Aufnahme.",
             "Er loopt al een opname.",
-            "Ya hay una grabación en curso.");
+            "Ya hay una grabación en curso.",
+            "È già in corso una registrazione.");
         Add("S_RecSaved",
             "Enregistré : {0}.",
             "Recorded: {0}.",
             "Aufgenommen: {0}.",
             "Opgenomen: {0}.",
-            "Grabado: {0}.");
+            "Grabado: {0}.",
+            "Registrato: {0}.");
         Add("S_RecSavedMax",
             "Enregistré : 5 min (maximum atteint).",
             "Recorded: 5 min (maximum reached).",
             "Aufgenommen: 5 Min. (Maximum erreicht).",
             "Opgenomen: 5 min (maximum bereikt).",
-            "Grabado: 5 min (máximo alcanzado).");
+            "Grabado: 5 min (máximo alcanzado).",
+            "Registrato: 5 min (massimo raggiunto).");
         Add("S_RecInterrupted",
             "Enregistrement interrompu (réseau) – {0} gardées.",
             "Recording interrupted (network) – {0} kept.",
             "Aufnahme unterbrochen (Netzwerk) – {0} behalten.",
             "Opname onderbroken (netwerk) – {0} bewaard.",
-            "Grabación interrumpida (red): se conservan {0}.");
+            "Grabación interrumpida (red): se conservan {0}.",
+            "Registrazione interrotta (rete) – {0} conservati.");
         Add("S_RecTooShort",
             "Enregistrement trop court, il n'a pas été gardé.",
             "Recording too short, it was not kept.",
             "Aufnahme zu kurz, sie wurde nicht behalten.",
             "Opname te kort, ze is niet bewaard.",
-            "Grabación demasiado corta, no se ha conservado.");
+            "Grabación demasiado corta, no se ha conservado.",
+            "Registrazione troppo breve, non è stata conservata.");
         Add("S_RecDeleted",
             "Enregistrement supprimé.",
             "Recording deleted.",
             "Aufnahme gelöscht.",
             "Opname verwijderd.",
-            "Grabación eliminada.");
+            "Grabación eliminada.",
+            "Registrazione eliminata.");
 
-        Add("L_Recent", "ÉCOUTÉ RÉCEMMENT", "RECENTLY PLAYED", "ZULETZT GEHÖRT", "ONLANGS AFGESPEELD", "ESCUCHADO RECIENTEMENTE");
+        Add("L_Recent", "ÉCOUTÉ RÉCEMMENT", "RECENTLY PLAYED", "ZULETZT GEHÖRT", "ONLANGS AFGESPEELD", "ESCUCHADO RECIENTEMENTE", "ASCOLTATI DI RECENTE");
         Add("L_NoRecent",
             "Rien dans l'historique de l'agent.",
             "Nothing in the agent's history.",
             "Nichts im Verlauf des Agenten.",
             "Niets in de geschiedenis van de agent.",
-            "Nada en el historial del agente.");
+            "Nada en el historial del agente.",
+            "Nulla nella cronologia dell'agente.");
 
         // ---------------------------------------------------------- Page Multi-pièces
-        Add("L_Master", "ENCEINTE MAÎTRE", "MASTER SPEAKER", "HAUPTLAUTSPRECHER", "HOOFDSPEAKER", "ALTAVOZ PRINCIPAL");
+        Add("L_Master", "ENCEINTE MAÎTRE", "MASTER SPEAKER", "HAUPTLAUTSPRECHER", "HOOFDSPEAKER", "ALTAVOZ PRINCIPAL", "DIFFUSORE PRINCIPALE");
         Add("L_MasterNote",
             "C'est elle qui diffuse le flux ; les autres le suivent. Change d'enceinte active pour changer de maître.",
             "It broadcasts the stream; the others follow it. Switch the active speaker to change the master.",
             "Er sendet den Stream; die anderen folgen ihm. Wechsle den aktiven Lautsprecher, um den Hauptlautsprecher zu ändern.",
             "Deze speaker zendt de stream uit; de andere volgen. Wissel van actieve speaker om de hoofdspeaker te wijzigen.",
-            "Es el que difunde el flujo; los demás lo siguen. Cambia de altavoz activo para cambiar de principal.");
+            "Es el que difunde el flujo; los demás lo siguen. Cambia de altavoz activo para cambiar de principal.",
+            "Trasmette il flusso; gli altri lo seguono. Cambia il diffusore attivo per cambiare il principale.");
         Add("L_NotMasterNote",
             "L'enceinte pilotée suit ce groupe, elle ne le diffuse pas. Les commandes de groupe s'adressent au maître ci-dessus.",
             "The controlled speaker follows this group, it does not broadcast it. Group commands are addressed to the master above.",
             "Der gesteuerte Lautsprecher folgt dieser Gruppe, er sendet sie nicht. Gruppenbefehle gehen an den Master oben.",
             "De bediende speaker volgt deze groep, hij zendt ze niet uit. Groepsopdrachten gaan naar de master hierboven.",
-            "El altavoz controlado sigue este grupo, no lo emite. Los mandos de grupo se dirigen al maestro de arriba.");
-        Add("L_SpeakersToGroup", "ENCEINTES À GROUPER", "SPEAKERS TO GROUP", "ZU GRUPPIERENDE LAUTSPRECHER", "SPEAKERS OM TE GROEPEREN", "ALTAVOCES A AGRUPAR");
+            "El altavoz controlado sigue este grupo, no lo emite. Los mandos de grupo se dirigen al maestro de arriba.",
+            "Il diffusore controllato segue questo gruppo, non lo trasmette. I comandi del gruppo vanno al principale qui sopra.");
+        Add("L_SpeakersToGroup", "ENCEINTES À GROUPER", "SPEAKERS TO GROUP", "ZU GRUPPIERENDE LAUTSPRECHER", "SPEAKERS OM TE GROEPEREN", "ALTAVOCES A AGRUPAR", "DIFFUSORI DA RAGGRUPPARE");
         Add("L_NoOtherSpeakers",
             "Aucune autre enceinte connue. Lance un balayage dans Réglages.",
             "No other speaker known. Run a scan in Settings.",
             "Kein weiterer Lautsprecher bekannt. Starte einen Suchlauf unter Einstellungen.",
             "Geen andere speaker bekend. Start een scan bij Instellingen.",
-            "No se conoce ningún otro altavoz. Lanza un escaneo en Ajustes.");
+            "No se conoce ningún otro altavoz. Lanza un escaneo en Ajustes.",
+            "Nessun altro diffusore conosciuto. Avvia una ricerca nelle Impostazioni.");
         Add("L_PermanentGroup",
             "Groupe permanent (reformé à la prochaine lecture)",
             "Permanent group (re-formed on the next play)",
             "Dauerhafte Gruppe (wird bei der nächsten Wiedergabe neu gebildet)",
             "Permanente groep (wordt bij de volgende weergave hersteld)",
-            "Grupo permanente (se recrea en la próxima reproducción)");
-        Add("L_FormGroup", "Grouper", "Group", "Gruppieren", "Groeperen", "Agrupar");
-        Add("L_Dissolve", "Dissoudre", "Dissolve", "Auflösen", "Ontbinden", "Disolver");
-        Add("L_GroupVolume", "VOLUME DU GROUPE", "GROUP VOLUME", "GRUPPENLAUTSTÄRKE", "GROEPSVOLUME", "VOLUMEN DEL GRUPO");
-        Add("L_ApplyToGroup", "Appliquer à tout le groupe", "Apply to the whole group", "Auf die ganze Gruppe anwenden", "Op de hele groep toepassen", "Aplicar a todo el grupo");
-        Add("L_NoActiveGroup", "Pas de groupe actif.", "No active group.", "Keine aktive Gruppe.", "Geen actieve groep.", "Sin grupo activo.");
+            "Grupo permanente (se recrea en la próxima reproducción)",
+            "Gruppo permanente (ricomposto alla prossima riproduzione)");
+        Add("L_FormGroup", "Grouper", "Group", "Gruppieren", "Groeperen", "Agrupar", "Raggruppa");
+        Add("L_Dissolve", "Dissoudre", "Dissolve", "Auflösen", "Ontbinden", "Disolver", "Sciogli");
+        Add("L_GroupVolume", "VOLUME DU GROUPE", "GROUP VOLUME", "GRUPPENLAUTSTÄRKE", "GROEPSVOLUME", "VOLUMEN DEL GRUPO", "VOLUME DEL GRUPPO");
+        Add("L_ApplyToGroup", "Appliquer à tout le groupe", "Apply to the whole group", "Auf die ganze Gruppe anwenden", "Op de hele groep toepassen", "Aplicar a todo el grupo", "Applica a tutto il gruppo");
+        Add("L_NoActiveGroup", "Pas de groupe actif.", "No active group.", "Keine aktive Gruppe.", "Geen actieve groep.", "Sin grupo activo.", "Nessun gruppo attivo.");
 
         // ---------------------------------------------------------- Page Réglages
         // « Sélectionnée » et non « active » : dans un groupe, l'enceinte désignée
         // n'est pas celle qui reçoit les commandes.
-        Add("L_ActiveSpeaker", "ENCEINTE SÉLECTIONNÉE", "SELECTED SPEAKER", "AUSGEWÄHLTER LAUTSPRECHER", "GEKOZEN SPEAKER", "ALTAVOZ SELECCIONADO");
+        Add("L_ActiveSpeaker", "ENCEINTE SÉLECTIONNÉE", "SELECTED SPEAKER", "AUSGEWÄHLTER LAUTSPRECHER", "GEKOZEN SPEAKER", "ALTAVOZ SELECCIONADO", "DIFFUSORE SELEZIONATO");
         Add("L_CommandsGoTo",
             "Elle suit un groupe : les commandes vont à {0}, qui diffuse.",
             "It follows a group: commands go to {0}, which does the playing.",
             "Er folgt einer Gruppe: Befehle gehen an {0}, der wiedergibt.",
             "Hij volgt een groep: opdrachten gaan naar {0}, die afspeelt.",
-            "Sigue a un grupo: los comandos van a {0}, que reproduce.");
-        Add("L_NoSpeakerSelected", "Aucune enceinte sélectionnée", "No speaker selected", "Kein Lautsprecher ausgewählt", "Geen speaker geselecteerd", "Ningún altavoz seleccionado");
-        Add("L_Search", "RECHERCHE", "SEARCH", "SUCHE", "ZOEKEN", "BÚSQUEDA");
-        Add("L_ScanButton", "Balayer le réseau local", "Scan the local network", "Lokales Netzwerk durchsuchen", "Lokaal netwerk scannen", "Escanear la red local");
+            "Sigue a un grupo: los comandos van a {0}, que reproduce.",
+            "Segue un gruppo: i comandi vanno a {0}, che si occupa della riproduzione.");
+        Add("L_NoSpeakerSelected", "Aucune enceinte sélectionnée", "No speaker selected", "Kein Lautsprecher ausgewählt", "Geen speaker geselecteerd", "Ningún altavoz seleccionado", "Nessun diffusore selezionato");
+        Add("L_Search", "RECHERCHE", "SEARCH", "SUCHE", "ZOEKEN", "BÚSQUEDA", "RICERCA");
+        Add("L_ScanButton", "Balayer le réseau local", "Scan the local network", "Lokales Netzwerk durchsuchen", "Lokaal netwerk scannen", "Escanear la red local", "Cerca nella rete locale");
         Add("L_ScanNote",
             "Le balayage interroge chaque adresse du sous-réseau sur le port 8090. Le téléphone doit être sur le même Wi-Fi que les enceintes.",
             "The scan probes every address of the subnet on port 8090. The phone must be on the same Wi-Fi as the speakers.",
             "Der Suchlauf prüft jede Adresse des Subnetzes auf Port 8090. Das Telefon muss im selben WLAN sein wie die Lautsprecher.",
             "De scan bevraagt elk adres van het subnet op poort 8090. De telefoon moet op dezelfde wifi zitten als de speakers.",
-            "El escaneo consulta cada dirección de la subred en el puerto 8090. El teléfono debe estar en la misma wifi que los altavoces.");
-        Add("L_Add", "Ajouter", "Add", "Hinzufügen", "Toevoegen", "Añadir");
-        Add("L_KnownSpeakers", "ENCEINTES CONNUES", "KNOWN SPEAKERS", "BEKANNTE LAUTSPRECHER", "BEKENDE SPEAKERS", "ALTAVOCES CONOCIDOS");
+            "El escaneo consulta cada dirección de la subred en el puerto 8090. El teléfono debe estar en la misma wifi que los altavoces.",
+            "La ricerca interroga ogni indirizzo della sottorete sulla porta 8090. Il telefono deve essere sulla stessa rete Wi-Fi dei diffusori.");
+        Add("L_Add", "Ajouter", "Add", "Hinzufügen", "Toevoegen", "Añadir", "Aggiungi");
+        Add("L_KnownSpeakers", "ENCEINTES CONNUES", "KNOWN SPEAKERS", "BEKANNTE LAUTSPRECHER", "BEKENDE SPEAKERS", "ALTAVOCES CONOCIDOS", "DIFFUSORI CONOSCIUTI");
         Add("L_NoKnownSpeakers",
             "Aucune enceinte connue. Lance un balayage.",
             "No speaker known yet. Run a scan.",
             "Noch kein Lautsprecher bekannt. Starte einen Suchlauf.",
             "Nog geen speaker bekend. Start een scan.",
-            "Aún no hay altavoces. Lanza un escaneo.");
-        Add("L_Use", "Utiliser", "Use", "Verwenden", "Gebruiken", "Usar");
+            "Aún no hay altavoces. Lanza un escaneo.",
+            "Ancora nessun diffusore conosciuto. Avvia una ricerca.");
+        Add("L_Use", "Utiliser", "Use", "Verwenden", "Gebruiken", "Usar", "Usa");
 
         // ------------------------------------------- Enceintes sans agent STR
         Add("L_ReadyForStr",
@@ -757,41 +851,47 @@ public static class Localization
             "No STR — ready for installation",
             "Ohne STR — bereit zur Installation",
             "Zonder STR — klaar voor installatie",
-            "Sin STR — lista para instalar");
-        Add("L_StrMissingTitle", "AGENT STR MANQUANT", "STR AGENT MISSING", "STR-AGENT FEHLT", "STR-AGENT ONTBREEKT", "FALTA EL AGENTE STR");
+            "Sin STR — lista para instalar",
+            "Senza STR — pronto per l'installazione");
+        Add("L_StrMissingTitle", "AGENT STR MANQUANT", "STR AGENT MISSING", "STR-AGENT FEHLT", "STR-AGENT ONTBREEKT", "FALTA EL AGENTE STR", "AGENTE STR MANCANTE");
         Add("L_StrMissingOne",
             "Une enceinte connue n'a pas l'agent STR.",
             "One known speaker has no STR agent.",
             "Ein bekannter Lautsprecher hat keinen STR-Agenten.",
             "Eén bekende speaker heeft geen STR-agent.",
-            "Un altavoz conocido no tiene el agente STR.");
+            "Un altavoz conocido no tiene el agente STR.",
+            "Un diffusore conosciuto non ha l'agente STR.");
         Add("L_StrMissingMany",
             "{0} enceintes connues n'ont pas l'agent STR.",
             "{0} known speakers have no STR agent.",
             "{0} bekannte Lautsprecher haben keinen STR-Agenten.",
             "{0} bekende speakers hebben geen STR-agent.",
-            "{0} altavoces conocidos no tienen el agente STR.");
+            "{0} altavoces conocidos no tienen el agente STR.",
+            "{0} diffusori conosciuti non hanno l'agente STR.");
         Add("L_StrMissingBody",
             "Sans l'agent, seules les fonctions du firmware restent : volume, graves, touches déjà enregistrées. La recherche de stations, l'enregistrement des touches et le groupage fiable passent par STR.\n\nL'installation ne peut pas se faire depuis le téléphone : elle ouvre un accès système sur l'enceinte, y copie l'agent et la redémarre. Elle se fait depuis l'outil STR sur PC ou Mac, qui gère aussi les cas de récupération.",
             "Without the agent, only firmware features remain: volume, bass, presets already stored. Station search, saving presets and reliable grouping all go through STR.\n\nInstalling cannot be done from the phone: it opens a system access on the speaker, copies the agent onto it and reboots it. It is done with the STR tool on PC or Mac, which also handles recovery cases.",
             "Ohne den Agenten bleiben nur Firmware-Funktionen: Lautstärke, Bass, bereits gespeicherte Tasten. Sendersuche, Tastenbelegung und zuverlässige Gruppen laufen über STR.\n\nDie Installation ist vom Telefon aus nicht möglich: sie öffnet einen Systemzugang am Lautsprecher, kopiert den Agenten darauf und startet ihn neu. Das macht das STR-Werkzeug für PC oder Mac, das auch Wiederherstellungsfälle abdeckt.",
             "Zonder de agent blijven alleen firmwarefuncties over: volume, bass, al opgeslagen toetsen. Zenders zoeken, toetsen opslaan en betrouwbaar groeperen gaan via STR.\n\nInstalleren kan niet vanaf de telefoon: het opent een systeemtoegang op de speaker, kopieert de agent erop en herstart hem. Dat doet het STR-programma op pc of Mac, dat ook herstelgevallen aankan.",
-            "Sin el agente solo quedan las funciones del firmware: volumen, graves, teclas ya guardadas. Buscar emisoras, guardar teclas y agrupar de forma fiable pasan por STR.\n\nLa instalación no puede hacerse desde el teléfono: abre un acceso de sistema en el altavoz, copia el agente y lo reinicia. Se hace con la herramienta STR para PC o Mac, que también cubre los casos de recuperación.");
+            "Sin el agente solo quedan las funciones del firmware: volumen, graves, teclas ya guardadas. Buscar emisoras, guardar teclas y agrupar de forma fiable pasan por STR.\n\nLa instalación no puede hacerse desde el teléfono: abre un acceso de sistema en el altavoz, copia el agente y lo reinicia. Se hace con la herramienta STR para PC o Mac, que también cubre los casos de recuperación.",
+            "Senza l'agente restano solo le funzioni del firmware: volume, bassi, preselezioni già memorizzate. La ricerca delle stazioni, il salvataggio delle preselezioni e i gruppi affidabili passano tutti da STR.\n\nL'installazione non si può fare dal telefono: apre un accesso di sistema sul diffusore, vi copia l'agente e lo riavvia. Si fa con lo strumento STR su PC o Mac, che gestisce anche i casi di ripristino.");
         Add("L_StrMissingOpen",
             "Voir comment installer STR",
             "See how to install STR",
             "So installiert man STR",
             "Zie hoe je STR installeert",
-            "Ver cómo instalar STR");
-        Add("L_Diagnostics", "DIAGNOSTIC", "DIAGNOSTICS", "DIAGNOSE", "DIAGNOSE", "DIAGNÓSTICO");
-        Add("L_DiagnoseButton", "Interroger l'enceinte active", "Query the active speaker", "Aktiven Lautsprecher abfragen", "Actieve speaker bevragen", "Consultar el altavoz activo");
-        Add("L_Language", "LANGUE", "LANGUAGE", "SPRACHE", "TAAL", "IDIOMA");
+            "Ver cómo instalar STR",
+            "Vedi come installare STR");
+        Add("L_Diagnostics", "DIAGNOSTIC", "DIAGNOSTICS", "DIAGNOSE", "DIAGNOSE", "DIAGNÓSTICO", "DIAGNOSTICA");
+        Add("L_DiagnoseButton", "Interroger l'enceinte active", "Query the active speaker", "Aktiven Lautsprecher abfragen", "Actieve speaker bevragen", "Consultar el altavoz activo", "Interroga il diffusore attivo");
+        Add("L_Language", "LANGUE", "LANGUAGE", "SPRACHE", "TAAL", "IDIOMA", "LINGUA");
         Add("L_LanguageNote",
             "Le changement est immédiat et retenu pour les prochains lancements.",
             "The change takes effect at once and is kept for future launches.",
             "Die Änderung wirkt sofort und bleibt für künftige Starts erhalten.",
             "De wijziging werkt meteen en blijft bewaard voor volgende keren.",
-            "El cambio se aplica de inmediato y se conserva para próximos inicios.");
+            "El cambio se aplica de inmediato y se conserva para próximos inicios.",
+            "La modifica vale subito e viene mantenuta ai prossimi avvii.");
 
         // ---------------------------------------------------------- Messages d'état
         Add("S_NoSpeaker",
@@ -799,376 +899,457 @@ public static class Localization
             "No speaker selected. Go to Settings to find one.",
             "Kein Lautsprecher ausgewählt. Suche einen unter Einstellungen.",
             "Geen speaker geselecteerd. Zoek er een bij Instellingen.",
-            "Ningún altavoz seleccionado. Busca uno en Ajustes.");
+            "Ningún altavoz seleccionado. Busca uno en Ajustes.",
+            "Nessun diffusore selezionato. Vai nelle Impostazioni per trovarne uno.");
         Add("S_Timeout",
             "L'enceinte n'a pas répondu à temps.",
             "The speaker did not answer in time.",
             "Der Lautsprecher hat nicht rechtzeitig geantwortet.",
             "De speaker antwoordde niet op tijd.",
-            "El altavoz no respondió a tiempo.");
+            "El altavoz no respondió a tiempo.",
+            "Il diffusore non ha risposto in tempo.");
         Add("S_PowerOnRefused",
             "L'enceinte n'a pas répondu à l'allumage. Si elle fait partie d'un groupe, elle suit l'enceinte maître : allume plutôt celle-ci, ou dissous le groupe.",
             "The speaker did not come on. If it belongs to a group it follows the master speaker: turn that one on instead, or dissolve the group.",
             "Der Lautsprecher ist nicht angegangen. Gehört er zu einer Gruppe, folgt er dem Master: schalte stattdessen diesen ein oder löse die Gruppe auf.",
             "De speaker ging niet aan. Hoort hij bij een groep, dan volgt hij de masterspeaker: zet die aan of ontbind de groep.",
-            "El altavoz no se ha encendido. Si pertenece a un grupo, sigue al altavoz maestro: enciende ese, o disuelve el grupo.");
+            "El altavoz no se ha encendido. Si pertenece a un grupo, sigue al altavoz maestro: enciende ese, o disuelve el grupo.",
+            "Il diffusore non si è acceso. Se fa parte di un gruppo segue il diffusore principale: accendi quello, oppure sciogli il gruppo.");
         Add("S_Unreachable",
             "Enceinte injoignable. Même réseau Wi-Fi ?",
             "Speaker unreachable. Same Wi-Fi network?",
             "Lautsprecher nicht erreichbar. Gleiches WLAN?",
             "Speaker onbereikbaar. Zelfde wifi-netwerk?",
-            "Altavoz inaccesible. ¿Misma red wifi?");
-        Add("S_Scanning", "Balayage du réseau local…", "Scanning the local network…", "Lokales Netzwerk wird durchsucht…", "Lokaal netwerk scannen…", "Escaneando la red local…");
+            "Altavoz inaccesible. ¿Misma red wifi?",
+            "Diffusore irraggiungibile. Stessa rete Wi-Fi?");
+        Add("S_Scanning", "Balayage du réseau local…", "Scanning the local network…", "Lokales Netzwerk wird durchsucht…", "Lokaal netwerk scannen…", "Escaneando la red local…", "Ricerca nella rete locale…");
         Add("S_NoneFound",
             "Aucune enceinte trouvée. Vérifie que le téléphone est sur le même Wi-Fi (pas en 4G, pas sur un réseau invité).",
             "No speaker found. Check the phone is on the same Wi-Fi (not on mobile data, not on a guest network).",
             "Kein Lautsprecher gefunden. Prüfe, ob das Telefon im selben WLAN ist (nicht mobil, nicht im Gastnetz).",
             "Geen speaker gevonden. Controleer of de telefoon op dezelfde wifi zit (niet op mobiel, niet op een gastnetwerk).",
-            "No se encontró ningún altavoz. Comprueba que el teléfono esté en la misma wifi (no en datos móviles ni en red de invitados).");
-        Add("S_OneFound", "1 enceinte trouvée.", "1 speaker found.", "1 Lautsprecher gefunden.", "1 speaker gevonden.", "1 altavoz encontrado.");
-        Add("S_ManyFound", "{0} enceintes trouvées.", "{0} speakers found.", "{0} Lautsprecher gefunden.", "{0} speakers gevonden.", "{0} altavoces encontrados.");
+            "No se encontró ningún altavoz. Comprueba que el teléfono esté en la misma wifi (no en datos móviles ni en red de invitados).",
+            "Nessun diffusore trovato. Verifica che il telefono sia sulla stessa rete Wi-Fi (non sui dati mobili, non su una rete ospiti).");
+        Add("S_OneFound", "1 enceinte trouvée.", "1 speaker found.", "1 Lautsprecher gefunden.", "1 speaker gevonden.", "1 altavoz encontrado.", "1 diffusore trovato.");
+        Add("S_ManyFound", "{0} enceintes trouvées.", "{0} speakers found.", "{0} Lautsprecher gefunden.", "{0} speakers gevonden.", "{0} altavoces encontrados.", "{0} diffusori trovati.");
         Add("S_EnterIp",
             "Saisis l'adresse IP de l'enceinte, par exemple 192.168.1.42.",
             "Enter the speaker's IP address, for example 192.168.1.42.",
             "Gib die IP-Adresse des Lautsprechers ein, zum Beispiel 192.168.1.42.",
             "Voer het IP-adres van de speaker in, bijvoorbeeld 192.168.1.42.",
-            "Escribe la dirección IP del altavoz, por ejemplo 192.168.1.42.");
+            "Escribe la dirección IP del altavoz, por ejemplo 192.168.1.42.",
+            "Inserisci l'indirizzo IP del diffusore, ad esempio 192.168.1.42.");
         Add("S_NothingAt",
             "Rien ne répond à l'API SoundTouch sur {0}:8090.",
             "Nothing answers the SoundTouch API at {0}:8090.",
             "Auf {0}:8090 antwortet keine SoundTouch-API.",
             "Niets antwoordt op de SoundTouch-API op {0}:8090.",
-            "Nada responde a la API SoundTouch en {0}:8090.");
-        Add("S_Added", "{0} ajoutée.", "{0} added.", "{0} hinzugefügt.", "{0} toegevoegd.", "{0} añadido.");
-        Add("S_Connected", "Connecté à {0}.", "Connected to {0}.", "Verbunden mit {0}.", "Verbonden met {0}.", "Conectado a {0}.");
-        Add("S_Removed", "{0} retirée de la liste.", "{0} removed from the list.", "{0} aus der Liste entfernt.", "{0} uit de lijst verwijderd.", "{0} eliminado de la lista.");
+            "Nada responde a la API SoundTouch en {0}:8090.",
+            "Nessuna risposta dall'API SoundTouch su {0}:8090.");
+        Add("S_Added", "{0} ajoutée.", "{0} added.", "{0} hinzugefügt.", "{0} toegevoegd.", "{0} añadido.", "{0} aggiunto.");
+        Add("S_Connected", "Connecté à {0}.", "Connected to {0}.", "Verbunden mit {0}.", "Verbonden met {0}.", "Conectado a {0}.", "Connesso a {0}.");
+        Add("S_Removed", "{0} retirée de la liste.", "{0} removed from the list.", "{0} aus der Liste entfernt.", "{0} uit de lijst verwijderd.", "{0} eliminado de la lista.", "{0} rimosso dall'elenco.");
         Add("S_SelectFirst",
             "Sélectionne d'abord une enceinte.",
             "Select a speaker first.",
             "Wähle zuerst einen Lautsprecher.",
             "Selecteer eerst een speaker.",
-            "Selecciona primero un altavoz.");
-        Add("S_PresetStarted", "{0} lancée", "{0} started", "{0} gestartet", "{0} gestart", "{0} iniciada");
+            "Selecciona primero un altavoz.",
+            "Seleziona prima un diffusore.");
+        Add("S_PresetStarted", "{0} lancée", "{0} started", "{0} gestartet", "{0} gestart", "{0} iniciada", "{0} avviata");
         Add("S_NoPresets",
             "Aucune présélection enregistrée.",
             "No preset stored.",
             "Kein Preset gespeichert.",
             "Geen preset opgeslagen.",
-            "Ninguna presintonía guardada.");
-        Add("S_SourceSet", "Source : {0}", "Source: {0}", "Quelle: {0}", "Bron: {0}", "Fuente: {0}");
-        Add("S_StandbySet", "Mise en veille", "Going to standby", "Wird in Standby versetzt", "Naar stand-by", "Poniendo en reposo");
-        Add("S_StreamStarted", "Flux lancé", "Stream started", "Stream gestartet", "Stream gestart", "Flujo iniciado");
+            "Ninguna presintonía guardada.",
+            "Nessuna preselezione memorizzata.");
+        Add("S_SourceSet", "Source : {0}", "Source: {0}", "Quelle: {0}", "Bron: {0}", "Fuente: {0}", "Sorgente: {0}");
+        Add("S_StandbySet", "Mise en veille", "Going to standby", "Wird in Standby versetzt", "Naar stand-by", "Poniendo en reposo", "Passaggio in standby");
+        Add("S_StreamStarted", "Flux lancé", "Stream started", "Stream gestartet", "Stream gestart", "Flujo iniciado", "Flusso avviato");
         Add("S_EnterStream",
             "Saisis l'adresse d'un flux.",
             "Enter a stream address.",
             "Gib eine Stream-Adresse ein.",
             "Voer een streamadres in.",
-            "Escribe la dirección de un flujo.");
+            "Escribe la dirección de un flujo.",
+            "Inserisci l'indirizzo di un flusso.");
         Add("S_NeedAgentUrl",
             "Jouer une URL demande l'agent STR (l'ancien point /speaker du firmware est mort).",
             "Playing a URL needs the STR agent (the firmware's old /speaker endpoint is dead).",
             "Eine URL abzuspielen erfordert den STR-Agenten (der alte /speaker-Endpunkt der Firmware ist tot).",
             "Een URL afspelen vereist de STR-agent (het oude /speaker-eindpunt van de firmware is dood).",
-            "Reproducir una URL requiere el agente STR (el antiguo endpoint /speaker del firmware está muerto).");
+            "Reproducir una URL requiere el agente STR (el antiguo endpoint /speaker del firmware está muerto).",
+            "Per riprodurre un URL serve l'agente STR (il vecchio endpoint /speaker del firmware non funziona più).");
         Add("S_NeedAgentReplay",
             "Rejouer un flux demande l'agent STR.",
             "Replaying a stream needs the STR agent.",
             "Einen Stream erneut abzuspielen erfordert den STR-Agenten.",
             "Een stream opnieuw afspelen vereist de STR-agent.",
-            "Volver a reproducir un flujo requiere el agente STR.");
+            "Volver a reproducir un flujo requiere el agente STR.",
+            "Per riascoltare un flusso serve l'agente STR.");
         Add("S_NotReplayable",
             "Cette entrée ne porte pas d'adresse rejouable.",
             "This entry carries no replayable address.",
             "Dieser Eintrag enthält keine erneut abspielbare Adresse.",
             "Dit item bevat geen herspeelbaar adres.",
-            "Esta entrada no tiene una dirección reproducible.");
-        Add("S_Replaying", "Relance : {0}", "Replaying: {0}", "Erneut: {0}", "Opnieuw: {0}", "Repitiendo: {0}");
+            "Esta entrada no tiene una dirección reproducible.",
+            "Questa voce non ha un indirizzo riascoltabile.");
+        Add("S_Replaying", "Relance : {0}", "Replaying: {0}", "Erneut: {0}", "Opnieuw: {0}", "Repitiendo: {0}", "Riascolto: {0}");
         Add("S_CheckOne",
             "Coche au moins une enceinte à ajouter au groupe.",
             "Tick at least one speaker to add to the group.",
             "Wähle mindestens einen Lautsprecher für die Gruppe aus.",
             "Vink minstens één speaker aan om toe te voegen.",
-            "Marca al menos un altavoz para añadir al grupo.");
+            "Marca al menos un altavoz para añadir al grupo.",
+            "Spunta almeno un diffusore da aggiungere al gruppo.");
         Add("S_OnlyOneSpeaker",
             "Une seule enceinte connue. Lance un balayage dans Réglages pour en trouver d'autres.",
             "Only one speaker known. Run a scan in Settings to find others.",
             "Nur ein Lautsprecher bekannt. Starte einen Suchlauf unter Einstellungen.",
             "Slechts één speaker bekend. Start een scan bij Instellingen.",
-            "Solo se conoce un altavoz. Lanza un escaneo en Ajustes.");
-        Add("S_GroupFormed", "Groupe formé", "Group formed", "Gruppe gebildet", "Groep gevormd", "Grupo formado");
-        Add("S_GroupDissolved", "Groupe dissous", "Group dissolved", "Gruppe aufgelöst", "Groep ontbonden", "Grupo disuelto");
+            "Solo se conoce un altavoz. Lanza un escaneo en Ajustes.",
+            "Un solo diffusore conosciuto. Avvia una ricerca nelle Impostazioni per trovarne altri.");
+        Add("S_GroupFormed", "Groupe formé", "Group formed", "Gruppe gebildet", "Groep gevormd", "Grupo formado", "Gruppo formato");
+        Add("S_GroupDissolved", "Groupe dissous", "Group dissolved", "Gruppe aufgelöst", "Groep ontbonden", "Grupo disuelto", "Gruppo sciolto");
         Add("S_GroupStillUp",
             "L'enceinte a gardé le groupe : {0} membre(s) encore liés.",
             "The speaker kept the group: {0} member(s) still linked.",
             "Der Lautsprecher hat die Gruppe behalten: {0} Mitglied(er) noch verbunden.",
             "De speaker hield de groep aan: {0} lid/leden nog verbonden.",
-            "El altavoz mantuvo el grupo: {0} miembro(s) aún enlazados.");
+            "El altavoz mantuvo el grupo: {0} miembro(s) aún enlazados.",
+            "Il diffusore ha mantenuto il gruppo: {0} membro/i ancora collegati.");
         Add("S_StereoPairKept",
             "Le groupe est défait, la paire stéréo reste active.",
             "The group is undone; the stereo pair is still active.",
             "Die Gruppe ist aufgelöst, das Stereopaar bleibt bestehen.",
             "De groep is opgeheven, het stereopaar blijft actief.",
-            "El grupo está deshecho; la pareja estéreo sigue activa.");
+            "El grupo está deshecho; la pareja estéreo sigue activa.",
+            "Il gruppo è sciolto; la coppia stereo è ancora attiva.");
         Add("S_ZoneUnreadable",
             "Zone illisible : rien n'a été modifié, pour ne pas perdre le groupe enregistré.",
             "Zone unreadable: nothing was changed, so the saved group is not lost.",
             "Zone nicht lesbar: nichts geändert, damit die gespeicherte Gruppe erhalten bleibt.",
             "Zone onleesbaar: er is niets gewijzigd, zodat de opgeslagen groep blijft.",
-            "Zona ilegible: no se cambió nada, para no perder el grupo guardado.");
-        Add("S_GroupVolumeApplied", "Volume du groupe appliqué", "Group volume applied", "Gruppenlautstärke angewendet", "Groepsvolume toegepast", "Volumen de grupo aplicado");
+            "Zona ilegible: no se cambió nada, para no perder el grupo guardado.",
+            "Zona illeggibile: non è stato modificato nulla, quindi il gruppo salvato non va perso.");
+        Add("S_GroupVolumeApplied", "Volume du groupe appliqué", "Group volume applied", "Gruppenlautstärke angewendet", "Groepsvolume toegepast", "Volumen de grupo aplicado", "Volume del gruppo applicato");
         Add("S_NeedAgentGroupVolume",
             "Le volume de groupe demande l'agent STR.",
             "Group volume needs the STR agent.",
             "Die Gruppenlautstärke erfordert den STR-Agenten.",
             "Groepsvolume vereist de STR-agent.",
-            "El volumen de grupo requiere el agente STR.");
+            "El volumen de grupo requiere el agente STR.",
+            "Il volume del gruppo richiede l'agente STR.");
         Add("S_MissingDeviceId",
             "Identifiant manquant pour {0}. Relance un balayage dans Réglages.",
             "Missing device id for {0}. Run a scan again in Settings.",
             "Fehlende Geräte-ID für {0}. Starte erneut einen Suchlauf unter Einstellungen.",
             "Ontbrekende apparaat-id voor {0}. Start opnieuw een scan bij Instellingen.",
-            "Falta el identificador de {0}. Vuelve a lanzar un escaneo en Ajustes.");
+            "Falta el identificador de {0}. Vuelve a lanzar un escaneo en Ajustes.",
+            "Identificativo mancante per {0}. Avvia di nuovo una ricerca nelle Impostazioni.");
 
         // ---------------------------------------------------------- Transport et thème
-        Add("L_NowPlaying", "EN LECTURE", "NOW PLAYING", "WIEDERGABE", "SPEELT NU", "EN REPRODUCCIÓN");
-        Add("L_Stop", "Arrêt", "Stop", "Stopp", "Stop", "Parar");
-        Add("L_PowerOnAction", "Allumer", "Power on", "Einschalten", "Aanzetten", "Encender");
-        Add("L_PowerOffAction", "Veille", "Standby", "Standby", "Stand-by", "Reposo");
-        Add("L_GroupWith", "GROUPER AVEC", "GROUP WITH", "GRUPPIEREN MIT", "GROEPEREN MET", "AGRUPAR CON");
-        Add("L_Theme", "THÈME", "THEME", "DESIGN", "THEMA", "TEMA");
-        Add("L_ThemeSystem", "Système", "System", "System", "Systeem", "Sistema");
-        Add("L_ThemeLight", "Clair", "Light", "Hell", "Licht", "Claro");
-        Add("L_ThemeDark", "Foncé", "Dark", "Dunkel", "Donker", "Oscuro");
+        Add("L_NowPlaying", "EN LECTURE", "NOW PLAYING", "WIEDERGABE", "SPEELT NU", "EN REPRODUCCIÓN", "IN RIPRODUZIONE");
+        Add("L_Stop", "Arrêt", "Stop", "Stopp", "Stop", "Parar", "Stop");
+        Add("L_PowerOnAction", "Allumer", "Power on", "Einschalten", "Aanzetten", "Encender", "Accendi");
+        Add("L_PowerOffAction", "Veille", "Standby", "Standby", "Stand-by", "Reposo", "Standby");
+        Add("L_GroupWith", "GROUPER AVEC", "GROUP WITH", "GRUPPIEREN MIT", "GROEPEREN MET", "AGRUPAR CON", "RAGGRUPPA CON");
+        Add("L_Theme", "THÈME", "THEME", "DESIGN", "THEMA", "TEMA", "TEMA");
+        Add("L_ThemeSystem", "Système", "System", "System", "Systeem", "Sistema", "Sistema");
+        Add("L_ThemeLight", "Clair", "Light", "Hell", "Licht", "Claro", "Chiaro");
+        Add("L_ThemeDark", "Foncé", "Dark", "Dunkel", "Donker", "Oscuro", "Scuro");
         Add("L_ThemeNote",
             "« Système » suit le réglage d'affichage du téléphone.",
             "\"System\" follows the phone's display setting.",
             "„System“ folgt der Anzeigeeinstellung des Telefons.",
             "\"Systeem\" volgt de weergave-instelling van de telefoon.",
-            "«Sistema» sigue el ajuste de pantalla del teléfono.");
-        Add("L_ClearArtCache", "Vider le cache des logos", "Clear the logo cache", "Logo-Cache leeren", "Logocache wissen", "Vaciar la caché de logos");
+            "«Sistema» sigue el ajuste de pantalla del teléfono.",
+            "\"Sistema\" segue l'impostazione di visualizzazione del telefono.");
+        Add("L_ClearArtCache", "Vider le cache des logos", "Clear the logo cache", "Logo-Cache leeren", "Logocache wissen", "Vaciar la caché de logos", "Svuota la cache dei loghi");
         Add("S_ArtCacheCleared",
             "Cache vidé. Les logos seront retéléchargés.",
             "Cache cleared. Logos will be downloaded again.",
             "Cache geleert. Logos werden erneut geladen.",
             "Cache gewist. Logo's worden opnieuw gedownload.",
-            "Caché vaciada. Los logos se descargarán de nuevo.");
+            "Caché vaciada. Los logos se descargarán de nuevo.",
+            "Cache svuotata. I loghi verranno scaricati di nuovo.");
 
         // ---------------------------------------------------------- Recherche de radios
-        Add("L_RadioSearch", "TROUVER UNE STATION", "FIND A STATION", "SENDER SUCHEN", "EEN ZENDER ZOEKEN", "BUSCAR UNA EMISORA");
-        Add("L_RadioPlaceholder", "ex. Bel RTL, Nostalgie, jazz…", "e.g. BBC, NDR, jazz…", "z. B. NDR, WDR, Jazz…", "bijv. Radio 1, NPO, jazz…", "p. ej. Cadena SER, jazz…");
-        Add("L_SearchButton", "Rechercher", "Search", "Suchen", "Zoeken", "Buscar");
-        Add("L_TopStations", "Top liste", "Top list", "Top-Liste", "Toplijst", "Top lista");
-        Add("L_Country", "Pays", "Country", "Land", "Land", "País");
-        Add("L_LanguageFilter", "Langue", "Language", "Sprache", "Taal", "Idioma");
-        Add("L_AllCountries", "Tous les pays", "All countries", "Alle Länder", "Alle landen", "Todos los países");
-        Add("L_AllLanguages", "Toutes les langues", "All languages", "Alle Sprachen", "Alle talen", "Todos los idiomas");
+        Add("L_RadioSearch", "TROUVER UNE STATION", "FIND A STATION", "SENDER SUCHEN", "EEN ZENDER ZOEKEN", "BUSCAR UNA EMISORA", "TROVA UNA STAZIONE");
+        Add("L_RadioPlaceholder", "ex. Bel RTL, Nostalgie, jazz…", "e.g. BBC, NDR, jazz…", "z. B. NDR, WDR, Jazz…", "bijv. Radio 1, NPO, jazz…", "p. ej. Cadena SER, jazz…", "es. BBC, NDR, jazz…");
+        Add("L_SearchButton", "Rechercher", "Search", "Suchen", "Zoeken", "Buscar", "Cerca");
+        Add("L_TopStations", "Top liste", "Top list", "Top-Liste", "Toplijst", "Top lista", "Le più ascoltate");
+        Add("L_Country", "Pays", "Country", "Land", "Land", "País", "Paese");
+        Add("L_LanguageFilter", "Langue", "Language", "Sprache", "Taal", "Idioma", "Lingua");
+        Add("L_AllCountries", "Tous les pays", "All countries", "Alle Länder", "Alle landen", "Todos los países", "Tutti i paesi");
+        Add("L_AllLanguages", "Toutes les langues", "All languages", "Alle Sprachen", "Alle talen", "Todos los idiomas", "Tutte le lingue");
         Add("L_BoseOnly",
             "Compatibles Bose uniquement",
             "Bose-compatible only",
             "Nur Bose-kompatible",
             "Alleen Bose-compatibel",
-            "Solo compatibles con Bose");
+            "Solo compatibles con Bose",
+            "Solo compatibili Bose");
         Add("L_RadioSource",
             "Annuaire radio-browser.info",
             "radio-browser.info directory",
             "Verzeichnis radio-browser.info",
             "Gids radio-browser.info",
-            "Directorio radio-browser.info");
+            "Directorio radio-browser.info",
+            "elenco radio-browser.info");
         Add("L_NoResults",
             "Aucune station. Élargis la recherche ou décoche le filtre.",
             "No station. Widen the search or clear the filter.",
             "Kein Sender. Suche erweitern oder Filter abwählen.",
             "Geen zender. Verbreed de zoekopdracht of zet het filter uit.",
-            "Ninguna emisora. Amplía la búsqueda o quita el filtro.");
-        Add("L_Listen", "Écouter maintenant", "Play now", "Jetzt abspielen", "Nu afspelen", "Escuchar ahora");
-        Add("L_AssignToKey", "Affecter à la touche {0}", "Assign to key {0}", "Auf Taste {0} legen", "Toewijzen aan toets {0}", "Asignar a la tecla {0}");
-        Add("L_Cancel", "Annuler", "Cancel", "Abbrechen", "Annuleren", "Cancelar");
-        Add("L_ChooseAction", "Que faire de cette station ?", "What to do with this station?", "Was mit diesem Sender tun?", "Wat doen met deze zender?", "¿Qué hacer con esta emisora?");
-        Add("S_Searching", "Recherche en cours…", "Searching…", "Suche läuft…", "Bezig met zoeken…", "Buscando…");
-        Add("S_StationPlaying", "Lecture : {0}", "Playing: {0}", "Wiedergabe: {0}", "Speelt af: {0}", "Reproduciendo: {0}");
-        Add("S_StationSaved", "{0} enregistrée sur la touche {1}", "{0} saved to key {1}", "{0} auf Taste {1} gespeichert", "{0} opgeslagen op toets {1}", "{0} guardada en la tecla {1}");
+            "Ninguna emisora. Amplía la búsqueda o quita el filtro.",
+            "Nessuna stazione. Amplia la ricerca o togli il filtro.");
+        Add("L_Listen", "Écouter maintenant", "Play now", "Jetzt abspielen", "Nu afspelen", "Escuchar ahora", "Ascolta ora");
+        Add("L_AssignToKey", "Affecter à la touche {0}", "Assign to key {0}", "Auf Taste {0} legen", "Toewijzen aan toets {0}", "Asignar a la tecla {0}", "Assegna al tasto {0}");
+        Add("L_Cancel", "Annuler", "Cancel", "Abbrechen", "Annuleren", "Cancelar", "Annulla");
+        Add("L_ChooseAction", "Que faire de cette station ?", "What to do with this station?", "Was mit diesem Sender tun?", "Wat doen met deze zender?", "¿Qué hacer con esta emisora?", "Cosa fare con questa stazione?");
+        Add("S_Searching", "Recherche en cours…", "Searching…", "Suche läuft…", "Bezig met zoeken…", "Buscando…", "Ricerca…");
+        Add("S_StationPlaying", "Lecture : {0}", "Playing: {0}", "Wiedergabe: {0}", "Speelt af: {0}", "Reproduciendo: {0}", "In riproduzione: {0}");
+        Add("S_StationSaved", "{0} enregistrée sur la touche {1}", "{0} saved to key {1}", "{0} auf Taste {1} gespeichert", "{0} opgeslagen op toets {1}", "{0} guardada en la tecla {1}", "{0} salvata sul tasto {1}");
         Add("S_NeedAgentStation",
             "Chercher et enregistrer des stations demande l'agent STR.",
             "Finding and saving stations needs the STR agent.",
             "Sender suchen und speichern erfordert den STR-Agenten.",
             "Zenders zoeken en opslaan vereist de STR-agent.",
-            "Buscar y guardar emisoras requiere el agente STR.");
+            "Buscar y guardar emisoras requiere el agente STR.",
+            "Per trovare e salvare le stazioni serve l'agente STR.");
 
         // ---------------------------------------------------------- Pays
         // Traduits à la main : sur Android, RegionInfo.DisplayName renvoie le nom
         // NATIF du pays (« België », « Lëtzebuerg »), pas sa traduction.
-        Add("L_CtryBE", "Belgique", "Belgium", "Belgien", "België", "Bélgica");
-        Add("L_CtryFR", "France", "France", "Frankreich", "Frankrijk", "Francia");
-        Add("L_CtryNL", "Pays-Bas", "Netherlands", "Niederlande", "Nederland", "Países Bajos");
-        Add("L_CtryDE", "Allemagne", "Germany", "Deutschland", "Duitsland", "Alemania");
-        Add("L_CtryLU", "Luxembourg", "Luxembourg", "Luxemburg", "Luxemburg", "Luxemburgo");
-        Add("L_CtryCH", "Suisse", "Switzerland", "Schweiz", "Zwitserland", "Suiza");
-        Add("L_CtryGB", "Royaume-Uni", "United Kingdom", "Vereinigtes Königreich", "Verenigd Koninkrijk", "Reino Unido");
-        Add("L_CtryES", "Espagne", "Spain", "Spanien", "Spanje", "España");
-        Add("L_CtryIT", "Italie", "Italy", "Italien", "Italië", "Italia");
-        Add("L_CtryPT", "Portugal", "Portugal", "Portugal", "Portugal", "Portugal");
-        Add("L_CtryUS", "États-Unis", "United States", "Vereinigte Staaten", "Verenigde Staten", "Estados Unidos");
-        Add("L_CtryCA", "Canada", "Canada", "Kanada", "Canada", "Canadá");
+        Add("L_CtryBE", "Belgique", "Belgium", "Belgien", "België", "Bélgica", "Belgio");
+        Add("L_CtryFR", "France", "France", "Frankreich", "Frankrijk", "Francia", "Francia");
+        Add("L_CtryNL", "Pays-Bas", "Netherlands", "Niederlande", "Nederland", "Países Bajos", "Paesi Bassi");
+        Add("L_CtryDE", "Allemagne", "Germany", "Deutschland", "Duitsland", "Alemania", "Germania");
+        Add("L_CtryLU", "Luxembourg", "Luxembourg", "Luxemburg", "Luxemburg", "Luxemburgo", "Lussemburgo");
+        Add("L_CtryCH", "Suisse", "Switzerland", "Schweiz", "Zwitserland", "Suiza", "Svizzera");
+        Add("L_CtryGB", "Royaume-Uni", "United Kingdom", "Vereinigtes Königreich", "Verenigd Koninkrijk", "Reino Unido", "Regno Unito");
+        Add("L_CtryES", "Espagne", "Spain", "Spanien", "Spanje", "España", "Spagna");
+        Add("L_CtryIT", "Italie", "Italy", "Italien", "Italië", "Italia", "Italia");
+        Add("L_CtryPT", "Portugal", "Portugal", "Portugal", "Portugal", "Portugal", "Portogallo");
+        Add("L_CtryUS", "États-Unis", "United States", "Vereinigte Staaten", "Verenigde Staten", "Estados Unidos", "Stati Uniti");
+        Add("L_CtryCA", "Canada", "Canada", "Kanada", "Canada", "Canadá", "Canada");
 
         // ---------------------------------------------------------- Affectation d'une station
-        Add("L_ReplacePreset", "Remplacer {0}", "Replace {0}", "{0} ersetzen", "{0} vervangen", "Sustituir {0}");
-        Add("L_AssignEmpty", "Affecter à cette touche", "Assign to this key", "Auf diese Taste legen", "Aan deze toets toewijzen", "Asignar a esta tecla");
-        Add("L_Controls", "COMMANDES", "CONTROLS", "STEUERUNG", "BEDIENING", "CONTROLES");
-        Add("L_RightNow", "EN CE MOMENT", "RIGHT NOW", "GERADE EBEN", "OP DIT MOMENT", "AHORA MISMO");
-        Add("S_Refreshed", "Actualisé", "Refreshed", "Aktualisiert", "Bijgewerkt", "Actualizado");
-        Add("L_ResultsHeader", "RÉSULTATS ({0})", "RESULTS ({0})", "ERGEBNISSE ({0})", "RESULTATEN ({0})", "RESULTADOS ({0})");
-        Add("S_GroupedWith", "Groupé avec {0}", "Grouped with {0}", "Mit {0} gruppiert", "Gegroepeerd met {0}", "Agrupado con {0}");
-        Add("S_Grouping", "Groupement avec {0} en cours…", "Grouping with {0}…", "Gruppierung mit {0} läuft…", "Groeperen met {0}…", "Agrupando con {0}…");
-        Add("S_Ungrouping", "Retrait de {0} du groupe en cours…", "Removing {0} from the group…", "{0} wird aus der Gruppe entfernt…", "{0} wordt uit de groep gehaald…", "Retirando {0} del grupo…");
-        Add("S_Ungrouped", "{0} retirée du groupe", "{0} removed from the group", "{0} aus der Gruppe entfernt", "{0} uit de groep gehaald", "{0} retirado del grupo");
+        Add("L_ReplacePreset", "Remplacer {0}", "Replace {0}", "{0} ersetzen", "{0} vervangen", "Sustituir {0}", "Sostituisci {0}");
+        Add("L_AssignEmpty", "Affecter à cette touche", "Assign to this key", "Auf diese Taste legen", "Aan deze toets toewijzen", "Asignar a esta tecla", "Assegna a questo tasto");
+        Add("L_Controls", "COMMANDES", "CONTROLS", "STEUERUNG", "BEDIENING", "CONTROLES", "COMANDI");
+        Add("L_RightNow", "EN CE MOMENT", "RIGHT NOW", "GERADE EBEN", "OP DIT MOMENT", "AHORA MISMO", "ORA");
+        Add("S_Refreshed", "Actualisé", "Refreshed", "Aktualisiert", "Bijgewerkt", "Actualizado", "Aggiornato");
+        Add("L_ResultsHeader", "RÉSULTATS ({0})", "RESULTS ({0})", "ERGEBNISSE ({0})", "RESULTATEN ({0})", "RESULTADOS ({0})", "RISULTATI ({0})");
+        Add("S_GroupedWith", "Groupé avec {0}", "Grouped with {0}", "Mit {0} gruppiert", "Gegroepeerd met {0}", "Agrupado con {0}", "Raggruppato con {0}");
+        Add("S_Grouping", "Groupement avec {0} en cours…", "Grouping with {0}…", "Gruppierung mit {0} läuft…", "Groeperen met {0}…", "Agrupando con {0}…", "Raggruppamento con {0}…");
+        Add("S_Ungrouping", "Retrait de {0} du groupe en cours…", "Removing {0} from the group…", "{0} wird aus der Gruppe entfernt…", "{0} wordt uit de groep gehaald…", "Retirando {0} del grupo…", "Rimozione di {0} dal gruppo…");
+        Add("S_Ungrouped", "{0} retirée du groupe", "{0} removed from the group", "{0} aus der Gruppe entfernt", "{0} uit de groep gehaald", "{0} retirado del grupo", "{0} rimosso dal gruppo");
         Add("L_VolumeOfGroup",
             "Volume de l'ensemble du groupe",
             "Volume of the whole group",
             "Lautstärke der ganzen Gruppe",
             "Volume van de hele groep",
-            "Volumen de todo el grupo");
+            "Volumen de todo el grupo",
+            "Volume di tutto il gruppo");
         Add("L_LevelGroup",
             "Égaliser",
             "Level all",
             "Angleichen",
             "Gelijkzetten",
-            "Igualar");
+            "Igualar",
+            "Livella tutti");
         Add("L_LevelGroupHint",
             "La touche « = » met toutes les enceintes à cette valeur.",
             "The “=” key sets every speaker to this value.",
             "Die Taste „=“ setzt alle Lautsprecher auf diesen Wert.",
             "De toets “=” zet alle speakers op deze waarde.",
-            "La tecla «=» pone todos los altavoces en este valor.");
+            "La tecla «=» pone todos los altavoces en este valor.",
+            "Il tasto “=” porta ogni diffusore a questo valore.");
         Add("S_SlaveCannotForm",
             "Cette enceinte suit {0}. Sélectionne {0} pour modifier le groupe.",
             "This speaker follows {0}. Select {0} to change the group.",
             "Dieser Lautsprecher folgt {0}. Wähle {0}, um die Gruppe zu ändern.",
             "Deze speaker volgt {0}. Kies {0} om de groep te wijzigen.",
-            "Este altavoz sigue a {0}. Selecciona {0} para cambiar el grupo.");
+            "Este altavoz sigue a {0}. Selecciona {0} para cambiar el grupo.",
+            "Questo diffusore segue {0}. Seleziona {0} per modificare il gruppo.");
         Add("L_SlaveOfGroup",
             "Cette enceinte suit le groupe. Touche l'enceinte cochée pour l'en retirer.",
             "This speaker follows the group. Tap the ticked speaker to leave it.",
             "Dieser Lautsprecher folgt der Gruppe. Tippe auf den angehakten Lautsprecher, um ihn zu verlassen.",
             "Deze speaker volgt de groep. Tik op de aangevinkte speaker om hem te verlaten.",
-            "Este altavoz sigue al grupo. Toca el altavoz marcado para salir.");
+            "Este altavoz sigue al grupo. Toca el altavoz marcado para salir.",
+            "Questo diffusore segue il gruppo. Tocca il diffusore spuntato per uscirne.");
         Add("S_GroupLevelled",
             "Toutes les enceintes à {0} %",
             "All speakers at {0}%",
             "Alle Lautsprecher auf {0} %",
             "Alle speakers op {0} %",
-            "Todos los altavoces al {0} %");
-        Add("L_PerSpeaker", "PAR ENCEINTE", "PER SPEAKER", "PRO LAUTSPRECHER", "PER SPEAKER", "POR ALTAVOZ");
-        Add("L_GroupedBadge", "groupé", "grouped", "gruppiert", "gegroepeerd", "agrupado");
+            "Todos los altavoces al {0} %",
+            "Tutti i diffusori al {0}%");
+        Add("L_PerSpeaker", "PAR ENCEINTE", "PER SPEAKER", "PRO LAUTSPRECHER", "PER SPEAKER", "POR ALTAVOZ", "PER DIFFUSORE");
+        Add("L_GroupedBadge", "groupé", "grouped", "gruppiert", "gegroepeerd", "agrupado", "raggruppato");
         Add("L_TapToUngroup",
             "Touche une enceinte cochée pour la retirer du groupe.",
             "Tap a ticked speaker to remove it from the group.",
             "Tippe auf einen angehakten Lautsprecher, um ihn aus der Gruppe zu nehmen.",
             "Tik op een aangevinkte speaker om hem uit de groep te halen.",
-            "Toca un altavoz marcado para sacarlo del grupo.");
+            "Toca un altavoz marcado para sacarlo del grupo.",
+            "Tocca un diffusore spuntato per toglierlo dal gruppo.");
 
         // ---------------------------------------------------------- À propos
-        Add("L_About", "À PROPOS", "ABOUT", "ÜBER", "OVER", "ACERCA DE");
+        Add("L_About", "À PROPOS", "ABOUT", "ÜBER", "OVER", "ACERCA DE", "INFORMAZIONI");
         Add("L_AppTagline",
             "Télécommande locale pour enceintes Bose SoundTouch.",
             "Local remote for Bose SoundTouch speakers.",
             "Lokale Fernbedienung für Bose-SoundTouch-Lautsprecher.",
             "Lokale afstandsbediening voor Bose SoundTouch-speakers.",
-            "Mando local para altavoces Bose SoundTouch.");
-        Add("L_ThanksTitle", "STR — SoundTouch Reborn", "STR — SoundTouch Reborn", "STR — SoundTouch Reborn", "STR — SoundTouch Reborn", "STR — SoundTouch Reborn");
+            "Mando local para altavoces Bose SoundTouch.",
+            "Telecomando locale per diffusori Bose SoundTouch.");
+        Add("L_ThanksTitle", "STR — SoundTouch Reborn", "STR — SoundTouch Reborn", "STR — SoundTouch Reborn", "STR — SoundTouch Reborn", "STR — SoundTouch Reborn", "STR — SoundTouch Reborn");
         Add("L_ThanksBody",
             "Quand Bose a coupé son cloud le 6 mai 2026, les enceintes SoundTouch perdaient l'essentiel de leur usage. Jens Roggenfelder (JRpersonal) a écrit STR, l'agent qui tourne sur l'enceinte elle-même et lui rend tout ce que le cloud assurait. Cette application ne fait que lui parler : sans son travail, elle n'aurait rien à piloter.",
             "When Bose shut its cloud down on 6 May 2026, SoundTouch speakers lost most of what made them useful. Jens Roggenfelder (JRpersonal) wrote STR, the agent that runs on the speaker itself and gives back everything the cloud used to provide. This app only talks to it: without his work, it would have nothing to control.",
             "Als Bose am 6. Mai 2026 seine Cloud abschaltete, verloren die SoundTouch-Lautsprecher fast ihren gesamten Nutzen. Jens Roggenfelder (JRpersonal) schrieb STR, den Agenten, der auf dem Lautsprecher selbst läuft und zurückgibt, was die Cloud leistete. Diese App spricht nur mit ihm: ohne seine Arbeit hätte sie nichts zu steuern.",
             "Toen Bose op 6 mei 2026 zijn cloud uitzette, verloren de SoundTouch-speakers vrijwel hun hele nut. Jens Roggenfelder (JRpersonal) schreef STR, de agent die op de speaker zelf draait en teruggeeft wat de cloud deed. Deze app praat er alleen mee: zonder zijn werk zou ze niets te besturen hebben.",
-            "Cuando Bose apagó su nube el 6 de mayo de 2026, los altavoces SoundTouch perdieron casi toda su utilidad. Jens Roggenfelder (JRpersonal) escribió STR, el agente que corre en el propio altavoz y devuelve lo que la nube aportaba. Esta aplicación solo habla con él: sin su trabajo, no tendría nada que controlar.");
+            "Cuando Bose apagó su nube el 6 de mayo de 2026, los altavoces SoundTouch perdieron casi toda su utilidad. Jens Roggenfelder (JRpersonal) escribió STR, el agente que corre en el propio altavoz y devuelve lo que la nube aportaba. Esta aplicación solo habla con él: sin su trabajo, no tendría nada que controlar.",
+            "Quando Bose ha chiuso il suo cloud il 6 maggio 2026, i diffusori SoundTouch hanno perso gran parte di ciò che li rendeva utili. Jens Roggenfelder (JRpersonal) ha scritto STR, l'agente che gira sul diffusore stesso e restituisce tutto ciò che il cloud forniva. Questa app parla solo con lui: senza il suo lavoro non avrebbe nulla da comandare.");
         Add("L_ThanksLicense",
             "STR est publié sous licence MIT.",
             "STR is released under the MIT licence.",
             "STR steht unter der MIT-Lizenz.",
             "STR valt onder de MIT-licentie.",
-            "STR se publica bajo licencia MIT.");
-        Add("L_OpenWebsite", "Site du projet STR", "STR project website", "Website des STR-Projekts", "Website van het STR-project", "Sitio del proyecto STR");
-        Add("L_OpenSource", "Code source", "Source code", "Quellcode", "Broncode", "Código fuente");
+            "STR se publica bajo licencia MIT.",
+            "STR è distribuito con licenza MIT.");
+        Add("L_OpenWebsite", "Site du projet STR", "STR project website", "Website des STR-Projekts", "Website van het STR-project", "Sitio del proyecto STR", "Sito del progetto STR");
+        Add("L_OpenSource", "Code source", "Source code", "Quellcode", "Broncode", "Código fuente", "Codice sorgente");
         Add("L_RadioCredit",
             "Annuaire des stations : radio-browser.info, base ouverte tenue par des bénévoles.",
             "Station directory: radio-browser.info, an open database kept by volunteers.",
             "Senderverzeichnis: radio-browser.info, eine offene, von Freiwilligen gepflegte Datenbank.",
             "Zendergids: radio-browser.info, een open database bijgehouden door vrijwilligers.",
-            "Directorio de emisoras: radio-browser.info, una base abierta mantenida por voluntarios.");
+            "Directorio de emisoras: radio-browser.info, una base abierta mantenida por voluntarios.",
+            "Elenco delle stazioni: radio-browser.info, una banca dati aperta curata da volontari.");
         Add("L_IndependenceNotice",
             "Application indépendante du projet STR : ni développée, ni maintenue, ni prise en charge par lui. Les problèmes rencontrés avec elle sont à signaler à son auteur.",
             "This app is independent of the STR project: not built, maintained or supported by it. Report problems with the app to its author.",
             "Diese App ist unabhängig vom STR-Projekt: sie wird von ihm weder entwickelt noch gepflegt noch unterstützt. Probleme mit der App bitte an ihren Autor melden.",
             "Deze app staat los van het STR-project: niet erdoor gebouwd, onderhouden of ondersteund. Meld problemen met de app bij de auteur ervan.",
-            "Aplicación independiente del proyecto STR: ni desarrollada, ni mantenida, ni respaldada por él. Informa de los problemas con la aplicación a su autor.");
+            "Aplicación independiente del proyecto STR: ni desarrollada, ni mantenida, ni respaldada por él. Informa de los problemas con la aplicación a su autor.",
+            "Questa app è indipendente dal progetto STR: non è realizzata, mantenuta né supportata da esso. Segnala i problemi dell'app al suo autore.");
         Add("L_TrademarkNotice",
             "Projet personnel, sans lien avec Bose Corporation. « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer la compatibilité.",
             "Personal project, not affiliated with Bose Corporation. “Bose” and “SoundTouch” are trademarks of Bose Corporation, named here to indicate compatibility.",
             "Privates Projekt, nicht mit der Bose Corporation verbunden. „Bose“ und „SoundTouch“ sind Marken der Bose Corporation und werden hier nur genannt, um die Kompatibilität anzugeben.",
             "Persoonlijk project, niet verbonden aan Bose Corporation. “Bose” en “SoundTouch” zijn merken van Bose Corporation, hier genoemd om de compatibiliteit aan te geven.",
-            "Proyecto personal, sin vínculo con Bose Corporation. «Bose» y «SoundTouch» son marcas de Bose Corporation, citadas aquí para indicar la compatibilidad.");
+            "Proyecto personal, sin vínculo con Bose Corporation. «Bose» y «SoundTouch» son marcas de Bose Corporation, citadas aquí para indicar la compatibilidad.",
+            "Progetto personale, non affiliato a Bose Corporation. “Bose” e “SoundTouch” sono marchi di Bose Corporation, citati qui per indicare la compatibilità.");
         Add("L_ClaudeCredit",
             "Application écrite avec Claude (Anthropic).",
             "App written with Claude (Anthropic).",
             "App geschrieben mit Claude (Anthropic).",
             "App geschreven met Claude (Anthropic).",
-            "Aplicación escrita con Claude (Anthropic).");
+            "Aplicación escrita con Claude (Anthropic).",
+            "App scritta con Claude (Anthropic).");
 
         // ---------------------------------------------------------- Diagnostic
-        Add("D_Name", "Nom", "Name", "Name", "Naam", "Nombre");
-        Add("D_Model", "Modèle", "Model", "Modell", "Model", "Modelo");
-        Add("D_Firmware", "Firmware", "Firmware", "Firmware", "Firmware", "Firmware");
-        Add("D_Address", "Adresse", "Address", "Adresse", "Adres", "Dirección");
-        Add("D_Agent", "Agent STR", "STR agent", "STR-Agent", "STR-agent", "Agente STR");
-        Add("D_AgentYes", "oui, port {0}", "yes, port {0}", "ja, Port {0}", "ja, poort {0}", "sí, puerto {0}");
-        Add("D_AgentNo", "non détecté", "not detected", "nicht erkannt", "niet gevonden", "no detectado");
+        Add("D_Name", "Nom", "Name", "Name", "Naam", "Nombre", "Nome");
+        Add("D_Model", "Modèle", "Model", "Modell", "Model", "Modelo", "Modello");
+        Add("D_Firmware", "Firmware", "Firmware", "Firmware", "Firmware", "Firmware", "Firmware");
+        Add("D_Address", "Adresse", "Address", "Adresse", "Adres", "Dirección", "Indirizzo");
+        Add("D_Agent", "Agent STR", "STR agent", "STR-Agent", "STR-agent", "Agente STR", "Agente STR");
+        Add("D_AgentYes", "oui, port {0}", "yes, port {0}", "ja, Port {0}", "ja, poort {0}", "sí, puerto {0}", "sì, porta {0}");
+        Add("D_AgentNo", "non détecté", "not detected", "nicht erkannt", "niet gevonden", "no detectado", "non rilevato");
         Add("D_AgentSilent",
             "ne répond pas (ports 17008 et 8888 essayés)",
             "no answer (ports 17008 and 8888 tried)",
             "keine Antwort (Ports 17008 und 8888 versucht)",
             "geen antwoord (poorten 17008 en 8888 geprobeerd)",
-            "sin respuesta (puertos 17008 y 8888 probados)");
+            "sin respuesta (puertos 17008 y 8888 probados)",
+            "nessuna risposta (porte 17008 e 8888 provate)");
         Add("D_AgentStored",
             "dernière version connue : {0}",
             "last known version: {0}",
             "zuletzt bekannte Version: {0}",
             "laatst bekende versie: {0}",
-            "última versión conocida: {0}");
-        Add("D_Notifications", "Notifications", "Notifications", "Benachrichtigungen", "Meldingen", "Notificaciones");
-        Add("D_WsUp", "WebSocket 8080 connecté", "WebSocket 8080 connected", "WebSocket 8080 verbunden", "WebSocket 8080 verbonden", "WebSocket 8080 conectado");
-        Add("D_WsDown", "hors ligne", "offline", "offline", "offline", "sin conexión");
-        Add("D_BassRange", "{0} à {1} (défaut {2})", "{0} to {1} (default {2})", "{0} bis {1} (Standard {2})", "{0} tot {1} (standaard {2})", "{0} a {1} (por defecto {2})");
-        Add("D_BassNone", "non réglables sur ce modèle", "not adjustable on this model", "bei diesem Modell nicht einstellbar", "niet instelbaar op dit model", "no ajustables en este modelo");
-        Add("D_Endpoints", "Points exposés", "Exposed endpoints", "Verfügbare Endpunkte", "Beschikbare eindpunten", "Endpoints expuestos");
+            "última versión conocida: {0}",
+            "ultima versione conosciuta: {0}");
+        Add("D_Notifications", "Notifications", "Notifications", "Benachrichtigungen", "Meldingen", "Notificaciones", "Notifiche");
+        Add("D_WsUp", "WebSocket 8080 connecté", "WebSocket 8080 connected", "WebSocket 8080 verbunden", "WebSocket 8080 verbonden", "WebSocket 8080 conectado", "WebSocket 8080 connesso");
+        Add("D_WsDown", "hors ligne", "offline", "offline", "offline", "sin conexión", "non connesso");
+        Add("D_BassRange", "{0} à {1} (défaut {2})", "{0} to {1} (default {2})", "{0} bis {1} (Standard {2})", "{0} tot {1} (standaard {2})", "{0} a {1} (por defecto {2})", "da {0} a {1} (predefinito {2})");
+        Add("D_BassNone", "non réglables sur ce modèle", "not adjustable on this model", "bei diesem Modell nicht einstellbar", "niet instelbaar op dit model", "no ajustables en este modelo", "non regolabile su questo modello");
+        Add("D_Endpoints", "Points exposés", "Exposed endpoints", "Verfügbare Endpunkte", "Beschikbare eindpunten", "Endpoints expuestos", "Endpoint esposti");
         Add("S_PresetsUnread",
             "Touches non relues — l'enceinte n'a pas répondu.",
             "Presets not re-read — the speaker did not answer.",
             "Tasten nicht neu gelesen — der Lautsprecher hat nicht geantwortet.",
             "Toetsen niet opnieuw gelezen — de speaker antwoordde niet.",
-            "Teclas no releídas — el altavoz no respondió.");
-        Add("D_Zone", "Zone vue par chaque enceinte", "Zone as each speaker sees it", "Zone aus Sicht jedes Lautsprechers", "Zone zoals elke speaker die ziet", "Zona según cada altavoz");
+            "Teclas no releídas — el altavoz no respondió.",
+            "Preselezioni non rilette — il diffusore non ha risposto.");
+        Add("D_Zone", "Zone vue par chaque enceinte", "Zone as each speaker sees it", "Zone aus Sicht jedes Lautsprechers", "Zone zoals elke speaker die ziet", "Zona según cada altavoz", "Zona vista da ogni diffusore");
         Add("D_EndpointsNone",
             "/supportedURLs non disponible.",
             "/supportedURLs not available.",
             "/supportedURLs nicht verfügbar.",
             "/supportedURLs niet beschikbaar.",
-            "/supportedURLs no disponible.");
+            "/supportedURLs no disponible.",
+            "/supportedURLs non disponibile.");
 
         // ---------------------------------------------------------- Seconde rangée de touches
-        Add("L_RowOnce", "Une fois", "Once", "Einmal", "Eén keer", "Una vez");
-        Add("L_RowTwice", "Deux fois", "Twice", "Zweimal", "Twee keer", "Dos veces");
+        Add("L_RowOnce", "Une fois", "Once", "Einmal", "Eén keer", "Una vez", "Una volta");
+        Add("L_RowTwice", "Deux fois", "Twice", "Zweimal", "Twee keer", "Dos veces", "Due volte");
+
+        // ---------------------------------------------------------- Renommer, effacer une touche (1.8.2)
+        Add("L_KeyNumber", "Touche {0}", "Key {0}", "Taste {0}", "Toets {0}", "Tecla {0}", "Tasto {0}");
+        Add("L_KeyRenameTitle",
+            "Renommer la touche {0}",
+            "Rename key {0}",
+            "Taste {0} umbenennen",
+            "Toets {0} hernoemen",
+            "Renombrar la tecla {0}",
+            "Rinomina il tasto {0}");
+        Add("L_KeyRenameMessage",
+            "Seul le nom change : la station et son image restent.",
+            "Only the name changes: the station and its picture stay.",
+            "Nur der Name ändert sich: Sender und Bild bleiben.",
+            "Alleen de naam verandert: de zender en zijn afbeelding blijven.",
+            "Solo cambia el nombre: la emisora y su imagen se mantienen.",
+            "Cambia solo il nome: la stazione e la sua immagine restano.");
+        Add("L_KeyRenameGo", "Renommer", "Rename", "Umbenennen", "Hernoemen", "Renombrar", "Rinomina");
+        Add("L_KeyClearConfirm",
+            "Effacer la touche {0} ({1}) ?",
+            "Clear key {0} ({1})?",
+            "Taste {0} ({1}) löschen?",
+            "Toets {0} ({1}) wissen?",
+            "¿Borrar la tecla {0} ({1})?",
+            "Cancellare il tasto {0} ({1})?");
+        Add("L_KeyClearGo", "Effacer", "Clear", "Löschen", "Wissen", "Borrar", "Cancella");
+        Add("S_KeyRenamed", "Touche {0} renommée.", "Key {0} renamed.", "Taste {0} umbenannt.", "Toets {0} hernoemd.", "Tecla {0} renombrada.", "Tasto {0} rinominato.");
+        Add("S_KeyCleared", "Touche {0} effacée.", "Key {0} cleared.", "Taste {0} gelöscht.", "Toets {0} gewist.", "Tecla {0} borrada.", "Tasto {0} cancellato.");
+        Add("S_KeyGone",
+            "La touche {0} est déjà vide : elle a été modifiée ailleurs.",
+            "Key {0} is already empty: it was changed elsewhere.",
+            "Taste {0} ist bereits leer: Sie wurde anderswo geändert.",
+            "Toets {0} is al leeg: hij werd elders gewijzigd.",
+            "La tecla {0} ya está vacía: se cambió en otro lugar.",
+            "Il tasto {0} è già vuoto: è stato modificato altrove.");
         Add("S_AlreadyOnKey",
             "Déjà enregistré sur la touche {0}.",
             "Already stored on key {0}.",
             "Bereits auf Taste {0} gespeichert.",
             "Staat al op toets {0}.",
-            "Ya está guardado en la tecla {0}.");
+            "Ya está guardado en la tecla {0}.",
+            "Già memorizzata sul tasto {0}.");
         Add("S_AlreadyOnKeyNamed",
             "{0} est déjà sur la touche {1}.",
             "{0} is already on key {1}.",
             "{0} liegt bereits auf Taste {1}.",
             "{0} staat al op toets {1}.",
-            "{0} ya está en la tecla {1}.");
+            "{0} ya está en la tecla {1}.",
+            "{0} è già sul tasto {1}.");
 
         // ---------------------------------------------------------- Paires stéréo et groupe enregistré
         Add("S_StereoCannotExtend",
@@ -1176,253 +1357,295 @@ public static class Localization
             "This speaker is half of a stereo pair: a pair cannot lead a group. Start the group on another speaker, then add the pair to it (STR agent 1.6.3 or later).",
             "Dieser Lautsprecher gehört zu einem Stereopaar: Ein Paar kann keine Gruppe leiten. Starten Sie die Gruppe auf einem anderen Lautsprecher und fügen Sie dann das Paar hinzu (STR-Agent 1.6.3 oder neuer).",
             "Deze speaker maakt deel uit van een stereopaar: een paar kan geen groep leiden. Start de groep op een andere speaker en voeg het paar daarna toe (STR-agent 1.6.3 of nieuwer).",
-            "Este altavoz forma parte de un par estéreo: un par no puede dirigir un grupo. Inicie el grupo en otro altavoz y añada después el par (agente STR 1.6.3 o posterior).");
+            "Este altavoz forma parte de un par estéreo: un par no puede dirigir un grupo. Inicie el grupo en otro altavoz y añada después el par (agente STR 1.6.3 o posterior).",
+            "Questo diffusore è metà di una coppia stereo: una coppia non può guidare un gruppo. Avvia il gruppo su un altro diffusore, poi aggiungi la coppia (agente STR 1.6.3 o successivo).");
         Add("L_SavedGroupAsk",
             "Un groupe permanent est enregistré sur cette enceinte. Former un autre groupe peut le remplacer.",
             "A permanent group is saved on this speaker. Forming a different group may replace it.",
             "Auf diesem Lautsprecher ist eine permanente Gruppe gespeichert. Eine andere Gruppe zu bilden kann sie ersetzen.",
             "Op deze speaker is een permanente groep opgeslagen. Een andere groep vormen kan die vervangen.",
-            "Hay un grupo permanente guardado en este altavoz. Formar otro grupo puede sustituirlo.");
+            "Hay un grupo permanente guardado en este altavoz. Formar otro grupo puede sustituirlo.",
+            "Su questo diffusore è salvato un gruppo permanente. Formare un gruppo diverso potrebbe sostituirlo.");
         Add("L_SavedGroupAskNamed",
             "Un groupe permanent est enregistré sur cette enceinte ({0}). Former un autre groupe peut le remplacer.",
             "A permanent group is saved on this speaker ({0}). Forming a different group may replace it.",
             "Auf diesem Lautsprecher ist eine permanente Gruppe gespeichert ({0}). Eine andere Gruppe zu bilden kann sie ersetzen.",
             "Op deze speaker is een permanente groep opgeslagen ({0}). Een andere groep vormen kan die vervangen.",
-            "Hay un grupo permanente guardado en este altavoz ({0}). Formar otro grupo puede sustituirlo.");
+            "Hay un grupo permanente guardado en este altavoz ({0}). Formar otro grupo puede sustituirlo.",
+            "Su questo diffusore è salvato un gruppo permanente ({0}). Formare un gruppo diverso potrebbe sostituirlo.");
         Add("L_FormAnyway",
             "Former ce groupe quand même",
             "Form this group anyway",
             "Diese Gruppe trotzdem bilden",
             "Deze groep toch vormen",
-            "Formar este grupo de todos modos");
+            "Formar este grupo de todos modos",
+            "Forma comunque questo gruppo");
         Add("L_SetAsideAsk",
             "Un groupe ordinaire est enregistré sur cette enceinte. S'il a été formé par-dessus un groupe permanent, l'agent garde ce dernier de côté, et le nouveau groupe permanent le remplacera.",
             "An ordinary group is saved on this speaker. If it was formed on top of a permanent group, the agent keeps that one aside, and the new permanent group will replace it.",
             "Auf diesem Lautsprecher ist eine normale Gruppe gespeichert. Wurde sie über einer permanenten Gruppe gebildet, hält der Agent diese zurück, und die neue permanente Gruppe ersetzt sie.",
             "Op deze speaker is een gewone groep opgeslagen. Werd die gevormd boven op een permanente groep, dan houdt de agent die apart, en de nieuwe permanente groep vervangt haar.",
-            "Hay un grupo normal guardado en este altavoz. Si se formó encima de un grupo permanente, el agente lo guarda aparte y el nuevo grupo permanente lo sustituirá.");
+            "Hay un grupo normal guardado en este altavoz. Si se formó encima de un grupo permanente, el agente lo guarda aparte y el nuevo grupo permanente lo sustituirá.",
+            "Su questo diffusore è salvato un gruppo normale. Se è stato formato sopra un gruppo permanente, l'agente tiene quest'ultimo da parte, e il nuovo gruppo permanente lo sostituirà.");
         Add("S_AgentTooOldGroups",
             "L'agent STR de cette enceinte ({0}) est trop ancien pour modifier les groupes : la version {1} ou plus récente est nécessaire. Mettez-le à jour avec l'application STR sur ordinateur.",
             "This speaker's STR agent ({0}) is too old to change groups: version {1} or later is needed. Update it with the STR app on a computer.",
             "Der STR-Agent dieses Lautsprechers ({0}) ist zu alt, um Gruppen zu ändern: Version {1} oder neuer ist nötig. Aktualisieren Sie ihn mit der STR-App am Computer.",
             "De STR-agent van deze speaker ({0}) is te oud om groepen te wijzigen: versie {1} of nieuwer is nodig. Werk hem bij met de STR-app op een computer.",
-            "El agente STR de este altavoz ({0}) es demasiado antiguo para cambiar grupos: se necesita la versión {1} o posterior. Actualícelo con la aplicación STR en un ordenador.");
-        Add("L_AgentTooOldShort", "trop ancien", "too old", "zu alt", "te oud", "demasiado antiguo");
+            "El agente STR de este altavoz ({0}) es demasiado antiguo para cambiar grupos: se necesita la versión {1} o posterior. Actualícelo con la aplicación STR en un ordenador.",
+            "L'agente STR di questo diffusore ({0}) è troppo vecchio per modificare i gruppi: serve la versione {1} o successiva. Aggiornalo con l'app STR su un computer.");
+        Add("L_AgentTooOldShort", "trop ancien", "too old", "zu alt", "te oud", "demasiado antiguo", "troppo vecchio");
         Add("D_AgentTooOld",
             "trop ancien, {0} minimum",
             "too old, {0} minimum",
             "zu alt, mindestens {0}",
             "te oud, minimaal {0}",
-            "demasiado antiguo, mínimo {0}");
-        Add("L_AgentOldTitle", "AGENT STR TROP ANCIEN", "STR AGENT TOO OLD", "STR-AGENT ZU ALT", "STR-AGENT TE OUD", "AGENTE STR DEMASIADO ANTIGUO");
+            "demasiado antiguo, mínimo {0}",
+            "troppo vecchio, minimo {0}");
+        Add("L_AgentOldTitle", "AGENT STR TROP ANCIEN", "STR AGENT TOO OLD", "STR-AGENT ZU ALT", "STR-AGENT TE OUD", "AGENTE STR DEMASIADO ANTIGUO", "AGENTE STR TROPPO VECCHIO");
         Add("L_AgentOldOne",
             "Une enceinte connue a un agent STR antérieur à la version {0}.",
             "One known speaker has an STR agent older than version {0}.",
             "Ein bekannter Lautsprecher hat einen STR-Agenten älter als Version {0}.",
             "Eén bekende speaker heeft een STR-agent ouder dan versie {0}.",
-            "Un altavoz conocido tiene un agente STR anterior a la versión {0}.");
+            "Un altavoz conocido tiene un agente STR anterior a la versión {0}.",
+            "Un diffusore conosciuto ha un agente STR precedente alla versione {0}.");
         Add("L_AgentOldMany",
             "{0} enceintes connues ont un agent STR antérieur à la version {1}.",
             "{0} known speakers have an STR agent older than version {1}.",
             "{0} bekannte Lautsprecher haben einen STR-Agenten älter als Version {1}.",
             "{0} bekende speakers hebben een STR-agent ouder dan versie {1}.",
-            "{0} altavoces conocidos tienen un agente STR anterior a la versión {1}.");
+            "{0} altavoces conocidos tienen un agente STR anterior a la versión {1}.",
+            "{0} diffusori conosciuti hanno un agente STR precedente alla versione {1}.");
         Add("L_AgentOldBody",
             "L'application ne modifie pas les groupes de ces enceintes : un agent plus ancien remplace le groupe permanent enregistré au lieu de le garder. Le reste fonctionne. La mise à jour se fait avec l'application STR sur PC ou Mac.",
             "The app does not change the groups of these speakers: an older agent replaces the saved permanent group instead of keeping it. Everything else works. Updating is done with the STR app on PC or Mac.",
             "Die App ändert die Gruppen dieser Lautsprecher nicht: Ein älterer Agent ersetzt die gespeicherte permanente Gruppe, statt sie zu behalten. Alles andere funktioniert. Das Update erfolgt mit der STR-App auf PC oder Mac.",
             "De app wijzigt de groepen van deze speakers niet: een oudere agent vervangt de opgeslagen permanente groep in plaats van haar te bewaren. De rest werkt. Bijwerken gebeurt met de STR-app op pc of Mac.",
-            "La aplicación no cambia los grupos de estos altavoces: un agente más antiguo sustituye el grupo permanente guardado en lugar de conservarlo. Todo lo demás funciona. La actualización se hace con la aplicación STR en PC o Mac.");
+            "La aplicación no cambia los grupos de estos altavoces: un agente más antiguo sustituye el grupo permanente guardado en lugar de conservarlo. Todo lo demás funciona. La actualización se hace con la aplicación STR en PC o Mac.",
+            "L'app non modifica i gruppi di questi diffusori: un agente più vecchio sostituisce il gruppo permanente salvato invece di conservarlo. Tutto il resto funziona. L'aggiornamento si fa con l'app STR su PC o Mac.");
         Add("L_AgentOldOpen",
             "Voir comment mettre STR à jour",
             "See how to update STR",
             "So aktualisiert man STR",
             "Zie hoe je STR bijwerkt",
-            "Ver cómo actualizar STR");
+            "Ver cómo actualizar STR",
+            "Vedi come aggiornare STR");
         Add("L_AlarmsTitle",
             "RÉVEILS",
             "ALARMS",
             "WECKER",
             "WEKKERS",
-            "ALARMAS");
+            "ALARMAS",
+            "SVEGLIE");
         Add("L_AlarmsNoSpeaker",
             "Aucune enceinte sélectionnée.",
             "No speaker selected.",
             "Kein Lautsprecher ausgewählt.",
             "Geen speaker geselecteerd.",
-            "Ningún altavoz seleccionado.");
+            "Ningún altavoz seleccionado.",
+            "Nessun diffusore selezionato.");
         Add("L_AlarmsNoAgent",
             "Les réveils demandent l'agent STR sur cette enceinte.",
             "Alarms need the STR agent on this speaker.",
             "Wecker brauchen den STR-Agenten auf diesem Lautsprecher.",
             "Wekkers hebben de STR-agent op deze speaker nodig.",
-            "Las alarmas necesitan el agente STR en este altavoz.");
+            "Las alarmas necesitan el agente STR en este altavoz.",
+            "Le sveglie richiedono l'agente STR su questo diffusore.");
         Add("L_AlarmsUnavailable",
             "L'agent STR de cette enceinte ne répond pas pour les réveils. Réessayez avec « Rafraîchir ».",
             "This speaker's STR agent does not answer for alarms. Try again with \"Refresh\".",
             "Der STR-Agent dieses Lautsprechers antwortet nicht für die Wecker. Versuchen Sie es erneut mit „Aktualisieren“.",
             "De STR-agent van deze speaker antwoordt niet voor de wekkers. Probeer opnieuw met \"Vernieuwen\".",
-            "El agente STR de este altavoz no responde para las alarmas. Vuelva a intentarlo con «Actualizar».");
+            "El agente STR de este altavoz no responde para las alarmas. Vuelva a intentarlo con «Actualizar».",
+            "L'agente STR di questo diffusore non risponde per le sveglie. Riprova con \"Aggiorna\".");
         Add("L_AlarmsNone",
             "Aucun réveil sur cette enceinte.",
             "No alarm on this speaker.",
             "Kein Wecker auf diesem Lautsprecher.",
             "Geen wekker op deze speaker.",
-            "Ninguna alarma en este altavoz.");
+            "Ninguna alarma en este altavoz.",
+            "Nessuna sveglia su questo diffusore.");
         Add("L_AlarmOn",
             "Activé",
             "On",
             "Ein",
             "Aan",
-            "Activada");
+            "Activada",
+            "Attiva");
         Add("L_AlarmOff",
             "Désactivé",
             "Off",
             "Aus",
             "Uit",
-            "Desactivada");
+            "Desactivada",
+            "Disattivata");
         Add("L_AlarmNext",
             "Prochain réveil : {0}",
             "Next alarm: {0}",
             "Nächster Wecker: {0}",
             "Volgende wekker: {0}",
-            "Próxima alarma: {0}");
+            "Próxima alarma: {0}",
+            "Prossima sveglia: {0}");
         Add("S_AlarmClockUntrusted",
             "L'horloge de l'enceinte n'est pas encore à l'heure : aucun réveil ne sonnera tant qu'elle ne l'est pas.",
             "The speaker's clock is not set yet: no alarm will ring until it is.",
             "Die Uhr des Lautsprechers ist noch nicht gestellt: Kein Wecker klingelt, bevor sie es ist.",
             "De klok van de speaker staat nog niet goed: geen wekker gaat af zolang dat zo is.",
-            "El reloj del altavoz aún no está en hora: ninguna alarma sonará hasta que lo esté.");
+            "El reloj del altavoz aún no está en hora: ninguna alarma sonará hasta que lo esté.",
+            "L'orologio del diffusore non è ancora impostato: nessuna sveglia suonerà finché non lo sarà.");
         Add("S_AlarmZoneUnknown",
             "Le fuseau horaire enregistré est inconnu de l'enceinte : aucun réveil n'est programmé.",
             "The saved time zone is unknown to the speaker: no alarm is scheduled.",
             "Die gespeicherte Zeitzone ist dem Lautsprecher unbekannt: Kein Wecker ist geplant.",
             "De opgeslagen tijdzone is onbekend voor de speaker: er is geen wekker gepland.",
-            "El altavoz no reconoce la zona horaria guardada: no hay ninguna alarma programada.");
+            "El altavoz no reconoce la zona horaria guardada: no hay ninguna alarma programada.",
+            "Il fuso orario salvato è sconosciuto al diffusore: nessuna sveglia è programmata.");
         Add("L_AlarmZoneUtc",
             "Fuseau horaire de l'enceinte : UTC.",
             "Speaker time zone: UTC.",
             "Zeitzone des Lautsprechers: UTC.",
             "Tijdzone van de speaker: UTC.",
-            "Zona horaria del altavoz: UTC.");
+            "Zona horaria del altavoz: UTC.",
+            "Fuso orario del diffusore: UTC.");
         Add("L_AlarmZoneUtcFix",
             "Fuseau horaire de l'enceinte : UTC. Celui du téléphone ({0}) sera enregistré avec le prochain réveil.",
             "Speaker time zone: UTC. The phone's ({0}) will be saved with the next alarm.",
             "Zeitzone des Lautsprechers: UTC. Die des Telefons ({0}) wird mit dem nächsten Wecker gespeichert.",
             "Tijdzone van de speaker: UTC. Die van de telefoon ({0}) wordt met de volgende wekker opgeslagen.",
-            "Zona horaria del altavoz: UTC. La del teléfono ({0}) se guardará con la próxima alarma.");
+            "Zona horaria del altavoz: UTC. La del teléfono ({0}) se guardará con la próxima alarma.",
+            "Fuso orario del diffusore: UTC. Quello del telefono ({0}) verrà salvato con la prossima sveglia.");
         Add("L_AlarmZone",
             "Fuseau horaire de l'enceinte : {0}",
             "Speaker time zone: {0}",
             "Zeitzone des Lautsprechers: {0}",
             "Tijdzone van de speaker: {0}",
-            "Zona horaria del altavoz: {0}");
+            "Zona horaria del altavoz: {0}",
+            "Fuso orario del diffusore: {0}");
         Add("L_AlarmNew",
             "NOUVEAU RÉVEIL",
             "NEW ALARM",
             "NEUER WECKER",
             "NIEUWE WEKKER",
-            "NUEVA ALARMA");
+            "NUEVA ALARMA",
+            "NUOVA SVEGLIA");
         Add("L_AlarmEdit",
             "RÉVEIL DE {0}",
             "ALARM AT {0}",
             "WECKER UM {0}",
             "WEKKER OM {0}",
-            "ALARMA DE LAS {0}");
+            "ALARMA DE LAS {0}",
+            "SVEGLIA ALLE {0}");
         Add("S_AlarmNoDay",
             "Choisissez au moins un jour.",
             "Pick at least one day.",
             "Wählen Sie mindestens einen Tag.",
             "Kies minstens één dag.",
-            "Elija al menos un día.");
+            "Elija al menos un día.",
+            "Scegli almeno un giorno.");
         Add("S_AlarmIncomplete",
             "Choisissez l'heure et la touche.",
             "Pick the time and the key.",
             "Wählen Sie Uhrzeit und Taste.",
             "Kies het uur en de toets.",
-            "Elija la hora y la tecla.");
+            "Elija la hora y la tecla.",
+            "Scegli l'ora e il tasto.");
         Add("S_AlarmAdded",
             "Réveil de {0} ajouté.",
             "Alarm at {0} added.",
             "Wecker um {0} hinzugefügt.",
             "Wekker om {0} toegevoegd.",
-            "Alarma de las {0} añadida.");
+            "Alarma de las {0} añadida.",
+            "Sveglia alle {0} aggiunta.");
         Add("S_AlarmSaved",
             "Réveil de {0} enregistré.",
             "Alarm at {0} saved.",
             "Wecker um {0} gespeichert.",
             "Wekker om {0} opgeslagen.",
-            "Alarma de las {0} guardada.");
+            "Alarma de las {0} guardada.",
+            "Sveglia alle {0} salvata.");
         Add("S_AlarmFull",
             "Cette enceinte a déjà huit réveils, le maximum.",
             "This speaker already has eight alarms, the maximum.",
             "Dieser Lautsprecher hat bereits acht Wecker, das Maximum.",
             "Deze speaker heeft al acht wekkers, het maximum.",
-            "Este altavoz ya tiene ocho alarmas, el máximo.");
+            "Este altavoz ya tiene ocho alarmas, el máximo.",
+            "Questo diffusore ha già otto sveglie, il massimo.");
         Add("S_AlarmGone",
             "Ce réveil a été supprimé ailleurs entre-temps. La liste est à jour.",
             "This alarm was deleted elsewhere in the meantime. The list is up to date.",
             "Dieser Wecker wurde inzwischen anderswo gelöscht. Die Liste ist aktuell.",
             "Deze wekker werd intussen elders verwijderd. De lijst is bijgewerkt.",
-            "Esta alarma se eliminó en otro lugar mientras tanto. La lista está actualizada.");
+            "Esta alarma se eliminó en otro lugar mientras tanto. La lista está actualizada.",
+            "Nel frattempo questa sveglia è stata eliminata altrove. L'elenco è aggiornato.");
         Add("L_AlarmDelete",
             "Supprimer ce réveil",
             "Delete this alarm",
             "Diesen Wecker löschen",
             "Deze wekker verwijderen",
-            "Eliminar esta alarma");
+            "Eliminar esta alarma",
+            "Elimina questa sveglia");
         Add("L_AlarmDeleteAsk",
             "Supprimer le réveil de {0} ?",
             "Delete the alarm at {0}?",
             "Den Wecker um {0} löschen?",
             "De wekker om {0} verwijderen?",
-            "¿Eliminar la alarma de las {0}?");
+            "¿Eliminar la alarma de las {0}?",
+            "Eliminare la sveglia delle {0}?");
         Add("S_AlarmDeleted",
             "Réveil supprimé.",
             "Alarm deleted.",
             "Wecker gelöscht.",
             "Wekker verwijderd.",
-            "Alarma eliminada.");
+            "Alarma eliminada.",
+            "Sveglia eliminata.");
         Add("S_AlarmConflict",
             "Les réveils changent sans cesse ailleurs : rien n'a été enregistré. Réessayez.",
             "The alarms keep changing elsewhere: nothing was saved. Try again.",
             "Die Wecker ändern sich ständig anderswo: Nichts wurde gespeichert. Versuchen Sie es erneut.",
             "De wekkers veranderen voortdurend elders: er is niets opgeslagen. Probeer opnieuw.",
-            "Las alarmas cambian sin cesar en otro lugar: no se guardó nada. Vuelva a intentarlo.");
+            "Las alarmas cambian sin cesar en otro lugar: no se guardó nada. Vuelva a intentarlo.",
+            "Le sveglie continuano a cambiare altrove: non è stato salvato nulla. Riprova.");
         Add("S_AlarmRefused",
             "L'enceinte a refusé : {0}",
             "The speaker refused: {0}",
             "Der Lautsprecher hat abgelehnt: {0}",
             "De speaker weigerde: {0}",
-            "El altavoz lo rechazó: {0}");
+            "El altavoz lo rechazó: {0}",
+            "Il diffusore ha rifiutato: {0}");
         Add("S_StartVolumeOff",
             "Volume de départ désactivé.",
             "Start volume switched off.",
             "Startlautstärke ausgeschaltet.",
             "Startvolume uitgeschakeld.",
-            "Volumen de inicio desactivado.");
+            "Volumen de inicio desactivado.",
+            "Volume di avvio disattivato.");
         Add("S_StartVolumeSet",
             "Volume de départ réglé à {0}.",
             "Start volume set to {0}.",
             "Startlautstärke auf {0} gesetzt.",
             "Startvolume ingesteld op {0}.",
-            "Volumen de inicio ajustado a {0}.");
+            "Volumen de inicio ajustado a {0}.",
+            "Volume di avvio impostato a {0}.");
         Add("L_AlarmAutoOffNever",
             "Jamais",
             "Never",
             "Nie",
             "Nooit",
-            "Nunca");
+            "Nunca",
+            "Mai");
         Add("L_AlarmAutoOffMinutes",
             "Après {0} min",
             "After {0} min",
             "Nach {0} Min.",
             "Na {0} min",
-            "Tras {0} min");
+            "Tras {0} min",
+            "Dopo {0} min");
         Add("L_AlarmSnoozeMinutes",
             "{0} min",
             "{0} min",
             "{0} Min.",
+            "{0} min",
             "{0} min",
             "{0} min");
         Add("L_AlarmKey",
@@ -1430,163 +1653,190 @@ public static class Localization
             "Key {0}",
             "Taste {0}",
             "Toets {0}",
-            "Tecla {0}");
+            "Tecla {0}",
+            "Tasto {0}");
         Add("L_AlarmKeyEmpty",
             "vide",
             "empty",
             "leer",
             "leeg",
-            "vacía");
+            "vacía",
+            "vuoto");
         Add("L_AlarmEveryDay",
             "Tous les jours",
             "Every day",
             "Täglich",
             "Elke dag",
-            "Todos los días");
+            "Todos los días",
+            "Tutti i giorni");
         Add("L_AlarmWeekdays",
             "Du lundi au vendredi",
             "Monday to Friday",
             "Montag bis Freitag",
             "Maandag tot vrijdag",
-            "De lunes a viernes");
+            "De lunes a viernes",
+            "Dal lunedì al venerdì");
         Add("L_AlarmWeekend",
             "Le week-end",
             "Weekends",
             "Am Wochenende",
             "In het weekend",
-            "Fines de semana");
+            "Fines de semana",
+            "Fine settimana");
         Add("L_AlarmOffAt",
             "Arrêt à {0}, réglé depuis la page téléphone de STR : il est conservé.",
             "Switches off at {0}, set from the STR phone page: it is kept.",
             "Schaltet um {0} ab, auf der STR-Telefonseite eingestellt: bleibt erhalten.",
             "Schakelt uit om {0}, ingesteld via de STR-telefoonpagina: blijft behouden.",
-            "Se apaga a las {0}, ajustado desde la página de teléfono de STR: se conserva.");
+            "Se apaga a las {0}, ajustado desde la página de teléfono de STR: se conserva.",
+            "Si spegne alle {0}, impostato dalla pagina STR del telefono: viene mantenuto.");
         Add("L_AlarmAdd",
             "Ajouter un réveil",
             "Add an alarm",
             "Wecker hinzufügen",
             "Wekker toevoegen",
-            "Añadir una alarma");
+            "Añadir una alarma",
+            "Aggiungi una sveglia");
         Add("L_AlarmHour",
             "Heure",
             "Hour",
             "Stunde",
             "Uur",
-            "Hora");
+            "Hora",
+            "Ora");
         Add("L_AlarmDays",
             "Jours",
             "Days",
             "Tage",
             "Dagen",
-            "Días");
+            "Días",
+            "Giorni");
         Add("L_DayMonday",
             "Lun",
             "Mon",
             "Mo",
             "Ma",
+            "Lun",
             "Lun");
         Add("L_DayTuesday",
             "Mar",
             "Tue",
             "Di",
             "Di",
+            "Mar",
             "Mar");
         Add("L_DayWednesday",
             "Mer",
             "Wed",
             "Mi",
             "Wo",
-            "Mié");
+            "Mié",
+            "Mer");
         Add("L_DayThursday",
             "Jeu",
             "Thu",
             "Do",
             "Do",
-            "Jue");
+            "Jue",
+            "Gio");
         Add("L_DayFriday",
             "Ven",
             "Fri",
             "Fr",
             "Vr",
-            "Vie");
+            "Vie",
+            "Ven");
         Add("L_DaySaturday",
             "Sam",
             "Sat",
             "Sa",
             "Za",
-            "Sáb");
+            "Sáb",
+            "Sab");
         Add("L_DaySunday",
             "Dim",
             "Sun",
             "So",
             "Zo",
+            "Dom",
             "Dom");
         Add("L_AlarmKeyTitle",
             "Touche jouée",
             "Key to play",
             "Gespielte Taste",
             "Gespeelde toets",
-            "Tecla que suena");
+            "Tecla que suena",
+            "Tasto da riprodurre");
         Add("L_AlarmUseVolume",
             "Régler le volume du réveil",
             "Set the alarm volume",
             "Weckerlautstärke einstellen",
             "Volume van de wekker instellen",
-            "Ajustar el volumen de la alarma");
+            "Ajustar el volumen de la alarma",
+            "Imposta il volume della sveglia");
         Add("L_AlarmAutoOffTitle",
             "Arrêt automatique",
             "Automatic switch-off",
             "Automatisch ausschalten",
             "Automatisch uitschakelen",
-            "Apagado automático");
+            "Apagado automático",
+            "Spegnimento automatico");
         Add("L_AlarmSnoozeTitle",
             "Répétition",
             "Snooze",
             "Schlummern",
             "Sluimeren",
-            "Repetición");
+            "Repetición",
+            "Posticipa");
         Add("L_AlarmSnoozeNote",
             "La répétition ne sert que si une touche de la télécommande (pouce ou AUX) est réglée sur « répéter le réveil » dans l'application STR sur ordinateur.",
             "Snooze only works if a remote key (thumbs or AUX) is set to \"snooze\" in the STR app on a computer.",
             "Schlummern wirkt nur, wenn eine Taste der Fernbedienung (Daumen oder AUX) in der STR-App am Computer auf „Schlummern“ gestellt ist.",
             "Sluimeren werkt alleen als een toets van de afstandsbediening (duim of AUX) in de STR-app op de computer op \"sluimeren\" staat.",
-            "La repetición solo funciona si una tecla del mando (pulgar o AUX) está ajustada a «repetir» en la aplicación STR del ordenador.");
+            "La repetición solo funciona si una tecla del mando (pulgar o AUX) está ajustada a «repetir» en la aplicación STR del ordenador.",
+            "Il posticipo funziona solo se un tasto del telecomando (pollici o AUX) è impostato su \"posticipa\" nell'app STR su computer.");
         Add("L_AlarmEnabled",
             "Réveil activé",
             "Alarm on",
             "Wecker aktiv",
             "Wekker aan",
-            "Alarma activada");
+            "Alarma activada",
+            "Sveglia attiva");
         Add("L_AlarmSave",
             "Enregistrer",
             "Save",
             "Speichern",
             "Opslaan",
-            "Guardar");
+            "Guardar",
+            "Salva");
         Add("L_StartVolumeTitle",
             "VOLUME DE DÉPART",
             "START VOLUME",
             "STARTLAUTSTÄRKE",
             "STARTVOLUME",
-            "VOLUMEN DE INICIO");
+            "VOLUMEN DE INICIO",
+            "VOLUME DI AVVIO");
         Add("L_StartVolumeUse",
             "Démarrer toujours à ce volume",
             "Always start at this volume",
             "Immer mit dieser Lautstärke starten",
             "Altijd op dit volume starten",
-            "Empezar siempre con este volumen");
+            "Empezar siempre con este volumen",
+            "Parti sempre con questo volume");
         Add("L_StartVolumeNote",
             "Le niveau que prend l'enceinte quand on l'allume et qu'elle se met à jouer. Un volume réglé pendant l'écoute n'est jamais modifié.",
             "The level the speaker takes when it is switched on and starts playing. A volume set while listening is never changed.",
             "Die Lautstärke, die der Lautsprecher beim Einschalten annimmt, sobald er spielt. Eine während des Hörens eingestellte Lautstärke wird nie geändert.",
             "Het niveau dat de speaker krijgt wanneer hij wordt aangezet en begint te spelen. Een volume dat tijdens het luisteren is ingesteld, wordt nooit gewijzigd.",
-            "El nivel que toma el altavoz al encenderlo y empezar a sonar. Un volumen ajustado durante la escucha nunca se modifica.");
+            "El nivel que toma el altavoz al encenderlo y empezar a sonar. Un volumen ajustado durante la escucha nunca se modifica.",
+            "Il livello che il diffusore assume quando viene acceso e inizia a suonare. Un volume regolato durante l'ascolto non viene mai modificato.");
         Add("L_StartVolumeSave",
             "Enregistrer le volume de départ",
             "Save the start volume",
             "Startlautstärke speichern",
             "Startvolume opslaan",
-            "Guardar el volumen de inicio");
+            "Guardar el volumen de inicio",
+            "Salva il volume di avvio");
 
         // ---------------------------------------------------------- Garder ce qui joue
         Add("L_KeepPlaying",
@@ -1594,32 +1844,37 @@ public static class Localization
             "Keep what's playing on a key",
             "Laufendes auf eine Taste legen",
             "Wat nu speelt op een toets zetten",
-            "Guardar lo que suena en una tecla");
-        Add("L_KeepPlayingTitle", "Sur quelle touche ?", "On which key?", "Auf welche Taste?", "Op welke toets?", "¿En qué tecla?");
+            "Guardar lo que suena en una tecla",
+            "Salva su un tasto ciò che suona");
+        Add("L_KeepPlayingTitle", "Sur quelle touche ?", "On which key?", "Auf welche Taste?", "Op welke toets?", "¿En qué tecla?", "Su quale tasto?");
         Add("S_NeedAgentKeep",
             "Garder ce qui joue demande l'agent STR.",
             "Keeping what's playing needs the STR agent.",
             "Laufendes zu speichern erfordert den STR-Agenten.",
             "Bewaren wat nu speelt vereist de STR-agent.",
-            "Guardar lo que suena requiere el agente STR.");
+            "Guardar lo que suena requiere el agente STR.",
+            "Per salvare ciò che suona serve l'agente STR.");
         Add("S_Kept",
             "{0} : enregistré sur la touche {1}",
             "{0} saved to key {1}",
             "{0} auf Taste {1} gespeichert",
             "{0} opgeslagen op toets {1}",
-            "{0}: guardado en la tecla {1}");
+            "{0}: guardado en la tecla {1}",
+            "{0} salvata sul tasto {1}");
         Add("S_KeptAlready",
             "{0} est déjà sur la touche {1}",
             "{0} is already on key {1}",
             "{0} liegt bereits auf Taste {1}",
             "{0} staat al op toets {1}",
-            "{0} ya está en la tecla {1}");
+            "{0} ya está en la tecla {1}",
+            "{0} è già sul tasto {1}");
         Add("S_NothingToKeep",
             "Ce qui joue ne peut pas être gardé sur une touche (veille, AUX, Bluetooth ou Spotify).",
             "What's playing cannot be kept on a key (standby, AUX, Bluetooth or Spotify).",
             "Das Laufende lässt sich nicht auf eine Taste legen (Standby, AUX, Bluetooth oder Spotify).",
             "Wat nu speelt kan niet op een toets worden gezet (stand-by, AUX, Bluetooth of Spotify).",
-            "Lo que suena no se puede guardar en una tecla (reposo, AUX, Bluetooth o Spotify).");
+            "Lo que suena no se puede guardar en una tecla (reposo, AUX, Bluetooth o Spotify).",
+            "Ciò che suona non può essere salvato su un tasto (standby, AUX, Bluetooth o Spotify).");
 
         // ---------------------------------------------------------- Historique : bibliothèque
         Add("S_LibraryOffline",
@@ -1627,52 +1882,59 @@ public static class Localization
             "The media server is off or cannot be found: nothing was started.",
             "Der Medienserver ist aus oder nicht auffindbar: Es wurde nichts gestartet.",
             "De mediaserver staat uit of is niet te vinden: er is niets gestart.",
-            "El servidor multimedia está apagado o no se encuentra: no se ha iniciado nada.");
+            "El servidor multimedia está apagado o no se encuentra: no se ha iniciado nada.",
+            "Il server multimediale è spento o introvabile: non è stato avviato nulla.");
         Add("S_LibraryOfflineNamed",
             "Le serveur de médias {0} est éteint ou introuvable : rien n'a été lancé.",
             "Media server {0} is off or cannot be found: nothing was started.",
             "Der Medienserver {0} ist aus oder nicht auffindbar: Es wurde nichts gestartet.",
             "Mediaserver {0} staat uit of is niet te vinden: er is niets gestart.",
-            "El servidor multimedia {0} está apagado o no se encuentra: no se ha iniciado nada.");
+            "El servidor multimedia {0} está apagado o no se encuentra: no se ha iniciado nada.",
+            "Il server multimediale {0} è spento o introvabile: non è stato avviato nulla.");
 
         // ---------------------------------------------------------- Minuterie de sommeil
-        Add("L_Sleep", "Minuterie de sommeil", "Sleep timer", "Sleeptimer", "Slaaptimer", "Temporizador de apagado");
-        Add("L_SleepIn", "Veille dans {0} min", "Standby in {0} min", "Standby in {0} Min.", "Stand-by over {0} min", "Reposo en {0} min");
+        Add("L_Sleep", "Minuterie de sommeil", "Sleep timer", "Sleeptimer", "Slaaptimer", "Temporizador de apagado", "Timer di spegnimento");
+        Add("L_SleepIn", "Veille dans {0} min", "Standby in {0} min", "Standby in {0} Min.", "Stand-by over {0} min", "Reposo en {0} min", "Standby tra {0} min");
         Add("L_SleepInGroup",
             "Veille du groupe dans {0} min",
             "Group standby in {0} min",
             "Gruppe in {0} Min. im Standby",
             "Groep in stand-by over {0} min",
-            "Grupo en reposo en {0} min");
-        Add("L_SleepTitle", "Mettre en veille dans…", "Go to standby in…", "In den Standby in…", "Naar stand-by over…", "Pasar a reposo en…");
-        Add("L_SleepCancel", "Annuler la minuterie", "Cancel the timer", "Timer abbrechen", "Timer annuleren", "Cancelar el temporizador");
-        Add("L_Minutes", "{0} min", "{0} min", "{0} Min.", "{0} min", "{0} min");
+            "Grupo en reposo en {0} min",
+            "Standby del gruppo tra {0} min");
+        Add("L_SleepTitle", "Mettre en veille dans…", "Go to standby in…", "In den Standby in…", "Naar stand-by over…", "Pasar a reposo en…", "Passare in standby tra…");
+        Add("L_SleepCancel", "Annuler la minuterie", "Cancel the timer", "Timer abbrechen", "Timer annuleren", "Cancelar el temporizador", "Annulla il timer");
+        Add("L_Minutes", "{0} min", "{0} min", "{0} Min.", "{0} min", "{0} min", "{0} min");
         Add("L_SleepScope",
             "Que faut-il mettre en veille ?",
             "What should go to standby?",
             "Was soll in den Standby?",
             "Wat moet naar stand-by?",
-            "¿Qué debe pasar a reposo?");
-        Add("L_SleepWholeGroup", "Tout le groupe", "The whole group", "Die ganze Gruppe", "De hele groep", "Todo el grupo");
-        Add("L_SleepOnlyThis", "Seulement {0}", "Only {0}", "Nur {0}", "Alleen {0}", "Solo {0}");
+            "¿Qué debe pasar a reposo?",
+            "Cosa deve andare in standby?");
+        Add("L_SleepWholeGroup", "Tout le groupe", "The whole group", "Die ganze Gruppe", "De hele groep", "Todo el grupo", "Tutto il gruppo");
+        Add("L_SleepOnlyThis", "Seulement {0}", "Only {0}", "Nur {0}", "Alleen {0}", "Solo {0}", "Solo {0}");
         Add("S_NeedAgentSleep",
             "La minuterie de sommeil demande l'agent STR.",
             "The sleep timer needs the STR agent.",
             "Der Sleeptimer erfordert den STR-Agenten.",
             "De slaaptimer vereist de STR-agent.",
-            "El temporizador requiere el agente STR.");
-        Add("S_SleepCancelled", "Minuterie annulée", "Timer cancelled", "Timer abgebrochen", "Timer geannuleerd", "Temporizador cancelado");
+            "El temporizador requiere el agente STR.",
+            "Il timer di spegnimento richiede l'agente STR.");
+        Add("S_SleepCancelled", "Minuterie annulée", "Timer cancelled", "Timer abgebrochen", "Timer geannuleerd", "Temporizador cancelado", "Timer annullato");
         Add("S_SleepSet",
             "{0} passera en veille dans {1} min",
             "{0} will go to standby in {1} min",
             "{0} geht in {1} Min. in den Standby",
             "{0} gaat over {1} min naar stand-by",
-            "{0} pasará a reposo en {1} min");
+            "{0} pasará a reposo en {1} min",
+            "{0} andrà in standby tra {1} min");
         Add("S_SleepSetGroup",
             "Le groupe passera en veille dans {0} min",
             "The group will go to standby in {0} min",
             "Die Gruppe geht in {0} Min. in den Standby",
             "De groep gaat over {0} min naar stand-by",
-            "El grupo pasará a reposo en {0} min");
+            "El grupo pasará a reposo en {0} min",
+            "Il gruppo andrà in standby tra {0} min");
     }
 }

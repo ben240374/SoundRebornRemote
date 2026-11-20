@@ -16,8 +16,8 @@ no service in between.
 ## Features
 
 **Play tab**
-- Volume, mute, standby and bass; play, pause, next and previous track; what is playing, with its artwork.
-- The six presets with their station logos, and the second row of six (a key pressed twice).
+- Volume, mute, standby and bass; play, pause, next and previous track; what is playing, with its artwork — during a Spotify key, the song, the artist and the cover (STR agent 1.8.2 or later).
+- The six presets with their station logos and key names, and the second row of six (a key pressed twice), with the number of keys it holds.
 - Keep what is playing on a key; sleep timer for the speaker or the whole group.
 - *Group with*: one tap adds a speaker to the group or removes it, with the progress shown in place; asks first when the speaker you add is playing something else.
 - Like or dislike the Spotify song that is playing (STR agent 1.8.1 or later).
@@ -25,12 +25,13 @@ no service in between.
 **Presets tab**
 - Internet station search (radio-browser.info) by name, country and language, with a filter for streams the speaker can play.
 - Assign a station to any of the twelve keys.
+- Rename or clear a key.
 - Copy all the keys to another STR speaker, or to all of them (STR agent 1.6.5 or later).
 
 **Sources tab**
 - Bluetooth, AUX and the speaker's own sources; play any stream address.
 - Listening history, replayed the right way: a station, a library track, or a whole album.
-- Record the internet radio that is playing (up to 5 minutes) on the phone; keep the last 10, play them back, share them (WhatsApp, e-mail…) or delete them, even when no speaker is reachable.
+- Record the internet radio that is playing (up to 5 minutes) on the phone; keep the last 10, play them back with a counter and a slider to move within them, share them (WhatsApp, e-mail…) or delete them, even when no speaker is reachable.
 
 **Groups tab**
 - Multi-room groups, including permanent groups that re-form on the next play.
@@ -40,8 +41,8 @@ no service in between.
 **Settings tab**
 - Alarms of each speaker: time on the phone's clock dial, days, key, volume, automatic switch-off, snooze. Changes made in other STR apps are kept.
 - Start volume: the level the speaker takes when it is switched on.
-- Speaker discovery (mDNS, then a network sweep) or manual address; flags speakers without the STR agent or with an agent older than 1.6.0.
-- Interface in English, French, German, Dutch and Spanish; light or dark theme; diagnostics.
+- Speaker discovery (mDNS, then a network sweep) or manual address; flags speakers without the STR agent or with an agent older than 1.8.0.
+- Interface in English, French, German, Dutch, Spanish and Italian; light or dark theme; diagnostics.
 
 **Everywhere**
 - Commands follow the group's master, because the master is what plays.
@@ -78,11 +79,11 @@ done with the STR tool for PC or Mac. It simply flags speakers that do not have 
 better there.
 
 In the repository: [English](docs/manual/en.md) · [Français](docs/manual/fr.md) ·
-[Deutsch](docs/manual/de.md) · [Nederlands](docs/manual/nl.md) · [Español](docs/manual/es.md)
+[Deutsch](docs/manual/de.md) · [Nederlands](docs/manual/nl.md) · [Español](docs/manual/es.md) · [Italiano](docs/manual/it.md)
 
 Installation, screen by screen, gestures, troubleshooting and known limits. PDF versions,
 attached to the latest release: [English](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-en.pdf) · [Français](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-fr.pdf) ·
-[Deutsch](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-de.pdf) · [Nederlands](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-nl.pdf) · [Español](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-es.pdf).
+[Deutsch](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-de.pdf) · [Nederlands](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-nl.pdf) · [Español](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-es.pdf) · [Italiano](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-it.pdf).
 
 ## What the application controls
 
@@ -95,6 +96,7 @@ attached to the latest release: [English](https://github.com/ben240374/SoundRebo
 | Second preset row (keys pressed twice, slots 7 to 12) | Play and Presets tabs | `POST :8888/api/play/<slot>` — agent only, shown when `/api/agent/version` reports `presetRows` |
 | Keeping what is playing on a key | Play tab | `POST :8888/api/box/save-playing` |
 | Like / Dislike the Spotify song that is playing | Play tab | `POST :8888/api/spotify/liked` — shown only when `/api/agent/version` reports `spotifyLiked` and Spotify plays |
+| Song, artist and cover during a Spotify key | Play tab | `GET :8888/api/stream/title` — `track`, `artist`, `art` (agent 1.8.2), read again every 5 s while the key plays |
 | Asking before grouping a speaker that plays something else | Play tab | its `GET :8090/now_playing`, compared by source and stream address |
 | Sleep timer | Play tab | `GET/POST/DELETE :8888/api/box/sleep` |
 | Alarms of the selected speaker (time, days, key, volume, switch-off, snooze) | Settings tab | `GET/PUT :8888/api/alarms` with `rev`; on `409` the user's change is applied again to the current document |
@@ -108,11 +110,12 @@ attached to the latest release: [English](https://github.com/ben240374/SoundRebo
 | Per-speaker volume in a group | Play and Groups tabs | `GET/POST :8888/api/box/zone/volume` |
 | Speaker discovery | Settings tab | mDNS (`_streborn._tcp`, `_soundtouch._tcp`), falling back to a `/24` sweep on `GET :8090/info` |
 | Switching speakers | Play tab | cards at the top of the screen, with model and agent version |
-| STR agent version | Play and Settings tabs | `GET :8888/api/agent/version` — below 1.6.0 the agent is flagged "too old" and group changes are refused |
+| STR agent version | Play and Settings tabs | `GET :8888/api/agent/version` — below 1.8.0 the agent is flagged "too old" and group changes are refused |
 | Station search | Presets tab | radio-browser.info, queried by the application itself |
 | Assigning a station to a key (1 to 12) | Presets tab | `PUT :8888/api/presets/{slot}` |
+| Renaming or clearing a key | Presets tab | `PATCH :8888/api/presets/{slot}` with `{"name"}`, `DELETE :8888/api/presets/{slot}` |
 | Copying all keys to another speaker, or to all | Presets tab | `POST :8888/api/box/preset-copy` (agent 1.6.5 or later) |
-| Interface language | Settings tab | EN, FR, DE, NL, ES — applied immediately, no restart |
+| Interface language | Settings tab | EN, FR, DE, NL, ES, IT — applied immediately, no restart |
 | Light or dark theme | Settings tab | System, Light or Dark — switches immediately |
 | Swipe navigation | everywhere | horizontal gesture recognised in `MainActivity`, without touching scrolling |
 | Speakers without the STR agent | Settings tab | flagged, pointing to the official installer |
@@ -354,8 +357,8 @@ aucun service intermédiaire.
 ## Fonctions
 
 **Onglet Lecture**
-- Volume, sourdine, marche/veille et graves ; lecture, pause, piste suivante et précédente ; ce qui joue, avec sa pochette.
-- Les six présélections avec le logo des stations, et la seconde rangée de six (touche pressée deux fois).
+- Volume, sourdine, marche/veille et graves ; lecture, pause, piste suivante et précédente ; ce qui joue, avec sa pochette — pendant une touche Spotify, le morceau, l'artiste et la pochette (agent STR 1.8.2 ou plus récent).
+- Les six présélections avec le logo des stations et le nom des touches, et la seconde rangée de six (touche pressée deux fois), avec le nombre de touches qu'elle porte.
 - Garder ce qui joue sur une touche ; minuterie de sommeil pour l'enceinte ou tout le groupe.
 - *Grouper avec* : un appui ajoute une enceinte au groupe ou l'en retire, avec l'avancement affiché sur place ; demande d'abord quand l'enceinte ajoutée joue autre chose.
 - « J'aime » ou « Je n'aime pas » sur le titre Spotify en cours (agent STR 1.8.1 ou plus récent).
@@ -363,12 +366,13 @@ aucun service intermédiaire.
 **Onglet Présélections**
 - Recherche de stations internet (radio-browser.info) par nom, pays et langue, avec un filtre pour les flux que l'enceinte sait lire.
 - Affectation d'une station à l'une des douze touches.
+- Renommer ou effacer une touche.
 - Copie de toutes les touches vers une autre enceinte STR, ou vers toutes (agent STR 1.6.5 ou plus récent).
 
 **Onglet Sources**
 - Bluetooth, AUX et les sources de l'enceinte ; lecture de n'importe quelle adresse de flux.
 - Historique d'écoute, relancé comme il faut : une station, une piste de bibliothèque ou un album entier.
-- Enregistrement sur le téléphone de la radio internet qui joue (5 minutes au plus) ; les 10 derniers enregistrements se réécoutent, se partagent (WhatsApp, e-mail…) ou se suppriment, même sans enceinte joignable.
+- Enregistrement sur le téléphone de la radio internet qui joue (5 minutes au plus) ; les 10 derniers enregistrements se réécoutent, avec un compteur et une barre pour s'y déplacer, se partagent (WhatsApp, e-mail…) ou se suppriment, même sans enceinte joignable.
 
 **Onglet Groupes**
 - Groupes multi-pièces, y compris les groupes permanents qui se reforment à la lecture suivante.
@@ -378,8 +382,8 @@ aucun service intermédiaire.
 **Onglet Réglages**
 - Réveils de chaque enceinte : heure sur le cadran du téléphone, jours, touche, volume, arrêt automatique, répétition. Les modifications faites dans les autres applications STR sont conservées.
 - Volume de départ : le niveau que prend l'enceinte quand on l'allume.
-- Découverte des enceintes (mDNS, puis balayage du réseau) ou adresse manuelle ; signale les enceintes sans agent STR ou avec un agent antérieur à 1.6.0.
-- Interface en français, anglais, allemand, néerlandais et espagnol ; thème clair ou foncé ; diagnostic.
+- Découverte des enceintes (mDNS, puis balayage du réseau) ou adresse manuelle ; signale les enceintes sans agent STR ou avec un agent antérieur à 1.8.0.
+- Interface en français, anglais, allemand, néerlandais, espagnol et italien ; thème clair ou foncé ; diagnostic.
 
 **Partout**
 - Les commandes suivent le maître du groupe, puisque c'est lui qui diffuse.
@@ -417,11 +421,11 @@ l'ont pas encore.
 plus confortablement.
 
 Dans le dépôt : [Français](docs/manual/fr.md) · [English](docs/manual/en.md) ·
-[Deutsch](docs/manual/de.md) · [Nederlands](docs/manual/nl.md) · [Español](docs/manual/es.md)
+[Deutsch](docs/manual/de.md) · [Nederlands](docs/manual/nl.md) · [Español](docs/manual/es.md) · [Italiano](docs/manual/it.md)
 
 Installation, écran par écran, gestes, dépannage et limites connues. Les versions PDF,
 jointes à la dernière release : [Français](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-fr.pdf) · [English](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-en.pdf) ·
-[Deutsch](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-de.pdf) · [Nederlands](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-nl.pdf) · [Español](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-es.pdf).
+[Deutsch](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-de.pdf) · [Nederlands](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-nl.pdf) · [Español](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-es.pdf) · [Italiano](https://github.com/ben240374/SoundRebornRemote/releases/latest/download/SoundRebornRemote-manual-it.pdf).
 
 ## Ce que l'application pilote
 
@@ -434,6 +438,7 @@ jointes à la dernière release : [Français](https://github.com/ben240374/Sound
 | Seconde rangée de touches (pressées deux fois, emplacements 7 à 12) | onglets Lecture et Présélections | `POST :8888/api/play/<slot>` — agent seul, affichée quand `/api/agent/version` annonce `presetRows` |
 | Garder ce qui joue sur une touche | onglet Lecture | `POST :8888/api/box/save-playing` |
 | « J'aime » / « Je n'aime pas » sur le titre Spotify en cours | onglet Lecture | `POST :8888/api/spotify/liked` — affiché seulement quand `/api/agent/version` annonce `spotifyLiked` et que Spotify joue |
+| Morceau, artiste et pochette pendant une touche Spotify | onglet Lecture | `GET :8888/api/stream/title` — `track`, `artist`, `art` (agent 1.8.2), relu toutes les 5 s tant que la touche joue |
 | Question avant de grouper une enceinte qui joue autre chose | onglet Lecture | son `GET :8090/now_playing`, comparé par source et adresse du flux |
 | Minuterie de sommeil | onglet Lecture | `GET/POST/DELETE :8888/api/box/sleep` |
 | Réveils de l'enceinte sélectionnée (heure, jours, touche, volume, arrêt, répétition) | onglet Réglages | `GET/PUT :8888/api/alarms` avec `rev` ; sur un `409`, la modification de l'utilisateur est refaite sur le document actuel |
@@ -447,11 +452,12 @@ jointes à la dernière release : [Français](https://github.com/ben240374/Sound
 | Volume par enceinte du groupe | onglets Lecture et Groupes | `GET/POST :8888/api/box/zone/volume` |
 | Découverte des enceintes | onglet Réglages | mDNS (`_streborn._tcp`, `_soundtouch._tcp`), repli sur le balayage du `/24` sur `GET :8090/info` |
 | Bascule d'une enceinte à l'autre | onglet Lecture | cartes en haut de l'écran, avec modèle et version de l'agent |
-| Version de l'agent STR | onglets Lecture et Réglages | `GET :8888/api/agent/version` — sous 1.6.0, l'agent est signalé « trop ancien » et les modifications de groupe sont refusées |
+| Version de l'agent STR | onglets Lecture et Réglages | `GET :8888/api/agent/version` — sous 1.8.0, l'agent est signalé « trop ancien » et les modifications de groupe sont refusées |
 | Recherche de stations | onglet Présélections | radio-browser.info, interrogé directement par l'application |
 | Affectation à une touche (1 à 12) | onglet Présélections | `PUT :8888/api/presets/{slot}` |
+| Renommer ou effacer une touche | onglet Présélections | `PATCH :8888/api/presets/{slot}` avec `{"name"}`, `DELETE :8888/api/presets/{slot}` |
 | Copie de toutes les touches vers une autre enceinte, ou vers toutes | onglet Présélections | `POST :8888/api/box/preset-copy` (agent 1.6.5 ou plus récent) |
-| Langue de l'interface | onglet Réglages | FR, EN, DE, NL, ES — changement immédiat, sans redémarrage |
+| Langue de l'interface | onglet Réglages | FR, EN, DE, NL, ES, IT — changement immédiat, sans redémarrage |
 | Thème clair ou foncé | onglet Réglages | Système, Clair ou Foncé — bascule immédiate |
 | Navigation par balayage | partout | geste horizontal reconnu dans `MainActivity`, sans toucher au défilement |
 | Enceintes sans agent STR | onglet Réglages | signalées, avec renvoi vers l'outil d'installation officiel |

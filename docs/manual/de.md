@@ -1,8 +1,8 @@
 # SoundReborn Remote — Handbuch
 
-Version 1.8.1 · Android 7 und neuer
+Version 1.8.2 · Android 7 und neuer
 
-> Sprachen: [Français](fr.md) · [English](en.md) · **Deutsch** · [Nederlands](nl.md) · [Español](es.md)
+> Sprachen: [Français](fr.md) · [English](en.md) · **Deutsch** · [Nederlands](nl.md) · [Español](es.md) · [Italiano](it.md)
 
 ---
 
@@ -41,7 +41,7 @@ Vier Voraussetzungen:
   Installiert wird er mit dem STR-Werkzeug für PC oder Mac — <https://st-reborn.de>.
   **Diese App installiert ihn nicht**; sie weist lediglich auf Lautsprecher hin, denen er
   fehlt.
-- **Ein STR-Agent 1.6.0 oder neuer, um Gruppen zu ändern.** Bei einem älteren Agenten
+- **Ein STR-Agent 1.8.0 oder neuer, um Gruppen zu ändern.** Bei einem älteren Agenten
   weist die App darauf hin und lässt die Gruppen unverändert; alles andere funktioniert.
 - **Android 7 oder neuer.**
 
@@ -65,7 +65,7 @@ Kontakte noch auf Standort noch auf Speicher zu.
 ## 3. Erster Start
 
 Die App startet in der Sprache des Telefons, sofern sie sie kennt — Französisch,
-Englisch, Deutsch, Niederländisch, Spanisch — sonst auf Englisch. Ändern lässt sich das
+Englisch, Deutsch, Niederländisch, Spanisch, Italienisch — sonst auf Englisch. Ändern lässt sich das
 jederzeit.
 
 Beim ersten Start ist kein Lautsprecher bekannt. Gehe zu **Einstellungen** und dann auf
@@ -115,6 +115,11 @@ Titel zwei Tasten: **Gefällt mir** fügt den laufenden Song zu den Lieblingsson
 im Spotify-Konto, mit dem der **Lautsprecher** angemeldet ist, nicht unbedingt in dem auf
 deinem Telefon. Ein Lautsprecher mit Display zeigt „LIKED“ oder „REMOVED“.
 
+Während einer Spotify-Taste (ein Preset, das eine Spotify-Playlist spielt) kennt der
+Lautsprecher nur den Namen der Playlist. Mit dem STR-Agenten 1.8.2 oder neuer zeigt die App
+stattdessen den Titel, den Interpreten und das Cover, mit „Spotify · Playlist“ als Quelle;
+der Titel wird etwa alle fünf Sekunden neu gelesen.
+
 ### Steuerung
 
 Vier Tasten: Stopp, zurück, Wiedergabe/Pause, vor. Je nach Quelle bleiben manche ohne
@@ -161,7 +166,9 @@ umrandete Kachel ist die laufende.
 Wenn der STR-Agent die zweite Reihe unterstützt, erscheinen über den Kacheln zwei
 Schaltflächen, **Einmal** und **Zweimal**: Die zweite zeigt die sechs Sender, die der
 Lautsprecher startet, wenn eine Taste zweimal gedrückt wird. Die Wahl gilt für beide
-Reiter.
+Reiter. Jede Kachel trägt oben den Namen ihrer Taste („Taste 1“ bis „Taste 6“, in beiden Reihen),
+und die Schaltfläche **Zweimal** zeigt eine kleine Zahl: wie viele Tasten der zweiten Reihe
+einen Sender tragen.
 
 **Laufendes auf eine Taste legen**, unter den Kacheln, speichert das, was der
 Lautsprecher gerade spielt — Sender, Album oder Titel aus der Bibliothek — auf der Taste
@@ -225,6 +232,17 @@ einem älteren erscheinen die Schaltflächen nicht.
 Eine Taste, die nur in der zweiten Reihe einen Sender hat, erscheint unter **Einmal**
 leer: Ein einfacher Druck am Lautsprecher startet dann den Sender der zweiten Reihe
 (STR-Agent 1.6.3 und neuer).
+
+### Eine Taste umbenennen und löschen
+
+Jede Kachel trägt oben den Namen ihrer Taste. Bei einer Taste, die der STR-Agent gespeichert
+hat, stehen daneben zwei kleine Schaltflächen: **✎** benennt die Taste um, **✕** löscht sie
+nach Rückfrage. Umbenennen ändert nur den angezeigten Namen: Sender, Bild und die Playlist
+einer Spotify-Taste bleiben. Ein Name hat höchstens 64 Zeichen. Die Schaltfläche **Zweimal**
+zeigt, wie viele Tasten der zweiten Reihe einen Sender tragen.
+
+Eine Taste, die nur die Firmware des Lautsprechers kennt, und eine leere Taste haben diese
+Schaltflächen nicht: Der Agent hätte nichts umzubenennen oder zu löschen.
 
 ### Tasten auf einen anderen Lautsprecher kopieren
 
@@ -303,6 +321,9 @@ Telefon ab, ⤴ öffnet das Teilen-Menü von Android, der Papierkorb löscht nac
 10 Aufnahmen verweigert die App eine neue: Lösche zuerst die, die du nicht mehr brauchst.
 Die Aufnahmen bleiben in der App und verschwinden, wenn du sie deinstallierst. Die Liste bleibt verfügbar, auch wenn kein Lautsprecher antwortet: Nur das Aufnehmen ist dann nicht möglich.
 
+Während eine Aufnahme läuft, erscheinen darunter ein Schieberegler und ein Zähler:
+„01:23 / 04:50“, Position und Dauer. Zieh den Regler, um dich in der Aufnahme zu bewegen.
+
 **Zuletzt gehört** zeigt den vom Agenten geführten Verlauf: Tippe auf eine Zeile, um
 erneut zu starten.
 
@@ -372,7 +393,7 @@ gespeichert. Anderswo geänderte Wecker — STR-Telefonseite, Desktop-App — we
 er spielt. Häkchen setzen, Lautstärke wählen, dann **Startlautstärke speichern**. Eine
 während des Hörens eingestellte Lautstärke wird nie geändert.
 
-**Sprache**: Deutsch, Französisch, Englisch, Niederländisch, Spanisch. Die Umstellung
+**Sprache**: Deutsch, Französisch, Englisch, Niederländisch, Spanisch, Italienisch. Die Umstellung
 gilt sofort, ohne Neustart, und wird gemerkt.
 
 **Thema**: System, Hell oder Dunkel. „System" folgt der Anzeigeeinstellung des Telefons,
@@ -388,7 +409,7 @@ vergisst ihn. Ein Lautsprecher mit dem Hinweis **„Kein STR — bereit zur Inst
 antwortet einwandfrei, hat aber keinen Agenten; weiter unten erscheint dann ein
 erklärender Block mit einem Link zur Seite des STR-Projekts.
 
-Ein Lautsprecher, dessen Agent älter als Version 1.6.0 ist, zeigt einen ähnlichen Block,
+Ein Lautsprecher, dessen Agent älter als Version 1.8.0 ist, zeigt einen ähnlichen Block,
 **STR-Agent zu alt**, und seine Karte im Tab Wiedergabe trägt den Hinweis „zu alt".
 
 **Diagnose**: *Lautsprecher abfragen* betrifft den **ausgewählten** Lautsprecher — Name,
@@ -472,6 +493,8 @@ erneut über einen Speicherplatz oder das Verzeichnis und öffne dann den Reiter
 - **Tasten kopieren: STR-Agent 1.6.5 oder neuer** auf dem Quell-Lautsprecher.
 - **„Gefällt mir“ und „Gefällt mir nicht“: STR-Agent 1.8.1 oder neuer.** Der Titel landet
   im Spotify-Konto, mit dem der Lautsprecher angemeldet ist.
+- **Tasten umbenennen und löschen: STR-Agent 1.8.0 oder neuer; der Titel einer
+  Spotify-Taste: 1.8.2 oder neuer.**
 
 ---
 

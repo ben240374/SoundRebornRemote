@@ -1,8 +1,8 @@
 # SoundReborn Remote — Handleiding
 
-Versie 1.8.1 · Android 7 en hoger
+Versie 1.8.2 · Android 7 en hoger
 
-> Talen: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · **Nederlands** · [Español](es.md)
+> Talen: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · **Nederlands** · [Español](es.md) · [Italiano](it.md)
 
 ---
 
@@ -39,7 +39,7 @@ Vier voorwaarden:
   toewijzen en betrouwbaar groeperen lopen allemaal via de agent.
   Installeren gebeurt met het STR-programma voor pc of Mac — <https://st-reborn.de>.
   **Deze app installeert hem niet**; ze wijst alleen de speakers aan die hem missen.
-- **Een STR-agent 1.6.0 of nieuwer om groepen te wijzigen.** Met een oudere agent meldt
+- **Een STR-agent 1.8.0 of nieuwer om groepen te wijzigen.** Met een oudere agent meldt
   de app dat en laat ze de groepen ongemoeid; de rest werkt.
 - **Android 7 of hoger.**
 
@@ -63,7 +63,7 @@ locatie noch opslag aan.
 ## 3. Eerste start
 
 De app start in de taal van de telefoon als ze die kent — Frans, Engels, Duits,
-Nederlands, Spaans — en anders in het Engels. Je kunt dit altijd wijzigen.
+Nederlands, Spaans, Italiaans — en anders in het Engels. Je kunt dit altijd wijzigen.
 
 Bij de eerste start is er nog geen speaker bekend. Ga naar **Instellingen** en dan
 **Lokaal netwerk scannen**.
@@ -112,6 +112,11 @@ titel twee knoppen: **Vind ik leuk** voegt het huidige nummer toe aan Gelikete n
 nummer gaat naar het Spotify-account waarmee de **speaker** is aangemeld, niet per se dat
 op je telefoon. Een speaker met scherm toont “LIKED” of “REMOVED”.
 
+Tijdens een Spotify-toets (een preset die een Spotify-afspeellijst speelt) kent de speaker
+alleen de naam van de afspeellijst. Met STR-agent 1.8.2 of nieuwer toont de app in plaats
+daarvan het nummer, de artiest en de hoes, met “Spotify · afspeellijst” als bron; het nummer
+wordt ongeveer elke vijf seconden opnieuw gelezen.
+
 ### Bediening
 
 Vier toetsen: stoppen, vorige, afspelen/pauzeren, volgende. Afhankelijk van de bron doen
@@ -157,7 +162,9 @@ is degene die speelt.
 
 Als de STR-agent de tweede rij ondersteunt, verschijnen boven de tegels twee knoppen,
 **Eén keer** en **Twee keer**: de tweede toont de zes zenders die de speaker start
-wanneer een toets twee keer wordt ingedrukt. De keuze geldt voor beide tabbladen.
+wanneer een toets twee keer wordt ingedrukt. De keuze geldt voor beide tabbladen. Elke tegel toont bovenaan de naam van zijn toets (“Toets 1” tot “Toets 6”, in beide rijen),
+en de knop **Twee keer** draagt een klein getal: hoeveel toetsen van de tweede rij een zender
+hebben.
 
 **Wat nu speelt op een toets zetten**, onder de tegels, bewaart wat de speaker op dit
 moment speelt — zender, album of nummer uit de bibliotheek — op de toets van je keuze.
@@ -217,6 +224,17 @@ oudere, verschijnen de knoppen niet.
 
 Een toets die alleen in de tweede rij een zender heeft, verschijnt leeg onder **Eén keer**:
 één druk op de speaker start dan de zender van de tweede rij (STR-agent 1.6.3 en nieuwer).
+
+### Een toets hernoemen en wissen
+
+Elke tegel toont bovenaan de naam van zijn toets. Bij een toets die de STR-agent heeft
+opgeslagen staan er twee kleine knoppen naast: **✎** hernoemt de toets en **✕** wist hem, na
+bevestiging. Hernoemen verandert alleen de getoonde naam: de zender, zijn afbeelding en de
+afspeellijst van een Spotify-toets blijven. Een naam telt hoogstens 64 tekens. De knop **Twee
+keer** toont hoeveel toetsen van de tweede rij een zender hebben.
+
+Een toets die alleen de firmware van de speaker kent, en een lege toets, hebben die knoppen
+niet: de agent zou niets te hernoemen of te wissen hebben.
 
 ### De toetsen naar een andere speaker kopiëren
 
@@ -292,6 +310,9 @@ telefoon, ⤴ opent het deelmenu van Android, de prullenbak verwijdert na bevest
 10 weigert de app een nieuwe opname: verwijder eerst die je niet meer nodig hebt. De opnames
 blijven in de app en verdwijnen als je de app verwijdert. De lijst blijft beschikbaar, ook als geen enkele speaker antwoordt: alleen opnemen is dan niet mogelijk.
 
+Terwijl een opname speelt, verschijnen eronder een schuifbalk en een teller: “01:23 / 04:50”,
+positie en duur. Versleep de balk om door de opname te gaan.
+
 **Onlangs afgespeeld** toont de geschiedenis die de agent bijhoudt: tik op een regel om
 opnieuw te starten.
 
@@ -362,7 +383,7 @@ Vereist de STR-agent. Het uur stel je in op de klok van de telefoon. Het prullen
 spelen. Vink het vakje aan, kies het niveau en tik op **Startvolume opslaan**. Een volume
 dat tijdens het luisteren is ingesteld, wordt nooit gewijzigd.
 
-**Taal**: Nederlands, Frans, Engels, Duits, Spaans. De wijziging geldt meteen, zonder
+**Taal**: Nederlands, Frans, Engels, Duits, Spaans, Italiaans. De wijziging geldt meteen, zonder
 herstart, en wordt onthouden.
 
 **Thema**: Systeem, Licht of Donker. "Systeem" volgt de weergave-instelling van de
@@ -377,7 +398,7 @@ hem. Een speaker met de melding **"Geen STR — klaar voor installatie"** antwoo
 maar heeft geen agent; verderop verschijnt dan een uitlegblok met een link naar de site
 van het STR-project.
 
-Een speaker waarvan de agent ouder is dan versie 1.6.0 toont een vergelijkbaar blok,
+Een speaker waarvan de agent ouder is dan versie 1.8.0 toont een vergelijkbaar blok,
 **STR-agent te oud**, en zijn kaart in het tabblad Afspelen vermeldt "te oud".
 
 **Diagnose**: *Speaker bevragen* gaat over de **gekozen** speaker — naam, model,
@@ -460,6 +481,8 @@ de gids en open daarna het tabblad Bronnen opnieuw.
 - **Toetsen kopiëren: STR-agent 1.6.5 of nieuwer** op de bronspeaker.
 - **Vind ik leuk en Vind ik niet leuk: STR-agent 1.8.1 of nieuwer.** Het nummer gaat naar
   het Spotify-account waarmee de speaker is aangemeld.
+- **Toetsen hernoemen en wissen: STR-agent 1.8.0 of nieuwer; het nummer van een
+  Spotify-toets: 1.8.2 of nieuwer.**
 
 ---
 

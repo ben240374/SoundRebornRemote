@@ -226,6 +226,28 @@ public sealed partial class PlayerViewModel : BaseViewModel
     private SpeakerDevice? _subscribedTo;
     private NowPlaying _lastNowPlaying = NowPlaying.Standby;
 
+    /// <summary>
+    /// Le morceau Spotify en cours pendant une touche Spotify, tel que l'agent le
+    /// donne (GET /api/stream/title, agent 1.8.2) ; null le reste du temps.
+    /// </summary>
+    private StrStreamTitle? _liveSong;
+
+    /// <summary>Le flux pour lequel <see cref="_liveSong"/> a été lu, et quand.</summary>
+    private string _liveSongFor = "";
+
+    private DateTime _liveSongAt = DateTime.MinValue;
+
+    /// <summary>Une lecture récente sert telle quelle : les notifications arrivent par rafales.</summary>
+    private static readonly TimeSpan LiveSongReuse = TimeSpan.FromSeconds(3);
+
+    /// <summary>
+    /// Le morceau change sans que l'enceinte ne l'annonce (c'est le même flux) :
+    /// on le relit à chaque passage du sondage (5 s) tant qu'une touche Spotify
+    /// joue. L'agent connaît le changement tout de suite ; c'est ce rythme qui
+    /// fait le retard affiché, une lecture locale ne coûte presque rien.
+    /// </summary>
+    private static readonly TimeSpan LiveSongInterval = TimeSpan.FromSeconds(4);
+
     /// <summary>Identité de ce qui est affiché comme pochette, pour savoir quand la remplacer.</summary>
     private string _artKey = "";
 
@@ -262,7 +284,8 @@ public sealed partial class PlayerViewModel : BaseViewModel
         // page la montre aussi, elle relaie donc ses changements à son sélecteur.
         _presetsViewModel.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName is nameof(HasSecondRow) or nameof(IsSecondRow) or nameof(IsFirstRow))
+            if (e.PropertyName is nameof(HasSecondRow) or nameof(IsSecondRow) or nameof(IsFirstRow)
+                or nameof(SecondRowCount) or nameof(ShowSecondRowCount))
             {
                 OnPropertyChanged(e.PropertyName);
             }
@@ -289,6 +312,11 @@ public sealed partial class PlayerViewModel : BaseViewModel
     public bool IsSecondRow => _presetsViewModel.IsSecondRow;
 
     public bool IsFirstRow => _presetsViewModel.IsFirstRow;
+
+    /// <summary>La pastille de « Deux fois » : touches garnies de la seconde rangée.</summary>
+    public int SecondRowCount => _presetsViewModel.SecondRowCount;
+
+    public bool ShowSecondRowCount => _presetsViewModel.ShowSecondRowCount;
 
     /// <summary>Sélecteur « Une fois / Deux fois » de cette page. Le paramètre vaut "1" ou "2".</summary>
     [RelayCommand]
@@ -2221,6 +2249,13 @@ public sealed partial class PlayerViewModel : BaseViewModel
             // La zone fait exception : elle change sans que personne ne l'annonce,
             // et elle peut même se former sans nous. On la relit donc dans les deux
             // cas, simplement plus souvent quand un groupe est déjà connu.
+            // Touche Spotify : le morceau change sans notification, on le relit.
+            if (IsSpotifyKey(_lastNowPlaying) && DateTime.UtcNow - _liveSongAt >= LiveSongInterval)
+            {
+                _liveSongAt = DateTime.UtcNow;
+                _ = RefreshLiveSongAsync();
+            }
+
             var due = IsGroupActive || HasGroupVolume ? ZonePollInterval : IdleZonePollInterval;
 
             if (DateTime.UtcNow - _zonePolledAt >= due)
@@ -2334,11 +2369,7 @@ public sealed partial class PlayerViewModel : BaseViewModel
         _lastNowPlaying = nowPlaying;
         Like.Update(Device, nowPlaying);
 
-        Title = nowPlaying.IsIdle && string.IsNullOrWhiteSpace(nowPlaying.Track)
-            ? Localization.Get(nowPlaying.IsStandby ? "L_Standby" : "L_NothingPlaying")
-            : nowPlaying.DisplayTitle;
-
-        Subtitle = nowPlaying.DisplaySubtitle;
+        ShowRegularTitle(nowPlaying);
         ArtGlyph = GlyphFor(nowPlaying.Source);
         IsPlaying = nowPlaying.IsPlaying;
         // Pendant le sursis, l'état demandé prime sur celui que l'enceinte annonce
@@ -2346,7 +2377,6 @@ public sealed partial class PlayerViewModel : BaseViewModel
         var pendingPower = DateTime.UtcNow - _powerRequestedAt < PowerGrace;
 
         IsStandby = pendingPower ? !_powerRequestedOn : nowPlaying.IsIdle;
-        SourceLabel = nowPlaying.IsIdle ? Localization.Get("L_Standby") : FriendlySource(nowPlaying.Source);
 
         // La touche correspondant à ce qui joue est mise en avant ; si rien ne
         // correspond — Spotify lancé depuis le téléphone, par exemple — plus aucune
@@ -2357,7 +2387,134 @@ public sealed partial class PlayerViewModel : BaseViewModel
             nowPlaying.Content?.Location,
             nowPlaying.IsIdle);
 
+        await ApplyLiveSongAsync(nowPlaying, force: false).ConfigureAwait(true);
         await LoadArtAsync(nowPlaying).ConfigureAwait(true);
+    }
+
+    /// <summary>Titre, sous-titre et source tels que l'enceinte les annonce.</summary>
+    private void ShowRegularTitle(NowPlaying nowPlaying)
+    {
+        Title = nowPlaying.IsIdle && string.IsNullOrWhiteSpace(nowPlaying.Track)
+            ? Localization.Get(nowPlaying.IsStandby ? "L_Standby" : "L_NothingPlaying")
+            : nowPlaying.DisplayTitle;
+
+        Subtitle = nowPlaying.DisplaySubtitle;
+        SourceLabel = nowPlaying.IsIdle ? Localization.Get("L_Standby") : FriendlySource(nowPlaying.Source);
+    }
+
+    /// <summary>
+    /// Touche Spotify : l'enceinte lit le flux Spotify relayé par l'agent
+    /// (« /spotify/ » dans l'adresse) et ne connaît que le nom de la playlist.
+    /// Spotify Connect, lui, annonce déjà le morceau : il n'est pas concerné.
+    /// </summary>
+    private static bool IsSpotifyKey(NowPlaying nowPlaying)
+        => !nowPlaying.IsIdle &&
+           !string.Equals(nowPlaying.Source, "SPOTIFY", StringComparison.OrdinalIgnoreCase) &&
+           nowPlaying.Content?.Location?.Contains("/spotify/", StringComparison.OrdinalIgnoreCase) == true;
+
+    /// <summary>
+    /// Relit le morceau Spotify en cours, sans attendre la réutilisation. Appelée
+    /// par le sondage périodique tant qu'une touche Spotify joue.
+    /// </summary>
+    public async Task RefreshLiveSongAsync()
+    {
+        var nowPlaying = _lastNowPlaying;
+
+        if (!IsSpotifyKey(nowPlaying))
+        {
+            return;
+        }
+
+        await ApplyLiveSongAsync(nowPlaying, force: true).ConfigureAwait(true);
+        await LoadArtAsync(nowPlaying).ConfigureAwait(true);
+    }
+
+    /// <summary>
+    /// Pendant une touche Spotify, met le morceau en titre, l'artiste en
+    /// sous-titre et « Spotify · playlist » en source (agent 1.8.2). Un agent qui
+    /// ne donne pas le morceau, ou qui ne répond pas, laisse le titre habituel,
+    /// sans message d'erreur : c'est un complément, pas une commande.
+    /// </summary>
+    private async Task ApplyLiveSongAsync(NowPlaying nowPlaying, bool force)
+    {
+        var device = Device;
+
+        if (!IsSpotifyKey(nowPlaying) || device is not { Str: { } str } || device.AgentTooOld)
+        {
+            _liveSong = null;
+            _liveSongFor = "";
+            return;
+        }
+
+        var location = nowPlaying.Content?.Location ?? "";
+
+        if (!string.Equals(location, _liveSongFor, StringComparison.Ordinal))
+        {
+            _liveSong = null;
+        }
+
+        // Le morceau déjà connu s'affiche tout de suite : pas de clignotement
+        // entre la playlist et le morceau à chaque notification.
+        ShowLiveSong(nowPlaying);
+
+        if (!force && _liveSong is not null && DateTime.UtcNow - _liveSongAt < LiveSongReuse)
+        {
+            return;
+        }
+
+        StrStreamTitle? song;
+
+        try
+        {
+            song = await str.GetStreamTitleAsync().ConfigureAwait(true);
+        }
+        catch (Exception)
+        {
+            song = null;
+        }
+
+        // Une réponse tardive ne vaut plus rien si la lecture ou l'enceinte a changé.
+        if (!ReferenceEquals(nowPlaying, _lastNowPlaying) || !ReferenceEquals(device, Device))
+        {
+            return;
+        }
+
+        var hadSong = _liveSong is not null;
+
+        _liveSongFor = location;
+        _liveSongAt = DateTime.UtcNow;
+        _liveSong = song is { HasSong: true } ? song : null;
+
+        if (_liveSong is null)
+        {
+            ShowRegularTitle(nowPlaying);
+
+            // Le morceau Spotify a disparu alors que l'enceinte annonçait encore la
+            // touche : elle est sans doute passée à autre chose (une radio) sans que
+            // sa notification soit arrivée. On relit son état plutôt que d'afficher
+            // le nom de la playlist en attendant.
+            if (hadSong)
+            {
+                _ = RefreshAsync();
+            }
+        }
+        else
+        {
+            ShowLiveSong(nowPlaying);
+        }
+    }
+
+    private void ShowLiveSong(NowPlaying nowPlaying)
+    {
+        if (_liveSong is not { HasSong: true } song)
+        {
+            return;
+        }
+
+        var playlist = nowPlaying.DisplayTitle;
+        Title = song.Track!;
+        Subtitle = song.Artist ?? "";
+        SourceLabel = string.IsNullOrWhiteSpace(playlist) ? "Spotify" : $"Spotify · {playlist}";
     }
 
     /// <summary>
@@ -2377,11 +2534,16 @@ public sealed partial class PlayerViewModel : BaseViewModel
     {
         var station = FirstNonEmpty(nowPlaying.StationName, nowPlaying.Content?.ItemName);
 
+        // Touche Spotify : la pochette du morceau en cours passe avant tout le reste,
+        // et elle fait partie de l'identité — elle change à chaque morceau.
+        var songArt = IsSpotifyKey(nowPlaying) ? _liveSong?.Art : null;
+
         var key = string.Join(
             '|',
             nowPlaying.Source,
             nowPlaying.Content?.Location ?? "",
-            station ?? "");
+            station ?? "",
+            songArt ?? "");
 
         if (string.Equals(key, _artKey, StringComparison.Ordinal) && HasArt)
         {
@@ -2395,6 +2557,11 @@ public sealed partial class PlayerViewModel : BaseViewModel
         HasArt = false;
 
         var candidates = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(songArt))
+        {
+            candidates.Add(songArt);
+        }
 
         foreach (var candidate in ArtworkCache.SplitCandidates(nowPlaying.ArtUrl))
         {
