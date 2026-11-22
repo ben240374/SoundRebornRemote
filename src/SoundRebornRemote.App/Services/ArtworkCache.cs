@@ -53,6 +53,12 @@ public sealed class ArtworkCache
 
     private readonly SemaphoreSlim _gate = new(4);
 
+    /// <summary>
+    /// Fichiers déjà passés au décodeur d'images pendant cette session : vrai quand
+    /// il sait les lire. Voir <see cref="CanDecode(string)"/>.
+    /// </summary>
+    private readonly Dictionary<string, bool> _decodable = new(StringComparer.Ordinal);
+
     public ArtworkCache()
     {
         _directory = Path.Combine(FileSystem.CacheDirectory, "artwork");
@@ -151,7 +157,7 @@ public sealed class ArtworkCache
 
             var bytes = await DownloadAsync(url, CancellationToken.None).ConfigureAwait(false);
 
-            if (bytes is null)
+            if (bytes is null || !CanDecode(bytes))
             {
                 Remember(url, null);
                 return null;
@@ -247,12 +253,87 @@ public sealed class ArtworkCache
     {
         var path = await GetLocalPathAsync(url, ct).ConfigureAwait(false);
 
-        if (path is null)
+        // Un fichier que le décodeur ne sait pas lire — un logo SVG, notamment, ou
+        // une image déjà en cache avant ce contrôle — compte comme une image
+        // absente : la chaîne passe au candidat suivant, ou la tuile à son symbole.
+        if (path is null || !IsDecodable(path))
         {
             return null;
         }
 
         return ImageSource.FromStream(() => (Stream)File.OpenRead(path));
+    }
+
+    /// <summary>
+    /// <see cref="CanDecode(string)"/>, mémorisé pour la session : un fichier du
+    /// cache ne change pas tant qu'il garde son nom.
+    /// </summary>
+    private bool IsDecodable(string path)
+    {
+        lock (_decodable)
+        {
+            if (_decodable.TryGetValue(path, out var known))
+            {
+                return known;
+            }
+        }
+
+        var result = CanDecode(path);
+
+        lock (_decodable)
+        {
+            _decodable[path] = result;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Vrai quand le décodeur d'images d'Android sait lire ce fichier.
+    ///
+    /// Pourquoi ce contrôle : un logo que le contrôle Image ne sait pas décoder ne
+    /// s'affiche pas, et sur Android il ne retire pas pour autant l'image d'avant.
+    /// La tuile d'une touche de la seconde rangée gardait ainsi le logo de la
+    /// touche de la première rangée qu'elle montrait juste avant. Le cas typique
+    /// est un logo SVG, que le décodeur d'Android ne lit pas.
+    ///
+    /// Seules les dimensions sont lues, sans charger l'image. Ne lève jamais.
+    /// </summary>
+    private static bool CanDecode(string path)
+    {
+#if ANDROID
+        try
+        {
+            var options = new Android.Graphics.BitmapFactory.Options { InJustDecodeBounds = true };
+            Android.Graphics.BitmapFactory.DecodeFile(path, options);
+            return options.OutWidth > 0 && options.OutHeight > 0;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+#else
+        return true;
+#endif
+    }
+
+    /// <summary><see cref="CanDecode(string)"/> pour une image encore en mémoire.</summary>
+    private static bool CanDecode(byte[] bytes)
+    {
+#if ANDROID
+        try
+        {
+            var options = new Android.Graphics.BitmapFactory.Options { InJustDecodeBounds = true };
+            Android.Graphics.BitmapFactory.DecodeByteArray(bytes, 0, bytes.Length, options);
+            return options.OutWidth > 0 && options.OutHeight > 0;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+#else
+        return bytes.Length > 0;
+#endif
     }
 
     /// <summary>Vide le cache disque. Utile depuis les réglages si un logo a changé.</summary>
@@ -262,6 +343,11 @@ public sealed class ArtworkCache
         {
             _resolved.Clear();
             _failedAt.Clear();
+        }
+
+        lock (_decodable)
+        {
+            _decodable.Clear();
         }
 
         try
@@ -337,6 +423,8 @@ public sealed class ArtworkCache
     /// <summary>
     /// Contrôle du nombre magique : PNG, JPEG, GIF, BMP, WebP ou SVG.
     /// Un serveur qui annonce « image/png » et renvoie du HTML est monnaie courante.
+    /// Le SVG passe ce premier tri ; c'est <see cref="CanDecode(byte[])"/> qui l'écarte
+    /// ensuite sur Android, où il ne s'affiche pas.
     /// </summary>
     private static bool LooksLikeImage(byte[] bytes)
     {

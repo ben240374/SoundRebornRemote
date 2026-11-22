@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:SoundRebornRemote.App.ViewModels"
+             xmlns:views="clr-namespace:SoundRebornRemote.App.Views"
              x:Class="SoundRebornRemote.App.Views.PresetsPage"
              x:DataType="vm:PresetsViewModel"
              Title="{DynamicResource L_TabPresets}">
@@ -26,48 +27,79 @@
                     </Grid>
 
                     <!--
-                        Seconde rangée : la même touche pressée deux fois. Le sélecteur
-                        n'apparaît que si l'agent de l'enceinte gère ces six touches-là.
+                        « Une fois » : les six touches. « Deux fois » : la même touche
+                        pressée deux fois, seulement si l'agent de l'enceinte gère ces
+                        six touches-là. « Local », à droite : les présélections gardées
+                        dans le téléphone, en nombre libre.
                     -->
-                    <HorizontalStackLayout Spacing="8" IsVisible="{Binding HasSecondRow}">
-                        <Border Style="{StaticResource Chip}" Padding="14,6">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                        <HorizontalStackLayout Grid.Column="0" Spacing="8">
+                            <Border Style="{StaticResource Chip}" Padding="14,6">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ShowRowCommand}" CommandParameter="1" />
+                                </Border.GestureRecognizers>
+
+                                <!-- Pastille : nombre de touches garnies dans la première rangée. -->
+                                <HorizontalStackLayout Spacing="6">
+                                    <Label Text="{DynamicResource L_RowOnce}" FontSize="13" VerticalOptions="Center" />
+                                    <Border Style="{StaticResource CountBadge}" IsVisible="{Binding ShowFirstRowCount}">
+                                        <Label Text="{Binding FirstRowCount}" Style="{StaticResource CountBadgeLabel}" />
+                                    </Border>
+                                </HorizontalStackLayout>
+
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding OnceSelected}" Value="True">
+                                        <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                        <Setter Property="StrokeThickness" Value="2" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                            </Border>
+
+                            <Border Style="{StaticResource Chip}" Padding="14,6" IsVisible="{Binding HasSecondRow}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ShowRowCommand}" CommandParameter="2" />
+                                </Border.GestureRecognizers>
+
+                                <!-- Pastille : nombre de touches garnies dans cette rangée. -->
+                                <HorizontalStackLayout Spacing="6">
+                                    <Label Text="{DynamicResource L_RowTwice}" FontSize="13" VerticalOptions="Center" />
+                                    <Border Style="{StaticResource CountBadge}" IsVisible="{Binding ShowSecondRowCount}">
+                                        <Label Text="{Binding SecondRowCount}" Style="{StaticResource CountBadgeLabel}" />
+                                    </Border>
+                                </HorizontalStackLayout>
+
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding TwiceSelected}" Value="True">
+                                        <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                        <Setter Property="StrokeThickness" Value="2" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                            </Border>
+                        </HorizontalStackLayout>
+
+                        <Border Grid.Column="2" Style="{StaticResource Chip}" Padding="14,6">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ShowRowCommand}" CommandParameter="1" />
+                                <TapGestureRecognizer Command="{Binding ShowLocalCommand}" />
                             </Border.GestureRecognizers>
 
-                            <Label Text="{DynamicResource L_RowOnce}" FontSize="13" />
-
-                            <Border.Triggers>
-                                <DataTrigger TargetType="Border" Binding="{Binding IsFirstRow}" Value="True">
-                                    <Setter Property="Stroke" Value="{StaticResource Accent}" />
-                                    <Setter Property="StrokeThickness" Value="2" />
-                                </DataTrigger>
-                            </Border.Triggers>
-                        </Border>
-
-                        <Border Style="{StaticResource Chip}" Padding="14,6">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ShowRowCommand}" CommandParameter="2" />
-                            </Border.GestureRecognizers>
-
-                            <!-- Pastille : nombre de touches garnies dans cette rangée. -->
+                            <!-- Pastille : nombre de présélections locales. -->
                             <HorizontalStackLayout Spacing="6">
-                                <Label Text="{DynamicResource L_RowTwice}" FontSize="13" VerticalOptions="Center" />
-                                <Border Style="{StaticResource CountBadge}" IsVisible="{Binding ShowSecondRowCount}">
-                                    <Label Text="{Binding SecondRowCount}" Style="{StaticResource CountBadgeLabel}" />
+                                <Label Text="{DynamicResource L_RowLocal}" FontSize="13" VerticalOptions="Center" />
+                                <Border Style="{StaticResource CountBadge}" IsVisible="{Binding Local.ShowCount}">
+                                    <Label Text="{Binding Local.Count}" Style="{StaticResource CountBadgeLabel}" />
                                 </Border>
                             </HorizontalStackLayout>
 
                             <Border.Triggers>
-                                <DataTrigger TargetType="Border" Binding="{Binding IsSecondRow}" Value="True">
+                                <DataTrigger TargetType="Border" Binding="{Binding Local.IsShown}" Value="True">
                                     <Setter Property="Stroke" Value="{StaticResource Accent}" />
                                     <Setter Property="StrokeThickness" Value="2" />
                                 </DataTrigger>
                             </Border.Triggers>
                         </Border>
-                    </HorizontalStackLayout>
+                    </Grid>
 
-                    <CollectionView ItemsSource="{Binding Presets}" HeightRequest="308">
+                    <CollectionView ItemsSource="{Binding Presets}" HeightRequest="308" IsVisible="{Binding ShowKeys}">
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout Orientation="Vertical" Span="3"
                                              HorizontalItemSpacing="8" VerticalItemSpacing="8" />
@@ -134,6 +166,12 @@
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
+
+                    <!-- La liste « Local », à la place de la grille. Visibilité sur la grille englobante (voir LocalPresetsView). -->
+                    <Grid IsVisible="{Binding Local.IsShown}">
+                        <views:LocalPresetsView BindingContext="{Binding Local}" />
+                    </Grid>
+
                 </VerticalStackLayout>
             </Border>
 
@@ -192,14 +230,53 @@
                                 Title="{DynamicResource L_LanguageFilter}" />
                     </Grid>
 
-                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="4">
-                        <CheckBox Grid.Column="0" IsChecked="{Binding BoseCompatibleOnly, Mode=TwoWay}"
-                                  VerticalOptions="Center" />
-                        <Label Grid.Column="1" Text="{DynamicResource L_BoseOnly}" Style="{StaticResource SubtitleLabel}"
-                               VerticalOptions="Center" />
-                        <Button Grid.Column="2" Text="{DynamicResource L_TopStations}"
-                                Style="{StaticResource QuietButton}" Command="{Binding TopCommand}" />
+                    <!-- Tri (relance la recherche) et débit minimal (filtre la liste reçue). -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Picker Grid.Column="0" ItemsSource="{Binding SortLabels}"
+                                SelectedIndex="{Binding SortIndex, Mode=TwoWay}"
+                                Title="{DynamicResource L_SortTitle}" />
+                        <Picker Grid.Column="1" ItemsSource="{Binding BitrateLabels}"
+                                SelectedIndex="{Binding BitrateIndex, Mode=TwoWay}"
+                                Title="{DynamicResource L_BitrateTitle}" />
                     </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="4">
+                        <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding OnlyWorking, Mode=TwoWay}"
+                                  VerticalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="1" Text="{DynamicResource L_OnlyWorking}" Style="{StaticResource SubtitleLabel}"
+                               VerticalOptions="Center" />
+                        <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding BoseCompatibleOnly, Mode=TwoWay}"
+                                  VerticalOptions="Center" />
+                        <Label Grid.Row="1" Grid.Column="1" Text="{DynamicResource L_BoseOnly}" Style="{StaticResource SubtitleLabel}"
+                               VerticalOptions="Center" />
+                    </Grid>
+
+                    <!-- Genres : « Tous », ceux du pays, la rangée fixe, puis « Plus de genres ». -->
+                    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                        <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Genres}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:GenreChip">
+                                    <Border Style="{StaticResource Chip}" Padding="12,6">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PresetsViewModel}}, Path=SelectGenreCommand}"
+                                                CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <Label Text="{Binding Label}" FontSize="13" VerticalOptions="Center" />
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                                <Setter Property="StrokeThickness" Value="2" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </HorizontalStackLayout>
+                    </ScrollView>
+
+                    <Button Text="{DynamicResource L_TopStations}" HorizontalOptions="End"
+                            Style="{StaticResource QuietButton}" Command="{Binding TopCommand}" />
 
                 </VerticalStackLayout>
             </Border>
@@ -208,6 +285,10 @@
             <Border Style="{StaticResource Card}" IsVisible="{Binding HasResults}">
                 <VerticalStackLayout Spacing="6">
                     <Label Text="{Binding ResultsHeader}" Style="{StaticResource SectionLabel}" />
+                    <Label Text="{Binding FilteredNote}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap"
+                           IsVisible="{Binding FilteredNote, Converter={StaticResource StringNotEmpty}}" />
+                    <Label Text="{DynamicResource L_RelaxedHint}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap"
+                           TextColor="{StaticResource Warning}" IsVisible="{Binding IsRelaxed}" />
 
                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding Results}" Spacing="0">
                         <BindableLayout.ItemTemplate>
@@ -236,6 +317,9 @@
                                                LineBreakMode="TailTruncation" MaxLines="1" />
                                         <Label Text="{Binding Summary}" Style="{StaticResource CaptionLabel}"
                                                LineBreakMode="TailTruncation" MaxLines="1" />
+                                        <Label Text="{DynamicResource L_StationUnchecked}" Style="{StaticResource CaptionLabel}"
+                                               TextColor="{StaticResource Warning}" IsVisible="{Binding IsUnreachable}"
+                                               LineBreakMode="TailTruncation" MaxLines="1" />
                                     </VerticalStackLayout>
 
                                     <Label Grid.Column="2" Text="›" FontSize="22" VerticalOptions="Center"
@@ -244,8 +328,19 @@
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
+
+                    <Button Text="{DynamicResource L_LoadMore}" Style="{StaticResource QuietButton}"
+                            Command="{Binding LoadMoreCommand}" IsVisible="{Binding CanLoadMore}" />
                 </VerticalStackLayout>
             </Border>
+
+            <!-- Une station absente de l'annuaire : chacun peut l'y ajouter, pour tout le monde. -->
+            <Label Text="{DynamicResource L_AddMissingStation}" Style="{StaticResource CaptionLabel}"
+                   LineBreakMode="WordWrap" TextColor="{StaticResource Accent}" IsVisible="{Binding HasSearched}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding AddMissingStationCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
 
             <Label Text="{DynamicResource L_PresetsHint}" Style="{StaticResource CaptionLabel}"
                    IsVisible="{Binding HasResults, Converter={StaticResource InvertedBool}}" />

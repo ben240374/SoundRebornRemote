@@ -1120,6 +1120,73 @@ public static class Localization
             "Buscar y guardar emisoras requiere el agente STR.",
             "Per trovare e salvare le stazioni serve l'agente STR.");
 
+        // ---------------------------------------------------------- Recherche : filtres de l'application PC de STR
+        Add("L_SortTitle", "Trier", "Sort", "Sortieren", "Sorteren", "Ordenar", "Ordina");
+        Add("L_SortVotes", "Popularité", "Popularity", "Beliebtheit", "Populariteit", "Popularidad", "Popolarità");
+        Add("L_SortClicks", "Les plus écoutées", "Most played", "Meistgehört", "Meest beluisterd", "Más escuchadas", "Più ascoltate");
+        Add("L_SortTrend", "Tendance", "Trending", "Im Trend", "Trending", "Tendencia", "Di tendenza");
+        Add("L_SortName", "Nom (A → Z)", "Name (A → Z)", "Name (A → Z)", "Naam (A → Z)", "Nombre (A → Z)", "Nome (A → Z)");
+        Add("L_SortBitrate", "Débit", "Bitrate", "Bitrate", "Bitrate", "Tasa de bits", "Bitrate");
+        Add("L_BitrateTitle", "Débit", "Bitrate", "Bitrate", "Bitrate", "Tasa de bits", "Bitrate");
+        Add("L_BitrateAll", "Débit : tous", "Bitrate: any", "Bitrate: alle", "Bitrate: alle", "Tasa: todas", "Bitrate: tutti");
+        Add("L_BitrateMin", "{0} kbit/s ou plus", "{0} kbit/s or more", "ab {0} kbit/s", "{0} kbit/s of meer", "{0} kbit/s o más", "{0} kbit/s o più");
+        Add("L_OnlyWorking", "En service uniquement", "Working stations only", "Nur erreichbare", "Alleen werkende zenders", "Solo emisoras activas", "Solo stazioni attive");
+        Add("L_AllGenres", "Tous", "All", "Alle", "Alle", "Todos", "Tutti");
+        Add("L_MoreGenres", "Plus de genres ({0})", "More genres ({0})", "Mehr Genres ({0})", "Meer genres ({0})", "Más géneros ({0})", "Altri generi ({0})");
+        Add("L_FewerGenres", "Moins de genres", "Fewer genres", "Weniger Genres", "Minder genres", "Menos géneros", "Meno generi");
+        Add("L_GenrePop", "Pop", "Pop", "Pop", "Pop", "Pop", "Pop");
+        Add("L_GenreRock", "Rock", "Rock", "Rock", "Rock", "Rock", "Rock");
+        Add("L_GenreHits", "Tubes", "Hits", "Hits", "Hits", "Éxitos", "Successi");
+        Add("L_GenreOldies", "Anciens succès", "Oldies", "Oldies", "Oldies", "Clásicos", "Oldies");
+        Add("L_GenreJazz", "Jazz", "Jazz", "Jazz", "Jazz", "Jazz", "Jazz");
+        Add("L_GenreClassical", "Classique", "Classical", "Klassik", "Klassiek", "Clásica", "Classica");
+        Add("L_GenreChill", "Chill", "Chill", "Chill", "Chill", "Chill", "Chill");
+        Add("L_GenreDance", "Dance", "Dance", "Dance", "Dance", "Dance", "Dance");
+        Add("L_GenreElectronic", "Électronique", "Electronic", "Elektronisch", "Elektronisch", "Electrónica", "Elettronica");
+        Add("L_GenreHouse", "House", "House", "House", "House", "House", "House");
+        Add("L_GenreHipHop", "Hip Hop", "Hip Hop", "Hip-Hop", "Hiphop", "Hip hop", "Hip hop");
+        Add("L_GenreLatin", "Latino", "Latin", "Latin", "Latin", "Latina", "Latina");
+        Add("L_Genre80s", "Années 80", "80s", "80er", "Jaren 80", "Años 80", "Anni '80");
+        Add("L_Genre90s", "Années 90", "90s", "90er", "Jaren 90", "Años 90", "Anni '90");
+        Add("L_GenreNews", "Actualités", "News", "Nachrichten", "Nieuws", "Noticias", "Notizie");
+        Add("L_ResultsFiltered",
+            "{0} masquée(s) par « Compatibles Bose » ou le débit.",
+            "{0} hidden by \"Bose-compatible\" or the bitrate.",
+            "{0} durch „Bose-kompatibel“ oder die Bitrate ausgeblendet.",
+            "{0} verborgen door „Bose-compatibel” of de bitrate.",
+            "{0} ocultas por «Compatibles con Bose» o la tasa de bits.",
+            "{0} nascoste da «Compatibili Bose» o dal bitrate.");
+        Add("S_AllFiltered",
+            "Les stations trouvées sont toutes masquées : décoche « Compatibles Bose » ou baisse le débit.",
+            "Every station found is hidden: clear \"Bose-compatible\" or lower the bitrate.",
+            "Alle gefundenen Sender sind ausgeblendet: „Bose-kompatibel“ abwählen oder die Bitrate senken.",
+            "Alle gevonden zenders zijn verborgen: zet „Bose-compatibel” uit of verlaag de bitrate.",
+            "Todas las emisoras encontradas están ocultas: quita «Compatibles con Bose» o baja la tasa de bits.",
+            "Tutte le stazioni trovate sono nascoste: togli «Compatibili Bose» o abbassa il bitrate.");
+        Add("L_RelaxedHint",
+            "L'annuaire signale ces stations hors service. Elles jouent parfois très bien : son contrôle se fait depuis l'étranger.",
+            "The directory reports these stations as down. They often play fine: its check runs from abroad.",
+            "Das Verzeichnis meldet diese Sender als nicht erreichbar. Oft spielen sie trotzdem: geprüft wird vom Ausland aus.",
+            "De gids meldt deze zenders als onbereikbaar. Vaak spelen ze toch: de controle gebeurt vanuit het buitenland.",
+            "El directorio marca estas emisoras como caídas. A menudo suenan bien: su control se hace desde el extranjero.",
+            "L'elenco segnala queste stazioni come non attive. Spesso funzionano: il controllo avviene dall'estero.");
+        Add("L_StationUnchecked",
+            "Hors service au dernier contrôle de l'annuaire",
+            "Down at the directory's last check",
+            "Bei der letzten Prüfung nicht erreichbar",
+            "Onbereikbaar bij de laatste controle",
+            "Caída en el último control",
+            "Non attiva all'ultimo controllo");
+        Add("L_LoadMore", "Voir plus", "Show more", "Mehr anzeigen", "Meer tonen", "Ver más", "Mostra altre");
+        Add("L_AddMissingStation",
+            "Une station manque ? Ajoute-la sur radio-browser.info : elle sera trouvable ici, et pour tout le monde.",
+            "A station is missing? Add it on radio-browser.info: it will turn up here, and for everyone.",
+            "Fehlt ein Sender? Trag ihn auf radio-browser.info ein: Dann findest du ihn hier, und alle anderen auch.",
+            "Mist er een zender? Voeg hem toe op radio-browser.info: dan vind je hem hier, en iedereen met jou.",
+            "¿Falta una emisora? Añádela en radio-browser.info: aparecerá aquí, y para todos.",
+            "Manca una stazione? Aggiungila su radio-browser.info: comparirà qui, e per tutti.");
+        Add("L_PastedAddress", "Adresse collée", "Pasted address", "Eingefügte Adresse", "Geplakt adres", "Dirección pegada", "Indirizzo incollato");
+
         // ---------------------------------------------------------- Pays
         // Traduits à la main : sur Android, RegionInfo.DisplayName renvoie le nom
         // NATIF du pays (« België », « Lëtzebuerg »), pas sa traduction.
@@ -1135,6 +1202,22 @@ public static class Localization
         Add("L_CtryPT", "Portugal", "Portugal", "Portugal", "Portugal", "Portugal", "Portogallo");
         Add("L_CtryUS", "États-Unis", "United States", "Vereinigte Staaten", "Verenigde Staten", "Estados Unidos", "Stati Uniti");
         Add("L_CtryCA", "Canada", "Canada", "Kanada", "Canada", "Canadá", "Canada");
+        Add("L_CtryAT", "Autriche", "Austria", "Österreich", "Oostenrijk", "Austria", "Austria");
+        Add("L_CtryIE", "Irlande", "Ireland", "Irland", "Ierland", "Irlanda", "Irlanda");
+        Add("L_CtryDK", "Danemark", "Denmark", "Dänemark", "Denemarken", "Dinamarca", "Danimarca");
+        Add("L_CtrySE", "Suède", "Sweden", "Schweden", "Zweden", "Suecia", "Svezia");
+        Add("L_CtryNO", "Norvège", "Norway", "Norwegen", "Noorwegen", "Noruega", "Norvegia");
+        Add("L_CtryFI", "Finlande", "Finland", "Finnland", "Finland", "Finlandia", "Finlandia");
+        Add("L_CtryPL", "Pologne", "Poland", "Polen", "Polen", "Polonia", "Polonia");
+        Add("L_CtryCZ", "Tchéquie", "Czechia", "Tschechien", "Tsjechië", "Chequia", "Cechia");
+        Add("L_CtryGR", "Grèce", "Greece", "Griechenland", "Griekenland", "Grecia", "Grecia");
+        Add("L_CtryTR", "Turquie", "Turkey", "Türkei", "Turkije", "Turquía", "Turchia");
+        Add("L_CtryMA", "Maroc", "Morocco", "Marokko", "Marokko", "Marruecos", "Marocco");
+        Add("L_CtryBR", "Brésil", "Brazil", "Brasilien", "Brazilië", "Brasil", "Brasile");
+        Add("L_CtryMX", "Mexique", "Mexico", "Mexiko", "Mexico", "México", "Messico");
+        Add("L_CtryAR", "Argentine", "Argentina", "Argentinien", "Argentinië", "Argentina", "Argentina");
+        Add("L_CtryAU", "Australie", "Australia", "Australien", "Australië", "Australia", "Australia");
+        Add("L_CtryJP", "Japon", "Japan", "Japan", "Japan", "Japón", "Giappone");
 
         // ---------------------------------------------------------- Affectation d'une station
         Add("L_ReplacePreset", "Remplacer {0}", "Replace {0}", "{0} ersetzen", "{0} vervangen", "Sustituir {0}", "Sostituisci {0}");
@@ -1676,6 +1759,9 @@ public static class Localization
             "Maandag tot vrijdag",
             "De lunes a viernes",
             "Dal lunedì al venerdì");
+        Add("L_AlarmDaysWork", "Lun → Ven", "Mon → Fri", "Mo → Fr", "Ma → Vr", "Lun → Vie", "Lun → Ven");
+        Add("L_AlarmDaysWeekend", "Week-end", "Weekend", "Wochenende", "Weekend", "Fin de semana", "Weekend");
+        Add("L_AlarmDaysAll", "Tous les jours", "Every day", "Täglich", "Elke dag", "Todos los días", "Tutti i giorni");
         Add("L_AlarmWeekend",
             "Le week-end",
             "Weekends",
@@ -1936,5 +2022,515 @@ public static class Localization
             "De groep gaat over {0} min naar stand-by",
             "El grupo pasará a reposo en {0} min",
             "Il gruppo andrà in standby tra {0} min");
+
+        // ---------------------------------------------------------- Présélections « Local » et message vocal (1.8.3)
+        Add("L_RowLocal",
+            "Local",
+            "Local",
+            "Lokal",
+            "Lokaal",
+            "Local",
+            "Locale");
+        Add("L_AddLocal",
+            "Ajouter à Local",
+            "Add to Local",
+            "Zu Lokal hinzufügen",
+            "Toevoegen aan Lokaal",
+            "Añadir a Local",
+            "Aggiungi a Locale");
+        Add("L_LocalEmpty",
+            "Aucune présélection locale. Ajoute la radio qui joue, une adresse, ou une station trouvée par la recherche (« Ajouter à Local »). Elles restent dans ce téléphone.",
+            "No local presets yet. Add the radio that is playing, an address, or a station found by the search (“Add to Local”). They stay on this phone.",
+            "Noch keine lokalen Presets. Füge den laufenden Sender, eine Adresse oder einen in der Suche gefundenen Sender hinzu („Zu Lokal hinzufügen“). Sie bleiben auf diesem Telefon.",
+            "Nog geen lokale presets. Voeg de zender toe die speelt, een adres, of een zender uit de zoekfunctie (“Toevoegen aan Lokaal”). Ze blijven op deze telefoon.",
+            "Aún no hay presintonías locales. Añade la radio que suena, una dirección o una emisora encontrada en la búsqueda («Añadir a Local»). Se quedan en este teléfono.",
+            "Nessuna preselezione locale. Aggiungi la radio in riproduzione, un indirizzo o una stazione trovata con la ricerca («Aggiungi a Locale»). Restano su questo telefono.");
+        Add("L_LocalAddPlaying",
+            "Ajouter ce qui joue",
+            "Add what is playing",
+            "Laufenden Sender hinzufügen",
+            "Wat speelt toevoegen",
+            "Añadir lo que suena",
+            "Aggiungi ciò che suona");
+        Add("L_LocalAddUrl",
+            "Ajouter une adresse",
+            "Add an address",
+            "Adresse hinzufügen",
+            "Adres toevoegen",
+            "Añadir una dirección",
+            "Aggiungi un indirizzo");
+        Add("L_LocalUrlTitle",
+            "Adresse du flux",
+            "Stream address",
+            "Stream-Adresse",
+            "Streamadres",
+            "Dirección del flujo",
+            "Indirizzo del flusso");
+        Add("L_LocalUrlMessage",
+            "Colle l'adresse http ou https de la radio.",
+            "Paste the radio's http or https address.",
+            "Füge die http- oder https-Adresse des Senders ein.",
+            "Plak het http- of https-adres van de zender.",
+            "Pega la dirección http o https de la radio.",
+            "Incolla l'indirizzo http o https della radio.");
+        Add("L_Next",
+            "Suivant",
+            "Next",
+            "Weiter",
+            "Volgende",
+            "Siguiente",
+            "Avanti");
+        Add("L_LocalNameTitle",
+            "Nom de la radio",
+            "Radio name",
+            "Name des Senders",
+            "Naam van de zender",
+            "Nombre de la radio",
+            "Nome della radio");
+        Add("L_LocalNameMessage",
+            "Le nom affiché dans la liste.",
+            "The name shown in the list.",
+            "Der Name in der Liste.",
+            "De naam in de lijst.",
+            "El nombre que se muestra en la lista.",
+            "Il nome mostrato nell'elenco.");
+        Add("L_LocalAddGo",
+            "Ajouter",
+            "Add",
+            "Hinzufügen",
+            "Toevoegen",
+            "Añadir",
+            "Aggiungi");
+        Add("L_LocalRenameTitle",
+            "Renommer la présélection",
+            "Rename the preset",
+            "Preset umbenennen",
+            "Preset hernoemen",
+            "Renombrar la presintonía",
+            "Rinomina la preselezione");
+        Add("L_LocalRemoveGo",
+            "Retirer",
+            "Remove",
+            "Entfernen",
+            "Verwijderen",
+            "Quitar",
+            "Rimuovi");
+        Add("L_LocalRemoveConfirm",
+            "Retirer {0} des présélections locales ?",
+            "Remove {0} from the local presets?",
+            "{0} aus den lokalen Presets entfernen?",
+            "{0} uit de lokale presets verwijderen?",
+            "¿Quitar {0} de las presintonías locales?",
+            "Rimuovere {0} dalle preselezioni locali?");
+        Add("S_LocalNothing",
+            "Rien à ajouter : seule une radio internet dont l'adresse est connue peut être gardée.",
+            "Nothing to add: only an internet radio whose address is known can be kept.",
+            "Nichts hinzuzufügen: Nur ein Internetradio mit bekannter Adresse kann gespeichert werden.",
+            "Niets toe te voegen: alleen een internetradio met een bekend adres kan worden bewaard.",
+            "Nada que añadir: solo se puede guardar una radio por internet cuya dirección se conoce.",
+            "Niente da aggiungere: si può salvare solo una radio internet di cui si conosce l'indirizzo.");
+        Add("S_LocalBadUrl",
+            "Adresse non valable : elle doit commencer par http:// ou https://.",
+            "Invalid address: it must start with http:// or https://.",
+            "Ungültige Adresse: Sie muss mit http:// oder https:// beginnen.",
+            "Ongeldig adres: het moet beginnen met http:// of https://.",
+            "Dirección no válida: debe empezar por http:// o https://.",
+            "Indirizzo non valido: deve iniziare con http:// o https://.");
+        Add("S_LocalAlready",
+            "{0} est déjà dans la liste locale.",
+            "{0} is already in the local list.",
+            "{0} ist bereits in der lokalen Liste.",
+            "{0} staat al in de lokale lijst.",
+            "{0} ya está en la lista local.",
+            "{0} è già nell'elenco locale.");
+        Add("S_LocalFull",
+            "La liste locale est pleine ({0} présélections).",
+            "The local list is full ({0} presets).",
+            "Die lokale Liste ist voll ({0} Presets).",
+            "De lokale lijst is vol ({0} presets).",
+            "La lista local está llena ({0} presintonías).",
+            "L'elenco locale è pieno ({0} preselezioni).");
+        Add("S_LocalAdded",
+            "{0} ajoutée aux présélections locales.",
+            "{0} added to the local presets.",
+            "{0} zu den lokalen Presets hinzugefügt.",
+            "{0} toegevoegd aan de lokale presets.",
+            "{0} añadida a las presintonías locales.",
+            "{0} aggiunta alle preselezioni locali.");
+        Add("S_LocalRenamed",
+            "Renommée : {0}.",
+            "Renamed: {0}.",
+            "Umbenannt: {0}.",
+            "Hernoemd: {0}.",
+            "Renombrada: {0}.",
+            "Rinominata: {0}.");
+        Add("S_LocalRemoved",
+            "{0} retirée.",
+            "{0} removed.",
+            "{0} entfernt.",
+            "{0} verwijderd.",
+            "{0} quitada.",
+            "{0} rimossa.");
+        Add("S_LocalNotSaved",
+            "La liste n'a pas pu être enregistrée sur le téléphone.",
+            "The list could not be saved on the phone.",
+            "Die Liste konnte nicht auf dem Telefon gespeichert werden.",
+            "De lijst kon niet op de telefoon worden opgeslagen.",
+            "No se pudo guardar la lista en el teléfono.",
+            "Impossibile salvare l'elenco sul telefono.");
+        Add("L_VoiceTitle",
+            "Message vocal",
+            "Voice message",
+            "Sprachnachricht",
+            "Spraakbericht",
+            "Mensaje de voz",
+            "Messaggio vocale");
+        Add("L_VoiceTextPlaceholder",
+            "Texte à lire sur l'enceinte",
+            "Text for the speaker to read",
+            "Text, den der Lautsprecher vorliest",
+            "Tekst die de luidspreker voorleest",
+            "Texto que leerá el altavoz",
+            "Testo da leggere sul diffusore");
+        Add("L_VoiceSpeak",
+            "Lire",
+            "Read",
+            "Vorlesen",
+            "Voorlezen",
+            "Leer",
+            "Leggi");
+        Add("L_VoiceHint",
+            "L'enceinte joue le message puis reprend ce qu'elle jouait. Le texte est lu par la voix de Google : il passe par Google, et l'enceinte doit avoir accès à internet. En groupe, le message passe par l'enceinte choisie.",
+            "The speaker plays the message, then goes back to what it was playing. The text is read by Google's voice: it goes through Google, and the speaker needs internet access. In a group, the message goes to the selected speaker.",
+            "Der Lautsprecher spielt die Nachricht und setzt dann fort, was er gespielt hat. Der Text wird von der Google-Stimme gelesen: Er läuft über Google, und der Lautsprecher braucht Internetzugang. In einer Gruppe geht die Nachricht an den gewählten Lautsprecher.",
+            "De luidspreker speelt het bericht en gaat daarna verder met wat hij speelde. De tekst wordt voorgelezen door de stem van Google: hij gaat via Google, en de luidspreker heeft internettoegang nodig. In een groep gaat het bericht naar de gekozen luidspreker.",
+            "El altavoz reproduce el mensaje y luego vuelve a lo que sonaba. El texto lo lee la voz de Google: pasa por Google, y el altavoz necesita acceso a internet. En un grupo, el mensaje va al altavoz elegido.",
+            "Il diffusore riproduce il messaggio, poi riprende ciò che suonava. Il testo è letto dalla voce di Google: passa da Google, e il diffusore deve avere accesso a internet. In un gruppo, il messaggio va al diffusore scelto.");
+        Add("S_VoiceNoMic",
+            "Le micro n'est pas autorisé. Autorise-le dans les réglages d'Android.",
+            "The microphone is not allowed. Allow it in the Android settings.",
+            "Das Mikrofon ist nicht erlaubt. Erlaube es in den Android-Einstellungen.",
+            "De microfoon is niet toegestaan. Sta hem toe in de Android-instellingen.",
+            "El micrófono no está permitido. Permítelo en los ajustes de Android.",
+            "Il microfono non è autorizzato. Autorizzalo nelle impostazioni di Android.");
+        Add("S_VoiceMicFailed",
+            "Le micro n'a pas pu démarrer.",
+            "The microphone could not start.",
+            "Das Mikrofon konnte nicht starten.",
+            "De microfoon kon niet starten.",
+            "No se pudo iniciar el micrófono.",
+            "Impossibile avviare il microfono.");
+        Add("S_VoiceCancelled",
+            "Message abandonné.",
+            "Message discarded.",
+            "Nachricht verworfen.",
+            "Bericht verworpen.",
+            "Mensaje descartado.",
+            "Messaggio annullato.");
+        Add("S_VoiceNothing",
+            "Rien n'a été enregistré.",
+            "Nothing was recorded.",
+            "Es wurde nichts aufgenommen.",
+            "Er is niets opgenomen.",
+            "No se ha grabado nada.",
+            "Non è stato registrato nulla.");
+        Add("S_VoiceTooBig",
+            "Message trop lourd pour l'enceinte (8 Mo au plus).",
+            "Message too large for the speaker (8 MB at most).",
+            "Nachricht zu groß für den Lautsprecher (höchstens 8 MB).",
+            "Bericht te groot voor de luidspreker (hoogstens 8 MB).",
+            "Mensaje demasiado grande para el altavoz (8 MB como máximo).",
+            "Messaggio troppo grande per il diffusore (8 MB al massimo).");
+        Add("S_VoiceSending",
+            "Envoi à l'enceinte…",
+            "Sending to the speaker…",
+            "Wird an den Lautsprecher gesendet…",
+            "Versturen naar de luidspreker…",
+            "Enviando al altavoz…",
+            "Invio al diffusore…");
+        Add("S_VoiceSent",
+            "Message envoyé à {0}.",
+            "Message sent to {0}.",
+            "Nachricht an {0} gesendet.",
+            "Bericht verstuurd naar {0}.",
+            "Mensaje enviado a {0}.",
+            "Messaggio inviato a {0}.");
+        Add("S_VoiceSpoken",
+            "Texte envoyé à {0}.",
+            "Text sent to {0}.",
+            "Text an {0} gesendet.",
+            "Tekst verstuurd naar {0}.",
+            "Texto enviado a {0}.",
+            "Testo inviato a {0}.");
+        Add("S_VoiceNoNetwork",
+            "Le téléphone n'a pas d'adresse sur le réseau de l'enceinte.",
+            "The phone has no address on the speaker's network.",
+            "Das Telefon hat keine Adresse im Netzwerk des Lautsprechers.",
+            "De telefoon heeft geen adres op het netwerk van de luidspreker.",
+            "El teléfono no tiene dirección en la red del altavoz.",
+            "Il telefono non ha un indirizzo sulla rete del diffusore.");
+        Add("S_VoiceNotFetched",
+            "L'enceinte n'est pas venue chercher le message. Le Wi-Fi isole peut-être les appareils (réseau invité).",
+            "The speaker did not fetch the message. The Wi-Fi may be isolating devices (guest network).",
+            "Der Lautsprecher hat die Nachricht nicht abgeholt. Das WLAN isoliert vielleicht die Geräte (Gastnetz).",
+            "De luidspreker heeft het bericht niet opgehaald. De wifi isoleert misschien de apparaten (gastnetwerk).",
+            "El altavoz no recogió el mensaje. Quizá la wifi aísla los dispositivos (red de invitados).",
+            "Il diffusore non ha prelevato il messaggio. Forse il Wi-Fi isola i dispositivi (rete ospiti).");
+        Add("S_VoiceNeedAgent",
+            "Le message vocal demande l'agent STR.",
+            "The voice message needs the STR agent.",
+            "Die Sprachnachricht erfordert den STR-Agenten.",
+            "Het spraakbericht vereist de STR-agent.",
+            "El mensaje de voz requiere el agente STR.",
+            "Il messaggio vocale richiede l'agente STR.");
+        Add("S_VoiceUnsupported",
+            "L'agent STR de cette enceinte ne connaît pas encore les annonces. Mets-le à jour.",
+            "This speaker's STR agent does not know announcements yet. Update it.",
+            "Der STR-Agent dieses Lautsprechers kennt noch keine Durchsagen. Aktualisiere ihn.",
+            "De STR-agent van deze luidspreker kent nog geen aankondigingen. Werk hem bij.",
+            "El agente STR de este altavoz aún no admite anuncios. Actualízalo.",
+            "L'agente STR di questo diffusore non conosce ancora gli annunci. Aggiornalo.");
+        Add("L_VoiceHoldHint",
+            "Maintiens pour parler, relâche pour envoyer",
+            "Hold to talk, release to send",
+            "Halten zum Sprechen, loslassen zum Senden",
+            "Ingedrukt houden om te spreken, loslaten om te versturen",
+            "Mantén pulsado para hablar, suelta para enviar",
+            "Tieni premuto per parlare, rilascia per inviare");
+        Add("L_VoiceReleaseHint",
+            "Relâche pour envoyer",
+            "Release to send",
+            "Loslassen zum Senden",
+            "Loslaten om te versturen",
+            "Suelta para enviar",
+            "Rilascia per inviare");
+        Add("S_VoiceRecording",
+            "Je t'écoute… relâche pour envoyer (1 minute au plus).",
+            "Listening… release to send (1 minute at most).",
+            "Ich höre zu… loslassen zum Senden (höchstens 1 Minute).",
+            "Ik luister… loslaten om te versturen (hoogstens 1 minuut).",
+            "Te escucho… suelta para enviar (1 minuto como máximo).",
+            "Ti ascolto… rilascia per inviare (1 minuto al massimo).");
+        Add("S_VoiceHold",
+            "Maintiens le bouton pendant que tu parles, puis relâche-le pour envoyer.",
+            "Hold the button while you speak, then release it to send.",
+            "Halte die Taste gedrückt, während du sprichst, und lass sie dann zum Senden los.",
+            "Houd de knop ingedrukt terwijl je spreekt en laat hem dan los om te versturen.",
+            "Mantén pulsado el botón mientras hablas y suéltalo para enviar.",
+            "Tieni premuto il pulsante mentre parli, poi rilascialo per inviare.");
+        Add("L_VoiceKeep",
+            "Garder",
+            "Keep",
+            "Behalten",
+            "Bewaren",
+            "Guardar",
+            "Salva");
+        Add("L_VoiceTexts",
+            "Textes gardés",
+            "Kept texts",
+            "Gespeicherte Texte",
+            "Bewaarde teksten",
+            "Textos guardados",
+            "Testi salvati");
+        Add("L_VoiceTextEditTitle",
+            "Modifier le texte",
+            "Edit the text",
+            "Text bearbeiten",
+            "Tekst bewerken",
+            "Editar el texto",
+            "Modifica il testo");
+        Add("L_VoiceTextEditMessage",
+            "Le texte que l'enceinte lira.",
+            "The text the speaker will read.",
+            "Der Text, den der Lautsprecher vorliest.",
+            "De tekst die de luidspreker zal voorlezen.",
+            "El texto que leerá el altavoz.",
+            "Il testo che il diffusore leggerà.");
+        Add("L_VoiceTextEditGo",
+            "Modifier",
+            "Edit",
+            "Bearbeiten",
+            "Bewerken",
+            "Editar",
+            "Modifica");
+        Add("L_VoiceTextDeleteGo",
+            "Supprimer",
+            "Delete",
+            "Löschen",
+            "Verwijderen",
+            "Eliminar",
+            "Elimina");
+        Add("L_VoiceTextDeleteConfirm",
+            "Supprimer « {0} » ?",
+            "Delete “{0}”?",
+            "„{0}“ löschen?",
+            "“{0}” verwijderen?",
+            "¿Eliminar «{0}»?",
+            "Eliminare «{0}»?");
+        Add("S_VoiceTextAlready",
+            "Ce texte est déjà gardé.",
+            "This text is already kept.",
+            "Dieser Text ist bereits gespeichert.",
+            "Deze tekst is al bewaard.",
+            "Este texto ya está guardado.",
+            "Questo testo è già salvato.");
+        Add("S_VoiceTextsFull",
+            "{0} textes au plus : supprimes-en un pour en garder un autre.",
+            "{0} texts at most: delete one to keep another.",
+            "Höchstens {0} Texte: Lösche einen, um einen anderen zu behalten.",
+            "Hoogstens {0} teksten: verwijder er een om een andere te bewaren.",
+            "{0} textos como máximo: elimina uno para guardar otro.",
+            "{0} testi al massimo: eliminane uno per salvarne un altro.");
+        Add("S_VoiceTextKept",
+            "Texte gardé.",
+            "Text kept.",
+            "Text gespeichert.",
+            "Tekst bewaard.",
+            "Texto guardado.",
+            "Testo salvato.");
+        Add("S_VoiceTextEdited",
+            "Texte modifié.",
+            "Text edited.",
+            "Text bearbeitet.",
+            "Tekst bewerkt.",
+            "Texto editado.",
+            "Testo modificato.");
+        Add("S_VoiceTextDeleted",
+            "Texte supprimé.",
+            "Text deleted.",
+            "Text gelöscht.",
+            "Tekst verwijderd.",
+            "Texto eliminado.",
+            "Testo eliminato.");
+
+        // ---------------------------------------------------------- Volume des annonces, sauvegarde des favoris (1.9.0)
+        Add("L_VoiceVolumeSpeaker",
+            "Volume des annonces : celui de l'enceinte",
+            "Announcement volume: the speaker's own",
+            "Lautstärke der Durchsagen: die des Lautsprechers",
+            "Volume van aankondigingen: dat van de speaker",
+            "Volumen de los anuncios: el del altavoz",
+            "Volume degli annunci: quello del diffusore");
+        Add("L_VoiceVolumeValue",
+            "Volume des annonces : {0} %",
+            "Announcement volume: {0} %",
+            "Lautstärke der Durchsagen: {0} %",
+            "Volume van aankondigingen: {0} %",
+            "Volumen de los anuncios: {0} %",
+            "Volume degli annunci: {0} %");
+        Add("L_BackupTitle",
+            "SAUVEGARDE DES FAVORIS",
+            "FAVOURITES BACKUP",
+            "SICHERUNG DER FAVORITEN",
+            "BACK-UP VAN FAVORIETEN",
+            "COPIA DE LOS FAVORITOS",
+            "BACKUP DEI PREFERITI");
+        Add("L_BackupHint",
+            "Les présélections « Local » et les textes gardés ne vivent que dans ce téléphone : une mise à jour les garde, une désinstallation les efface. Exporte-les dans un fichier (Drive, e-mail…) pour les retrouver ; l'import ajoute ce qui manque, sans rien supprimer.",
+            "Local presets and kept texts only live on this phone: an update keeps them, an uninstall erases them. Export them to a file (Drive, e-mail…) to get them back; importing adds what is missing and deletes nothing.",
+            "Lokale Presets und gespeicherte Texte leben nur auf diesem Telefon: Ein Update behält sie, eine Deinstallation löscht sie. Exportiere sie in eine Datei (Drive, E-Mail…), um sie wiederzufinden; der Import fügt Fehlendes hinzu und löscht nichts.",
+            "Lokale presets en bewaarde teksten leven alleen op deze telefoon: een update houdt ze, een verwijdering wist ze. Exporteer ze naar een bestand (Drive, e-mail…) om ze terug te vinden; importeren voegt toe wat ontbreekt en verwijdert niets.",
+            "Las presintonías «Local» y los textos guardados solo viven en este teléfono: una actualización los conserva, una desinstalación los borra. Expórtalos a un archivo (Drive, correo…) para recuperarlos; la importación añade lo que falta sin borrar nada.",
+            "Le preselezioni «Locale» e i testi salvati vivono solo in questo telefono: un aggiornamento li conserva, una disinstallazione li cancella. Esportali in un file (Drive, e-mail…) per ritrovarli; l'importazione aggiunge ciò che manca e non elimina nulla.");
+        Add("L_BackupExport",
+            "Exporter",
+            "Export",
+            "Exportieren",
+            "Exporteren",
+            "Exportar",
+            "Esporta");
+        Add("L_BackupImport",
+            "Importer",
+            "Import",
+            "Importieren",
+            "Importeren",
+            "Importar",
+            "Importa");
+        Add("L_BackupShareTitle",
+            "Sauvegarde des favoris SoundReborn Remote",
+            "SoundReborn Remote favourites backup",
+            "Sicherung der Favoriten von SoundReborn Remote",
+            "Back-up van favorieten van SoundReborn Remote",
+            "Copia de los favoritos de SoundReborn Remote",
+            "Backup dei preferiti di SoundReborn Remote");
+        Add("L_BackupPickTitle",
+            "Choisir une sauvegarde des favoris",
+            "Choose a favourites backup",
+            "Eine Sicherung der Favoriten wählen",
+            "Een back-up van favorieten kiezen",
+            "Elegir una copia de los favoritos",
+            "Scegli un backup dei preferiti");
+        Add("S_BackupEmpty",
+            "Rien à exporter : aucune présélection « Local » ni texte gardé.",
+            "Nothing to export: no local preset and no kept text.",
+            "Nichts zu exportieren: keine lokalen Presets und keine gespeicherten Texte.",
+            "Niets te exporteren: geen lokale presets en geen bewaarde teksten.",
+            "Nada que exportar: ninguna presintonía «Local» ni texto guardado.",
+            "Niente da esportare: nessuna preselezione «Locale» né testo salvato.");
+        Add("S_BackupExported",
+            "Fichier prêt : {0} présélection(s) « Local », {1} texte(s).",
+            "File ready: {0} local preset(s), {1} text(s).",
+            "Datei bereit: {0} lokale(s) Preset(s), {1} Text(e).",
+            "Bestand klaar: {0} lokale preset(s), {1} tekst(en).",
+            "Archivo listo: {0} presintonía(s) «Local», {1} texto(s).",
+            "File pronto: {0} preselezione/i «Locale», {1} testo/i.");
+        Add("S_BackupImported",
+            "Ajouté : {0} présélection(s) « Local », {1} texte(s).",
+            "Added: {0} local preset(s), {1} text(s).",
+            "Hinzugefügt: {0} lokale(s) Preset(s), {1} Text(e).",
+            "Toegevoegd: {0} lokale preset(s), {1} tekst(en).",
+            "Añadido: {0} presintonía(s) «Local», {1} texto(s).",
+            "Aggiunto: {0} preselezione/i «Locale», {1} testo/i.");
+        Add("S_BackupNothingNew",
+            "Rien de nouveau : tout ce que contient le fichier est déjà là (ou les listes sont pleines).",
+            "Nothing new: everything in the file is already here (or the lists are full).",
+            "Nichts Neues: Alles aus der Datei ist schon da (oder die Listen sind voll).",
+            "Niets nieuws: alles uit het bestand staat er al (of de lijsten zijn vol).",
+            "Nada nuevo: todo lo del archivo ya está (o las listas están llenas).",
+            "Niente di nuovo: tutto ciò che contiene il file c'è già (o gli elenchi sono pieni).");
+        Add("S_BackupNotRecognized",
+            "Ce fichier n'est pas une sauvegarde des favoris de SoundReborn Remote.",
+            "This file is not a SoundReborn Remote favourites backup.",
+            "Diese Datei ist keine Sicherung der Favoriten von SoundReborn Remote.",
+            "Dit bestand is geen back-up van favorieten van SoundReborn Remote.",
+            "Este archivo no es una copia de los favoritos de SoundReborn Remote.",
+            "Questo file non è un backup dei preferiti di SoundReborn Remote.");
+
+        // ---------------------------------------------------------- Message vocal : réessayer (1.9.0)
+        Add("L_VoiceRetry",
+            "Réessayer",
+            "Try again",
+            "Erneut versuchen",
+            "Opnieuw proberen",
+            "Reintentar",
+            "Riprova");
+        Add("S_VoiceTextFetchFailed",
+            "L'enceinte n'a pas obtenu la voix de Google ({0}). Vérifie qu'elle a accès à internet, puis réessaie.",
+            "The speaker could not get Google's voice ({0}). Check that it has internet access, then try again.",
+            "Der Lautsprecher hat die Google-Stimme nicht erhalten ({0}). Prüfe, ob er Internetzugang hat, und versuche es erneut.",
+            "De luidspreker kreeg de stem van Google niet ({0}). Controleer of hij internettoegang heeft en probeer opnieuw.",
+            "El altavoz no obtuvo la voz de Google ({0}). Comprueba que tiene acceso a internet y vuelve a intentarlo.",
+            "Il diffusore non ha ottenuto la voce di Google ({0}). Verifica che abbia accesso a internet, poi riprova.");
+        Add("S_VoiceTextFetchFailedPlain",
+            "L'enceinte n'a pas obtenu la voix de Google. Vérifie qu'elle a accès à internet, puis réessaie.",
+            "The speaker could not get Google's voice. Check that it has internet access, then try again.",
+            "Der Lautsprecher hat die Google-Stimme nicht erhalten. Prüfe, ob er Internetzugang hat, und versuche es erneut.",
+            "De luidspreker kreeg de stem van Google niet. Controleer of hij internettoegang heeft en probeer opnieuw.",
+            "El altavoz no obtuvo la voz de Google. Comprueba que tiene acceso a internet y vuelve a intentarlo.",
+            "Il diffusore non ha ottenuto la voce di Google. Verifica che abbia accesso a internet, poi riprova.");
+        Add("S_VoiceClipFetchFailed",
+            "L'enceinte n'a pas pu chercher le message sur le téléphone ({0}). Réessaie.",
+            "The speaker could not fetch the message from the phone ({0}). Try again.",
+            "Der Lautsprecher konnte die Nachricht nicht vom Telefon abholen ({0}). Versuche es erneut.",
+            "De luidspreker kon het bericht niet van de telefoon ophalen ({0}). Probeer opnieuw.",
+            "El altavoz no pudo recoger el mensaje del teléfono ({0}). Vuelve a intentarlo.",
+            "Il diffusore non ha potuto prelevare il messaggio dal telefono ({0}). Riprova.");
+        Add("S_VoiceClipFetchFailedPlain",
+            "L'enceinte n'a pas pu chercher le message sur le téléphone. Réessaie.",
+            "The speaker could not fetch the message from the phone. Try again.",
+            "Der Lautsprecher konnte die Nachricht nicht vom Telefon abholen. Versuche es erneut.",
+            "De luidspreker kon het bericht niet van de telefoon ophalen. Probeer opnieuw.",
+            "El altavoz no pudo recoger el mensaje del teléfono. Vuelve a intentarlo.",
+            "Il diffusore non ha potuto prelevare il messaggio dal telefono. Riprova.");
     }
 }

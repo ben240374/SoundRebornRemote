@@ -351,6 +351,18 @@ public sealed class StrDissolveResult
     public string? Error { get; init; }
 }
 
+/// <summary>
+/// Corps de POST /api/announce : un clip à aller chercher (url) ou un texte à
+/// lire (text, dans la langue lang), au volume donné ou à celui de l'agent.
+/// </summary>
+public sealed class StrAnnounceRequest
+{
+    [JsonPropertyName("text")] public string? Text { get; set; }
+    [JsonPropertyName("lang")] public string? Lang { get; set; }
+    [JsonPropertyName("url")] public string? Url { get; set; }
+    [JsonPropertyName("volume")] public int? Volume { get; set; }
+}
+
 /// <summary>Corps de POST /api/play (jouer une URL arbitraire).</summary>
 public sealed class StrPlayUrlRequest
 {

@@ -12,6 +12,10 @@ public partial class SettingsPage : ContentPage
     {
         InitializeComponent();
 
+        // La carte « Sauvegarde des favoris » a sa propre vue-modèle. Posée AVANT celle
+        // de la page : un BindingContext déjà fixé n'hérite pas de celui de la page.
+        BackupCard.BindingContext = ServiceHelper.Get<BackupViewModel>();
+
         _viewModel = ServiceHelper.Get<SettingsViewModel>();
         BindingContext = _viewModel;
     }

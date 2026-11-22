@@ -227,15 +227,41 @@ public sealed partial class PlayerViewModel : BaseViewModel
     private NowPlaying _lastNowPlaying = NowPlaying.Standby;
 
     /// <summary>
-    /// Le morceau Spotify en cours pendant une touche Spotify, tel que l'agent le
-    /// donne (GET /api/stream/title, agent 1.8.2) ; null le reste du temps.
+    /// Le titre en direct tel que l'agent le donne (GET /api/stream/title) pendant
+    /// une touche Spotify (agent 1.8.2) ou une radio : null le reste du temps, et
+    /// quand il n'y a pas de morceau à montrer.
     /// </summary>
     private StrStreamTitle? _liveSong;
+
+    /// <summary>Ce que <see cref="_liveSong"/> décrit : une touche Spotify ou une radio.</summary>
+    private LiveKind _liveSongKind;
 
     /// <summary>Le flux pour lequel <see cref="_liveSong"/> a été lu, et quand.</summary>
     private string _liveSongFor = "";
 
     private DateTime _liveSongAt = DateTime.MinValue;
+
+    /// <summary>
+    /// Le titre brut du morceau affiché en ce moment (vide quand aucun ne l'est).
+    /// Sert à reconnaître ce titre s'il revient juste après un changement de station.
+    /// Seul un titre réellement affiché compte : celui que l'agent donne déjà pour
+    /// la station suivante, avant que l'enceinte n'annonce le changement, ne doit pas
+    /// être pris pour un titre périmé.
+    /// </summary>
+    private string _lastShownTitle = "";
+
+    /// <summary>
+    /// Titre de la station précédente, à ignorer tant que l'agent le renvoie encore :
+    /// au changement de station, l'agent garde quelques secondes le titre de
+    /// l'ancien flux, le temps que le nouveau envoie le sien. Sans cela, le morceau
+    /// de Nostalgie restait affiché sous le logo de la station suivante.
+    /// </summary>
+    private string _staleTitle = "";
+
+    private DateTime _staleUntil = DateTime.MinValue;
+
+    /// <summary>Au-delà, un titre identique à celui de l'ancienne station est cru : c'est le même morceau.</summary>
+    private static readonly TimeSpan StaleTitleWindow = TimeSpan.FromSeconds(20);
 
     /// <summary>Une lecture récente sert telle quelle : les notifications arrivent par rafales.</summary>
     private static readonly TimeSpan LiveSongReuse = TimeSpan.FromSeconds(3);
@@ -285,7 +311,9 @@ public sealed partial class PlayerViewModel : BaseViewModel
         _presetsViewModel.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName is nameof(HasSecondRow) or nameof(IsSecondRow) or nameof(IsFirstRow)
-                or nameof(SecondRowCount) or nameof(ShowSecondRowCount))
+                or nameof(SecondRowCount) or nameof(ShowSecondRowCount)
+                or nameof(FirstRowCount) or nameof(ShowFirstRowCount)
+                or nameof(OnceSelected) or nameof(TwiceSelected) or nameof(ShowKeys))
             {
                 OnPropertyChanged(e.PropertyName);
             }
@@ -317,6 +345,25 @@ public sealed partial class PlayerViewModel : BaseViewModel
     public int SecondRowCount => _presetsViewModel.SecondRowCount;
 
     public bool ShowSecondRowCount => _presetsViewModel.ShowSecondRowCount;
+
+    /// <summary>La pastille de « Une fois » : touches garnies de la première rangée.</summary>
+    public int FirstRowCount => _presetsViewModel.FirstRowCount;
+
+    public bool ShowFirstRowCount => _presetsViewModel.ShowFirstRowCount;
+
+    /// <summary>Les présélections « Local » du téléphone, partagées avec l'onglet Présélections.</summary>
+    public LocalPresetsViewModel Local => _presetsViewModel.Local;
+
+    public bool OnceSelected => _presetsViewModel.OnceSelected;
+
+    public bool TwiceSelected => _presetsViewModel.TwiceSelected;
+
+    /// <summary>La grille des touches est montrée : la liste locale ne l'a pas remplacée.</summary>
+    public bool ShowKeys => _presetsViewModel.ShowKeys;
+
+    /// <summary>Sélecteur « Local » de cette page.</summary>
+    [RelayCommand]
+    private void ShowLocal() => _presetsViewModel.Local.IsShown = true;
 
     /// <summary>Sélecteur « Une fois / Deux fois » de cette page. Le paramètre vaut "1" ou "2".</summary>
     [RelayCommand]
@@ -2249,8 +2296,8 @@ public sealed partial class PlayerViewModel : BaseViewModel
             // La zone fait exception : elle change sans que personne ne l'annonce,
             // et elle peut même se former sans nous. On la relit donc dans les deux
             // cas, simplement plus souvent quand un groupe est déjà connu.
-            // Touche Spotify : le morceau change sans notification, on le relit.
-            if (IsSpotifyKey(_lastNowPlaying) && DateTime.UtcNow - _liveSongAt >= LiveSongInterval)
+            // Touche Spotify ou radio : le morceau change sans notification, on le relit.
+            if (LiveKindOf(_lastNowPlaying) != LiveKind.None && DateTime.UtcNow - _liveSongAt >= LiveSongInterval)
             {
                 _liveSongAt = DateTime.UtcNow;
                 _ = RefreshLiveSongAsync();
@@ -2402,6 +2449,32 @@ public sealed partial class PlayerViewModel : BaseViewModel
         SourceLabel = nowPlaying.IsIdle ? Localization.Get("L_Standby") : FriendlySource(nowPlaying.Source);
     }
 
+    /// <summary>Ce dont l'agent peut donner le titre en direct.</summary>
+    private enum LiveKind
+    {
+        None,
+        SpotifyKey,
+        Radio,
+    }
+
+    /// <summary>Sources de radio internet : la station annonce le morceau dans le flux.</summary>
+    private static readonly HashSet<string> RadioSources = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "LOCAL_INTERNET_RADIO", "INTERNET_RADIO", "TUNEIN",
+    };
+
+    private static LiveKind LiveKindOf(NowPlaying nowPlaying)
+    {
+        if (IsSpotifyKey(nowPlaying))
+        {
+            return LiveKind.SpotifyKey;
+        }
+
+        return !nowPlaying.IsIdle && RadioSources.Contains(nowPlaying.Source)
+            ? LiveKind.Radio
+            : LiveKind.None;
+    }
+
     /// <summary>
     /// Touche Spotify : l'enceinte lit le flux Spotify relayé par l'agent
     /// (« /spotify/ » dans l'adresse) et ne connaît que le nom de la playlist.
@@ -2413,14 +2486,14 @@ public sealed partial class PlayerViewModel : BaseViewModel
            nowPlaying.Content?.Location?.Contains("/spotify/", StringComparison.OrdinalIgnoreCase) == true;
 
     /// <summary>
-    /// Relit le morceau Spotify en cours, sans attendre la réutilisation. Appelée
-    /// par le sondage périodique tant qu'une touche Spotify joue.
+    /// Relit le titre en direct, sans attendre la réutilisation. Appelée par le
+    /// sondage périodique tant qu'une touche Spotify ou une radio joue.
     /// </summary>
     public async Task RefreshLiveSongAsync()
     {
         var nowPlaying = _lastNowPlaying;
 
-        if (!IsSpotifyKey(nowPlaying))
+        if (LiveKindOf(nowPlaying) == LiveKind.None)
         {
             return;
         }
@@ -2430,31 +2503,56 @@ public sealed partial class PlayerViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Pendant une touche Spotify, met le morceau en titre, l'artiste en
-    /// sous-titre et « Spotify · playlist » en source (agent 1.8.2). Un agent qui
-    /// ne donne pas le morceau, ou qui ne répond pas, laisse le titre habituel,
-    /// sans message d'erreur : c'est un complément, pas une commande.
+    /// Met le morceau en cours en titre et l'artiste en sous-titre :
+    ///
+    ///   – touche Spotify (agent 1.8.2) : « Spotify · playlist » en source ;
+    ///   – radio : le titre que la station envoie, « Bel RTL · Radio Internet » en
+    ///     source. La station qui n'envoie rien garde l'affichage habituel.
+    ///
+    /// Un agent qui ne donne pas le titre, ou qui ne répond pas, laisse le titre
+    /// habituel, sans message d'erreur : c'est un complément, pas une commande.
     /// </summary>
     private async Task ApplyLiveSongAsync(NowPlaying nowPlaying, bool force)
     {
         var device = Device;
+        var kind = LiveKindOf(nowPlaying);
 
-        if (!IsSpotifyKey(nowPlaying) || device is not { Str: { } str } || device.AgentTooOld)
+        if (kind == LiveKind.None || device is not { Str: { } str } || device.AgentTooOld)
         {
+            // Rien dont l'agent donne le titre. Le dernier titre lu reste à ignorer
+            // s'il revient à la prochaine station : l'agent peut le garder un moment.
+            if (_lastShownTitle.Length > 0)
+            {
+                _staleTitle = _lastShownTitle;
+                _staleUntil = DateTime.UtcNow + StaleTitleWindow;
+            }
+
             _liveSong = null;
             _liveSongFor = "";
+            _lastShownTitle = "";
             return;
         }
 
         var location = nowPlaying.Content?.Location ?? "";
 
-        if (!string.Equals(location, _liveSongFor, StringComparison.Ordinal))
+        // Un autre flux, ou le même flux décrit autrement : le titre connu ne vaut
+        // plus, et celui de l'ancien flux doit être ignoré s'il revient aussitôt.
+        if (!string.Equals(location, _liveSongFor, StringComparison.Ordinal) || kind != _liveSongKind)
         {
+            if (_liveSongFor.Length > 0 && _lastShownTitle.Length > 0)
+            {
+                _staleTitle = _lastShownTitle;
+                _staleUntil = DateTime.UtcNow + StaleTitleWindow;
+            }
+
             _liveSong = null;
+            _liveSongFor = location;
+            _liveSongKind = kind;
+            _lastShownTitle = "";
         }
 
         // Le morceau déjà connu s'affiche tout de suite : pas de clignotement
-        // entre la playlist et le morceau à chaque notification.
+        // entre la station et le morceau à chaque notification.
         ShowLiveSong(nowPlaying);
 
         if (!force && _liveSong is not null && DateTime.UtcNow - _liveSongAt < LiveSongReuse)
@@ -2480,10 +2578,13 @@ public sealed partial class PlayerViewModel : BaseViewModel
         }
 
         var hadSong = _liveSong is not null;
+        var rawTitle = (song?.Title ?? "").Trim();
 
         _liveSongFor = location;
+        _liveSongKind = kind;
         _liveSongAt = DateTime.UtcNow;
-        _liveSong = song is { HasSong: true } ? song : null;
+        _liveSong = song is not null && !IsStaleTitle(rawTitle) && HasLiveSong(kind, song, nowPlaying) ? song : null;
+        _lastShownTitle = _liveSong is null ? "" : rawTitle;
 
         if (_liveSong is null)
         {
@@ -2492,8 +2593,9 @@ public sealed partial class PlayerViewModel : BaseViewModel
             // Le morceau Spotify a disparu alors que l'enceinte annonçait encore la
             // touche : elle est sans doute passée à autre chose (une radio) sans que
             // sa notification soit arrivée. On relit son état plutôt que d'afficher
-            // le nom de la playlist en attendant.
-            if (hadSong)
+            // le nom de la playlist en attendant. Une radio, elle, se tait souvent
+            // entre deux morceaux (publicité, annonce) : rien à relire.
+            if (hadSong && kind == LiveKind.SpotifyKey)
             {
                 _ = RefreshAsync();
             }
@@ -2504,18 +2606,65 @@ public sealed partial class PlayerViewModel : BaseViewModel
         }
     }
 
+    /// <summary>
+    /// Vrai pour le titre de la station précédente que l'agent renvoie encore. Dès
+    /// qu'un autre titre arrive (ou que le délai est passé), plus rien n'est ignoré.
+    /// </summary>
+    private bool IsStaleTitle(string rawTitle)
+    {
+        if (_staleTitle.Length == 0)
+        {
+            return false;
+        }
+
+        if (DateTime.UtcNow < _staleUntil && string.Equals(rawTitle, _staleTitle, StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        _staleTitle = "";
+        return false;
+    }
+
+    private static bool HasLiveSong(LiveKind kind, StrStreamTitle song, NowPlaying nowPlaying) => kind switch
+    {
+        LiveKind.SpotifyKey => song.HasSong,
+
+        // Une radio ne donne jamais les champs Spotify ; s'ils sont là, l'agent
+        // parle encore de la touche Spotify qu'on vient de quitter.
+        LiveKind.Radio => !song.HasSong && song.RadioSongFor(StationOf(nowPlaying)) is not null,
+        _ => false,
+    };
+
     private void ShowLiveSong(NowPlaying nowPlaying)
     {
-        if (_liveSong is not { HasSong: true } song)
+        if (_liveSong is not { } song)
         {
             return;
         }
 
-        var playlist = nowPlaying.DisplayTitle;
-        Title = song.Track!;
-        Subtitle = song.Artist ?? "";
-        SourceLabel = string.IsNullOrWhiteSpace(playlist) ? "Spotify" : $"Spotify · {playlist}";
+        if (_liveSongKind == LiveKind.SpotifyKey && song.HasSong)
+        {
+            var playlist = nowPlaying.DisplayTitle;
+            Title = song.Track!;
+            Subtitle = song.Artist ?? "";
+            SourceLabel = string.IsNullOrWhiteSpace(playlist) ? "Spotify" : $"Spotify · {playlist}";
+            return;
+        }
+
+        if (_liveSongKind == LiveKind.Radio && song.RadioSongFor(StationOf(nowPlaying)) is { } radio)
+        {
+            var station = StationOf(nowPlaying);
+            var source = FriendlySource(nowPlaying.Source);
+            Title = radio.Song;
+            Subtitle = radio.Artist ?? "";
+            SourceLabel = string.IsNullOrWhiteSpace(station) ? source : $"{station} · {source}";
+        }
     }
+
+    /// <summary>Le nom de la station qui joue, tel que l'enceinte l'annonce.</summary>
+    private static string? StationOf(NowPlaying nowPlaying)
+        => FirstNonEmpty(nowPlaying.StationName, nowPlaying.Content?.ItemName);
 
     /// <summary>
     /// Charge la pochette de ce qui joue.

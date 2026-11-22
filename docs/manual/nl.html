@@ -107,7 +107,7 @@ footer a { color: var(--muted); }
 </div></header>
 <div class="wrap">
 <h1 id="soundreborn-remote--handleiding">SoundReborn Remote — Handleiding</h1>
-<p>Versie 1.8.2 · Android 7 en hoger</p>
+<p>Versie 1.9.0 · Android 7 en hoger</p>
 <ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html" aria-current="page">Nederlands</a></li><li><a href="es.html">Español</a></li><li><a href="it.html">Italiano</a></li></ul><hr />
 <h2 id="inhoud">Inhoud</h2>
 <ol>
@@ -195,6 +195,11 @@ op je telefoon. Een speaker met scherm toont “LIKED” of “REMOVED”.</p>
 alleen de naam van de afspeellijst. Met STR-agent 1.8.2 of nieuwer toont de app in plaats
 daarvan het nummer, de artiest en de hoes, met “Spotify · afspeellijst” als bron; het nummer
 wordt ongeveer elke vijf seconden opnieuw gelezen.</p>
+<p>Bij een internetradio toont de app ook het nummer dat de zender aankondigt, zoals het
+scherm van de speaker: de titel groot, de artiest eronder, en “zender · Internetradio” als
+bron. Een zender die niets stuurt, of alleen zijn eigen naam, houdt de gewone weergave; een
+tekst zonder artiest (een programma, reclame) wordt getoond zoals hij is. Het nummer wordt
+ongeveer elke vijf seconden opnieuw gelezen.</p>
 <h3 id="bediening">Bediening</h3>
 <p>Vier toetsen: stoppen, vorige, afspelen/pauzeren, volgende. Afhankelijk van de bron doen
 sommige niets — een live radiostream laat zich niet terugspoelen.</p>
@@ -230,9 +235,37 @@ is degene die speelt.</p>
 wanneer een toets twee keer wordt ingedrukt. De keuze geldt voor beide tabbladen. Elke tegel toont bovenaan de naam van zijn toets (“Toets 1” tot “Toets 6”, in beide rijen),
 en de knop <strong>Twee keer</strong> draagt een klein getal: hoeveel toetsen van de tweede rij een zender
 hebben.</p>
+<p>Rechts van de knoppen vervangt <strong>Lokaal</strong> de tegels door je lokale presets, die op de
+telefoon blijven (zie het tabblad Presets); <strong>Eén keer</strong> brengt de toetsen van de speaker
+terug.</p>
+<p>Ook de knop <strong>Eén keer</strong> draagt een klein getal: hoeveel toetsen van de eerste rij een
+zender hebben.</p>
 <p><strong>Wat nu speelt op een toets zetten</strong>, onder de tegels, bewaart wat de speaker op dit
 moment speelt — zender, album of nummer uit de bibliotheek — op de toets van je keuze.
 Spotify, AUX en Bluetooth kunnen zo niet worden bewaard.</p>
+<h3 id="spraakbericht">Spraakbericht</h3>
+<p>De kaart <strong>Spraakbericht</strong> laat de speaker spreken en daarna verdergaan met wat hij speelde.</p>
+<ul>
+<li><strong>Je stem</strong>: houd de ronde microfoonknop ingedrukt terwijl je spreekt en laat hem los om
+  te versturen (hoogstens 1 minuut). Tijdens de opname wordt de knop rood. De telefoon
+  houdt het bericht bij tot de speaker het komt ophalen en wist het daarna.</li>
+<li><strong>Een tekst</strong>: typ hem onder de knop, dan <strong>Voorlezen</strong>. De speaker leest hem met de stem
+  van Google, in de taal van de app; hij heeft internettoegang nodig, en de tekst gaat via
+  Google.</li>
+<li><strong>Bewaren</strong> zet de getypte tekst in de lijst van bewaarde teksten (hoogstens tien). Tik
+  op een bewaarde tekst om hem te laten voorlezen; <strong>✎</strong> bewerkt hem, <strong>✕</strong> verwijdert hem
+  na bevestiging.</li>
+</ul>
+<p>Een korte trilling meldt dat de microfoon loopt: spreek vanaf dan. De app voegt wat stilte
+toe voor en na je bericht, zodat de speaker, die zijn versterker met vertraging opent, het
+begin niet inslikt. Een tekst telt hoogstens 200 tekens.</p>
+<p>De schuifregelaar <strong>Volume van aankondigingen</strong> regelt het volume van het bericht, stem en
+tekst: helemaal links houdt de speaker zijn volume; anders gaat hij voor het bericht naar dat
+volume en daarna terug naar het vorige. De microfoon van de telefoon is niet instelbaar: voor
+een luider bericht schuif je deze regelaar hoger.</p>
+<p>Het bericht gaat naar de speaker die de opdrachten krijgt. Het speelt nog niet op alle
+speakers van een groep: dat is gepland in de STR-agent. De eerste keer vraagt Android
+toegang tot de microfoon. De kaart verschijnt alleen met de STR-agent.</p>
 <h3 id="groeperen-met">Groeperen met</h3>
 <p>Eén chip per speaker, behalve die welke de opdrachten krijgt. Tik erop om die speaker
 aan de groep toe te voegen; een vinkje en een groene rand verschijnen. Nog een tik haalt
@@ -270,6 +303,21 @@ zender geen bruikbare afbeelding, of antwoordt zijn server niet.</p>
 oudere, verschijnen de knoppen niet.</p>
 <p>Een toets die alleen in de tweede rij een zender heeft, verschijnt leeg onder <strong>Eén keer</strong>:
 één druk op de speaker start dan de zender van de tweede rij (STR-agent 1.6.3 en nieuwer).</p>
+<h3 id="lokale-presets">Lokale presets</h3>
+<p>De knop <strong>Lokaal</strong>, rechts, toont presets die op de telefoon blijven, naast de toetsen van
+de speaker, zoveel je wilt (hoogstens 100). Tik op een regel om de zender op de gekozen
+speaker te starten; <strong>✎</strong> hernoemt hem, <strong>✕</strong> verwijdert hem na bevestiging. De regel van
+de zender die speelt is groen.</p>
+<p>Om er toe te voegen:</p>
+<ul>
+<li><strong>Wat speelt toevoegen</strong> bewaart de zender die de speaker nu speelt, met het
+  oorspronkelijke adres van de stream en zijn logo;</li>
+<li><strong>Adres toevoegen</strong> vraagt het http- of https-adres van de stream, dan een naam;</li>
+<li>tik in de zoekfunctie op een zender, dan <strong>Toevoegen aan Lokaal</strong>.</li>
+</ul>
+<p>Deze presets blijven op deze telefoon: de toetsen van de speaker kennen ze niet, en een
+andere telefoon ziet ze niet. Een Spotify-afspeellijst kan er niet in: de STR-agent start
+een afspeellijst alleen vanaf een van zijn toetsen. Om ze bij een herinstallatie te bewaren, exporteer je ze in het tabblad Instellingen (<strong>Back-up van favorieten</strong>).</p>
 <h3 id="een-toets-hernoemen-en-wissen">Een toets hernoemen en wissen</h3>
 <p>Elke tegel toont bovenaan de naam van zijn toets. Bij een toets die de STR-agent heeft
 opgeslagen staan er twee kleine knoppen naast: <strong>✎</strong> hernoemt de toets en <strong>✕</strong> wist hem, na
@@ -288,11 +336,36 @@ bevestigingsvraag zegt het. Het resultaat verschijnt per speaker.</p>
 <p>Kopiëren vereist STR-agent 1.6.5 of nieuwer op de gekozen speaker.</p>
 <h3 id="een-zender-vinden">Een zender vinden</h3>
 <p>Het zoekveld bevraagt <strong>radio-browser.info</strong>, een open gids die door vrijwilligers wordt
-bijgehouden. Twee keuzelijsten beperken de zoekactie tot een land en een taal, en
-<strong>Toplijst</strong> toont de meest beluisterde zenders zonder dat je iets typt.</p>
-<p>Het vakje <strong>Alleen Bose-compatibel</strong> staat standaard aan en dat kun je beter zo laten: het
-filtert de formaten weg die SoundTouch-speakers niet kunnen decoderen (Ogg, Opus, FLAC) en
-die stilte zonder foutmelding zouden opleveren.</p>
+bijgehouden. Het zoeken volgt dat van de STR-desktopapp:</p>
+<ul>
+<li><strong>Land</strong> en <strong>Taal</strong> beperken de zoekactie; <strong>Sorteren</strong> rangschikt op populariteit
+  (stemmen), beluisteringen, trend, naam of bitrate. Een wijziging herhaalt de laatste
+  zoekactie.</li>
+<li>De <strong>genrechips</strong> (Alle, Pop, Rock, Hits, Jazz, Jaren 80…) filteren op genre; de eerste
+  twee hangen van het land af (Levenslied en Nederlandstalig voor Nederland). <strong>Meer
+  genres</strong> voegt de meest voorkomende genres van de gids toe. Zonder iets te typen
+  doorbladert een chip de gids, zoals de Toplijst.</li>
+<li><strong>Toplijst</strong> toont de zenders met de meeste stemmen, met deze filters.</li>
+<li>Een zoekopdracht van meerdere woorden zoekt die woorden ook in de genres („rock belge”),
+  en vindt een naam met andere leestekens („Mi Soul” vindt „Mi-Soul”).</li>
+<li>Een stream-adres dat je in het veld plakt (http://… of https://…) vindt de zender van de
+  gids die het uitzendt; een onbekend adres verschijnt als <strong>Geplakt adres</strong>, dat je kunt
+  beluisteren of opslaan zoals elke andere zender.</li>
+<li><strong>Meer tonen</strong>, onder de resultaten, voegt de volgende pagina toe.</li>
+</ul>
+<p><strong>Alleen werkende zenders</strong> (standaard aan) laat de zenders weg die de gids bij de laatste
+controle onbereikbaar vond. Een net toegevoegde, nog niet gecontroleerde zender blijft
+zichtbaar. Vindt een naam alleen zenders die als onbereikbaar gemeld zijn, dan worden ze
+toch getoond, met een waarschuwing: de gids controleert vanuit het buitenland, en een
+zender die alleen in zijn eigen land uitzendt lijkt daar dood terwijl hij bij jou prima
+speelt.</p>
+<p><strong>Alleen Bose-compatibel</strong> (standaard aan, zo laten) filtert de formaten weg die
+SoundTouch-speakers niet kunnen decoderen (Ogg, Opus, FLAC) en die stilte zonder foutmelding
+zouden opleveren. <strong>Bitrate</strong> verbergt zenders onder een gekozen bitrate; zenders zonder
+bekende bitrate blijven. Beide filters werken op de ontvangen lijst, zonder nieuwe
+zoekactie, en het aantal verborgen zenders staat onder de titel van de resultaten.</p>
+<p><strong>Mist er een zender?</strong> De link onder de resultaten opent radio-browser.info, waar iedereen
+hem kan toevoegen: dan vind je hem hier, en iedereen met jou.</p>
 <p>Tik op een resultaat en er opent een actieblad met</p>
 <ul>
 <li><strong>Beluisteren</strong> — start de zender meteen, zonder iets op te slaan;</li>
@@ -377,7 +450,7 @@ per se degene die de opdrachten krijgt. Volgt hij een groep, dan zegt een amberk
 regel waar de opdrachten werkelijk heen gaan, en waarom.</p>
 <p><strong>Wekkers</strong>: die van de gekozen speaker — een wekker laat alleen de speaker afgaan waarop
 hij is opgeslagen, ook in een groep. Elke wekker speelt een toets (1 tot 6, of 1 tot 6
-twee keer ingedrukt) op het gekozen uur en de gekozen dagen. Je stelt ook het volume in
+twee keer ingedrukt) op het gekozen uur en de gekozen dagen (de snelkoppelingen <strong>Ma → Vr</strong>, <strong>Weekend</strong> en <strong>Elke dag</strong> vinken de dagen in één keer aan; elk vakje blijft apart aan te passen). Je stelt ook het volume in
 (of houdt dat van de speaker), het automatisch uitschakelen en de sluimerduur. De kaart
 toont de volgende wekker zoals de speaker hem plant, en waarschuwt als zijn klok nog niet
 goed staat. Is de tijdzone van de speaker leeg (UTC), dan wordt die van de telefoon met
@@ -406,6 +479,11 @@ gelezen versie, de staat van de meldingen, het bassbereik, de lijst met herkende
 API-eindpunten, en wat elke bekende speaker over de huidige zone verklaart. Dit is de
 informatie die bij een probleemmelding hoort. <em>Logocache legen</em> dwingt het opnieuw
 ophalen van zenderafbeeldingen af.</p>
+<p><strong>Back-up van favorieten</strong>: de lokale presets en de bewaarde teksten van het spraakbericht
+leven alleen op de telefoon. Een update houdt ze; een verwijdering wist ze, ook die welke
+Android eist voor het installeren van een APK met een andere sleutel. <strong>Exporteren</strong> maakt een
+bestand en opent delen (Drive, e-mail, Bestanden…); <strong>Importeren</strong> leest zo'n bestand terug en
+voegt toe wat ontbreekt, zonder iets te vervangen of te verwijderen.</p>
 <p><strong>Over</strong>: de versie, de vermelding van het STR-project met een link naar zijn site in de
 gekozen taal, en de juridische vermeldingen.</p>
 <hr />
@@ -443,6 +521,17 @@ Instellingen → Taal. Jouw keuze gaat voor op de taal van de telefoon.</p>
 De melding onder de titel geeft de reden: er speelt niets, de bron is geen internetradio,
 of het streamadres van deze zender is onbekend. Start de zender opnieuw via een voorkeuze of
 de gids en open daarna het tabblad Bronnen opnieuw.</p>
+<p><strong>De speaker speelt het spraakbericht niet.</strong>
+De melding onder de kaart zegt waarom. Is de speaker het niet komen ophalen, dan isoleert
+de wifi waarschijnlijk de apparaten (gastnetwerk). Een te korte druk verstuurt niets:
+houd je vinger op de knop terwijl je spreekt. De voorgelezen tekst vraagt internettoegang
+op de speaker. Is een bericht niet vertrokken, dan verstuurt <strong>Opnieuw proberen</strong> naast de reden het
+ongewijzigd opnieuw, zonder nieuwe opname.</p>
+<p><strong>Mijn lokale presets zijn na een update verdwenen.</strong>
+Een gewone update houdt ze. Ze verdwijnen als de app verwijderd werd — Android eist dat om
+over te stappen naar een versie met een andere sleutel, bijvoorbeeld van een testversie uit
+Visual Studio naar de gepubliceerde versie. Exporteer ze eerst via Instellingen → <strong>Back-up
+van favorieten</strong> en importeer daarna het bestand.</p>
 <hr />
 <h2 id="11-bekende-beperkingen">11. Bekende beperkingen</h2>
 <ul>
@@ -465,6 +554,10 @@ de gids en open daarna het tabblad Bronnen opnieuw.</p>
   het Spotify-account waarmee de speaker is aangemeld.</li>
 <li><strong>Toetsen hernoemen en wissen: STR-agent 1.8.0 of nieuwer; het nummer van een
   Spotify-toets: 1.8.2 of nieuwer.</strong></li>
+<li><strong>Spraakbericht: alleen de gekozen speaker.</strong> Een aankondiging op een hele groep wacht
+  op de STR-agent. De voorgelezen tekst gaat via de stem van Google: hij verlaat je
+  netwerk, en de speaker heeft internettoegang nodig.</li>
+<li><strong>Lokale presets: alleen zenders</strong>, bewaard op deze telefoon.</li>
 </ul>
 <hr />
 <h2 id="12-vermeldingen">12. Vermeldingen</h2>

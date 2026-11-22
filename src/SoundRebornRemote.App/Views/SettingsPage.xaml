@@ -113,6 +113,27 @@
                                     <TimePicker Time="{Binding AlarmTime, Mode=TwoWay}" Format="HH:mm" FontSize="28" />
 
                                     <Label Text="{DynamicResource L_AlarmDays}" Style="{StaticResource CaptionLabel}" />
+                                    <!-- Raccourcis : cochent d'un coup les jours de semaine, le week-end ou toute la semaine. -->
+                                    <HorizontalStackLayout Spacing="8">
+                                        <Border Style="{StaticResource Chip}" Padding="12,6">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding PickDaysCommand}" CommandParameter="work" />
+                                            </Border.GestureRecognizers>
+                                            <Label Text="{DynamicResource L_AlarmDaysWork}" FontSize="13" />
+                                        </Border>
+                                        <Border Style="{StaticResource Chip}" Padding="12,6">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding PickDaysCommand}" CommandParameter="weekend" />
+                                            </Border.GestureRecognizers>
+                                            <Label Text="{DynamicResource L_AlarmDaysWeekend}" FontSize="13" />
+                                        </Border>
+                                        <Border Style="{StaticResource Chip}" Padding="12,6">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding PickDaysCommand}" CommandParameter="all" />
+                                            </Border.GestureRecognizers>
+                                            <Label Text="{DynamicResource L_AlarmDaysAll}" FontSize="13" />
+                                        </Border>
+                                    </HorizontalStackLayout>
                                     <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="2">
                                         <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding Monday, Mode=TwoWay}" VerticalOptions="Center" />
                                         <Label Grid.Row="0" Grid.Column="1" Text="{DynamicResource L_DayMonday}" VerticalOptions="Center" />
@@ -347,6 +368,30 @@
                    TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
                    FontSize="13"
                    IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+
+            <!--
+                ================================================= Sauvegarde des favoris
+                Sa propre vue-modèle (BackupViewModel), posée par la page dans son
+                code, avant celle de la page.
+            -->
+            <ContentView x:Name="BackupCard" x:DataType="vm:BackupViewModel">
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{DynamicResource L_BackupTitle}" Style="{StaticResource SectionLabel}" />
+                        <Label Text="{DynamicResource L_BackupHint}" Style="{StaticResource SubtitleLabel}" LineBreakMode="WordWrap" />
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Button Grid.Column="0" Text="{DynamicResource L_BackupExport}" Command="{Binding ExportCommand}" />
+                            <Button Grid.Column="1" Text="{DynamicResource L_BackupImport}" Command="{Binding ImportCommand}" />
+                        </Grid>
+
+                        <Label Text="{Binding StatusMessage}"
+                               TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                               FontSize="13" LineBreakMode="WordWrap"
+                               IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+                    </VerticalStackLayout>
+                </Border>
+            </ContentView>
 
             <!-- ================================================= À propos -->
             <Border Style="{StaticResource Card}">

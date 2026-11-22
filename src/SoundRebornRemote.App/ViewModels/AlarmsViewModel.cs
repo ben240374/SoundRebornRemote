@@ -867,6 +867,28 @@ public sealed partial class AlarmsViewModel : BaseViewModel
         }
     }
 
+    /// <summary>
+    /// Raccourcis au-dessus des cases des jours : « work » (lundi → vendredi),
+    /// « weekend » (samedi et dimanche) ou « all » (les sept jours). Les cases
+    /// restent modifiables une à une ensuite.
+    /// </summary>
+    [RelayCommand]
+    private void PickDays(string? which)
+    {
+        switch (which)
+        {
+            case "work":
+                SetDays(new[] { 1, 2, 3, 4, 5 });
+                break;
+            case "weekend":
+                SetDays(new[] { 0, 6 });
+                break;
+            case "all":
+                SetDays(new[] { 0, 1, 2, 3, 4, 5, 6 });
+                break;
+        }
+    }
+
     // ---------------------------------------------------------------- Outils
 
     private void SetDays(IEnumerable<int> days)

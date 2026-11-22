@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manuel d'utilisation
 
-Version 1.8.2 · Android 7 et suivants
+Version 1.9.0 · Android 7 et suivants
 
 > Langues : **Français** · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md) · [Italiano](it.md)
 
@@ -121,6 +121,12 @@ connaît que le nom de la playlist. Avec l'agent STR 1.8.2 ou plus récent, l'ap
 affiche à la place le morceau, l'artiste et la pochette, avec « Spotify · playlist » comme
 source ; le morceau est relu toutes les cinq secondes environ.
 
+Pour une radio internet, l'application affiche aussi le morceau que la station annonce,
+comme l'écran de l'enceinte : le titre en grand, l'artiste dessous, et « station · Radio
+Internet » comme source. Une station qui n'envoie rien, ou seulement son nom, garde
+l'affichage habituel ; un texte sans artiste (une émission, une publicité) s'affiche tel
+quel. Le morceau est relu toutes les cinq secondes environ.
+
 ### Commandes
 
 Quatre touches : arrêt, précédent, lecture/pause, suivant. Selon la source, certaines
@@ -170,9 +176,44 @@ lance quand on presse deux fois une touche. Le choix vaut pour les deux onglets.
 rangées), et la pastille **Deux fois** affiche un petit nombre : combien de touches de la
 seconde rangée portent une station.
 
+À droite des pastilles, **Local** remplace les tuiles par tes présélections locales,
+gardées dans le téléphone (voir l'onglet Présélections) ; **Une fois** ramène les touches
+de l'enceinte.
+
+La pastille **Une fois** porte elle aussi un petit nombre : combien de touches de la
+première rangée portent une station.
+
 **Garder ce qui joue sur une touche**, sous les tuiles, range sur la touche de ton choix
 ce que l'enceinte joue en ce moment — station, album ou piste de la bibliothèque.
 Spotify, l'AUX et le Bluetooth ne se gardent pas ainsi.
+
+### Message vocal
+
+La carte **Message vocal** fait parler l'enceinte, puis la laisse reprendre ce qu'elle
+jouait.
+
+- **Ta voix** : maintiens le bouton rond au micro pendant que tu parles, relâche-le pour
+  envoyer (1 minute au plus). Le bouton passe au rouge pendant l'enregistrement. Le
+  téléphone garde le message le temps que l'enceinte vienne le chercher, puis l'efface.
+- **Un texte** : tape-le sous le bouton, puis **Lire**. L'enceinte le lit avec la voix de
+  Google, dans la langue de l'application ; elle doit avoir accès à internet, et le texte
+  passe par Google.
+- **Garder** range le texte tapé dans la liste des textes gardés (dix au plus). Touche un
+  texte gardé pour le faire lire ; **✎** le modifie, **✕** le supprime après confirmation.
+
+Une courte vibration signale que le micro tourne : parle à partir de là. L'application
+ajoute un peu de silence avant et après ton message, pour que l'enceinte, qui ouvre son
+amplificateur avec un temps de retard, n'en avale pas le début. Un texte compte 200
+caractères au plus.
+
+Le curseur **Volume des annonces** règle le volume du message, voix et texte : tout à
+gauche, l'enceinte garde son volume ; sinon elle passe à ce volume le temps du message,
+puis revient à celui d'avant. Le micro du téléphone ne se règle pas : pour un message plus
+fort, monte ce curseur.
+
+Le message part vers l'enceinte qui reçoit les commandes. Il ne passe pas encore sur
+toutes les enceintes d'un groupe : c'est prévu dans l'agent STR. La première fois,
+Android demande l'accès au micro. La carte n'apparaît qu'avec l'agent STR.
 
 ### Grouper avec
 
@@ -234,6 +275,24 @@ Une touche qui n'a de station que sur sa seconde rangée apparaît vide en **Une
 une seule pression sur l'enceinte lance alors la station de la seconde rangée (agent
 STR 1.6.3 et suivants).
 
+### Présélections « Local »
+
+La pastille **Local**, à droite, montre des présélections gardées dans le téléphone, en
+plus des touches de l'enceinte, et en nombre libre (100 au plus). Touche une ligne pour
+lancer la radio sur l'enceinte sélectionnée ; **✎** la renomme, **✕** la retire après
+confirmation. La ligne de la radio qui joue est en vert.
+
+Pour en ajouter :
+
+- **Ajouter ce qui joue** garde la radio que l'enceinte joue en ce moment, avec l'adresse
+  d'origine du flux et son logo ;
+- **Ajouter une adresse** demande l'adresse http ou https du flux, puis un nom ;
+- dans la recherche, touche une station puis **Ajouter à Local**.
+
+Ces présélections restent dans ce téléphone : les touches de l'enceinte ne les
+connaissent pas, et un autre téléphone ne les voit pas. Une playlist Spotify ne peut pas
+y être rangée : l'agent STR ne lance une playlist que depuis l'une de ses touches. Pour les garder en cas de réinstallation, exporte-les depuis l'onglet Réglages (**Sauvegarde des favoris**).
+
 ### Renommer et effacer une touche
 
 Chaque tuile porte en haut le nom de sa touche. Sur une touche rangée par l'agent STR, deux
@@ -259,12 +318,38 @@ La copie demande l'agent STR 1.6.5 ou plus récent sur l'enceinte sélectionnée
 ### Trouver une station
 
 Le champ de recherche interroge **radio-browser.info**, un annuaire ouvert tenu par des
-bénévoles. Deux listes déroulantes limitent la recherche à un pays et à une langue, et
-**Top liste** affiche les stations les plus écoutées sans rien saisir.
+bénévoles. La recherche reprend celle de l'application PC de STR :
 
-La case **Compatibles Bose uniquement** est cochée par défaut, et il vaut mieux la
-laisser ainsi : elle écarte les formats que les enceintes SoundTouch ne savent pas lire
-(Ogg, Opus, FLAC), qui produiraient un silence sans message d'erreur.
+- **Pays** et **Langue** limitent la recherche ; **Trier** range les stations par
+  popularité (votes), par écoutes, par tendance, par nom ou par débit. Changer l'un de ces
+  choix relance la dernière recherche.
+- Les **pastilles de genres** (Tous, Pop, Rock, Tubes, Jazz, Années 80…) filtrent par
+  genre ; les deux premières dépendent du pays (Chanson et Levenslied pour la Belgique).
+  **Plus de genres** ajoute les genres les plus fréquents de l'annuaire. Sans rien saisir,
+  une pastille parcourt l'annuaire, comme la Top liste.
+- **Top liste** affiche les stations les plus votées, avec ces filtres.
+- Une recherche en plusieurs mots cherche aussi ces mots dans les genres (« rock belge »),
+  et trouve un nom écrit avec une autre ponctuation (« Mi Soul » trouve « Mi-Soul »).
+- Une adresse de flux collée dans le champ (http://… ou https://…) retrouve la station
+  de l'annuaire qui la diffuse ; inconnue, elle s'affiche comme **Adresse collée**, qu'on
+  peut écouter ou ranger comme une autre.
+- **Voir plus**, sous les résultats, ajoute la page suivante.
+
+**En service uniquement** (coché par défaut) écarte les stations que l'annuaire a trouvées
+hors service à son dernier contrôle. Une station qu'on vient d'ajouter à l'annuaire, pas
+encore contrôlée, reste visible. Si un nom ne donne que des stations signalées hors
+service, elles s'affichent quand même, avec un avertissement : l'annuaire contrôle depuis
+l'étranger, et une radio réservée à son pays y paraît morte alors qu'elle joue très bien
+chez toi.
+
+**Compatibles Bose uniquement** (coché par défaut, à laisser ainsi) écarte les formats que
+les enceintes SoundTouch ne savent pas lire (Ogg, Opus, FLAC), qui produiraient un silence
+sans message d'erreur. **Débit** cache les stations sous un débit choisi ; celles dont le
+débit est inconnu restent. Ces deux filtres agissent sur la liste reçue, sans nouvelle
+recherche, et le nombre de stations masquées s'affiche sous le titre des résultats.
+
+**Une station manque ?** Le lien sous les résultats ouvre radio-browser.info, où chacun
+peut l'ajouter : elle devient trouvable ici, et pour tout le monde.
 
 Touche un résultat : une feuille d'actions s'ouvre, avec
 
@@ -381,7 +466,7 @@ dit où partent réellement les commandes, et pourquoi.
 
 **Réveils** : ceux de l'enceinte sélectionnée — un réveil ne fait sonner que l'enceinte
 sur laquelle il est enregistré, même dans un groupe. Chaque réveil joue une touche (1 à 6,
-ou 1 à 6 pressée deux fois), à l'heure et les jours choisis. On règle aussi son volume
+ou 1 à 6 pressée deux fois), à l'heure et les jours choisis (les raccourcis **Lun → Ven**, **Week-end** et **Tous les jours** cochent les jours d'un coup ; chaque case reste modifiable). On règle aussi son volume
 (ou on laisse celui de l'enceinte), l'arrêt automatique et la durée de répétition. La
 carte affiche le prochain réveil tel que l'enceinte le prévoit, et prévient si son
 horloge n'est pas encore à l'heure. Si le fuseau horaire de l'enceinte est vide (UTC),
@@ -419,6 +504,12 @@ direct sur 17008 et 8888, l'état des notifications, la plage de graves, la list
 points d'API reconnus, et ce que chaque enceinte connue déclare de la zone en cours.
 C'est l'information à joindre à un signalement de problème. *Vider le cache des logos*
 force le retéléchargement des images de stations.
+
+**Sauvegarde des favoris** : les présélections « Local » et les textes gardés du message
+vocal ne vivent que dans le téléphone. Une mise à jour les garde ; une désinstallation les
+efface, y compris celle qu'Android impose avant d'installer un APK signé d'une autre clé.
+**Exporter** crée un fichier et ouvre le partage (Drive, e-mail, Fichiers…) ; **Importer**
+relit un tel fichier et ajoute ce qui manque, sans rien remplacer ni supprimer.
 
 **À propos** : la version, le crédit au projet STR avec un lien vers son site dans la
 langue choisie, et les mentions légales.
@@ -471,6 +562,19 @@ Le message sous le titre en donne la raison : rien ne joue, la source n'est pas 
 internet, ou l'adresse du flux de cette station n'est pas connue. Relance la station depuis
 une présélection ou l'annuaire, puis rouvre l'onglet Sources.
 
+**L'enceinte ne joue pas le message vocal.**
+Le message sous la carte en donne la raison. Si l'enceinte n'est pas venue le chercher, le
+Wi-Fi isole sans doute les appareils (réseau invité). Un appui trop bref n'envoie rien :
+garde le doigt sur le bouton pendant que tu parles. Le texte lu demande que l'enceinte ait
+accès à internet. Quand un message n'est pas parti, **Réessayer**, à côté de la raison, le renvoie tel quel,
+sans le réenregistrer.
+
+**Mes présélections « Local » ont disparu après une mise à jour.**
+Une mise à jour normale les garde. Elles disparaissent quand l'application a été
+désinstallée — Android l'exige pour passer d'une version signée d'une autre clé, par
+exemple d'une version de test lancée depuis Visual Studio à la version publiée. Exporte-les
+dans Réglages → **Sauvegarde des favoris** avant, puis importe le fichier.
+
 ---
 
 ## 11. Limites connues
@@ -493,6 +597,10 @@ une présélection ou l'annuaire, puis rouvre l'onglet Sources.
   compte Spotify avec lequel l'enceinte est connectée.
 - **Renommer et effacer une touche : agent STR 1.8.0 ou plus récent ; le morceau d'une
   touche Spotify : 1.8.2 ou plus récent.**
+- **Message vocal : l'enceinte sélectionnée seulement.** L'annonce sur tout un groupe
+  attend l'agent STR. Le texte lu passe par la voix de Google : il quitte ton réseau, et
+  l'enceinte doit avoir accès à internet.
+- **Présélections « Local » : radios seulement**, gardées dans ce téléphone.
 
 ---
 

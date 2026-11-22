@@ -107,7 +107,7 @@ footer a { color: var(--muted); }
 </div></header>
 <div class="wrap">
 <h1 id="soundreborn-remote--handbuch">SoundReborn Remote — Handbuch</h1>
-<p>Version 1.8.2 · Android 7 und neuer</p>
+<p>Version 1.9.0 · Android 7 und neuer</p>
 <ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html" aria-current="page">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li><li><a href="it.html">Italiano</a></li></ul><hr />
 <h2 id="inhalt">Inhalt</h2>
 <ol>
@@ -198,6 +198,11 @@ deinem Telefon. Ein Lautsprecher mit Display zeigt „LIKED“ oder „REMOVED�
 Lautsprecher nur den Namen der Playlist. Mit dem STR-Agenten 1.8.2 oder neuer zeigt die App
 stattdessen den Titel, den Interpreten und das Cover, mit „Spotify · Playlist“ als Quelle;
 der Titel wird etwa alle fünf Sekunden neu gelesen.</p>
+<p>Bei einem Internetradio zeigt die App außerdem den Titel, den der Sender ansagt, so wie
+das Display des Lautsprechers: den Titel groß, den Interpreten darunter und „Sender ·
+Internetradio“ als Quelle. Ein Sender, der nichts schickt oder nur seinen eigenen Namen,
+behält die übliche Anzeige; ein Text ohne Interpret (eine Sendung, Werbung) wird so
+gezeigt, wie er ist. Der Titel wird etwa alle fünf Sekunden neu gelesen.</p>
 <h3 id="steuerung">Steuerung</h3>
 <p>Vier Tasten: Stopp, zurück, Wiedergabe/Pause, vor. Je nach Quelle bleiben manche ohne
 Wirkung — ein Livestream lässt sich nicht zurückspulen.</p>
@@ -234,9 +239,38 @@ Lautsprecher startet, wenn eine Taste zweimal gedrückt wird. Die Wahl gilt für
 Reiter. Jede Kachel trägt oben den Namen ihrer Taste („Taste 1“ bis „Taste 6“, in beiden Reihen),
 und die Schaltfläche <strong>Zweimal</strong> zeigt eine kleine Zahl: wie viele Tasten der zweiten Reihe
 einen Sender tragen.</p>
+<p>Rechts neben den Schaltflächen ersetzt <strong>Lokal</strong> die Kacheln durch deine lokalen
+Presets, die auf dem Telefon bleiben (siehe Reiter Presets); <strong>Einmal</strong> bringt die Tasten
+des Lautsprechers zurück.</p>
+<p>Auch die Schaltfläche <strong>Einmal</strong> zeigt eine kleine Zahl: wie viele Tasten der ersten
+Reihe einen Sender tragen.</p>
 <p><strong>Laufendes auf eine Taste legen</strong>, unter den Kacheln, speichert das, was der
 Lautsprecher gerade spielt — Sender, Album oder Titel aus der Bibliothek — auf der Taste
 deiner Wahl. Spotify, AUX und Bluetooth lassen sich so nicht speichern.</p>
+<h3 id="sprachnachricht">Sprachnachricht</h3>
+<p>Die Karte <strong>Sprachnachricht</strong> lässt den Lautsprecher sprechen und danach fortsetzen, was
+er gespielt hat.</p>
+<ul>
+<li><strong>Deine Stimme</strong>: halte die runde Mikrofontaste gedrückt, während du sprichst, und lass
+  sie zum Senden los (höchstens 1 Minute). Während der Aufnahme wird die Taste rot. Das
+  Telefon behält die Nachricht, bis der Lautsprecher sie abholt, und löscht sie dann.</li>
+<li><strong>Ein Text</strong>: tippe ihn unter der Taste ein, dann <strong>Vorlesen</strong>. Der Lautsprecher liest ihn
+  mit der Google-Stimme in der Sprache der App; er braucht Internetzugang, und der Text
+  läuft über Google.</li>
+<li><strong>Behalten</strong> legt den getippten Text in die Liste der gespeicherten Texte (höchstens
+  zehn). Tippe auf einen gespeicherten Text, um ihn vorlesen zu lassen; <strong>✎</strong> bearbeitet
+  ihn, <strong>✕</strong> löscht ihn nach Bestätigung.</li>
+</ul>
+<p>Eine kurze Vibration zeigt an, dass das Mikrofon läuft: Sprich ab dann. Die App fügt vor
+und nach deiner Nachricht etwas Stille ein, damit der Lautsprecher, der seinen Verstärker
+verzögert öffnet, den Anfang nicht verschluckt. Ein Text hat höchstens 200 Zeichen.</p>
+<p>Der Regler <strong>Lautstärke der Durchsagen</strong> stellt die Lautstärke der Nachricht ein, Stimme
+und Text: ganz links behält der Lautsprecher seine Lautstärke; sonst wechselt er für die
+Nachricht auf diese Lautstärke und kehrt danach zur vorherigen zurück. Das Mikrofon des
+Telefons lässt sich nicht einstellen: Für eine lautere Nachricht schiebe diesen Regler hoch.</p>
+<p>Die Nachricht geht an den Lautsprecher, der die Befehle erhält. Auf allen Lautsprechern
+einer Gruppe läuft sie noch nicht: Das ist im STR-Agenten geplant. Beim ersten Mal fragt
+Android nach dem Zugriff auf das Mikrofon. Die Karte erscheint nur mit dem STR-Agenten.</p>
 <h3 id="gruppieren-mit">Gruppieren mit</h3>
 <p>Ein Plättchen je Lautsprecher, außer dem, der die Befehle erhält. Tippe darauf, um den
 Lautsprecher der Gruppe hinzuzufügen; ein Haken und ein grüner Rand erscheinen. Noch
@@ -278,6 +312,22 @@ einem älteren erscheinen die Schaltflächen nicht.</p>
 <p>Eine Taste, die nur in der zweiten Reihe einen Sender hat, erscheint unter <strong>Einmal</strong>
 leer: Ein einfacher Druck am Lautsprecher startet dann den Sender der zweiten Reihe
 (STR-Agent 1.6.3 und neuer).</p>
+<h3 id="lokale-presets">Lokale Presets</h3>
+<p>Die Schaltfläche <strong>Lokal</strong> rechts zeigt Presets, die auf dem Telefon bleiben, zusätzlich zu
+den Tasten des Lautsprechers und in beliebiger Zahl (höchstens 100). Tippe auf eine Zeile,
+um den Sender auf dem gewählten Lautsprecher zu starten; <strong>✎</strong> benennt ihn um, <strong>✕</strong>
+entfernt ihn nach Bestätigung. Die Zeile des laufenden Senders ist grün.</p>
+<p>Zum Hinzufügen:</p>
+<ul>
+<li><strong>Laufenden Sender hinzufügen</strong> behält den Sender, den der Lautsprecher gerade spielt,
+  mit der ursprünglichen Adresse des Streams und seinem Logo;</li>
+<li><strong>Adresse hinzufügen</strong> fragt nach der http- oder https-Adresse des Streams, dann nach
+  einem Namen;</li>
+<li>in der Suche einen Sender antippen, dann <strong>Zu Lokal hinzufügen</strong>.</li>
+</ul>
+<p>Diese Presets bleiben auf diesem Telefon: Die Tasten des Lautsprechers kennen sie nicht,
+und ein anderes Telefon sieht sie nicht. Eine Spotify-Playlist lässt sich dort nicht
+ablegen: Der STR-Agent startet eine Playlist nur von einer seiner Tasten. Um sie bei einer Neuinstallation zu behalten, exportiere sie im Reiter Einstellungen (<strong>Sicherung der Favoriten</strong>).</p>
 <h3 id="eine-taste-umbenennen-und-löschen">Eine Taste umbenennen und löschen</h3>
 <p>Jede Kachel trägt oben den Namen ihrer Taste. Bei einer Taste, die der STR-Agent gespeichert
 hat, stehen daneben zwei kleine Schaltflächen: <strong>✎</strong> benennt die Taste um, <strong>✕</strong> löscht sie
@@ -296,11 +346,35 @@ weist darauf hin. Das Ergebnis erscheint pro Lautsprecher.</p>
 <p>Das Kopieren braucht den STR-Agenten 1.6.5 oder neuer auf dem gewählten Lautsprecher.</p>
 <h3 id="einen-sender-finden">Einen Sender finden</h3>
 <p>Das Suchfeld fragt <strong>radio-browser.info</strong> ab, ein offenes, von Freiwilligen gepflegtes
-Verzeichnis. Zwei Auswahllisten grenzen auf Land und Sprache ein, und <strong>Top-Liste</strong> zeigt
-die meistgehörten Sender, ohne etwas einzutippen.</p>
-<p>Das Kästchen <strong>Nur Bose-kompatible</strong> ist standardmäßig gesetzt und sollte es bleiben: Es
-filtert die Formate heraus, die SoundTouch-Lautsprecher nicht decodieren (Ogg, Opus,
-FLAC) und die zu Stille ohne Fehlermeldung führen würden.</p>
+Verzeichnis. Die Suche folgt der der STR-Desktop-App:</p>
+<ul>
+<li><strong>Land</strong> und <strong>Sprache</strong> grenzen die Suche ein; <strong>Sortieren</strong> ordnet nach Beliebtheit
+  (Stimmen), Aufrufen, Trend, Name oder Bitrate. Eine Änderung startet die letzte Suche
+  neu.</li>
+<li>Die <strong>Genre-Chips</strong> (Alle, Pop, Rock, Hits, Jazz, 80er…) filtern nach Genre; die ersten
+  beiden hängen vom Land ab (Schlager und Deutschrap für Deutschland). <strong>Mehr Genres</strong>
+  fügt die häufigsten Genres des Verzeichnisses hinzu. Ohne Eingabe durchstöbert ein Chip
+  das Verzeichnis, wie die Top-Liste.</li>
+<li><strong>Top-Liste</strong> zeigt die Sender mit den meisten Stimmen, mit diesen Filtern.</li>
+<li>Eine Suche aus mehreren Wörtern sucht diese Wörter auch in den Genres („rock belge“) und
+  findet einen Namen mit anderer Zeichensetzung („Mi Soul“ findet „Mi-Soul“).</li>
+<li>Eine ins Feld eingefügte Stream-Adresse (http://… oder https://…) findet den Sender des
+  Verzeichnisses, der sie sendet; eine unbekannte erscheint als <strong>Eingefügte Adresse</strong>,
+  die du wie jeden anderen Sender abspielen oder ablegen kannst.</li>
+<li><strong>Mehr anzeigen</strong> unter den Ergebnissen hängt die nächste Seite an.</li>
+</ul>
+<p><strong>Nur erreichbare</strong> (standardmäßig gesetzt) blendet die Sender aus, die das Verzeichnis bei
+der letzten Prüfung nicht erreicht hat. Ein gerade eingetragener, noch nicht geprüfter
+Sender bleibt sichtbar. Findet ein Name nur als nicht erreichbar gemeldete Sender, werden
+sie trotzdem gezeigt, mit einem Hinweis: Das Verzeichnis prüft vom Ausland aus, und ein
+Sender, der nur im eigenen Land sendet, wirkt dort tot, spielt bei dir aber einwandfrei.</p>
+<p><strong>Nur Bose-kompatible</strong> (standardmäßig gesetzt, so lassen) filtert die Formate heraus, die
+SoundTouch-Lautsprecher nicht decodieren (Ogg, Opus, FLAC) und die zu Stille ohne
+Fehlermeldung führen würden. <strong>Bitrate</strong> blendet Sender unter einer gewählten Bitrate aus;
+Sender ohne bekannte Bitrate bleiben. Beide Filter wirken auf die erhaltene Liste, ohne
+neue Suche, und die Zahl der ausgeblendeten Sender steht unter der Ergebnisüberschrift.</p>
+<p><strong>Fehlt ein Sender?</strong> Der Link unter den Ergebnissen öffnet radio-browser.info, wo jeder
+ihn eintragen kann: Dann findest du ihn hier, und alle anderen auch.</p>
 <p>Tippe auf ein Ergebnis, dann öffnet sich ein Auswahlblatt mit</p>
 <ul>
 <li><strong>Anhören</strong> — startet den Sender sofort, ohne etwas zu speichern;</li>
@@ -388,7 +462,7 @@ du gewählt hast — nicht zwingend der, der die Befehle erhält. Folgt er einer
 sagt eine bernsteinfarbene Zeile, wohin die Befehle tatsächlich gehen und warum.</p>
 <p><strong>Wecker</strong>: die des ausgewählten Lautsprechers — ein Wecker klingelt nur auf dem
 Lautsprecher, auf dem er gespeichert ist, auch in einer Gruppe. Jeder Wecker spielt eine
-Taste (1 bis 6, oder 1 bis 6 zweimal gedrückt) zur gewählten Zeit an den gewählten Tagen.
+Taste (1 bis 6, oder 1 bis 6 zweimal gedrückt) zur gewählten Zeit an den gewählten Tagen (die Kurzwahlen <strong>Mo → Fr</strong>, <strong>Wochenende</strong> und <strong>Täglich</strong> setzen die Tage auf einmal; jedes Kästchen bleibt einzeln änderbar).
 Dazu stellst du seine Lautstärke ein (oder behältst die des Lautsprechers), das
 automatische Ausschalten und die Schlummerdauer. Die Karte zeigt den nächsten Wecker so,
 wie ihn der Lautsprecher plant, und warnt, wenn seine Uhr noch nicht gestellt ist. Ist die
@@ -418,6 +492,12 @@ gelesener Version, den Zustand der Benachrichtigungen, den Bassbereich, die List
 erkannten API-Endpunkte und das, was jeder bekannte Lautsprecher über die aktuelle Zone
 sagt. Das sind die Angaben, die in eine Fehlermeldung gehören. <em>Logo-Cache leeren</em>
 erzwingt das erneute Laden der Senderbilder.</p>
+<p><strong>Sicherung der Favoriten</strong>: Die lokalen Presets und die gespeicherten Texte der
+Sprachnachricht leben nur auf dem Telefon. Ein Update behält sie; eine Deinstallation löscht
+sie, auch die, die Android vor der Installation eines mit einem anderen Schlüssel signierten
+APK verlangt. <strong>Exportieren</strong> erstellt eine Datei und öffnet das Teilen (Drive, E-Mail,
+Dateien…); <strong>Importieren</strong> liest eine solche Datei wieder ein und fügt Fehlendes hinzu, ohne
+etwas zu ersetzen oder zu löschen.</p>
 <p><strong>Über</strong>: die Version, der Dank an das STR-Projekt mit einem Link zu dessen Seite in der
 gewählten Sprache, und die rechtlichen Hinweise.</p>
 <hr />
@@ -456,6 +536,17 @@ Einstellungen → Sprache. Die Wahl hat Vorrang vor der Sprache des Telefons.</p
 Die Meldung unter dem Titel nennt den Grund: Es läuft nichts, die Quelle ist kein
 Internetradio, oder die Stream-Adresse dieses Senders ist unbekannt. Starte den Sender
 erneut über einen Speicherplatz oder das Verzeichnis und öffne dann den Reiter Quellen neu.</p>
+<p><strong>Der Lautsprecher spielt die Sprachnachricht nicht.</strong>
+Die Meldung unter der Karte nennt den Grund. Hat der Lautsprecher sie nicht abgeholt,
+isoliert das WLAN wahrscheinlich die Geräte (Gastnetz). Ein zu kurzes Antippen sendet
+nichts: Lass den Finger auf der Taste, während du sprichst. Der vorgelesene Text verlangt
+Internetzugang am Lautsprecher. Ist eine Nachricht nicht angekommen, sendet <strong>Erneut versuchen</strong> neben dem Grund sie
+unverändert noch einmal, ohne neue Aufnahme.</p>
+<p><strong>Meine lokalen Presets sind nach einem Update verschwunden.</strong>
+Ein normales Update behält sie. Sie verschwinden, wenn die App deinstalliert wurde — Android
+verlangt das beim Wechsel zu einer mit einem anderen Schlüssel signierten Version, etwa von
+einer aus Visual Studio gestarteten Testversion zur veröffentlichten Version. Exportiere sie
+vorher unter Einstellungen → <strong>Sicherung der Favoriten</strong> und importiere dann die Datei.</p>
 <hr />
 <h2 id="11-bekannte-grenzen">11. Bekannte Grenzen</h2>
 <ul>
@@ -478,6 +569,10 @@ erneut über einen Speicherplatz oder das Verzeichnis und öffne dann den Reiter
   im Spotify-Konto, mit dem der Lautsprecher angemeldet ist.</li>
 <li><strong>Tasten umbenennen und löschen: STR-Agent 1.8.0 oder neuer; der Titel einer
   Spotify-Taste: 1.8.2 oder neuer.</strong></li>
+<li><strong>Sprachnachricht: nur der gewählte Lautsprecher.</strong> Eine Durchsage auf einer ganzen
+  Gruppe wartet auf den STR-Agenten. Der vorgelesene Text läuft über die Google-Stimme: Er
+  verlässt dein Netz, und der Lautsprecher braucht Internetzugang.</li>
+<li><strong>Lokale Presets: nur Sender</strong>, auf diesem Telefon gespeichert.</li>
 </ul>
 <hr />
 <h2 id="12-hinweise">12. Hinweise</h2>

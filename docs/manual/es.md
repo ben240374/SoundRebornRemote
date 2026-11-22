@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manual de uso
 
-Versión 1.8.2 · Android 7 y posteriores
+Versión 1.9.0 · Android 7 y posteriores
 
 > Idiomas: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · **Español** · [Italiano](it.md)
 
@@ -117,6 +117,12 @@ solo conoce el nombre de la lista. Con el agente STR 1.8.2 o posterior, la aplic
 en su lugar la canción, el artista y la carátula, con «Spotify · lista» como fuente; la
 canción se vuelve a leer cada cinco segundos aproximadamente.
 
+Con una radio por internet, la aplicación muestra también la canción que anuncia la
+emisora, como la pantalla del altavoz: el título en grande, el artista debajo y «emisora ·
+Radio por Internet» como fuente. Una emisora que no envía nada, o solo su nombre, conserva
+la presentación habitual; un texto sin artista (un programa, un anuncio) se muestra tal
+cual. La canción se vuelve a leer cada cinco segundos aproximadamente.
+
 ### Mandos
 
 Cuatro teclas: parar, anterior, reproducir/pausar, siguiente. Según la fuente, algunas no
@@ -165,9 +171,44 @@ al pulsar una tecla dos veces. La elección vale para las dos pestañas. Cada ta
 filas), y el botón **Dos veces** lleva un pequeño número: cuántas teclas de la segunda fila
 tienen una emisora.
 
+A la derecha de los botones, **Local** sustituye las tarjetas por tus presintonías
+locales, guardadas en el teléfono (ver la pestaña Presintonías); **Una vez** devuelve las
+teclas del altavoz.
+
+El botón **Una vez** también lleva un pequeño número: cuántas teclas de la primera fila
+tienen una emisora.
+
 **Guardar lo que suena en una tecla**, bajo las tarjetas, guarda en la tecla que elijas
 lo que el altavoz reproduce en este momento — emisora, álbum o pista de la biblioteca.
 Spotify, AUX y Bluetooth no se pueden guardar así.
+
+### Mensaje de voz
+
+La tarjeta **Mensaje de voz** hace hablar al altavoz y luego le deja volver a lo que sonaba.
+
+- **Tu voz**: mantén pulsado el botón redondo del micrófono mientras hablas y suéltalo
+  para enviar (1 minuto como máximo). El botón se vuelve rojo durante la grabación. El
+  teléfono guarda el mensaje hasta que el altavoz viene a buscarlo y luego lo borra.
+- **Un texto**: escríbelo bajo el botón y luego **Leer**. El altavoz lo lee con la voz de
+  Google, en el idioma de la aplicación; necesita acceso a internet, y el texto pasa por
+  Google.
+- **Guardar** añade el texto escrito a la lista de textos guardados (diez como máximo).
+  Pulsa un texto guardado para que se lea; **✎** lo edita, **✕** lo elimina tras
+  confirmar.
+
+Una breve vibración indica que el micrófono está grabando: habla a partir de ahí. La
+aplicación añade un poco de silencio antes y después del mensaje, para que el altavoz, que
+abre su amplificador con retraso, no se trague el principio. Un texto tiene 200 caracteres
+como máximo.
+
+El control **Volumen de los anuncios** ajusta el volumen del mensaje, voz y texto: todo a la
+izquierda, el altavoz conserva su volumen; si no, pasa a ese volumen durante el mensaje y
+luego vuelve al anterior. El micrófono del teléfono no se puede ajustar: para un mensaje más
+fuerte, sube este control.
+
+El mensaje va al altavoz que recibe las órdenes. Todavía no suena en todos los altavoces de
+un grupo: está previsto en el agente STR. La primera vez, Android pide acceso al micrófono.
+La tarjeta solo aparece con el agente STR.
 
 ### Agrupar con
 
@@ -227,6 +268,24 @@ Una tecla que solo tiene emisora en su segunda fila aparece vacía en **Una vez*
 sola pulsación en el altavoz inicia entonces la emisora de la segunda fila (agente STR
 1.6.3 y posteriores).
 
+### Presintonías «Local»
+
+El botón **Local**, a la derecha, muestra presintonías guardadas en el teléfono, además de
+las teclas del altavoz y en número libre (100 como máximo). Pulsa una línea para iniciar
+la radio en el altavoz elegido; **✎** la renombra, **✕** la quita tras confirmar. La línea
+de la radio que suena aparece en verde.
+
+Para añadir:
+
+- **Añadir lo que suena** guarda la radio que el altavoz reproduce en este momento, con la
+  dirección original del flujo y su logotipo;
+- **Añadir una dirección** pide la dirección http o https del flujo y luego un nombre;
+- en la búsqueda, pulsa una emisora y luego **Añadir a Local**.
+
+Estas presintonías se quedan en este teléfono: las teclas del altavoz no las conocen, y
+otro teléfono no las ve. Una lista de Spotify no se puede guardar ahí: el agente STR solo
+inicia una lista desde una de sus teclas. Para conservarlas en una reinstalación, expórtalas desde la pestaña Ajustes (**Copia de los favoritos**).
+
 ### Renombrar y borrar una tecla
 
 Cada tarjeta muestra arriba el nombre de su tecla. En una tecla guardada por el agente STR hay
@@ -252,12 +311,39 @@ La copia requiere el agente STR 1.6.5 o posterior en el altavoz seleccionado.
 ### Encontrar una emisora
 
 El campo de búsqueda consulta **radio-browser.info**, un directorio abierto mantenido por
-voluntarios. Dos listas desplegables acotan la búsqueda a un país y a un idioma, y **Top
-lista** muestra las emisoras más escuchadas sin escribir nada.
+voluntarios. La búsqueda sigue la de la aplicación de escritorio de STR:
 
-La casilla **Solo compatibles con Bose** viene marcada y conviene dejarla así: descarta
-los formatos que los altavoces SoundTouch no saben decodificar (Ogg, Opus, FLAC), que
-producirían silencio sin mensaje de error.
+- **País** e **Idioma** acotan la búsqueda; **Ordenar** clasifica por popularidad (votos),
+  escuchas, tendencia, nombre o tasa de bits. Cambiar una de estas opciones repite la
+  última búsqueda.
+- Las **etiquetas de género** (Todos, Pop, Rock, Éxitos, Jazz, Años 80…) filtran por
+  género; las dos primeras dependen del país (Reggaeton y Salsa para España). **Más
+  géneros** añade los géneros más frecuentes del directorio. Sin escribir nada, una
+  etiqueta recorre el directorio, como la Top lista.
+- **Top lista** muestra las emisoras más votadas, con estos filtros.
+- Una búsqueda de varias palabras también busca esas palabras en los géneros («rock
+  belge»), y encuentra un nombre escrito con otra puntuación («Mi Soul» encuentra
+  «Mi-Soul»).
+- Una dirección de flujo pegada en el campo (http://… o https://…) encuentra la emisora del
+  directorio que la emite; si es desconocida aparece como **Dirección pegada**, que puedes
+  escuchar o guardar como cualquier otra.
+- **Ver más**, bajo los resultados, añade la página siguiente.
+
+**Solo emisoras activas** (marcada por defecto) descarta las emisoras que el directorio
+encontró caídas en su último control. Una emisora recién añadida, aún no controlada, sigue
+visible. Si un nombre solo encuentra emisoras marcadas como caídas, se muestran igualmente,
+con un aviso: el directorio controla desde el extranjero, y una emisora limitada a su país
+parece muerta allí aunque en tu casa suene perfectamente.
+
+**Solo compatibles con Bose** (marcada por defecto, mejor dejarla así) descarta los formatos
+que los altavoces SoundTouch no saben decodificar (Ogg, Opus, FLAC), que producirían
+silencio sin mensaje de error. **Tasa de bits** oculta las emisoras por debajo de una tasa
+elegida; las de tasa desconocida se quedan. Ambos filtros actúan sobre la lista recibida,
+sin nueva búsqueda, y el número de emisoras ocultas aparece bajo el título de los
+resultados.
+
+**¿Falta una emisora?** El enlace bajo los resultados abre radio-browser.info, donde
+cualquiera puede añadirla: aparecerá aquí, y para todos.
 
 Toca un resultado y se abre una hoja de acciones con
 
@@ -370,7 +456,7 @@ indica adónde van realmente las órdenes, y por qué.
 
 **Alarmas**: las del altavoz seleccionado — una alarma solo hace sonar el altavoz en el
 que está guardada, incluso en un grupo. Cada alarma reproduce una tecla (1 a 6, o 1 a 6
-pulsada dos veces) a la hora y los días elegidos. También se ajusta su volumen (o se
+pulsada dos veces) a la hora y los días elegidos (los atajos **Lun → Vie**, **Fin de semana** y **Todos los días** marcan los días de una vez; cada casilla sigue siendo modificable). También se ajusta su volumen (o se
 mantiene el del altavoz), el apagado automático y la duración de la repetición. La
 tarjeta muestra la próxima alarma tal como la prevé el altavoz, y avisa si su reloj aún
 no está en hora. Si la zona horaria del altavoz está vacía (UTC), se guarda la del
@@ -408,6 +494,12 @@ en directo en 17008 y 8888, el estado de las notificaciones, el rango de graves,
 lista de puntos de API reconocidos, y lo que cada altavoz conocido declara sobre la zona
 en curso. Esta es la información que debe adjuntarse a un informe de problema. *Vaciar
 la caché de logotipos* fuerza la nueva descarga de las imágenes de emisoras.
+
+**Copia de los favoritos**: las presintonías «Local» y los textos guardados del mensaje de
+voz solo viven en el teléfono. Una actualización los conserva; una desinstalación los borra,
+incluida la que Android exige antes de instalar un APK firmado con otra clave. **Exportar**
+crea un archivo y abre el menú de compartir (Drive, correo, Archivos…); **Importar** vuelve a
+leer ese archivo y añade lo que falta, sin reemplazar ni borrar nada.
 
 **Acerca de**: la versión, el crédito al proyecto STR con un enlace a su sitio en el
 idioma elegido, y los avisos legales.
@@ -462,6 +554,19 @@ El mensaje bajo el título indica el motivo: no suena nada, la fuente no es una 
 internet, o se desconoce la dirección del flujo de esta emisora. Vuelve a lanzar la emisora
 desde una presintonía o el directorio y abre de nuevo la pestaña Fuentes.
 
+**El altavoz no reproduce el mensaje de voz.**
+El mensaje bajo la tarjeta da el motivo. Si el altavoz no vino a buscarlo, la wifi
+probablemente aísla los aparatos (red de invitados). Una pulsación demasiado breve no envía
+nada: mantén el dedo en el botón mientras hablas. El texto leído requiere que el altavoz
+tenga acceso a internet. Si un mensaje no salió, **Reintentar**, junto al motivo, lo vuelve a enviar tal cual, sin
+grabarlo de nuevo.
+
+**Mis presintonías «Local» desaparecieron tras una actualización.**
+Una actualización normal las conserva. Desaparecen cuando la aplicación se ha desinstalado —
+Android lo exige para pasar a una versión firmada con otra clave, por ejemplo de una versión
+de prueba lanzada desde Visual Studio a la versión publicada. Expórtalas antes en Ajustes →
+**Copia de los favoritos** y luego importa el archivo.
+
 ---
 
 ## 11. Límites conocidos
@@ -484,6 +589,10 @@ desde una presintonía o el directorio y abre de nuevo la pestaña Fuentes.
   Spotify con la que el altavoz ha iniciado sesión.
 - **Renombrar y borrar teclas: agente STR 1.8.0 o posterior; la canción de una tecla de
   Spotify: 1.8.2 o posterior.**
+- **Mensaje de voz: solo el altavoz elegido.** Un anuncio en todo un grupo espera al
+  agente STR. El texto leído pasa por la voz de Google: sale de tu red, y el altavoz
+  necesita acceso a internet.
+- **Presintonías «Local»: solo radios**, guardadas en este teléfono.
 
 ---
 

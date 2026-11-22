@@ -1,6 +1,6 @@
 # SoundReborn Remote — User manual
 
-Version 1.8.2 · Android 7 and later
+Version 1.9.0 · Android 7 and later
 
 > Languages: [Français](fr.md) · **English** · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md) · [Italiano](it.md)
 
@@ -113,6 +113,12 @@ During a Spotify key (a preset that plays a Spotify playlist), the speaker itsel
 the playlist name. With STR agent 1.8.2 or later, the app shows the song, the artist and the
 cover instead, with "Spotify · playlist" as the source; the song is read again every five seconds or so.
 
+For an internet radio, the app also shows the song the station announces, as the
+speaker's display does: the title in large type, the artist below, and "station ·
+Internet radio" as the source. A station that sends nothing, or only its own name, keeps
+the usual display; a text without an artist (a programme, an advert) is shown as it is.
+The song is read again every five seconds or so.
+
 ### Controls
 
 Four keys: stop, previous, play/pause, next. Depending on the source some have no
@@ -160,9 +166,42 @@ above the tiles: the second shows the six stations the speaker starts when a key
 pressed twice. The choice applies to both tabs. Each tile shows the name of its key at the top ("Key 1" to "Key 6", in both rows), and the
 **Twice** chip carries a small number: how many keys of the second row hold a station.
 
+To the right of the chips, **Local** replaces the tiles with your local presets, kept
+on the phone (see the Presets tab); **Once** brings back the speaker's keys.
+
+The **Once** chip also carries a small number: how many keys of the first row hold a
+station.
+
 **Keep what's playing on a key**, below the tiles, stores what the speaker is playing
 right now — station, album or library track — on the key you pick. Spotify, AUX and
 Bluetooth cannot be kept this way.
+
+### Voice message
+
+The **Voice message** card makes the speaker talk, then lets it go back to what it was
+playing.
+
+- **Your voice**: hold the round microphone button while you speak, release it to send
+  (1 minute at most). The button turns red while recording. The phone keeps the message
+  until the speaker comes to fetch it, then deletes it.
+- **A text**: type it below the button, then **Read**. The speaker reads it with Google's
+  voice, in the app's language; it needs internet access, and the text goes through
+  Google.
+- **Keep** adds the typed text to the list of kept texts (ten at most). Tap a kept text to
+  have it read; **✎** edits it, **✕** deletes it after confirmation.
+
+A short vibration tells you the microphone is running: speak from then on. The app adds a
+little silence before and after your message, so that the speaker, which opens its
+amplifier with a delay, does not swallow its beginning. A text is 200 characters at most.
+
+The **Announcement volume** slider sets the volume of the message, voice and text: all the
+way to the left, the speaker keeps its volume; otherwise it switches to that volume for the
+message, then goes back to the previous one. The phone's microphone cannot be adjusted: for
+a louder message, raise this slider.
+
+The message goes to the speaker that receives the commands. It does not yet play on every
+speaker of a group: that is planned in the STR agent. The first time, Android asks for
+access to the microphone. The card only appears with the STR agent.
 
 ### Group with
 
@@ -220,6 +259,24 @@ the agent, or with an older one.
 A key that has a station only on its second row shows as empty under **Once**: a single
 press on the speaker then starts the second-row station (STR agent 1.6.3 and later).
 
+### Local presets
+
+The **Local** chip, on the right, shows presets kept on the phone, on top of the speaker's
+keys, as many as you like (100 at most). Tap a line to start the radio on the selected
+speaker; **✎** renames it, **✕** removes it after confirmation. The line of the radio that
+is playing is green.
+
+To add some:
+
+- **Add what is playing** keeps the radio the speaker is playing right now, with the
+  stream's original address and its logo;
+- **Add an address** asks for the stream's http or https address, then a name;
+- in the search, tap a station, then **Add to Local**.
+
+These presets stay on this phone: the speaker's keys do not know them, and another phone
+does not see them. A Spotify playlist cannot be kept there: the STR agent only starts a
+playlist from one of its keys. To keep them across a reinstall, export them from the Settings tab (**Favourites backup**).
+
 ### Renaming and clearing a key
 
 Each tile shows the name of its key at the top. On a key stored by the STR agent, two small
@@ -245,12 +302,37 @@ Copying needs STR agent 1.6.5 or later on the selected speaker.
 ### Find a station
 
 The search box queries **radio-browser.info**, an open directory maintained by
-volunteers. Two drop-downs narrow the search to a country and a language, and **Top
-list** shows the most-listened stations without typing anything.
+volunteers. The search follows the one of the STR desktop app:
 
-The **Bose-compatible only** box is ticked by default, and is best left that way: it
-filters out the formats SoundTouch speakers cannot decode (Ogg, Opus, FLAC), which would
-produce silence with no error message.
+- **Country** and **Language** narrow the search; **Sort** orders stations by popularity
+  (votes), plays, trend, name or bitrate. Changing one of these runs the last search
+  again.
+- The **genre chips** (All, Pop, Rock, Hits, Jazz, 80s…) filter by genre; the first two
+  depend on the country (Chanson and Levenslied for Belgium). **More genres** adds the
+  directory's most frequent genres. With nothing typed, a chip browses the directory,
+  like the Top list.
+- **Top list** shows the most-voted stations, with these filters.
+- A search of several words also looks for those words among the genres ("rock belge"),
+  and finds a name written with other punctuation ("Mi Soul" finds "Mi-Soul").
+- A stream address pasted in the box (http://… or https://…) finds the directory station
+  that broadcasts it; an unknown one shows as **Pasted address**, which you can play or
+  store like any other.
+- **Show more**, below the results, adds the next page.
+
+**Working stations only** (ticked by default) leaves out the stations the directory found
+down at its last check. A station just added to the directory, not yet checked, stays
+visible. If a name only finds stations reported as down, they are shown anyway, with a
+warning: the directory checks from abroad, and a station limited to its own country looks
+dead there while it plays fine at home.
+
+**Bose-compatible only** (ticked by default, best left that way) filters out the formats
+SoundTouch speakers cannot decode (Ogg, Opus, FLAC), which would produce silence with no
+error message. **Bitrate** hides the stations below a chosen bitrate; those with an
+unknown bitrate stay. Both filters act on the list already received, without a new
+search, and the number of hidden stations shows below the results header.
+
+**A station is missing?** The link below the results opens radio-browser.info, where
+anyone can add it: it then turns up here, and for everyone.
 
 Tap a result and an action sheet opens with
 
@@ -361,7 +443,7 @@ amber says where the commands actually go, and why.
 
 **Alarms**: those of the selected speaker — an alarm rings only the speaker it is saved
 on, even in a group. Each alarm plays a key (1 to 6, or 1 to 6 pressed twice) at the time
-and on the days you choose. You also set its volume (or keep the speaker's), the
+and on the days you choose (the **Mon → Fri**, **Weekend** and **Every day** shortcuts tick the days in one go; each box can still be changed). You also set its volume (or keep the speaker's), the
 automatic switch-off and the snooze length. The card shows the next alarm as the speaker
 plans it, and warns when its clock is not set yet. If the speaker's time zone is empty
 (UTC), the phone's is saved with the next alarm. Alarms changed elsewhere — the STR phone
@@ -395,6 +477,12 @@ device ID, firmware version, the agent with its port and its version read live o
 endpoints, and what each known speaker declares about the current zone. This is the
 information to attach to a problem report. *Clear the logo cache* forces station images
 to be downloaded again.
+
+**Favourites backup**: the local presets and the kept texts of the voice message only live
+on the phone. An update keeps them; an uninstall erases them, including the one Android
+requires before installing an APK signed with another key. **Export** creates a file and
+opens sharing (Drive, e-mail, Files…); **Import** reads such a file back and adds what is
+missing, without replacing or deleting anything.
 
 **About**: the version, credit to the STR project with a link to its site in the chosen
 language, and the legal notices.
@@ -446,6 +534,19 @@ The message under the title gives the reason: nothing is playing, the source is 
 internet radio, or the stream address of this station is unknown. Start the station again
 from a preset or the directory, then reopen the Sources tab.
 
+**The speaker does not play the voice message.**
+The message under the card says why. If the speaker did not come to fetch it, the Wi-Fi
+probably isolates devices (guest network). A press that is too short sends nothing: keep
+your finger on the button while you speak. The read text needs internet access on the
+speaker. When a message did not go out, **Try again**, next to the reason, sends it again as it is,
+without recording it again.
+
+**My local presets disappeared after an update.**
+A normal update keeps them. They disappear when the app has been uninstalled — Android
+requires it to go from a version signed with another key, for example from a test build
+started from Visual Studio to the published version. Export them first in Settings →
+**Favourites backup**, then import the file.
+
 ---
 
 ## 11. Known limits
@@ -468,6 +569,10 @@ from a preset or the directory, then reopen the Sources tab.
   speaker is logged in with.
 - **Renaming and clearing keys: STR agent 1.8.0 or later; the song of a Spotify key: 1.8.2
   or later.**
+- **Voice message: the selected speaker only.** An announcement on a whole group waits
+  for the STR agent. The read text goes through Google's voice: it leaves your network,
+  and the speaker needs internet access.
+- **Local presets: radios only**, kept on this phone.
 
 ---
 

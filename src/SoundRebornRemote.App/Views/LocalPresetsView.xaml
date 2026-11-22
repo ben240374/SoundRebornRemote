@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Les présélections « Local », gardées dans le téléphone. Posée par les onglets
+    Lecture et Présélections à la place de la grille des touches quand on choisit
+    « Local ». Son BindingContext est la vue-modèle partagée (PresetsViewModel.Local).
+
+    Une liste par BindableLayout et non une CollectionView : elle vit dans la page
+    qui défile, et une liste défilante imbriquée s'y écrase.
+-->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SoundRebornRemote.App.ViewModels"
+             x:Class="SoundRebornRemote.App.Views.LocalPresetsView"
+             x:DataType="vm:LocalPresetsViewModel">
+
+    <VerticalStackLayout Spacing="6">
+
+        <Label Text="{DynamicResource L_LocalEmpty}" Style="{StaticResource CaptionLabel}"
+               LineBreakMode="WordWrap" IsVisible="{Binding IsEmpty}" />
+
+        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Items}" Spacing="0">
+            <BindableLayout.ItemTemplate>
+                <DataTemplate x:DataType="vm:LocalPresetItem">
+                    <Grid Padding="2,8" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=PlayCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Grid.GestureRecognizers>
+
+                        <Border Grid.Column="0" Style="{StaticResource TileCard}"
+                                WidthRequest="46" HeightRequest="46">
+                            <Grid>
+                                <Image Source="{Binding ArtSource}" Aspect="AspectFit" Margin="5"
+                                       IsVisible="{Binding HasArt}" />
+                                <Label Text="♪" FontSize="17" HorizontalOptions="Center" VerticalOptions="Center"
+                                       IsVisible="{Binding HasArt, Converter={StaticResource InvertedBool}}"
+                                       TextColor="{AppThemeBinding Light={StaticResource TextMutedLight}, Dark={StaticResource TextMutedDark}}" />
+                            </Grid>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsActive}" Value="True">
+                                    <Setter Property="Stroke" Value="{StaticResource Success}" />
+                                    <Setter Property="StrokeThickness" Value="2" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                        </Border>
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                            <Label Text="{Binding Name}" FontSize="15" LineBreakMode="TailTruncation" MaxLines="1">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsActive}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource Success}" />
+                                        <Setter Property="FontAttributes" Value="Bold" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                            <Label Text="{Binding Detail}" Style="{StaticResource CaptionLabel}"
+                                   LineBreakMode="TailTruncation" MaxLines="1" />
+                        </VerticalStackLayout>
+
+                        <!-- Des boutons et non des gestes : l'appui ne lance pas la station par la même occasion. -->
+                        <Button Grid.Column="2" Text="✎" Style="{StaticResource TileIconButton}" VerticalOptions="Center"
+                                SemanticProperties.Description="{DynamicResource L_KeyRenameGo}"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=RenameCommand}"
+                                CommandParameter="{Binding .}" />
+                        <Button Grid.Column="3" Text="✕" Style="{StaticResource TileIconButton}" VerticalOptions="Center"
+                                TextColor="{StaticResource Danger}"
+                                SemanticProperties.Description="{DynamicResource L_LocalRemoveGo}"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=RemoveCommand}"
+                                CommandParameter="{Binding .}" />
+                    </Grid>
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+        </VerticalStackLayout>
+
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+            <Button Grid.Column="0" Text="{DynamicResource L_LocalAddPlaying}" Style="{StaticResource QuietButton}"
+                    Command="{Binding AddPlayingCommand}" LineBreakMode="WordWrap" />
+            <Button Grid.Column="1" Text="{DynamicResource L_LocalAddUrl}" Style="{StaticResource QuietButton}"
+                    Command="{Binding AddUrlCommand}" LineBreakMode="WordWrap" />
+        </Grid>
+
+        <Label Text="{Binding StatusMessage}"
+               TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+               FontSize="13" LineBreakMode="WordWrap"
+               IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+    </VerticalStackLayout>
+</ContentView>

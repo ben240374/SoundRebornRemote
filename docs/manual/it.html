@@ -107,7 +107,7 @@ footer a { color: var(--muted); }
 </div></header>
 <div class="wrap">
 <h1 id="soundreborn-remote--manuale-duso">SoundReborn Remote — Manuale d'uso</h1>
-<p>Versione 1.8.2 · Android 7 e successivi</p>
+<p>Versione 1.9.0 · Android 7 e successivi</p>
 <ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li><li><a href="it.html" aria-current="page">Italiano</a></li></ul><hr />
 <h2 id="indice">Indice</h2>
 <ol>
@@ -196,6 +196,11 @@ tuo telefono. Un diffusore con display mostra «LIKED» o «REMOVED».</p>
 diffusore conosce solo il nome della playlist. Con l'agente STR 1.8.2 o successivo, l'app
 mostra al suo posto il brano, l'artista e la copertina, con «Spotify · playlist» come
 sorgente; il brano viene riletto circa ogni cinque secondi.</p>
+<p>Per una radio internet, l'app mostra anche il brano che la stazione annuncia, come il
+display del diffusore: il titolo in grande, l'artista sotto e «stazione · Radio internet»
+come sorgente. Una stazione che non invia nulla, o solo il proprio nome, mantiene la
+visualizzazione abituale; un testo senza artista (un programma, una pubblicità) è mostrato
+così com'è. Il brano viene riletto circa ogni cinque secondi.</p>
 <h3 id="comandi">Comandi</h3>
 <p>Quattro tasti: stop, precedente, riproduci/pausa, successivo. A seconda della sorgente
 alcuni non hanno effetto: un flusso radio in diretta non si può riavvolgere.</p>
@@ -231,9 +236,38 @@ quando si preme due volte un tasto. La scelta vale per entrambe le schede. Ogni 
 porta in alto il nome del suo tasto («Tasto 1» – «Tasto 6», in entrambe le file), e il
 pulsante <strong>Due volte</strong> porta un piccolo numero: quanti tasti della seconda fila hanno una
 stazione.</p>
+<p>A destra dei pulsanti, <strong>Locale</strong> sostituisce i riquadri con le tue preselezioni locali,
+salvate nel telefono (vedi la scheda Preselezioni); <strong>Una volta</strong> riporta i tasti del
+diffusore.</p>
+<p>Anche il pulsante <strong>Una volta</strong> porta un piccolo numero: quanti tasti della prima fila
+hanno una stazione.</p>
 <p><strong>Salva su un tasto ciò che suona</strong>, sotto i riquadri, memorizza sul tasto che scegli ciò
 che il diffusore riproduce in questo momento — stazione, album o brano della libreria.
 Spotify, AUX e Bluetooth non si possono salvare in questo modo.</p>
+<h3 id="messaggio-vocale">Messaggio vocale</h3>
+<p>La scheda <strong>Messaggio vocale</strong> fa parlare il diffusore, poi lo lascia riprendere ciò che
+suonava.</p>
+<ul>
+<li><strong>La tua voce</strong>: tieni premuto il pulsante rotondo del microfono mentre parli, rilascialo
+  per inviare (1 minuto al massimo). Durante la registrazione il pulsante diventa rosso. Il
+  telefono conserva il messaggio finché il diffusore non viene a prenderlo, poi lo cancella.</li>
+<li><strong>Un testo</strong>: scrivilo sotto il pulsante, poi <strong>Leggi</strong>. Il diffusore lo legge con la voce
+  di Google, nella lingua dell'app; deve avere accesso a internet, e il testo passa da
+  Google.</li>
+<li><strong>Salva</strong> aggiunge il testo scritto all'elenco dei testi salvati (dieci al massimo). Tocca
+  un testo salvato per farlo leggere; <strong>✎</strong> lo modifica, <strong>✕</strong> lo elimina dopo conferma.</li>
+</ul>
+<p>Una breve vibrazione segnala che il microfono è in funzione: parla da quel momento.
+L'app aggiunge un po' di silenzio prima e dopo il messaggio, perché il diffusore, che apre
+l'amplificatore con un ritardo, non ne inghiotta l'inizio. Un testo conta al massimo 200
+caratteri.</p>
+<p>Il cursore <strong>Volume degli annunci</strong> regola il volume del messaggio, voce e testo: tutto a
+sinistra, il diffusore mantiene il suo volume; altrimenti passa a quel volume per il
+messaggio, poi torna a quello di prima. Il microfono del telefono non si regola: per un
+messaggio più forte, alza questo cursore.</p>
+<p>Il messaggio va al diffusore che riceve i comandi. Non suona ancora su tutti i diffusori di
+un gruppo: è previsto nell'agente STR. La prima volta Android chiede l'accesso al
+microfono. La scheda compare solo con l'agente STR.</p>
 <h3 id="raggruppa-con">Raggruppa con</h3>
 <p>Un pulsante per ogni diffusore, tranne quello a cui vanno i comandi. Tocca un pulsante per
 aggiungere quel diffusore al gruppo; compaiono una spunta e un bordo verde. Toccalo di
@@ -276,6 +310,21 @@ agente, o con un agente più vecchio.</p>
 <p>Un tasto che ha una stazione solo sulla seconda fila appare vuoto sotto <strong>Una volta</strong>: una
 sola pressione sul diffusore avvia allora la stazione della seconda fila (agente STR 1.6.3
 e successivi).</p>
+<h3 id="preselezioni-locale">Preselezioni «Locale»</h3>
+<p>Il pulsante <strong>Locale</strong>, a destra, mostra preselezioni salvate nel telefono, oltre ai tasti
+del diffusore e in numero libero (100 al massimo). Tocca una riga per avviare la radio sul
+diffusore scelto; <strong>✎</strong> la rinomina, <strong>✕</strong> la rimuove dopo conferma. La riga della radio in
+riproduzione è verde.</p>
+<p>Per aggiungerne:</p>
+<ul>
+<li><strong>Aggiungi ciò che suona</strong> salva la radio che il diffusore riproduce in questo momento,
+  con l'indirizzo originale del flusso e il suo logo;</li>
+<li><strong>Aggiungi un indirizzo</strong> chiede l'indirizzo http o https del flusso, poi un nome;</li>
+<li>nella ricerca, tocca una stazione, poi <strong>Aggiungi a Locale</strong>.</li>
+</ul>
+<p>Queste preselezioni restano in questo telefono: i tasti del diffusore non le conoscono, e
+un altro telefono non le vede. Una playlist Spotify non può esservi salvata: l'agente STR
+avvia una playlist solo da uno dei suoi tasti. Per conservarle in caso di reinstallazione, esportale dalla scheda Impostazioni (<strong>Backup dei preferiti</strong>).</p>
 <h3 id="rinominare-e-cancellare-un-tasto">Rinominare e cancellare un tasto</h3>
 <p>Ogni riquadro porta in alto il nome del suo tasto. Su un tasto memorizzato dall'agente STR,
 accanto ci sono due piccoli pulsanti: <strong>✎</strong> rinomina il tasto e <strong>✕</strong> lo cancella, dopo
@@ -294,11 +343,36 @@ la domanda di conferma lo dice. Il risultato è mostrato per diffusore.</p>
 <p>La copia richiede l'agente STR 1.6.5 o successivo sul diffusore selezionato.</p>
 <h3 id="trovare-una-stazione">Trovare una stazione</h3>
 <p>La casella di ricerca interroga <strong>radio-browser.info</strong>, un elenco aperto curato da
-volontari. Due menu a tendina restringono la ricerca a un paese e a una lingua, e <strong>Le più
-ascoltate</strong> mostra le stazioni più ascoltate senza scrivere nulla.</p>
-<p>La casella <strong>Solo compatibili Bose</strong> è spuntata in partenza, ed è meglio lasciarla così:
-esclude i formati che i diffusori SoundTouch non sanno decodificare (Ogg, Opus, FLAC), che
-darebbero silenzio senza alcun messaggio d'errore.</p>
+volontari. La ricerca segue quella dell'app desktop di STR:</p>
+<ul>
+<li><strong>Paese</strong> e <strong>Lingua</strong> restringono la ricerca; <strong>Ordina</strong> dispone le stazioni per
+  popolarità (voti), ascolti, tendenza, nome o bitrate. Cambiare una di queste scelte
+  ripete l'ultima ricerca.</li>
+<li>Le <strong>etichette dei generi</strong> (Tutti, Pop, Rock, Successi, Jazz, Anni '80…) filtrano per
+  genere; le prime due dipendono dal paese (Italo e Italian per l'Italia). <strong>Altri
+  generi</strong> aggiunge i generi più frequenti dell'elenco. Senza scrivere nulla, un'etichetta
+  sfoglia l'elenco, come Le più ascoltate.</li>
+<li><strong>Le più ascoltate</strong> mostra le stazioni più votate, con questi filtri.</li>
+<li>Una ricerca di più parole cerca quelle parole anche nei generi («rock belge»), e trova un
+  nome scritto con un'altra punteggiatura («Mi Soul» trova «Mi-Soul»).</li>
+<li>Un indirizzo di flusso incollato nella casella (http://… o https://…) trova la stazione
+  dell'elenco che lo trasmette; se è sconosciuto compare come <strong>Indirizzo incollato</strong>, che
+  puoi ascoltare o salvare come le altre.</li>
+<li><strong>Mostra altre</strong>, sotto i risultati, aggiunge la pagina successiva.</li>
+</ul>
+<p><strong>Solo stazioni attive</strong> (spuntata in partenza) esclude le stazioni che l'elenco ha trovato
+non attive all'ultimo controllo. Una stazione appena aggiunta, non ancora controllata,
+resta visibile. Se un nome trova solo stazioni segnalate come non attive, vengono mostrate
+comunque, con un avviso: l'elenco controlla dall'estero, e una radio limitata al suo paese
+lì sembra spenta mentre a casa tua funziona benissimo.</p>
+<p><strong>Solo compatibili Bose</strong> (spuntata in partenza, meglio lasciarla così) esclude i formati
+che i diffusori SoundTouch non sanno decodificare (Ogg, Opus, FLAC), che darebbero silenzio
+senza alcun messaggio d'errore. <strong>Bitrate</strong> nasconde le stazioni sotto un bitrate scelto;
+quelle con bitrate sconosciuto restano. Entrambi i filtri agiscono sulla lista ricevuta,
+senza nuova ricerca, e il numero di stazioni nascoste compare sotto il titolo dei
+risultati.</p>
+<p><strong>Manca una stazione?</strong> Il link sotto i risultati apre radio-browser.info, dove chiunque può
+aggiungerla: comparirà qui, e per tutti.</p>
 <p>Tocca un risultato e si apre un menu con</p>
 <ul>
 <li><strong>Ascolta ora</strong> — riproduce subito la stazione, senza memorizzare nulla;</li>
@@ -383,7 +457,7 @@ per forza quello che riceve i comandi. Quando segue un gruppo, una riga in ambra
 vanno davvero i comandi, e perché.</p>
 <p><strong>Sveglie</strong>: quelle del diffusore selezionato — una sveglia suona solo sul diffusore su cui
 è salvata, anche in un gruppo. Ogni sveglia riproduce un tasto (da 1 a 6, o da 1 a 6 premuto
-due volte) all'ora e nei giorni che scegli. Imposti anche il suo volume (o mantieni quello
+due volte) all'ora e nei giorni che scegli (le scorciatoie <strong>Lun → Ven</strong>, <strong>Weekend</strong> e <strong>Tutti i giorni</strong> spuntano i giorni in un colpo; ogni casella resta modificabile). Imposti anche il suo volume (o mantieni quello
 del diffusore), lo spegnimento automatico e la durata del posticipo. La scheda mostra la
 prossima sveglia come la prevede il diffusore, e avvisa quando il suo orologio non è ancora
 impostato. Se il fuso orario del diffusore è vuoto (UTC), quello del telefono viene salvato
@@ -416,6 +490,11 @@ l'intervallo dei bassi, l'elenco degli endpoint API riconosciuti, e ciò che ogn
 conosciuto dichiara sulla zona attuale. Sono le informazioni da allegare a una
 segnalazione. <em>Svuota la cache dei loghi</em> obbliga a scaricare di nuovo le immagini delle
 stazioni.</p>
+<p><strong>Backup dei preferiti</strong>: le preselezioni «Locale» e i testi salvati del messaggio vocale
+vivono solo nel telefono. Un aggiornamento li conserva; una disinstallazione li cancella,
+compresa quella che Android impone prima di installare un APK firmato con un'altra chiave.
+<strong>Esporta</strong> crea un file e apre la condivisione (Drive, e-mail, File…); <strong>Importa</strong> rilegge
+un tale file e aggiunge ciò che manca, senza sostituire né eliminare nulla.</p>
 <p><strong>Informazioni</strong>: la versione, il ringraziamento al progetto STR con un collegamento al suo
 sito, e le note legali.</p>
 <hr />
@@ -453,6 +532,17 @@ Impostazioni → Lingua. La tua scelta prevale sulla lingua del telefono.</p>
 Il messaggio sotto il titolo ne dà il motivo: non suona nulla, la sorgente non è una radio
 internet, oppure l'indirizzo del flusso di questa stazione è sconosciuto. Riavvia la
 stazione da una preselezione o dall'elenco, poi riapri la scheda Sorgenti.</p>
+<p><strong>Il diffusore non riproduce il messaggio vocale.</strong>
+Il messaggio sotto la scheda ne indica il motivo. Se il diffusore non è venuto a prenderlo,
+probabilmente il Wi-Fi isola i dispositivi (rete ospiti). Una pressione troppo breve non
+invia nulla: tieni il dito sul pulsante mentre parli. Il testo letto richiede che il
+diffusore abbia accesso a internet. Se un messaggio non è partito, <strong>Riprova</strong>, accanto al motivo, lo rinvia così com'è,
+senza registrarlo di nuovo.</p>
+<p><strong>Le mie preselezioni «Locale» sono sparite dopo un aggiornamento.</strong>
+Un aggiornamento normale le conserva. Spariscono quando l'app è stata disinstallata —
+Android lo impone per passare a una versione firmata con un'altra chiave, per esempio da una
+versione di prova avviata da Visual Studio alla versione pubblicata. Esportale prima in
+Impostazioni → <strong>Backup dei preferiti</strong>, poi importa il file.</p>
 <hr />
 <h2 id="11-limiti-noti">11. Limiti noti</h2>
 <ul>
@@ -474,6 +564,10 @@ stazione da una preselezione o dall'elenco, poi riapri la scheda Sorgenti.</p>
   Spotify con cui è collegato il diffusore.</li>
 <li><strong>Rinominare e cancellare i tasti: agente STR 1.8.0 o successivo; il brano di un tasto
   Spotify: 1.8.2 o successivo.</strong></li>
+<li><strong>Messaggio vocale: solo il diffusore scelto.</strong> Un annuncio su un intero gruppo aspetta
+  l'agente STR. Il testo letto passa dalla voce di Google: esce dalla tua rete, e il
+  diffusore deve avere accesso a internet.</li>
+<li><strong>Preselezioni «Locale»: solo radio</strong>, salvate in questo telefono.</li>
 </ul>
 <hr />
 <h2 id="12-note-legali">12. Note legali</h2>

@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 
 namespace SoundReborn.Core.Models;
@@ -30,6 +31,57 @@ public sealed class StrStreamTitle
 
     /// <summary>Vrai quand l'agent donne le morceau Spotify en cours, au moins son nom.</summary>
     public bool HasSong => !string.IsNullOrWhiteSpace(Track);
+
+    /// <summary>
+    /// Le morceau d'une radio, tiré de <see cref="Title"/> : null quand la station
+    /// n'envoie rien, ou n'envoie que son propre nom.
+    ///
+    /// L'agent rend le titre sous la forme « Artiste - Titre » ; il le remet
+    /// lui-même dans cet ordre quand la station l'envoie à l'envers (« swapped »).
+    /// Le découpage se fait au premier « - » entouré d'espaces. Sans ce séparateur
+    /// — une publicité, le nom d'une émission — le texte entier devient le titre,
+    /// sans artiste.
+    ///
+    /// Les codes HTML (« &amp;eacute; », « &amp;#382; ») sont remis en lettres :
+    /// l'agent ne le fait lui-même que depuis la version 1.8.3.
+    /// </summary>
+    public RadioSong? RadioSongFor(string? stationName)
+    {
+        var title = Clean(Title);
+
+        if (title.Length == 0 ||
+            !string.IsNullOrWhiteSpace(stationName) &&
+            string.Equals(title, stationName.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        var cut = title.IndexOf(" - ", StringComparison.Ordinal);
+
+        if (cut > 0)
+        {
+            var artist = title[..cut].Trim();
+            var song = title[(cut + 3)..].Trim();
+
+            if (artist.Length > 0 && song.Length > 0)
+            {
+                return new RadioSong(song, artist);
+            }
+        }
+
+        return new RadioSong(title, null);
+    }
+
+    private static string Clean(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return "";
+        }
+
+        var decoded = text.Contains('&') ? WebUtility.HtmlDecode(text) : text;
+        return decoded.Trim();
+    }
 
     public static StrStreamTitle Parse(string? text)
     {
@@ -77,3 +129,6 @@ public sealed class StrStreamTitle
             ? value
             : null;
 }
+
+/// <summary>Le morceau qu'une radio annonce : son titre, et son artiste quand la station le donne.</summary>
+public sealed record RadioSong(string Song, string? Artist);

@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:SoundRebornRemote.App.ViewModels"
+             xmlns:views="clr-namespace:SoundRebornRemote.App.Views"
              x:Class="SoundRebornRemote.App.Views.PlayerPage"
              x:DataType="vm:PlayerViewModel"
              Title="{DynamicResource L_TabPlayer}">
@@ -115,7 +116,15 @@
                         « J'aime » / « Je n'aime pas » pour le titre Spotify en cours
                         (agent 1.8.1+). Sa propre vue-modèle : BindingContext sur le
                         ContentView, type compilé sur le bloc enfant.
+
+                        La visibilité est posée sur une grille qui enveloppe le tout et
+                        garde la vue-modèle de la page (Like.ShowButtons) : cachée, la
+                        carte ne lui réserve plus aucune place. Posée sur le bloc enfant
+                        seul, le ContentView gardait sur Android la hauteur des boutons
+                        après le passage de Spotify à une radio : un grand vide restait
+                        sous le titre.
                     -->
+                    <Grid IsVisible="{Binding Like.ShowButtons}">
                     <ContentView BindingContext="{Binding Like}">
                         <VerticalStackLayout x:DataType="vm:SpotifyLikeViewModel" Spacing="6" IsVisible="{Binding ShowButtons}">
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
@@ -132,6 +141,7 @@
                                    LineBreakMode="WordWrap" />
                         </VerticalStackLayout>
                     </ContentView>
+                    </Grid>
                 </VerticalStackLayout>
             </Border>
 
@@ -373,48 +383,79 @@
                     <Label Text="{DynamicResource L_Presets}" Style="{StaticResource SectionLabel}" />
 
                     <!--
-                        Seconde rangée : la même touche pressée deux fois. Le sélecteur
-                        n'apparaît que si l'agent de l'enceinte gère ces six touches-là.
+                        « Une fois » : les six touches. « Deux fois » : la même touche
+                        pressée deux fois, seulement si l'agent de l'enceinte gère ces
+                        six touches-là. « Local », à droite : les présélections gardées
+                        dans le téléphone, en nombre libre.
                     -->
-                    <HorizontalStackLayout Spacing="8" IsVisible="{Binding HasSecondRow}">
-                        <Border Style="{StaticResource Chip}" Padding="14,6">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                        <HorizontalStackLayout Grid.Column="0" Spacing="8">
+                            <Border Style="{StaticResource Chip}" Padding="14,6">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ShowPresetRowCommand}" CommandParameter="1" />
+                                </Border.GestureRecognizers>
+
+                                <!-- Pastille : nombre de touches garnies dans la première rangée. -->
+                                <HorizontalStackLayout Spacing="6">
+                                    <Label Text="{DynamicResource L_RowOnce}" FontSize="13" VerticalOptions="Center" />
+                                    <Border Style="{StaticResource CountBadge}" IsVisible="{Binding ShowFirstRowCount}">
+                                        <Label Text="{Binding FirstRowCount}" Style="{StaticResource CountBadgeLabel}" />
+                                    </Border>
+                                </HorizontalStackLayout>
+
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding OnceSelected}" Value="True">
+                                        <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                        <Setter Property="StrokeThickness" Value="2" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                            </Border>
+
+                            <Border Style="{StaticResource Chip}" Padding="14,6" IsVisible="{Binding HasSecondRow}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ShowPresetRowCommand}" CommandParameter="2" />
+                                </Border.GestureRecognizers>
+
+                                <!-- Pastille : nombre de touches garnies dans cette rangée. -->
+                                <HorizontalStackLayout Spacing="6">
+                                    <Label Text="{DynamicResource L_RowTwice}" FontSize="13" VerticalOptions="Center" />
+                                    <Border Style="{StaticResource CountBadge}" IsVisible="{Binding ShowSecondRowCount}">
+                                        <Label Text="{Binding SecondRowCount}" Style="{StaticResource CountBadgeLabel}" />
+                                    </Border>
+                                </HorizontalStackLayout>
+
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding TwiceSelected}" Value="True">
+                                        <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                        <Setter Property="StrokeThickness" Value="2" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                            </Border>
+                        </HorizontalStackLayout>
+
+                        <Border Grid.Column="2" Style="{StaticResource Chip}" Padding="14,6">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ShowPresetRowCommand}" CommandParameter="1" />
+                                <TapGestureRecognizer Command="{Binding ShowLocalCommand}" />
                             </Border.GestureRecognizers>
 
-                            <Label Text="{DynamicResource L_RowOnce}" FontSize="13" />
-
-                            <Border.Triggers>
-                                <DataTrigger TargetType="Border" Binding="{Binding IsFirstRow}" Value="True">
-                                    <Setter Property="Stroke" Value="{StaticResource Accent}" />
-                                    <Setter Property="StrokeThickness" Value="2" />
-                                </DataTrigger>
-                            </Border.Triggers>
-                        </Border>
-
-                        <Border Style="{StaticResource Chip}" Padding="14,6">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ShowPresetRowCommand}" CommandParameter="2" />
-                            </Border.GestureRecognizers>
-
-                            <!-- Pastille : nombre de touches garnies dans cette rangée. -->
+                            <!-- Pastille : nombre de présélections locales. -->
                             <HorizontalStackLayout Spacing="6">
-                                <Label Text="{DynamicResource L_RowTwice}" FontSize="13" VerticalOptions="Center" />
-                                <Border Style="{StaticResource CountBadge}" IsVisible="{Binding ShowSecondRowCount}">
-                                    <Label Text="{Binding SecondRowCount}" Style="{StaticResource CountBadgeLabel}" />
+                                <Label Text="{DynamicResource L_RowLocal}" FontSize="13" VerticalOptions="Center" />
+                                <Border Style="{StaticResource CountBadge}" IsVisible="{Binding Local.ShowCount}">
+                                    <Label Text="{Binding Local.Count}" Style="{StaticResource CountBadgeLabel}" />
                                 </Border>
                             </HorizontalStackLayout>
 
                             <Border.Triggers>
-                                <DataTrigger TargetType="Border" Binding="{Binding IsSecondRow}" Value="True">
+                                <DataTrigger TargetType="Border" Binding="{Binding Local.IsShown}" Value="True">
                                     <Setter Property="Stroke" Value="{StaticResource Accent}" />
                                     <Setter Property="StrokeThickness" Value="2" />
                                 </DataTrigger>
                             </Border.Triggers>
                         </Border>
-                    </HorizontalStackLayout>
+                    </Grid>
 
-                    <CollectionView ItemsSource="{Binding Presets}" HeightRequest="284">
+                    <CollectionView ItemsSource="{Binding Presets}" HeightRequest="284" IsVisible="{Binding ShowKeys}">
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout Orientation="Vertical" Span="3"
                                              HorizontalItemSpacing="8" VerticalItemSpacing="8" />
@@ -466,12 +507,132 @@
                         </CollectionView.ItemTemplate>
                     </CollectionView>
 
-                    <!-- Range sur une touche ce que l'enceinte joue en ce moment. -->
-                    <Button Text="{DynamicResource L_KeepPlaying}" Style="{StaticResource QuietButton}"
-                            Command="{Binding SavePlayingCommand}" HorizontalOptions="Center"
-                            IsVisible="{Binding HasStrAgent}" />
+                    <!-- La liste « Local », à la place de la grille. Visibilité sur la grille englobante (voir LocalPresetsView). -->
+                    <Grid IsVisible="{Binding Local.IsShown}">
+                        <views:LocalPresetsView BindingContext="{Binding Local}" />
+                    </Grid>
+
+
+                    <!-- Range sur une touche ce que l'enceinte joue en ce moment (pas dans la liste « Local », qui a ses propres boutons). -->
+                    <Grid IsVisible="{Binding ShowKeys}">
+                        <Button Text="{DynamicResource L_KeepPlaying}" Style="{StaticResource QuietButton}"
+                                Command="{Binding SavePlayingCommand}" HorizontalOptions="Center"
+                                IsVisible="{Binding HasStrAgent}" />
+                    </Grid>
                 </VerticalStackLayout>
             </Border>
+
+            <!--
+                ================================================= Message vocal
+                Sa propre vue-modèle (VoiceMessageViewModel), posée par la page
+                dans son code. La visibilité est sur le ContentView lui-même.
+            -->
+            <ContentView x:Name="VoiceCard" x:DataType="vm:VoiceMessageViewModel" IsVisible="{Binding ShowCard}">
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="{DynamicResource L_VoiceTitle}" Style="{StaticResource SectionLabel}" />
+
+                        <!--
+                            Ma voix : maintenir le bouton rond pour parler, relâcher pour
+                            envoyer. Les événements Pressed et Released du bouton sont
+                            relayés par la page (OnVoicePressed / OnVoiceReleased) : un
+                            bouton n'a de commande que pour l'appui complet. Le micro est
+                            un tracé posé par-dessus, transparent aux appuis.
+                        -->
+                        <VerticalStackLayout Spacing="6" HorizontalOptions="Center" IsVisible="{Binding RecorderSupported}">
+                            <Grid WidthRequest="84" HeightRequest="84" HorizontalOptions="Center">
+                                <!-- Couleur par le style, pas en valeur locale : le déclencheur doit pouvoir la passer au rouge. -->
+                                <Button x:Name="VoiceButton" Style="{StaticResource AccentButton}"
+                                        WidthRequest="84" HeightRequest="84" CornerRadius="42"
+                                        Padding="0" MinimumHeightRequest="84"
+                                        IsEnabled="{Binding CanRecord}"
+                                        SemanticProperties.Description="{DynamicResource L_VoiceHoldHint}"
+                                        Pressed="OnVoicePressed" Released="OnVoiceReleased">
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button" Binding="{Binding IsRecording}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource Danger}" />
+                                        </DataTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                                <Path Style="{StaticResource IconStrokeOnAccent}" InputTransparent="True"
+                                      WidthRequest="30" HeightRequest="30" StrokeThickness="2.2"
+                                      Data="M12,3 A3,3 0 0 1 15,6 V12 A3,3 0 0 1 9,12 V6 A3,3 0 0 1 12,3 Z M6,11 A6,6 0 0 0 18,11 M12,17 V21 M9,21 H15" />
+                            </Grid>
+                            <Label Text="{Binding HoldHint}" Style="{StaticResource CaptionLabel}"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="{Binding ElapsedText}" Style="{StaticResource ValueLabel}"
+                                   HorizontalOptions="Center" IsVisible="{Binding IsRecording}" />
+                        </VerticalStackLayout>
+
+                        <!-- Texte lu par l'enceinte, voix de Google, dans la langue de l'application. -->
+                        <Entry Text="{Binding Text}" Placeholder="{DynamicResource L_VoiceTextPlaceholder}"
+                               MaxLength="200" ReturnType="Send" ReturnCommand="{Binding SpeakCommand}" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Button Grid.Column="0" Text="{DynamicResource L_VoiceSpeak}" Style="{StaticResource QuietButton}"
+                                    Command="{Binding SpeakCommand}" IsEnabled="{Binding CanSpeak}" />
+                            <Button Grid.Column="1" Text="{DynamicResource L_VoiceKeep}" Style="{StaticResource QuietButton}"
+                                    Command="{Binding KeepTextCommand}" IsEnabled="{Binding CanKeep}" />
+                        </Grid>
+
+                        <!-- Les textes gardés (dix au plus) : appui pour les faire lire, ✎ modifier, ✕ supprimer. -->
+                        <VerticalStackLayout Spacing="0" IsVisible="{Binding HasTexts}">
+                            <Label Text="{DynamicResource L_VoiceTexts}" Style="{StaticResource CaptionLabel}" />
+                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Texts}" Spacing="0">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:SavedVoiceText">
+                                        <Grid Padding="2,8" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:VoiceMessageViewModel}}, Path=SpeakSavedCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            </Grid.GestureRecognizers>
+
+                                            <Label Grid.Column="0" Text="▶" FontSize="15" VerticalOptions="Center"
+                                                   TextColor="{StaticResource Accent}" />
+                                            <Label Grid.Column="1" Text="{Binding Text}" FontSize="15" VerticalOptions="Center"
+                                                   LineBreakMode="TailTruncation" MaxLines="2" />
+                                            <Button Grid.Column="2" Text="✎" Style="{StaticResource TileIconButton}" VerticalOptions="Center"
+                                                    SemanticProperties.Description="{DynamicResource L_VoiceTextEditGo}"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:VoiceMessageViewModel}}, Path=EditTextCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            <Button Grid.Column="3" Text="✕" Style="{StaticResource TileIconButton}" VerticalOptions="Center"
+                                                    TextColor="{StaticResource Danger}"
+                                                    SemanticProperties.Description="{DynamicResource L_VoiceTextDeleteGo}"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:VoiceMessageViewModel}}, Path=DeleteTextCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+
+                        <!--
+                            Volume des annonces, voix et texte : tout à gauche, celui de
+                            l'enceinte ; sinon le volume fixé le temps du message.
+                        -->
+                        <VerticalStackLayout Spacing="0">
+                            <Label Text="{Binding VolumeLabel}" Style="{StaticResource CaptionLabel}" />
+                            <Slider Minimum="0" Maximum="100" Value="{Binding AnnounceVolume, Mode=TwoWay}" />
+                        </VerticalStackLayout>
+
+                        <ActivityIndicator IsRunning="{Binding IsSending}" IsVisible="{Binding IsSending}"
+                                           HorizontalOptions="Start" HeightRequest="22" />
+
+                        <!-- Le message d'état, et « Réessayer » quand le dernier message n'est pas parti. -->
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8"
+                              IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}">
+                            <Label Grid.Column="0" Text="{Binding StatusMessage}"
+                                   TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                                   FontSize="13" LineBreakMode="WordWrap" VerticalOptions="Center" />
+                            <Button Grid.Column="1" Text="{DynamicResource L_VoiceRetry}" Style="{StaticResource QuietButton}"
+                                    Command="{Binding RetryCommand}" IsVisible="{Binding CanRetry}"
+                                    VerticalOptions="Center" />
+                        </Grid>
+
+                        <Label Text="{DynamicResource L_VoiceHint}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+                </Border>
+            </ContentView>
 
             <!-- ================================================= Groupement rapide -->
             <Border Style="{StaticResource Card}" IsVisible="{Binding HasSeveralSpeakers}">

@@ -58,6 +58,28 @@ public static class MauiProgram
             Path.Combine(FileSystem.AppDataDirectory, "recordings"),
             TimeProvider.System));
 
+        // Message vocal : le micro passe par IVoiceRecorder.
+#if ANDROID
+        builder.Services.AddSingleton<IVoiceRecorder, AndroidVoiceRecorder>();
+#else
+        builder.Services.AddSingleton<IVoiceRecorder, NoVoiceRecorder>();
+#endif
+        builder.Services.AddSingleton<VoiceMessageViewModel>(services => new VoiceMessageViewModel(
+            services.GetRequiredService<SpeakerManager>(),
+            services.GetRequiredService<IVoiceRecorder>()));
+
+        // Sauvegarde des favoris : partage et choix de fichiers par IFileExchange.
+#if ANDROID
+        builder.Services.AddSingleton<IFileExchange, AndroidFileExchange>();
+#else
+        builder.Services.AddSingleton<IFileExchange, NoFileExchange>();
+#endif
+        builder.Services.AddSingleton<BackupViewModel>(services => new BackupViewModel(
+            services.GetRequiredService<SpeakerManager>(),
+            services.GetRequiredService<PresetsViewModel>(),
+            services.GetRequiredService<VoiceMessageViewModel>(),
+            services.GetRequiredService<IFileExchange>()));
+
         builder.Services.AddSingleton<PlayerViewModel>();
         builder.Services.AddSingleton<PresetsViewModel>();
         builder.Services.AddSingleton<SourcesViewModel>();

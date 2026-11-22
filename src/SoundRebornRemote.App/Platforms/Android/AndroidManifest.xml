@@ -40,4 +40,11 @@
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+  <!-- Message vocal : le micro, demandé au premier enregistrement seulement. -->
+  <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+  <!-- Une courte vibration quand le micro tourne vraiment : on sait quand parler.
+       Autorisation sans question à l'utilisateur. -->
+  <uses-permission android:name="android.permission.VIBRATE" />
+
 </manifest>

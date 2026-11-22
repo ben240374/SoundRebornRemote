@@ -16,16 +16,18 @@ no service in between.
 ## Features
 
 **Play tab**
-- Volume, mute, standby and bass; play, pause, next and previous track; what is playing, with its artwork — during a Spotify key, the song, the artist and the cover (STR agent 1.8.2 or later).
+- Volume, mute, standby and bass; play, pause, next and previous track; what is playing, with its artwork — during a Spotify key, the song, the artist and the cover (STR agent 1.8.2 or later); on an internet radio, the song the station announces.
 - The six presets with their station logos and key names, and the second row of six (a key pressed twice), with the number of keys it holds.
 - Keep what is playing on a key; sleep timer for the speaker or the whole group.
 - *Group with*: one tap adds a speaker to the group or removes it, with the progress shown in place; asks first when the speaker you add is playing something else.
 - Like or dislike the Spotify song that is playing (STR agent 1.8.1 or later).
+- Voice message: hold the round button to talk and release it to send, or type a text the speaker reads with Google's voice (up to ten texts kept), at an announcement volume of your choice; the speaker plays it, then goes back to what it was playing.
 
 **Presets tab**
-- Internet station search (radio-browser.info) by name, country and language, with a filter for streams the speaker can play.
+- Internet station search (radio-browser.info), as in the STR desktop app: name, country, language, genre chips (two of them chosen for the country), sort (popularity, plays, trend, name, bitrate), minimum bitrate, working stations only, streams the speaker can play, pasted stream address, "Show more", and a link to add a missing station to the directory.
 - Assign a station to any of the twelve keys.
 - Rename or clear a key.
+- *Local* presets kept on the phone, as many as you like: the radio that is playing, a station from the search or a pasted address; started on any STR speaker.
 - Copy all the keys to another STR speaker, or to all of them (STR agent 1.6.5 or later).
 
 **Sources tab**
@@ -39,8 +41,9 @@ no service in between.
 - Safeguards: asks before replacing a saved permanent group; a stereo pair is never asked to lead a group.
 
 **Settings tab**
-- Alarms of each speaker: time on the phone's clock dial, days, key, volume, automatic switch-off, snooze. Changes made in other STR apps are kept.
+- Alarms of each speaker: time on the phone's clock dial, days (with Mon → Fri, Weekend and Every day shortcuts), key, volume, automatic switch-off, snooze. Changes made in other STR apps are kept.
 - Start volume: the level the speaker takes when it is switched on.
+- Favourites backup: export the local presets and kept texts to a file, and import them back.
 - Speaker discovery (mDNS, then a network sweep) or manual address; flags speakers without the STR agent or with an agent older than 1.8.0.
 - Interface in English, French, German, Dutch, Spanish and Italian; light or dark theme; diagnostics.
 
@@ -97,6 +100,9 @@ attached to the latest release: [English](https://github.com/ben240374/SoundRebo
 | Keeping what is playing on a key | Play tab | `POST :8888/api/box/save-playing` |
 | Like / Dislike the Spotify song that is playing | Play tab | `POST :8888/api/spotify/liked` — shown only when `/api/agent/version` reports `spotifyLiked` and Spotify plays |
 | Song, artist and cover during a Spotify key | Play tab | `GET :8888/api/stream/title` — `track`, `artist`, `art` (agent 1.8.2), read again every 5 s while the key plays |
+| Song of an internet radio | Play tab | `GET :8888/api/stream/title` — `title` split at the first " - " into artist and song, read again every 5 s |
+| Voice message (recorded clip or text read aloud) | Play tab | `POST :8888/api/announce` — `url` of an AAC clip (with silent lead-in) the phone serves over HTTP for the time the agent fetches it, or `text` and `lang` (Google voice); optional `volume` |
+| *Local* presets kept on the phone | Play and Presets tabs | stored in the app's preferences; started with `POST :8888/api/play` |
 | Asking before grouping a speaker that plays something else | Play tab | its `GET :8090/now_playing`, compared by source and stream address |
 | Sleep timer | Play tab | `GET/POST/DELETE :8888/api/box/sleep` |
 | Alarms of the selected speaker (time, days, key, volume, switch-off, snooze) | Settings tab | `GET/PUT :8888/api/alarms` with `rev`; on `409` the user's change is applied again to the current document |
@@ -357,16 +363,18 @@ aucun service intermédiaire.
 ## Fonctions
 
 **Onglet Lecture**
-- Volume, sourdine, marche/veille et graves ; lecture, pause, piste suivante et précédente ; ce qui joue, avec sa pochette — pendant une touche Spotify, le morceau, l'artiste et la pochette (agent STR 1.8.2 ou plus récent).
+- Volume, sourdine, marche/veille et graves ; lecture, pause, piste suivante et précédente ; ce qui joue, avec sa pochette — pendant une touche Spotify, le morceau, l'artiste et la pochette (agent STR 1.8.2 ou plus récent) ; sur une radio internet, le morceau que la station annonce.
 - Les six présélections avec le logo des stations et le nom des touches, et la seconde rangée de six (touche pressée deux fois), avec le nombre de touches qu'elle porte.
 - Garder ce qui joue sur une touche ; minuterie de sommeil pour l'enceinte ou tout le groupe.
 - *Grouper avec* : un appui ajoute une enceinte au groupe ou l'en retire, avec l'avancement affiché sur place ; demande d'abord quand l'enceinte ajoutée joue autre chose.
 - « J'aime » ou « Je n'aime pas » sur le titre Spotify en cours (agent STR 1.8.1 ou plus récent).
+- Message vocal : maintenir le bouton rond pour parler et le relâcher pour envoyer, ou un texte que l'enceinte lit avec la voix de Google (dix textes gardés au plus), au volume d'annonce choisi ; l'enceinte le joue, puis reprend ce qu'elle jouait.
 
 **Onglet Présélections**
-- Recherche de stations internet (radio-browser.info) par nom, pays et langue, avec un filtre pour les flux que l'enceinte sait lire.
+- Recherche de stations internet (radio-browser.info), comme dans l'application PC de STR : nom, pays, langue, pastilles de genres (dont deux choisies pour le pays), tri (popularité, écoutes, tendance, nom, débit), débit minimal, stations en service uniquement, flux que l'enceinte sait lire, adresse de flux collée, « Voir plus », et un lien pour ajouter à l'annuaire une station qui manque.
 - Affectation d'une station à l'une des douze touches.
 - Renommer ou effacer une touche.
+- Présélections *Local* gardées dans le téléphone, en nombre libre : la radio qui joue, une station de la recherche ou une adresse collée ; lancées sur n'importe quelle enceinte STR.
 - Copie de toutes les touches vers une autre enceinte STR, ou vers toutes (agent STR 1.6.5 ou plus récent).
 
 **Onglet Sources**
@@ -380,8 +388,9 @@ aucun service intermédiaire.
 - Garde-fous : confirmation avant de remplacer un groupe permanent enregistré ; une paire stéréo n'est jamais appelée à diriger un groupe.
 
 **Onglet Réglages**
-- Réveils de chaque enceinte : heure sur le cadran du téléphone, jours, touche, volume, arrêt automatique, répétition. Les modifications faites dans les autres applications STR sont conservées.
+- Réveils de chaque enceinte : heure sur le cadran du téléphone, jours (raccourcis Lun → Ven, Week-end, Tous les jours), touche, volume, arrêt automatique, répétition. Les modifications faites dans les autres applications STR sont conservées.
 - Volume de départ : le niveau que prend l'enceinte quand on l'allume.
+- Sauvegarde des favoris : export des présélections *Local* et des textes gardés dans un fichier, et import.
 - Découverte des enceintes (mDNS, puis balayage du réseau) ou adresse manuelle ; signale les enceintes sans agent STR ou avec un agent antérieur à 1.8.0.
 - Interface en français, anglais, allemand, néerlandais, espagnol et italien ; thème clair ou foncé ; diagnostic.
 
@@ -439,6 +448,9 @@ jointes à la dernière release : [Français](https://github.com/ben240374/Sound
 | Garder ce qui joue sur une touche | onglet Lecture | `POST :8888/api/box/save-playing` |
 | « J'aime » / « Je n'aime pas » sur le titre Spotify en cours | onglet Lecture | `POST :8888/api/spotify/liked` — affiché seulement quand `/api/agent/version` annonce `spotifyLiked` et que Spotify joue |
 | Morceau, artiste et pochette pendant une touche Spotify | onglet Lecture | `GET :8888/api/stream/title` — `track`, `artist`, `art` (agent 1.8.2), relu toutes les 5 s tant que la touche joue |
+| Morceau d'une radio internet | onglet Lecture | `GET :8888/api/stream/title` — `title` coupé au premier « - » en artiste et morceau, relu toutes les 5 s |
+| Message vocal (clip enregistré ou texte lu) | onglet Lecture | `POST :8888/api/announce` — `url` d'un clip AAC (précédé de silence) que le téléphone sert en HTTP le temps que l'agent le télécharge, ou `text` et `lang` (voix de Google) ; `volume` facultatif |
+| Présélections *Local* gardées dans le téléphone | onglets Lecture et Présélections | rangées dans les préférences de l'application ; lancées par `POST :8888/api/play` |
 | Question avant de grouper une enceinte qui joue autre chose | onglet Lecture | son `GET :8090/now_playing`, comparé par source et adresse du flux |
 | Minuterie de sommeil | onglet Lecture | `GET/POST/DELETE :8888/api/box/sleep` |
 | Réveils de l'enceinte sélectionnée (heure, jours, touche, volume, arrêt, répétition) | onglet Réglages | `GET/PUT :8888/api/alarms` avec `rev` ; sur un `409`, la modification de l'utilisateur est refaite sur le document actuel |

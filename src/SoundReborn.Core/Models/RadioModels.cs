@@ -24,7 +24,30 @@ public sealed class RadioStation
     [JsonPropertyName("hls")] public int Hls { get; set; }
     [JsonPropertyName("votes")] public int Votes { get; set; }
     [JsonPropertyName("clickcount")] public int ClickCount { get; set; }
+    [JsonPropertyName("clicktrend")] public int ClickTrend { get; set; }
     [JsonPropertyName("lastcheckok")] public int LastCheckOk { get; set; }
+
+    /// <summary>
+    /// Date du dernier contrôle du flux par radio-browser. Vide, ou faite de zéros
+    /// selon le miroir, pour une station que l'annuaire n'a pas encore contrôlée —
+    /// typiquement une station qu'on vient d'y ajouter.
+    /// </summary>
+    [JsonPropertyName("lastchecktime")] public string? LastCheckTime { get; set; }
+
+    /// <summary>Jamais contrôlée par radio-browser : une entrée toute neuve, pas une station morte.</summary>
+    [JsonIgnore]
+    public bool IsNeverChecked
+    {
+        get
+        {
+            var time = (LastCheckTime ?? "").Trim();
+            return time.Length == 0 || time.StartsWith("0000-00-00", StringComparison.Ordinal);
+        }
+    }
+
+    /// <summary>Contrôlée ET trouvée hors service au dernier passage de radio-browser.</summary>
+    [JsonIgnore]
+    public bool IsCheckedBroken => LastCheckOk != 1 && !IsNeverChecked;
 
     /// <summary>URL de flux à privilégier : celle que radio-browser a résolue.</summary>
     [JsonIgnore]
@@ -101,6 +124,32 @@ public sealed class RadioStation
     };
 }
 
+/// <summary>Ordres de tri de la recherche, tels que radio-browser les nomme.</summary>
+public static class RadioOrder
+{
+    /// <summary>Votes des auditeurs : la « popularité » de l'application PC de STR.</summary>
+    public const string Votes = "votes";
+
+    /// <summary>Nombre d'écoutes.</summary>
+    public const string Clicks = "clickcount";
+
+    /// <summary>Progression des écoutes sur 24 heures.</summary>
+    public const string Trend = "clicktrend";
+
+    /// <summary>Ordre alphabétique.</summary>
+    public const string Name = "name";
+
+    /// <summary>Débit, le plus haut d'abord.</summary>
+    public const string Bitrate = "bitrate";
+
+    /// <summary>Ordre connu, ou les votes pour une valeur inconnue ou vide.</summary>
+    public static string Normalize(string? order) => order switch
+    {
+        Clicks or Trend or Name or Bitrate => order,
+        _ => Votes,
+    };
+}
+
 /// <summary>Critères de recherche envoyés à radio-browser.</summary>
 public sealed class RadioSearchOptions
 {
@@ -112,13 +161,47 @@ public sealed class RadioSearchOptions
     /// <summary>Nom anglais de la langue en minuscules, « french » par exemple. Null = toutes.</summary>
     public string? Language { get; set; }
 
+    /// <summary>Genre (étiquette radio-browser), « jazz » par exemple. Null = tous.</summary>
     public string? Tag { get; set; }
+
+    /// <summary>Ordre de tri, voir <see cref="RadioOrder"/>.</summary>
+    public string Order { get; set; } = RadioOrder.Votes;
 
     public int Limit { get; set; } = 60;
 
-    /// <summary>Masque côté serveur les stations dont le dernier contrôle a échoué.</summary>
+    /// <summary>Position dans la liste de l'annuaire, pour « Voir plus ».</summary>
+    public int Offset { get; set; }
+
+    /// <summary>
+    /// « En service uniquement » : écarte les stations que radio-browser a
+    /// contrôlées et trouvées hors service. Pour une recherche par nom ou par genre,
+    /// une station pas encore contrôlée (ajoutée il y a peu) reste visible.
+    /// </summary>
     public bool HideBroken { get; set; } = true;
 
     /// <summary>Ne garde que ce que l'enceinte sait lire (filtrage côté application).</summary>
     public bool BoseCompatibleOnly { get; set; } = true;
+}
+
+/// <summary>Une page de résultats de l'annuaire.</summary>
+public sealed class RadioSearchPage
+{
+    public required IReadOnlyList<RadioStation> Stations { get; init; }
+
+    /// <summary>
+    /// Vrai quand la recherche par nom n'a trouvé que des stations signalées hors
+    /// service et les montre quand même : radio-browser contrôle depuis l'étranger,
+    /// et une radio réservée à son pays y paraît morte alors qu'elle joue très bien
+    /// chez soi.
+    /// </summary>
+    public bool Relaxed { get; init; }
+
+    /// <summary>Nombre de stations reçues de l'annuaire, avant tout filtre.</summary>
+    public int Fetched { get; init; }
+
+    /// <summary>Position de la page suivante, pour « Voir plus ».</summary>
+    public int NextOffset { get; init; }
+
+    /// <summary>L'annuaire a sans doute d'autres stations à donner.</summary>
+    public bool HasMore { get; init; }
 }

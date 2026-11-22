@@ -23,5 +23,8 @@ public partial class PresetsPage : ContentPage
         {
             _viewModel.RefreshCommand.Execute(null);
         }
+
+        // Les genres de l'annuaire, pour « Plus de genres » : lus une fois.
+        _ = _viewModel.LoadGenresAsync();
     }
 }

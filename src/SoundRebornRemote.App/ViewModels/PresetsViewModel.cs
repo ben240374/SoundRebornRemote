@@ -118,13 +118,37 @@ public sealed partial class RadioResult : ObservableObject
 
     public string Name => Station.Name;
 
-    public string Summary => Station.Summary;
+    /// <summary>Remplace le résumé de l'annuaire : « Adresse collée » pour une adresse hors annuaire.</summary>
+    public string? Note { get; init; }
+
+    public string Summary => Note ?? Station.Summary;
+
+    /// <summary>Signalée hors service au dernier contrôle de l'annuaire (visible sans « En service uniquement »).</summary>
+    public bool IsUnreachable => Station.IsCheckedBroken;
+
+    /// <summary>Le logo a déjà été demandé : un changement de filtre ne le retélécharge pas.</summary>
+    public bool LogoTried { get; set; }
 
     [ObservableProperty]
     private ImageSource? _logo;
 
     [ObservableProperty]
     private bool _hasLogo;
+}
+
+/// <summary>Une pastille de genre de la recherche, ou la pastille « Plus de genres ».</summary>
+public sealed partial class GenreChip : ObservableObject
+{
+    /// <summary>Étiquette radio-browser ; null pour « Tous ».</summary>
+    public string? Key { get; init; }
+
+    public string Label { get; init; } = "";
+
+    /// <summary>La pastille qui ouvre ou referme la longue traîne des genres.</summary>
+    public bool IsMore { get; init; }
+
+    [ObservableProperty]
+    private bool _isSelected;
 }
 
 /// <summary>Une entrée des listes déroulantes de filtre.</summary>
@@ -186,12 +210,30 @@ public sealed partial class PresetsViewModel : BaseViewModel
     /// <summary>La carte « Copier les touches » (agent 1.6.5 et suivants) : sa propre vue-modèle.</summary>
     public PresetCopyViewModel Copy { get; }
 
+    /// <summary>
+    /// Les présélections « Local », gardées dans le téléphone : leur propre
+    /// vue-modèle, partagée avec l'onglet Lecture.
+    /// </summary>
+    public LocalPresetsViewModel Local { get; }
+
     public PresetsViewModel(SpeakerManager speakers, ArtworkCache artwork, RadioBrowserClient radio) : base(speakers)
     {
         _artwork = artwork;
         _radio = radio;
         _artCache = LoadArtCache();
         Copy = new PresetCopyViewModel(speakers);
+        Local = new LocalPresetsViewModel(speakers, artwork);
+
+        // Le sélecteur « Une fois / Deux fois / Local » suit la liste locale.
+        Local.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(LocalPresetsViewModel.IsShown))
+            {
+                OnPropertyChanged(nameof(OnceSelected));
+                OnPropertyChanged(nameof(TwiceSelected));
+                OnPropertyChanged(nameof(ShowKeys));
+            }
+        };
 
         for (var slot = 1; slot <= 6; slot++)
         {
@@ -241,12 +283,33 @@ public sealed partial class PresetsViewModel : BaseViewModel
     /// <summary>La pastille n'apparaît qu'avec la seconde rangée et au moins une touche garnie.</summary>
     public bool ShowSecondRowCount => HasSecondRow && SecondRowCount > 0;
 
+    /// <summary>Nombre de touches garnies dans la première rangée (1 à 6), pour la pastille de « Une fois ».</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowFirstRowCount))]
+    private int _firstRowCount;
+
+    /// <summary>La pastille de « Une fois » n'apparaît qu'avec au moins une touche garnie.</summary>
+    public bool ShowFirstRowCount => FirstRowCount > 0;
+
     /// <summary>Vrai quand la grille montre la seconde rangée, emplacements 7 à 12.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsFirstRow))]
+    [NotifyPropertyChangedFor(nameof(IsFirstRow), nameof(OnceSelected), nameof(TwiceSelected))]
     private bool _isSecondRow;
 
     public bool IsFirstRow => !IsSecondRow;
+
+    /// <summary>Le sélecteur « Une fois » est en avant : première rangée, liste locale fermée.</summary>
+    public bool OnceSelected => !IsSecondRow && !Local.IsShown;
+
+    /// <summary>Le sélecteur « Deux fois » est en avant : seconde rangée, liste locale fermée.</summary>
+    public bool TwiceSelected => IsSecondRow && !Local.IsShown;
+
+    /// <summary>La grille des touches de l'enceinte est montrée : la liste locale ne l'a pas remplacée.</summary>
+    public bool ShowKeys => !Local.IsShown;
+
+    /// <summary>Le sélecteur « Local » : la liste des présélections du téléphone remplace la grille.</summary>
+    [RelayCommand]
+    private void ShowLocal() => Local.IsShown = true;
 
     // ================================================================ Les six touches
 
@@ -257,9 +320,11 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
         if (device is null)
         {
-            // Sans enceinte, pas de seconde rangée : on revient aux six touches.
+            // Sans enceinte, pas de seconde rangée : on revient aux six touches, et
+            // la pastille de « Une fois » ne compte plus rien.
             ApplyRowSupport(false);
             await ResetAsync().ConfigureAwait(true);
+            FirstRowCount = 0;
             return;
         }
 
@@ -555,6 +620,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
     public void SyncActive(string source, string? stationName, string? location, bool isIdle)
     {
         _lastSync = (source, stationName, location, isIdle);
+        Local.SyncActive(stationName, isIdle);
 
         if (DateTime.UtcNow < _optimisticUntil)
         {
@@ -603,9 +669,15 @@ public sealed partial class PresetsViewModel : BaseViewModel
     private async Task ApplyAsync(PresetTile tile, PresetInfo? hardware, StrPreset? store)
     {
         // L'agent stocke l'art comme une CHAÎNE de candidats séparés par des « | ».
-        // On concatène nos trois sources dans l'ordre de préférence et ArtworkCache
+        // On concatène les sources dans l'ordre de préférence et ArtworkCache
         // essaiera chaque adresse jusqu'à en trouver une qui donne une image.
-        var art = JoinCandidates(store?.Art, hardware?.ArtUrl, _artCache.GetValueOrDefault(tile.Slot));
+        //
+        // Le logo retenu la dernière fois pour cet emplacement ne sert que quand ni
+        // l'agent ni l'enceinte n'en proposent. Ajouté en fin de chaîne, il prenait
+        // la relève dès que le logo de la station ne s'affichait pas, alors qu'il
+        // peut dater d'une station rangée là auparavant : la touche montrait le
+        // logo d'une autre station.
+        var art = JoinCandidates(store?.Art, hardware?.ArtUrl) ?? _artCache.GetValueOrDefault(tile.Slot);
 
         if (store is not null)
         {
@@ -771,7 +843,16 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
     /// <summary>La pastille de « Deux fois » : touches 7 à 12 garnies dans le dernier magasin lu.</summary>
     private void UpdateSecondRowCount()
-        => SecondRowCount = HasSecondRow ? _lastStore.Keys.Count(PresetKeys.InSecondRow) : 0;
+    {
+        SecondRowCount = HasSecondRow ? _lastStore.Keys.Count(PresetKeys.InSecondRow) : 0;
+
+        // Première rangée : une touche compte dès que l'agent ou le firmware y range
+        // une station. Les présélections factices « 2x » ont déjà été retirées de la
+        // liste du firmware à la lecture.
+        FirstRowCount = Enumerable.Range(1, PresetKeys.PerRow).Count(slot =>
+            _lastStore.ContainsKey(slot) ||
+            (_lastHardware.TryGetValue(slot, out var hardware) && !hardware.IsEmpty));
+    }
 
     private async Task ResetAsync()
     {
@@ -796,6 +877,10 @@ public sealed partial class PresetsViewModel : BaseViewModel
     public async Task SelectRowAsync(bool second)
     {
         second = second && HasSecondRow;
+
+        // « Une fois » ou « Deux fois » referme la liste locale, même sur la
+        // rangée déjà affichée : c'est le seul moyen de revenir aux touches.
+        Local.IsShown = false;
 
         if (second == IsSecondRow)
         {
@@ -1076,6 +1161,70 @@ public sealed partial class PresetsViewModel : BaseViewModel
     }
 
     // ================================================================ Recherche de stations
+    //
+    // Reprise de la recherche de l'application PC de STR : pastilles de genres,
+    // tri, débit minimal, « en service uniquement », « Voir plus », et l'invitation
+    // à ajouter soi-même une station qui manque à l'annuaire.
+    //
+    // Deux sortes de filtres :
+    //   – ceux qui changent la question posée à l'annuaire (pays, langue, genre,
+    //     tri, en service) relancent la dernière recherche ;
+    //   – ceux qui ne regardent que la réponse (compatibles Bose, débit) filtrent
+    //     la liste déjà reçue, sans réseau : décocher « Bose » ramène aussitôt les
+    //     stations écartées.
+
+    /// <summary>Ce que la dernière recherche a demandé.</summary>
+    private enum SearchMode
+    {
+        None,
+
+        /// <summary>Recherche par nom (le champ de saisie).</summary>
+        Name,
+
+        /// <summary>Top liste : les plus votées, avec les filtres.</summary>
+        Top,
+
+        /// <summary>Une adresse de flux collée dans le champ.</summary>
+        Url,
+    }
+
+    /// <summary>Taille d'une page de résultats.</summary>
+    private const int SearchPage = 60;
+
+    /// <summary>Nombre de genres demandés à l'annuaire pour « Plus de genres ».</summary>
+    private const int GenreTagsLimit = 60;
+
+    /// <summary>Plafond de la liste affichée : « Voir plus » s'arrête là.</summary>
+    private const int MaxResults = 600;
+
+    /// <summary>Ordres de tri, dans l'ordre de la liste déroulante.</summary>
+    private static readonly string[] SortValues =
+    {
+        RadioOrder.Votes, RadioOrder.Clicks, RadioOrder.Trend, RadioOrder.Name, RadioOrder.Bitrate,
+    };
+
+    /// <summary>Débits minimaux proposés, en kbit/s ; 0 = tous.</summary>
+    private static readonly int[] BitrateValues = { 0, 64, 128, 192, 256, 320 };
+
+    /// <summary>Libellés des genres de la rangée fixe ; les autres s'affichent tels quels, capitalisés.</summary>
+    private static readonly Dictionary<string, string> GenreKeys = new(StringComparer.Ordinal)
+    {
+        ["pop"] = "L_GenrePop",
+        ["rock"] = "L_GenreRock",
+        ["hits"] = "L_GenreHits",
+        ["oldies"] = "L_GenreOldies",
+        ["jazz"] = "L_GenreJazz",
+        ["classical"] = "L_GenreClassical",
+        ["chillout"] = "L_GenreChill",
+        ["dance"] = "L_GenreDance",
+        ["electronic"] = "L_GenreElectronic",
+        ["house"] = "L_GenreHouse",
+        ["hip hop"] = "L_GenreHipHop",
+        ["latin"] = "L_GenreLatin",
+        ["80s"] = "L_Genre80s",
+        ["90s"] = "L_Genre90s",
+        ["news"] = "L_GenreNews",
+    };
 
     public ObservableCollection<RadioResult> Results { get; } = new();
 
@@ -1083,8 +1232,39 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
     public ObservableCollection<string> LanguageLabels { get; } = new();
 
+    public ObservableCollection<string> SortLabels { get; } = new();
+
+    public ObservableCollection<string> BitrateLabels { get; } = new();
+
+    /// <summary>Les pastilles de genres, « Tous » en tête et « Plus de genres » au bout.</summary>
+    public ObservableCollection<GenreChip> Genres { get; } = new();
+
     private readonly List<FilterOption> _countries = new();
     private readonly List<FilterOption> _languages = new();
+
+    /// <summary>Tout ce que l'annuaire a donné pour la recherche en cours, avant les filtres Bose et débit.</summary>
+    private readonly List<RadioResult> _found = new();
+
+    private SearchMode _mode;
+
+    /// <summary>Nom cherché par la liste affichée, pour « Voir plus ».</summary>
+    private string _lastName = "";
+
+    /// <summary>Position de la page suivante dans l'annuaire, pour « Voir plus ».</summary>
+    private int _nextOffset;
+
+    /// <summary>Genre choisi (étiquette radio-browser) ; null = tous.</summary>
+    private string? _genre;
+
+    private bool _showMoreGenres;
+
+    /// <summary>Genres de l'annuaire, lus une fois ; null tant qu'ils ne sont pas arrivés.</summary>
+    private IReadOnlyList<RadioTag>? _liveTags;
+
+    private bool _tagsRequested;
+
+    /// <summary>Vrai pendant la reconstruction des listes : les sélecteurs bougent sans que l'utilisateur y touche.</summary>
+    private bool _buildingFilters;
 
     [ObservableProperty]
     private string _query = "";
@@ -1096,7 +1276,17 @@ public sealed partial class PresetsViewModel : BaseViewModel
     private int _languageIndex;
 
     [ObservableProperty]
+    private int _sortIndex;
+
+    [ObservableProperty]
+    private int _bitrateIndex;
+
+    [ObservableProperty]
     private bool _boseCompatibleOnly = true;
+
+    /// <summary>« En service uniquement » : écarte les stations trouvées hors service par l'annuaire.</summary>
+    [ObservableProperty]
+    private bool _onlyWorking = true;
 
     [ObservableProperty]
     private bool _isSearching;
@@ -1110,50 +1300,230 @@ public sealed partial class PresetsViewModel : BaseViewModel
     [ObservableProperty]
     private string _resultsHeader = "";
 
-    [RelayCommand]
-    private Task SearchAsync() => RunSearchAsync(top: false);
+    /// <summary>« 12 stations masquées par les filtres » ; vide quand rien n'est masqué.</summary>
+    [ObservableProperty]
+    private string _filteredNote = "";
+
+    /// <summary>L'annuaire a d'autres stations : « Voir plus » est proposé.</summary>
+    [ObservableProperty]
+    private bool _canLoadMore;
+
+    /// <summary>La liste montre des stations signalées hors service, faute d'autres.</summary>
+    [ObservableProperty]
+    private bool _isRelaxed;
 
     [RelayCommand]
-    private Task TopAsync() => RunSearchAsync(top: true);
+    private Task SearchAsync() => RunSearchAsync(SearchMode.Name);
 
-    private async Task RunSearchAsync(bool top)
+    [RelayCommand]
+    private Task TopAsync() => RunSearchAsync(SearchMode.Top);
+
+    /// <summary>« Voir plus » : la page suivante de la même recherche, ajoutée au bout.</summary>
+    [RelayCommand]
+    private Task LoadMoreAsync() => CanLoadMore && !IsSearching ? RunSearchAsync(_mode, append: true) : Task.CompletedTask;
+
+    /// <summary>Une pastille de genre : la choisit, ou ouvre / referme « Plus de genres ».</summary>
+    [RelayCommand]
+    private Task SelectGenreAsync(GenreChip? chip)
+    {
+        if (chip is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        if (chip.IsMore)
+        {
+            _showMoreGenres = !_showMoreGenres;
+            BuildGenres();
+            return Task.CompletedTask;
+        }
+
+        _genre = chip.Key;
+
+        foreach (var g in Genres)
+        {
+            g.IsSelected = !g.IsMore && g.Key == _genre;
+        }
+
+        // Le genre précise la recherche par nom en cours ; sans nom, il parcourt
+        // l'annuaire, comme la Top liste.
+        return RunSearchAsync(_mode == SearchMode.Name && !string.IsNullOrWhiteSpace(Query) ? SearchMode.Name : SearchMode.Top);
+    }
+
+    /// <summary>
+    /// « Une station manque ? » : ouvre radio-browser.info, où chacun peut ajouter
+    /// une station. Elle apparaît ensuite ici, et dans toutes les applications qui
+    /// utilisent l'annuaire.
+    /// </summary>
+    [RelayCommand]
+    private async Task AddMissingStationAsync()
+    {
+        try
+        {
+            await Launcher.Default.OpenAsync(new Uri("https://www.radio-browser.info/")).ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+    }
+
+    /// <summary>
+    /// Lit une fois les genres de l'annuaire, pour « Plus de genres ». Appelé à
+    /// l'ouverture de l'onglet ; un échec est sans conséquence (les genres fixes
+    /// restent) et sera retenté à la prochaine ouverture.
+    /// </summary>
+    public async Task LoadGenresAsync()
+    {
+        if (_tagsRequested)
+        {
+            return;
+        }
+
+        _tagsRequested = true;
+
+        try
+        {
+            _liveTags = await _radio.TagsAsync(GenreTagsLimit).ConfigureAwait(true);
+            BuildGenres();
+        }
+        catch (Exception)
+        {
+            _tagsRequested = false;
+        }
+    }
+
+    // Les filtres qui changent la question relancent la dernière recherche ; les
+    // valeurs négatives viennent d'un sélecteur dont la liste est en reconstruction.
+    partial void OnCountryIndexChanged(int value)
+    {
+        if (value < 0 || _buildingFilters)
+        {
+            return;
+        }
+
+        // Les deux genres mis en avant dépendent du pays.
+        _showMoreGenres = false;
+        BuildGenres();
+        Rerun();
+    }
+
+    partial void OnLanguageIndexChanged(int value)
+    {
+        if (value >= 0)
+        {
+            Rerun();
+        }
+    }
+
+    partial void OnSortIndexChanged(int value)
+    {
+        if (value >= 0)
+        {
+            Rerun();
+        }
+    }
+
+    partial void OnOnlyWorkingChanged(bool value) => Rerun();
+
+    // Ceux qui ne regardent que la réponse refiltrent la liste reçue.
+    partial void OnBoseCompatibleOnlyChanged(bool value) => RefilterLocally();
+
+    partial void OnBitrateIndexChanged(int value)
+    {
+        if (value >= 0)
+        {
+            RefilterLocally();
+        }
+    }
+
+    /// <summary>Relance la dernière recherche avec les nouveaux filtres, s'il y en a eu une.</summary>
+    private void Rerun()
+    {
+        if (_buildingFilters || _mode is SearchMode.None or SearchMode.Url)
+        {
+            return;
+        }
+
+        _ = RunSearchAsync(_mode);
+    }
+
+    private void RefilterLocally()
+    {
+        if (_buildingFilters || !HasSearched)
+        {
+            return;
+        }
+
+        ApplyLocalFilters();
+        _ = LoadLogosAsync(_searchCts?.Token ?? CancellationToken.None);
+    }
+
+    private async Task RunSearchAsync(SearchMode mode, bool append = false)
     {
         // Une frappe rapide sur « Rechercher » annule la requête précédente plutôt
-        // que d'empiler deux listes de résultats.
+        // que d'empiler deux listes de résultats. L'ancienne source n'est pas
+        // libérée : la requête qu'elle annule peut encore lire son jeton.
         _searchCts?.Cancel();
-        _searchCts?.Dispose();
-        _searchCts = new CancellationTokenSource();
-        var ct = _searchCts.Token;
+        var cts = new CancellationTokenSource();
+        _searchCts = cts;
+        var ct = cts.Token;
+
+        // « Voir plus » continue la recherche affichée, même si le champ a changé depuis.
+        var name = append ? _lastName : Query?.Trim() ?? "";
+
+        if (!append)
+        {
+            // Champ vide : la recherche devient une Top liste filtrée. Une adresse
+            // de flux n'est pas un nom : elle est cherchée telle quelle.
+            mode = mode == SearchMode.Name && name.Length == 0 ? SearchMode.Top
+                : mode == SearchMode.Name && IsPastedUrl(name) ? SearchMode.Url
+                : mode;
+        }
 
         IsSearching = true;
         ShowInfo(Localization.Get("S_Searching"));
 
         try
         {
-            var options = new RadioSearchOptions
+            if (mode == SearchMode.Url)
             {
-                Name = top ? null : Query?.Trim(),
-                CountryCode = _countries.ElementAtOrDefault(CountryIndex)?.Value,
-                Language = _languages.ElementAtOrDefault(LanguageIndex)?.Value,
-                BoseCompatibleOnly = BoseCompatibleOnly,
-                Limit = 60,
-            };
-
-            var stations = top
-                ? await _radio.TopAsync(options, ct).ConfigureAwait(true)
-                : await _radio.SearchAsync(options, ct).ConfigureAwait(true);
-
-            Results.Clear();
-
-            foreach (var station in stations)
-            {
-                Results.Add(new RadioResult { Station = station });
+                await SearchByUrlAsync(name, ct).ConfigureAwait(true);
+                return;
             }
 
+            var page = await _radio.SearchAsync(new RadioSearchOptions
+            {
+                Name = mode == SearchMode.Name ? name : null,
+                Tag = _genre,
+                CountryCode = _countries.ElementAtOrDefault(CountryIndex)?.Value,
+                Language = _languages.ElementAtOrDefault(LanguageIndex)?.Value,
+                Order = SortValues.ElementAtOrDefault(SortIndex) ?? RadioOrder.Votes,
+                Limit = SearchPage,
+                Offset = append ? _nextOffset : 0,
+                HideBroken = OnlyWorking,
+
+                // Filtré ici, sur la liste reçue : cocher ou décocher ne relance rien.
+                BoseCompatibleOnly = false,
+            }, ct).ConfigureAwait(true);
+
+            ct.ThrowIfCancellationRequested();
+
+            if (!append)
+            {
+                _found.Clear();
+                IsRelaxed = false;
+            }
+
+            _mode = mode;
+            _lastName = name;
+            AddFound(page.Stations.Select(s => new RadioResult { Station = s }));
+            _nextOffset = page.NextOffset;
+            CanLoadMore = page.HasMore && _found.Count < MaxResults;
+            IsRelaxed = IsRelaxed || page.Relaxed;
             HasSearched = true;
-            HasResults = Results.Count > 0;
-            ResultsHeader = Localization.Get("L_ResultsHeader", Results.Count);
-            ShowInfo(Results.Count == 0 ? Localization.Get("L_NoResults") : null);
+
+            ApplyLocalFilters();
 
             // Les logos arrivent après la liste : l'utilisateur voit les noms tout
             // de suite, les images se remplissent au fil des téléchargements.
@@ -1165,12 +1535,133 @@ public sealed partial class PresetsViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            ShowError(ex);
+            if (!ct.IsCancellationRequested)
+            {
+                ShowError(ex);
+            }
         }
         finally
         {
-            IsSearching = false;
+            // Une recherche remplacée ne doit pas éteindre l'indicateur de la suivante.
+            if (ReferenceEquals(_searchCts, cts))
+            {
+                IsSearching = false;
+            }
         }
+    }
+
+    /// <summary>
+    /// Une adresse collée : la station de l'annuaire qui a exactement ce flux (avec
+    /// son nom et son logo), sinon une ligne « adresse collée » qu'on peut écouter,
+    /// garder dans Local ou mettre sur une touche comme les autres.
+    /// </summary>
+    private async Task SearchByUrlAsync(string url, CancellationToken ct)
+    {
+        IReadOnlyList<RadioStation> known;
+
+        try
+        {
+            known = await _radio.ByUrlAsync(url, ct).ConfigureAwait(true);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            // Annuaire injoignable : l'adresse reste utilisable telle quelle.
+            known = Array.Empty<RadioStation>();
+        }
+
+        ct.ThrowIfCancellationRequested();
+
+        _found.Clear();
+        _mode = SearchMode.Url;
+        IsRelaxed = false;
+        CanLoadMore = false;
+
+        if (known.Count > 0)
+        {
+            AddFound(known.Select(s => new RadioResult { Station = s }));
+        }
+        else
+        {
+            var uri = new Uri(url);
+
+            AddFound(new[]
+            {
+                new RadioResult
+                {
+                    Station = new RadioStation { Name = uri.Host, Url = url },
+                    Note = Localization.Get("L_PastedAddress"),
+                },
+            });
+        }
+
+        HasSearched = true;
+        ApplyLocalFilters(ignoreFilters: true);
+        await LoadLogosAsync(ct).ConfigureAwait(true);
+    }
+
+    /// <summary>Une adresse http(s) complète, de longueur raisonnable : pas un nom de station.</summary>
+    private static bool IsPastedUrl(string text)
+        => text.Length <= LocalPresetList.MaxUrlLength &&
+           (text.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            text.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) &&
+           LocalPresetList.IsStreamUrl(text);
+
+    /// <summary>Ajoute des résultats en écartant un flux déjà dans la liste (pages qui se chevauchent).</summary>
+    private void AddFound(IEnumerable<RadioResult> results)
+    {
+        var known = new HashSet<string>(_found.Select(r => r.Station.PlayableUrl.Trim()), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var result in results)
+        {
+            if (_found.Count >= MaxResults)
+            {
+                break;
+            }
+
+            if (known.Add(result.Station.PlayableUrl.Trim()))
+            {
+                _found.Add(result);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Construit la liste affichée à partir de ce que l'annuaire a donné : filtres
+    /// « Compatibles Bose » et débit minimal, compte des stations masquées.
+    /// </summary>
+    /// <param name="ignoreFilters">Une adresse collée s'affiche toujours : c'est l'utilisateur qui l'a choisie.</param>
+    private void ApplyLocalFilters(bool ignoreFilters = false)
+    {
+        ignoreFilters |= _mode == SearchMode.Url;
+        var minBitrate = BitrateValues.ElementAtOrDefault(BitrateIndex);
+
+        // Une station sans débit connu reste : c'est le cas de beaucoup d'entrées de
+        // l'annuaire, et le filtre ne doit pas vider la liste pour autant.
+        var shown = _found
+            .Where(r => ignoreFilters || !BoseCompatibleOnly || r.Station.IsBoseCompatible)
+            .Where(r => ignoreFilters || minBitrate <= 0 || r.Station.Bitrate <= 0 || r.Station.Bitrate >= minBitrate)
+            .ToList();
+
+        Results.Clear();
+
+        foreach (var result in shown)
+        {
+            Results.Add(result);
+        }
+
+        var hidden = _found.Count - shown.Count;
+
+        HasResults = Results.Count > 0;
+        ResultsHeader = Localization.Get("L_ResultsHeader", Results.Count);
+        FilteredNote = hidden > 0 ? Localization.Get("L_ResultsFiltered", hidden) : "";
+
+        ShowInfo(Results.Count > 0 ? null
+            : _found.Count > 0 ? Localization.Get("S_AllFiltered")
+            : Localization.Get("L_NoResults"));
     }
 
     private async Task LoadLogosAsync(CancellationToken ct)
@@ -1182,6 +1673,14 @@ public sealed partial class PresetsViewModel : BaseViewModel
                 return;
             }
 
+            // Une ligne déjà essayée (avant un changement de filtre) ne se retélécharge pas.
+            if (result.LogoTried)
+            {
+                continue;
+            }
+
+            result.LogoTried = true;
+
             var source = await _artwork.GetImageSourceAsync(result.Station.Favicon, ct).ConfigureAwait(true);
 
             if (source is not null)
@@ -1190,6 +1689,61 @@ public sealed partial class PresetsViewModel : BaseViewModel
                 result.HasLogo = true;
             }
         }
+    }
+
+    /// <summary>Reconstruit les pastilles de genres : pays, genres de l'annuaire, choix en cours.</summary>
+    private void BuildGenres()
+    {
+        var country = _countries.ElementAtOrDefault(CountryIndex)?.Value;
+        var chips = RadioGenres.Chips(country, _liveTags, _showMoreGenres, _genre, out var tail);
+
+        Genres.Clear();
+
+        foreach (var chip in chips)
+        {
+            Genres.Add(new GenreChip { Key = chip.Key, Label = GenreLabel(chip.Key), IsSelected = chip.Key == _genre });
+        }
+
+        if (tail > 0 || _showMoreGenres)
+        {
+            Genres.Add(new GenreChip
+            {
+                IsMore = true,
+                Label = _showMoreGenres ? Localization.Get("L_FewerGenres") : Localization.Get("L_MoreGenres", tail),
+            });
+        }
+    }
+
+    /// <summary>Libellé d'une pastille : traduit pour la rangée fixe, sinon l'étiquette capitalisée.</summary>
+    public static string GenreLabel(string? key)
+    {
+        if (key is null)
+        {
+            return Localization.Get("L_AllGenres");
+        }
+
+        if (GenreKeys.TryGetValue(key, out var locKey))
+        {
+            return Localization.Get(locKey);
+        }
+
+        if (key == "rnb")
+        {
+            return "R&B";
+        }
+
+        // « disco polo » → « Disco Polo », « j-pop » → « J-Pop ».
+        var chars = key.ToCharArray();
+
+        for (var i = 0; i < chars.Length; i++)
+        {
+            if (i == 0 || chars[i - 1] is ' ' or '-')
+            {
+                chars[i] = char.ToUpperInvariant(chars[i]);
+            }
+        }
+
+        return new string(chars);
     }
 
     /// <summary>
@@ -1222,6 +1776,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
         }
 
         var listen = Localization.Get("L_Listen");
+        var addLocal = Localization.Get("L_AddLocal");
 
         if (!IsSnapshotOf(device))
         {
@@ -1239,7 +1794,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
             result.Name,
             Localization.Get("L_Cancel"),
             null,
-            new[] { listen }.Concat(slots).ToArray()).ConfigureAwait(true);
+            new[] { listen, addLocal }.Concat(slots).ToArray()).ConfigureAwait(true);
 
         if (string.IsNullOrWhiteSpace(choice) || choice == Localization.Get("L_Cancel"))
         {
@@ -1253,6 +1808,16 @@ public sealed partial class PresetsViewModel : BaseViewModel
                 Localization.Get("S_StationPlaying", result.Name)).ConfigureAwait(true);
 
             _ = _radio.ReportClickAsync(result.Station.Uuid);
+            return;
+        }
+
+        if (choice == addLocal)
+        {
+            // La liste locale s'ouvre en haut de la page ; le message est redit ici,
+            // près de la recherche, où l'on se trouve.
+            Local.AddStation(result.Station);
+            IsError = Local.IsError;
+            StatusMessage = Local.StatusMessage;
             return;
         }
 
@@ -1315,65 +1880,119 @@ public sealed partial class PresetsViewModel : BaseViewModel
     };
 
     /// <summary>
-    /// Construit les listes de pays et de langues. Les libellés viennent de .NET,
-    /// donc ils suivent la langue choisie dans les réglages sans table à maintenir.
+    /// Construit les listes de pays, de langues, de tri et de débit, et les
+    /// pastilles de genres. Les noms de langue viennent de .NET ; ceux des pays sont
+    /// traduits à la main (voir les clés L_Ctry…). Appelée au démarrage et à chaque
+    /// changement de langue : les choix en cours sont gardés, et rien n'est relancé.
     /// </summary>
     private void BuildFilters()
     {
-        var previousCountry = _countries.ElementAtOrDefault(CountryIndex)?.Value;
-        var previousLanguage = _languages.ElementAtOrDefault(LanguageIndex)?.Value;
+        _buildingFilters = true;
 
-        _countries.Clear();
-        _countries.Add(new FilterOption { Label = Localization.Get("L_AllCountries"), Value = null });
-
-        // Clés littérales plutôt qu'une concaténation : une clé manquante se voit
-        // alors à la relecture, pas à l'exécution.
-        _countries.Add(new FilterOption { Label = Localization.Get("L_CtryBE"), Value = "BE" });
-        _countries.Add(new FilterOption { Label = Localization.Get("L_CtryFR"), Value = "FR" });
-        _countries.Add(new FilterOption { Label = Localization.Get("L_CtryNL"), Value = "NL" });
-        _countries.Add(new FilterOption { Label = Localization.Get("L_CtryDE"), Value = "DE" });
-        _countries.Add(new FilterOption { Label = Localization.Get("L_CtryLU"), Value = "LU" });
-        _countries.Add(new FilterOption { Label = Localization.Get("L_CtryCH"), Value = "CH" });
-        _countries.Add(new FilterOption { Label = Localization.Get("L_CtryGB"), Value = "GB" });
-        _countries.Add(new FilterOption { Label = Localization.Get("L_CtryES"), Value = "ES" });
-        _countries.Add(new FilterOption { Label = Localization.Get("L_CtryIT"), Value = "IT" });
-        _countries.Add(new FilterOption { Label = Localization.Get("L_CtryPT"), Value = "PT" });
-        _countries.Add(new FilterOption { Label = Localization.Get("L_CtryUS"), Value = "US" });
-        _countries.Add(new FilterOption { Label = Localization.Get("L_CtryCA"), Value = "CA" });
-
-        _languages.Clear();
-        _languages.Add(new FilterOption { Label = Localization.Get("L_AllLanguages"), Value = null });
-
-        // radio-browser indexe les langues par leur nom anglais en minuscules.
-        foreach (var (tag, value) in new[]
-                 {
-                     ("fr", "french"),
-                     ("nl", "dutch"),
-                     ("de", "german"),
-                     ("en", "english"),
-                     ("es", "spanish"),
-                     ("it", "italian"),
-                 })
+        try
         {
-            _languages.Add(new FilterOption { Label = LanguageName(tag), Value = value });
+            var previousCountry = _countries.ElementAtOrDefault(CountryIndex)?.Value;
+            var previousLanguage = _languages.ElementAtOrDefault(LanguageIndex)?.Value;
+            var previousSort = Math.Max(0, SortIndex);
+            var previousBitrate = Math.Max(0, BitrateIndex);
+
+            _countries.Clear();
+            _countries.Add(new FilterOption { Label = Localization.Get("L_AllCountries"), Value = null });
+
+            // Clés littérales plutôt qu'une concaténation : une clé manquante se voit
+            // alors à la relecture, pas à l'exécution. Les pays proches d'abord, dans
+            // l'ordre de toujours ; les autres ensuite, par ordre alphabétique.
+            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryBE"), Value = "BE" });
+            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryFR"), Value = "FR" });
+            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryNL"), Value = "NL" });
+            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryDE"), Value = "DE" });
+            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryLU"), Value = "LU" });
+            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryCH"), Value = "CH" });
+            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryGB"), Value = "GB" });
+            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryES"), Value = "ES" });
+            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryIT"), Value = "IT" });
+            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryPT"), Value = "PT" });
+            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryUS"), Value = "US" });
+            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryCA"), Value = "CA" });
+
+            var more = new List<FilterOption>
+            {
+                new() { Label = Localization.Get("L_CtryAT"), Value = "AT" },
+                new() { Label = Localization.Get("L_CtryIE"), Value = "IE" },
+                new() { Label = Localization.Get("L_CtryDK"), Value = "DK" },
+                new() { Label = Localization.Get("L_CtrySE"), Value = "SE" },
+                new() { Label = Localization.Get("L_CtryNO"), Value = "NO" },
+                new() { Label = Localization.Get("L_CtryFI"), Value = "FI" },
+                new() { Label = Localization.Get("L_CtryPL"), Value = "PL" },
+                new() { Label = Localization.Get("L_CtryCZ"), Value = "CZ" },
+                new() { Label = Localization.Get("L_CtryGR"), Value = "GR" },
+                new() { Label = Localization.Get("L_CtryTR"), Value = "TR" },
+                new() { Label = Localization.Get("L_CtryMA"), Value = "MA" },
+                new() { Label = Localization.Get("L_CtryBR"), Value = "BR" },
+                new() { Label = Localization.Get("L_CtryMX"), Value = "MX" },
+                new() { Label = Localization.Get("L_CtryAR"), Value = "AR" },
+                new() { Label = Localization.Get("L_CtryAU"), Value = "AU" },
+                new() { Label = Localization.Get("L_CtryJP"), Value = "JP" },
+            };
+
+            var culture = Localization.CultureOf(Localization.Current);
+            _countries.AddRange(more.OrderBy(o => o.Label, StringComparer.Create(culture, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace)));
+
+            _languages.Clear();
+            _languages.Add(new FilterOption { Label = Localization.Get("L_AllLanguages"), Value = null });
+
+            // radio-browser indexe les langues par leur nom anglais en minuscules.
+            foreach (var (tag, value) in new[]
+                     {
+                         ("fr", "french"),
+                         ("nl", "dutch"),
+                         ("de", "german"),
+                         ("en", "english"),
+                         ("es", "spanish"),
+                         ("it", "italian"),
+                         ("pt", "portuguese"),
+                     })
+            {
+                _languages.Add(new FilterOption { Label = LanguageName(tag), Value = value });
+            }
+
+            Refill(CountryLabels, _countries.Select(o => o.Label));
+            Refill(LanguageLabels, _languages.Select(o => o.Label));
+
+            Refill(SortLabels, new[]
+            {
+                Localization.Get("L_SortVotes"),
+                Localization.Get("L_SortClicks"),
+                Localization.Get("L_SortTrend"),
+                Localization.Get("L_SortName"),
+                Localization.Get("L_SortBitrate"),
+            });
+
+            Refill(BitrateLabels, BitrateValues.Select(v => v == 0
+                ? Localization.Get("L_BitrateAll")
+                : Localization.Get("L_BitrateMin", v)));
+
+            CountryIndex = Math.Max(0, _countries.FindIndex(o => o.Value == previousCountry));
+            LanguageIndex = Math.Max(0, _languages.FindIndex(o => o.Value == previousLanguage));
+            SortIndex = Math.Min(previousSort, SortValues.Length - 1);
+            BitrateIndex = Math.Min(previousBitrate, BitrateValues.Length - 1);
+
+            BuildGenres();
         }
-
-        CountryLabels.Clear();
-
-        foreach (var option in _countries)
+        finally
         {
-            CountryLabels.Add(option.Label);
+            _buildingFilters = false;
         }
+    }
 
-        LanguageLabels.Clear();
+    private static void Refill(ObservableCollection<string> target, IEnumerable<string> labels)
+    {
+        target.Clear();
 
-        foreach (var option in _languages)
+        foreach (var label in labels)
         {
-            LanguageLabels.Add(option.Label);
+            target.Add(label);
         }
-
-        CountryIndex = Math.Max(0, _countries.FindIndex(o => o.Value == previousCountry));
-        LanguageIndex = Math.Max(0, _languages.FindIndex(o => o.Value == previousLanguage));
     }
 
     private static string LanguageName(string tag)

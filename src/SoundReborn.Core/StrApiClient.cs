@@ -736,6 +736,36 @@ public sealed class StrApiClient
         return StrLikedResult.Parse(text);
     }
 
+    // ---------------------------------------------------------------- Annonce (message vocal)
+
+    /// <summary>
+    /// Délai d'une annonce. L'agent télécharge le clip en entier (8 Mo au plus, en
+    /// 25 secondes au plus) ou fait lire le texte par la voix de Google avant de le
+    /// jouer ; la réponse peut ne venir qu'à la fin du message.
+    /// </summary>
+    public static TimeSpan AnnounceTimeout { get; set; } = TimeSpan.FromSeconds(100);
+
+    /// <summary>
+    /// POST /api/announce : l'enceinte joue un clip (<paramref name="url"/>, que
+    /// l'agent va chercher lui-même) ou lit un texte (<paramref name="text"/>, voix
+    /// de Google Translate : l'enceinte doit avoir accès à internet), puis reprend
+    /// ce qu'elle jouait. <paramref name="lang"/> prend les codes de langue de
+    /// Google (fr, en, de, nl, es, it…). Un refus remonte en
+    /// <see cref="SpeakerException"/>.
+    /// </summary>
+    public Task AnnounceAsync(string? text, string? lang, string? url, int? volume = null, CancellationToken ct = default)
+        => PostJsonAsync(
+            "/api/announce",
+            new StrAnnounceRequest
+            {
+                Text = string.IsNullOrWhiteSpace(text) ? null : text.Trim(),
+                Lang = string.IsNullOrWhiteSpace(lang) ? null : lang,
+                Url = string.IsNullOrWhiteSpace(url) ? null : url,
+                Volume = volume is { } v ? Math.Clamp(v, 1, 100) : null,
+            },
+            ct,
+            AnnounceTimeout);
+
     // ---------------------------------------------------------------- Copie des touches
 
     /// <summary>
