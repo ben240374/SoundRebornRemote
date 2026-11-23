@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manuale d'uso
 
-Versione 1.9.0 · Android 7 e successivi
+Versione 1.9.1 · Android 7 e successivi
 
 > Lingue: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md) · **Italiano**
 
@@ -55,6 +55,9 @@ progetto: <https://github.com/ben240374/SoundRebornRemote/releases>
 2. Aprilo. Android chiederà il permesso di installare da una fonte sconosciuta: concedilo
    all'app che ha fatto il download, di solito il browser.
 3. Installa, poi apri.
+
+In seguito l'app segnala da sola le nuove versioni e sa installarle (scheda Impostazioni,
+**Aggiornamento**).
 
 Al primo avvio non viene chiesto nessun permesso particolare: l'app non tocca né i
 contatti, né la posizione, né la memoria.
@@ -312,12 +315,28 @@ la domanda di conferma lo dice. Il risultato è mostrato per diffusore.
 
 La copia richiede l'agente STR 1.6.5 o successivo sul diffusore selezionato.
 
+### Preferiti STR
+
+Con un agente STR recente, il pulsante **★ STR**, a destra di **Locale** (schede
+Riproduzione e Preselezioni), mostra al posto dei tasti le stazioni con la stella dell'app
+STR sul computer. Sono le stesse su tutti i diffusori STR: un preferito aggiunto o tolto
+qui lo è anche, pochi secondi dopo, sugli altri diffusori e sul computer. **Una volta** o
+**Due volte** riporta i tasti.
+
+- Tocca un preferito per avviarlo sul diffusore selezionato.
+- **⋯** propone **Metti su un tasto…**, **Aggiungi a Locale** e **Togli dai preferiti STR**
+  (dopo conferma).
+- **★ Aggiungi ciò che suona** salva la radio che il diffusore sta suonando; nella ricerca,
+  **⋯ Tasti, Local…** propone **★ Aggiungi ai preferiti STR**.
+- Una stazione Pandora compare nell'elenco, ma si avvia dall'app STR.
+
 ### Trovare una stazione
 
 La casella di ricerca interroga **radio-browser.info**, un elenco aperto curato da
 volontari. La ricerca segue quella dell'app desktop di STR:
 
-- **Paese** e **Lingua** restringono la ricerca; **Ordina** dispone le stazioni per
+- **Paese** (tutti in ordine alfabetico, territori d'oltremare compresi: Martinica,
+  Riunione, Guadalupa…) e **Lingua** restringono la ricerca; **Ordina** dispone le stazioni per
   popolarità (voti), ascolti, tendenza, nome o bitrate. Cambiare una di queste scelte
   ripete l'ultima ricerca.
 - Le **etichette dei generi** (Tutti, Pop, Rock, Successi, Jazz, Anni '80…) filtrano per
@@ -348,10 +367,19 @@ risultati.
 **Manca una stazione?** Il link sotto i risultati apre radio-browser.info, dove chiunque può
 aggiungerla: comparirà qui, e per tutti.
 
-Tocca un risultato e si apre un menu con
+Tocca un risultato: la riga si apre e offre tre scelte impossibili da confondere.
 
-- **Ascolta ora** — riproduce subito la stazione, senza memorizzare nulla;
-- **① Assegna a questo tasto** se il tasto è libero, oppure **① Sostituisci Bel RTL** se è
+- **📱 ▶ Ascolta su questo telefono** (o **questo tablet**): la stazione suona sul
+  dispositivo, per sentirla prima di mandarla al diffusore. Il pulsante diventa
+  **📱 ■ Ferma**; una barra sopra i risultati dice cosa suona, con **■ Ferma** e **🔊 Riproduci
+  su …**. Una stazione alla volta; si ferma uscendo dalla scheda o dall'app, e quando la
+  stazione va sul diffusore. Senza Wi-Fi usa i dati mobili (circa 1 MB al minuto a
+  128 kbit/s). Una stazione che non suona sul dispositivo può comunque suonare sul
+  diffusore: l'agente STR converte formati che il lettore di Android non legge.
+- **🔊 Riproduci su Cucina**: con il nome completo del diffusore scelto; la stazione parte
+  lì, senza memorizzare nulla.
+- **⋯ Tasti, Local…** apre un menu con **Riproduci su Cucina**, **★ Aggiungi ai preferiti STR** (agente recente), **Aggiungi a Local**, poi
+  **① Assegna a questo tasto** se il tasto è libero, oppure **① Sostituisci Bel RTL** se è
   occupato — il nome della stazione già presente è indicato, così non sovrascrivi quella a
   cui tenevi.
 
@@ -474,6 +502,14 @@ riga elimina la sveglia, dopo conferma.
 suonare. Spunta la casella, scegli il livello, poi **Salva il volume di avvio**. Un volume
 regolato durante l'ascolto non viene mai modificato.
 
+**Tasto posticipa** (nella scheda delle sveglie): spunta il tasto del telecomando che
+posticipa una sveglia che suona — **AUX**, **Pollice su** o **Pollice giù** — poi **Salva il
+tasto posticipa**. Fuori da una sveglia, un tasto pollice non fa nulla e AUX passa come
+sempre all'ingresso AUX. Un tasto pollice che ha già un'altra azione (timer, bassi…) lo
+indica; spuntarlo la sostituisce, e l'app lo dice prima. Vengono scritte solo le caselle
+che cambi: un'azione impostata altrove su un altro tasto resta. Un tasto con un gruppo
+salvato viene rifiutato dal diffusore, che dice perché.
+
 **Lingua**: italiano, francese, inglese, tedesco, olandese, spagnolo. La modifica è
 immediata, senza riavvio, e viene ricordata.
 
@@ -494,6 +530,13 @@ Un diffusore il cui agente è precedente alla versione 1.8.0 fa comparire un riq
 simile, **Agente STR troppo vecchio**, e la sua scheda nella scheda Riproduzione indica
 «troppo vecchio».
 
+**Agente STR: nuova versione**: al massimo una volta al giorno, all'apertura delle
+Impostazioni, l'app legge su GitHub l'ultima versione dell'agente STR. Quando diffusori
+conosciuti hanno un agente più vecchio, una scheda li nomina, con **Novità** e **Più tardi**
+(la scheda torna con la versione successiva), e la loro scheda nella scheda Riproduzione
+mostra "1.9.1 disponibile". L'agente si aggiorna con l'app STR sul computer. La casella
+**Controlla automaticamente** della scheda **Aggiornamento** disattiva anche questo.
+
 **Diagnostica**: *Interroga il diffusore attivo* riporta i dati del diffusore
 **selezionato** — nome, modello, identificativo, versione del firmware, l'agente con la sua
 porta e la sua versione lette in diretta su 17008 e 8888, lo stato delle notifiche,
@@ -508,6 +551,27 @@ compresa quella che Android impone prima di installare un APK firmato con un'alt
 **Esporta** crea un file e apre la condivisione (Drive, e-mail, File…); **Importa** rilegge
 un tale file e aggiunge ciò che manca, senza sostituire né eliminare nulla.
 
+**Backup del diffusore**: **Salva in un file** conserva ciò che l'agente STR tiene per il
+diffusore selezionato — i tasti da 1 a 12 (un tasto Spotify con la sua playlist), le
+sveglie, il volume di avvio e il tasto posticipa. **Ripristina da un file…** li rimette,
+dopo una domanda che nomina il diffusore di destinazione e quello da cui viene il file: il
+file serve anche a copiare queste impostazioni su un altro diffusore. I tasti del file
+sostituiscono quelli del diffusore, gli altri restano; le sue sveglie vengono sostituite.
+Senza seconda fila sul diffusore di destinazione, i tasti da 7 a 12 vengono saltati. Il
+resoconto dice cosa è stato ripristinato e cosa ha rifiutato il diffusore. Il gruppo
+permanente non viene salvato. Un tasto Spotify suona solo se il diffusore è collegato allo
+stesso account Spotify. Serve l'agente STR.
+
+**Aggiornamento** (versione installata da GitHub): al massimo una volta al giorno
+l'app chiede a GitHub se è uscita una versione più recente; la casella **Controlla
+automaticamente** lo disattiva. **Controlla ora** lo fa a richiesta. Se c'è, compare anche
+un avviso nella scheda Riproduzione (**Novità**, **Più tardi**, **Installa**). **Installa**
+scarica l'APK, verifica che abbia esattamente dimensione e impronta SHA-256 pubblicate su
+GitHub, poi apre il programma di installazione di Android, dove confermi. La prima volta
+Android chiede di consentire a SoundReborn Remote di installare app. Android rifiuta di
+installare sopra un APK firmato con un'altra chiave: una versione di prova avviata da
+Visual Studio non si aggiorna così.
+
 **Informazioni**: la versione, il ringraziamento al progetto STR con un collegamento al suo
 sito, e le note legali.
 
@@ -521,6 +585,13 @@ trascinamento lento non viene letto come un cambio di scheda.
 
 Uno scorrimento che parte **su un cursore** viene preso dal cursore: è voluto, altrimenti
 il volume diventerebbe impossibile da regolare. Inizia il gesto su una zona neutra.
+
+**Pressione lunga sull'icona dell'app** (launcher di Android): **Tutto standby** mette in
+standby ogni diffusore conosciuto con l'agente STR — un diffusore senza agente non viene
+toccato, perché il suo unico comando di standby lo accenderebbe se fosse spento —, e
+**Tasto 1** a **Tasto 3** avviano quel tasto sul diffusore selezionato. L'app si apre sulla
+scheda Riproduzione e dice cosa è stato fatto. Queste scorciatoie si possono mettere nella
+schermata iniziale.
 
 ---
 

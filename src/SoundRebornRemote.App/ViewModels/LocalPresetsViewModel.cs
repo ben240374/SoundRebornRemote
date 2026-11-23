@@ -182,7 +182,7 @@ public sealed partial class LocalPresetsViewModel : BaseViewModel
             var now = await device.GetNowPlayingAsync().ConfigureAwait(true);
             var recent = await ReadOrEmpty(() => str.GetRecentAsync()).ConfigureAwait(true);
             var presets = await ReadOrEmpty(() => str.GetPresetsAsync()).ConfigureAwait(true);
-            found = LocalPresetList.FromPlaying(now, recent, presets, device.Host);
+            found = LocalPresetList.FromPlaying(now, recent, presets, device.Host, str.LastPlayed);
         }
         catch (Exception ex)
         {
@@ -458,7 +458,7 @@ public sealed partial class LocalPresetsViewModel : BaseViewModel
 
         try
         {
-            var (source, _) = await _artwork.GetFromChainAsync(item.Preset.Art).ConfigureAwait(true);
+            var (source, _) = await _artwork.GetFromChainAsync(item.Preset.Art, background: true).ConfigureAwait(true);
 
             if (source is not null)
             {

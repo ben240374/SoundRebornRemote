@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SoundReborn Remote — Confidentialité / Privacy</title>
+<meta name="description" content="Politique de confidentialité de SoundReborn Remote. Privacy policy of SoundReborn Remote.">
+<style>
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --raised: #edf1f6; --border: #d6dee8;
+  --text: #141a21; --muted: #53616f; --faint: #7c8a99; --accent: #2f7ff0;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1218; --surface: #171d25; --raised: #212a34; --border: #2e3945;
+    --text: #f3f6f9; --muted: #9daab8; --faint: #6b7886; --accent: #5b9bf5;
+  }
+}
+* { box-sizing: border-box; }
+.switch { margin: -6px 0 18px; font-size: 15px; }
+.switch a { color: var(--accent); }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 72px; }
+header.top {
+  border-bottom: 1px solid var(--border); background: var(--surface);
+  padding: 14px 0; margin-bottom: 40px;
+}
+header.top .wrap { padding-bottom: 0; display: flex; gap: 16px;
+  align-items: baseline; flex-wrap: wrap; }
+header.top a { color: var(--muted); text-decoration: none; font-size: 14px; }
+header.top a:hover { color: var(--accent); }
+header.top .name { color: var(--text); font-weight: 600; font-size: 15px; }
+
+h1 { font-size: 30px; line-height: 1.22; margin: 0 0 6px; letter-spacing: -0.4px; }
+h2 { font-size: 21px; margin: 44px 0 10px; padding-bottom: 7px;
+     border-bottom: 1px solid var(--border); }
+h3 { font-size: 16.5px; margin: 26px 0 6px; color: var(--accent); }
+p { margin: 0 0 14px; }
+ul, ol { margin: 0 0 16px; padding-left: 22px; }
+li { margin-bottom: 6px; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+/* Les URL nues des manuels sont plus larges qu'un écran de téléphone. */
+p, li, td, th, blockquote { overflow-wrap: break-word; }
+code { background: var(--raised); padding: 2px 5px; border-radius: 4px;
+       font-size: 13.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--border);
+             color: var(--muted); font-size: 15px; background: var(--surface);
+             border-radius: 0 6px 6px 0; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 34px 0; }
+img { display: block; margin: 22px auto; max-width: 260px; width: 100%;
+      border: 1px solid var(--border); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; margin: 0 0 18px; font-size: 14.5px;
+        display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left;
+         vertical-align: top; }
+th { background: var(--raised); }
+.sub { color: var(--muted); margin-bottom: 30px; }
+
+.langbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 34px; padding: 0;
+           list-style: none; }
+.langbar a {
+  display: inline-block; padding: 6px 13px; border: 1px solid var(--border);
+  border-radius: 999px; background: var(--surface); text-decoration: none;
+  font-size: 14px; color: var(--muted);
+}
+.langbar a:hover { border-color: var(--accent); color: var(--accent); }
+.langbar a[aria-current] { background: var(--accent); border-color: var(--accent);
+                           color: #fff; }
+
+.cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+         margin: 0 0 32px; padding: 0; list-style: none; }
+.cards a {
+  display: block; padding: 15px 17px; background: var(--surface); text-decoration: none;
+  border: 1px solid var(--border); border-radius: 11px; color: var(--text);
+}
+.cards a:hover { border-color: var(--accent); }
+.cards strong { display: block; font-size: 16px; margin-bottom: 2px; }
+.cards span { color: var(--muted); font-size: 14px; }
+
+.shots { display: flex; gap: 12px; overflow-x: auto; margin: 0 0 32px; padding-bottom: 6px; }
+.shots img { margin: 0; flex: 0 0 auto; width: 190px; max-width: 45vw; }
+
+.cta {
+  display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+  padding: 11px 20px; border-radius: 9px; font-weight: 600; margin: 0 10px 12px 0;
+}
+.cta.ghost { background: transparent; color: var(--accent);
+             border: 1px solid var(--accent); }
+.note { background: var(--surface); border: 1px solid var(--border);
+        border-left: 3px solid var(--accent); border-radius: 0 9px 9px 0;
+        padding: 13px 16px; margin: 0 0 28px; font-size: 15px; }
+footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--border);
+         color: var(--faint); font-size: 13.5px; }
+footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <span class="name">SoundReborn Remote</span>
+  <a href="index-fr.html">Site (FR)</a>
+  <a href="index.html">Site (EN)</a>
+  <a href="#english">Privacy policy in English</a>
+</div></header>
+<main class="wrap">
+
+<h1>Confidentialité</h1>
+<p>Mise à jour : 23 novembre 2026 · version 1.9.1</p>
+
+<p>SoundReborn Remote est une télécommande pour enceintes Bose SoundTouch équipées de l'agent
+STR. Elle fonctionne sans compte, sans publicité, sans statistiques d'usage et sans aucun
+outil de suivi. Le développeur ne reçoit aucune donnée de l'application.</p>
+
+<h2>Ce qui reste sur l'appareil</h2>
+<ul>
+  <li>La liste des enceintes connues, les réglages (langue, thème, volume des annonces…),
+      les présélections « Local », les textes gardés du message vocal et le cache des logos :
+      dans les préférences et le cache de l'application. Une désinstallation les efface.</li>
+  <li>Les enregistrements de radio : dans le dossier de l'application. Ils ne quittent
+      l'appareil que si tu les partages toi-même.</li>
+  <li>Les fichiers de sauvegarde (favoris, enceinte) : créés dans le cache de l'application,
+      ils ne partent que là où tu les partages. La sauvegarde d'une enceinte contient ses
+      touches, ses réveils et ses réglages, sans son adresse IP.</li>
+</ul>
+
+<h2>Avec qui l'application communique</h2>
+<ul>
+  <li><strong>Tes enceintes, sur ton réseau local</strong> : commandes, état de lecture,
+      présélections, favoris STR, réveils, touches de la télécommande, groupes.</li>
+  <li><strong>radio-browser.info</strong> (annuaire public de radios) : les mots cherchés et
+      les filtres choisis (pays, langue, genre, tri) ; quand tu lances une station de
+      l'annuaire, son identifiant, pour le compteur d'écoutes de l'annuaire.</li>
+  <li><strong>Les sites des stations</strong> : téléchargement de leur logo ; lecture de leur
+      flux quand tu écoutes une station sur l'appareil ou que tu l'enregistres.</li>
+  <li><strong>GitHub</strong> (version GitHub seulement, pas la version Google Play) : une
+      requête anonyme par jour au plus pour savoir si une nouvelle version existe, et le
+      téléchargement de l'APK quand tu touches « Installer ». La vérification automatique
+      se coupe dans Réglages.</li>
+  <li><strong>GitHub, dépôt du projet STR</strong> (toutes les versions) : une requête anonyme
+      par jour au plus, à l'ouverture des Réglages, pour connaître la dernière version de
+      l'agent STR et dire quelles enceintes ont un agent plus ancien. Dans la version
+      GitHub, la même case « Vérifier automatiquement » la coupe.</li>
+</ul>
+<p>Ces services voient l'adresse IP de ta connexion, comme pour toute page web.</p>
+
+<h2>Micro et message vocal</h2>
+<p>Le micro n'enregistre que pendant que tu maintiens le bouton rond du message vocal.
+L'enregistrement est servi à ton enceinte sur le réseau local, puis effacé de l'appareil.
+L'application ne l'envoie nulle part ailleurs.</p>
+<p>Un texte à lire est envoyé à ton enceinte ; c'est l'agent STR, sur l'enceinte, qui le fait
+prononcer par la voix de Google (Google Translate). Ce texte passe donc par Google.</p>
+
+<h2>Autorisations Android</h2>
+<ul>
+  <li>Internet, état du réseau et du Wi-Fi : parler aux enceintes et aux services ci-dessus.</li>
+  <li>Micro : le message vocal, demandé au premier usage.</li>
+  <li>Notifications, service au premier plan, maintien en éveil : l'enregistrement d'une radio,
+      écran éteint compris.</li>
+  <li>Vibration : signaler que le micro tourne.</li>
+  <li>Installation d'applications (version GitHub seulement) : ouvrir l'installateur
+      d'Android sur une mise à jour, que tu confirmes toi-même.</li>
+</ul>
+
+<h2>Contact</h2>
+<p>Une question ou un problème : <a href="https://github.com/ben240374/SoundRebornRemote/issues">github.com/ben240374/SoundRebornRemote/issues</a>.</p>
+
+<hr>
+
+<h1 id="english">Privacy</h1>
+<p>Updated: 23 November 2026 · version 1.9.1</p>
+
+<p>SoundReborn Remote is a remote control for Bose SoundTouch speakers running the STR agent.
+It works without an account, without ads, without usage statistics and without any tracking
+tool. The developer receives no data from the app.</p>
+
+<h2>What stays on the device</h2>
+<ul>
+  <li>The list of known speakers, the settings (language, theme, announcement volume…), the
+      “Local” presets, the kept voice-message texts and the logo cache: in the app's
+      preferences and cache. Uninstalling deletes them.</li>
+  <li>Radio recordings: in the app's folder. They leave the device only if you share them
+      yourself.</li>
+  <li>Backup files (favourites, speaker): created in the app's cache, they only go where you
+      share them. A speaker backup holds its keys, alarms and settings, not its IP address.</li>
+</ul>
+
+<h2>Who the app talks to</h2>
+<ul>
+  <li><strong>Your speakers, on your local network</strong>: commands, playback state,
+      presets, STR favourites, alarms, remote keys, groups.</li>
+  <li><strong>radio-browser.info</strong> (public radio directory): the words you search for
+      and the filters you choose (country, language, genre, sort); when you start a station
+      from the directory, its identifier, for the directory's play counter.</li>
+  <li><strong>The stations' websites</strong>: downloading their logo; reading their stream
+      when you listen to a station on the device or record it.</li>
+  <li><strong>GitHub</strong> (GitHub build only, not the Google Play build): one anonymous
+      request a day at most to see whether a new version exists, and downloading the APK when
+      you tap “Install”. The automatic check can be turned off in Settings.</li>
+  <li><strong>GitHub, STR project repository</strong> (all builds): one anonymous request a
+      day at most, when Settings opens, to learn the latest STR agent version and say which
+      speakers have an older agent. In the GitHub build, the same “Check automatically” box
+      turns it off.</li>
+</ul>
+<p>These services see your connection's IP address, as for any web page.</p>
+
+<h2>Microphone and voice message</h2>
+<p>The microphone records only while you hold the round voice-message button. The recording is
+served to your speaker over the local network, then deleted from the device. The app sends it
+nowhere else.</p>
+<p>A text to be read is sent to your speaker; the STR agent, on the speaker, has it spoken by
+Google's voice (Google Translate). That text therefore goes through Google.</p>
+
+<h2>Android permissions</h2>
+<ul>
+  <li>Internet, network and Wi-Fi state: talking to the speakers and the services above.</li>
+  <li>Microphone: the voice message, asked the first time it is used.</li>
+  <li>Notifications, foreground service, wake lock: recording a radio, screen off included.</li>
+  <li>Vibration: signalling that the microphone is running.</li>
+  <li>Installing apps (GitHub build only): opening Android's installer on an update, which you
+      confirm yourself.</li>
+</ul>
+
+<h2>Contact</h2>
+<p>A question or a problem: <a href="https://github.com/ben240374/SoundRebornRemote/issues">github.com/ben240374/SoundRebornRemote/issues</a>.</p>
+
+</main>
+</body>
+</html>

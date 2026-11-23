@@ -167,12 +167,18 @@ public static class LocalPresetList
     /// L'adresse se cherche comme pour l'enregistrement (historique de l'agent,
     /// touches, ce que l'enceinte rapporte). Un flux HLS, que l'enregistrement
     /// refuse, est accepté ici : l'agent le convertit pour l'enceinte.
+    ///
+    /// En dernier recours, <paramref name="launched"/> : ce que l'application a
+    /// elle-même lancé (favori, Local, recherche). L'agent joue ces adresses par son
+    /// relais, et l'enceinte ne rapporte alors que le titre et l'adresse du relais.
+    /// Elle ne sert que si son titre est celui de la station qui joue.
     /// </summary>
     public static LocalPreset? FromPlaying(
         NowPlaying now,
         IReadOnlyList<RecentEntry> recent,
         IReadOnlyList<StrPreset> presets,
-        string speakerHost)
+        string speakerHost,
+        StrPlayedStream? launched = null)
     {
         var resolution = StreamUrlResolver.Resolve(now, recent, presets, speakerHost);
         var station = CleanName(resolution.Station);
@@ -185,6 +191,24 @@ public static class LocalPresetList
         if (url is null && resolution.Refusal == RecordingRefusal.Hls && lastIsThis && IsStreamUrl(last!.CardUrl))
         {
             url = last.CardUrl;
+        }
+
+        if ((url is null || !IsStreamUrl(url)) &&
+            launched is not null && station.Length > 0 &&
+            resolution.Refusal is not (RecordingRefusal.NotPlaying or RecordingRefusal.NotRadio) &&
+            string.Equals(CleanName(launched.Title), station, StringComparison.OrdinalIgnoreCase) &&
+            IsStreamUrl(launched.Url))
+        {
+            var launchedArt = string.IsNullOrWhiteSpace(launched.Icon) ? now.ArtUrl : launched.Icon;
+
+            return new LocalPreset
+            {
+                Id = NewId(),
+                Name = station,
+                Url = launched.Url.Trim(),
+                Art = string.IsNullOrWhiteSpace(launchedArt) ? null : launchedArt.Trim(),
+                Codec = string.IsNullOrWhiteSpace(launched.Codec) ? null : launched.Codec,
+            };
         }
 
         if (url is null || station.Length == 0 || !IsStreamUrl(url))

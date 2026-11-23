@@ -365,8 +365,18 @@ public sealed partial class PlayerViewModel : BaseViewModel
     [RelayCommand]
     private void ShowLocal() => _presetsViewModel.Local.IsShown = true;
 
-    /// <summary>Sélecteur « Une fois / Deux fois » de cette page. Le paramètre vaut "1" ou "2".</summary>
+    /// <summary>Les favoris STR, partagés avec l'onglet Présélections.</summary>
+    public StrFavoritesViewModel Favorites => _presetsViewModel.Favorites;
+
+    /// <summary>Sélecteur « ★ STR » de cette page.</summary>
     [RelayCommand]
+    private void ShowFavorites() => _presetsViewModel.OpenFavorites();
+
+    /// <summary>
+    /// Sélecteur « Une fois / Deux fois » de cette page. Le paramètre vaut "1" ou "2".
+    /// Toujours disponible, même pendant le chargement des logos (voir PresetsViewModel.ShowRowAsync).
+    /// </summary>
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private Task ShowPresetRowAsync(string? row) => _presetsViewModel.SelectRowAsync(row == "2");
 
     // ================================================================ Enceintes
@@ -2243,11 +2253,45 @@ public sealed partial class PlayerViewModel : BaseViewModel
 
     public void OnDisappearing() => _pollTimer?.Stop();
 
-    /// <summary>« v1.6.3 » ; sous la version minimale, « v1.5.2 · trop ancien ».</summary>
+    /// <summary>
+    /// Le compte rendu d'un raccourci de l'icône (« Tout mettre en veille »,
+    /// « Touche 1 »…), montré dans cet onglet, sur lequel l'application s'ouvre.
+    /// Un message vide ne change rien. L'état de lecture suit par la relecture
+    /// régulière de l'onglet.
+    /// </summary>
+    public void ShowShortcutResult(string message, bool isError)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        if (isError)
+        {
+            IsError = true;
+            StatusMessage = message;
+        }
+        else
+        {
+            ShowInfo(message);
+        }
+    }
+
+    /// <summary>
+    /// « v1.6.3 » ; sous la version minimale, « v1.5.2 · trop ancien » ; plus ancien
+    /// que la dernière version publiée (lue par les Réglages), « v1.8.3 · 1.9.1 dispo ».
+    /// </summary>
     private static string AgentLabel(string version)
-        => AgentRequirement.IsTooOld(version)
-            ? $"{version} · {Localization.Get("L_AgentTooOldShort")}"
+    {
+        if (AgentRequirement.IsTooOld(version))
+        {
+            return $"{version} · {Localization.Get("L_AgentTooOldShort")}";
+        }
+
+        return AgentUpdateViewModel.NewerThan(version) is { } newer
+            ? $"{version} · {Localization.Get("L_AgentNewShort", newer.Label)}"
             : version;
+    }
 
     private async Task FillAgentVersionsAsync()
     {

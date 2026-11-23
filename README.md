@@ -25,10 +25,12 @@ no service in between.
 
 **Presets tab**
 - Internet station search (radio-browser.info), as in the STR desktop app: name, country, language, genre chips (two of them chosen for the country), sort (popularity, plays, trend, name, bitrate), minimum bitrate, working stations only, streams the speaker can play, pasted stream address, "Show more", and a link to add a missing station to the directory.
+- Listen to a station on the phone or tablet before playing it on the speaker: an open result line offers "📱 ▶ Listen on this phone" and "🔊 Play on <speaker>", which cannot be mistaken for one another.
 - Assign a station to any of the twelve keys.
 - Rename or clear a key.
 - *Local* presets kept on the phone, as many as you like: the radio that is playing, a station from the search or a pasted address; started on any STR speaker.
 - Copy all the keys to another STR speaker, or to all of them (STR agent 1.6.5 or later).
+- STR favourites (*★ STR* button next to *Local*, also in the Play tab), the starred stations of the STR desktop app, shared by every STR speaker: play one, put it on a key or in *Local*, add a station from the search or what is playing, remove one (recent STR agent).
 
 **Sources tab**
 - Bluetooth, AUX and the speaker's own sources; play any stream address.
@@ -42,14 +44,18 @@ no service in between.
 
 **Settings tab**
 - Alarms of each speaker: time on the phone's clock dial, days (with Mon → Fri, Weekend and Every day shortcuts), key, volume, automatic switch-off, snooze. Changes made in other STR apps are kept.
+- Snooze key: choose which remote key (AUX, thumbs up, thumbs down) snoozes a ringing alarm; actions set elsewhere on other keys are kept.
 - Start volume: the level the speaker takes when it is switched on.
+- Speaker backup: keys 1 to 12, alarms, start volume and snooze key of a speaker in a file, restored on the same speaker or copied to another one, after confirmation.
 - Favourites backup: export the local presets and kept texts to a file, and import them back.
-- Speaker discovery (mDNS, then a network sweep) or manual address; flags speakers without the STR agent or with an agent older than 1.8.0.
+- Update from GitHub: at most once a day the app looks for a newer release (can be turned off); *Install* downloads the APK, checks its size and SHA-256 fingerprint against GitHub, then opens Android's installer. Not in the Google Play build.
+- Speaker discovery (mDNS, then a network sweep) or manual address; flags speakers without the STR agent or with an agent older than 1.8.0, and those whose agent is older than the latest STR release on GitHub (read at most once a day).
 - Interface in English, French, German, Dutch, Spanish and Italian; light or dark theme; diagnostics.
 
 **Everywhere**
 - Commands follow the group's master, because the master is what plays.
 - Swipe between tabs. No account, no cloud.
+- Long press on the app icon: *All standby* (every speaker with the STR agent) and keys 1 to 3 of the selected speaker.
 
 ## Thanks to STR
 
@@ -107,6 +113,9 @@ attached to the latest release: [English](https://github.com/ben240374/SoundRebo
 | Sleep timer | Play tab | `GET/POST/DELETE :8888/api/box/sleep` |
 | Alarms of the selected speaker (time, days, key, volume, switch-off, snooze) | Settings tab | `GET/PUT :8888/api/alarms` with `rev`; on `409` the user's change is applied again to the current document |
 | Start volume | Settings tab | `GET/POST :8888/api/box/start-volume` |
+| Snooze key (AUX, thumbs up, thumbs down) | Settings tab | `GET/PUT :8888/api/keyactions` — the document is read again just before saving and only the keys the user changed are written |
+| Speaker backup and restore (keys, alarms, start volume, snooze key) | Settings tab | `GET :8888/api/presets`, `/api/alarms`, `/api/box/start-volume`, `/api/keyactions`; restore with `PUT :8888/api/presets` (whole set), `PUT /api/alarms` with the target's `rev`, then the others |
+| Shortcuts on the app icon (*All standby*, keys 1 to 3) | Android launcher | `POST :8888/api/box/power` `{"on":false}` on each speaker with the agent; `POST :8888/api/play/<slot>` |
 | Now playing, artwork, source | everywhere | WebSocket `:8080` (subprotocol `gabbo`), falling back to `GET /now_playing` |
 | Sources, Bluetooth, AUX | Sources tab | `GET :8090/sources`, `POST :8090/select`, `PUT :8888/api/box/source` |
 | Playing an arbitrary URL | Sources tab | `POST :8888/api/play` |
@@ -121,6 +130,8 @@ attached to the latest release: [English](https://github.com/ben240374/SoundRebo
 | Assigning a station to a key (1 to 12) | Presets tab | `PUT :8888/api/presets/{slot}` |
 | Renaming or clearing a key | Presets tab | `PATCH :8888/api/presets/{slot}` with `{"name"}`, `DELETE :8888/api/presets/{slot}` |
 | Copying all keys to another speaker, or to all | Presets tab | `POST :8888/api/box/preset-copy` (agent 1.6.5 or later) |
+| STR favourites | Presets tab | `GET`, `POST`, `DELETE :8888/api/favorites` (never `PUT`, which is the desktop app's sync) |
+| Latest STR agent release | Settings and Play tabs | `GET https://api.github.com/repos/JRpersonal/streborn/releases/latest`, at most once a day |
 | Interface language | Settings tab | EN, FR, DE, NL, ES, IT — applied immediately, no restart |
 | Light or dark theme | Settings tab | System, Light or Dark — switches immediately |
 | Swipe navigation | everywhere | horizontal gesture recognised in `MainActivity`, without touching scrolling |
@@ -199,6 +210,10 @@ dotnet publish src\SoundRebornRemote.App\SoundRebornRemote.App.csproj -f net10.0
 ```
 
 Single quotes matter in PowerShell: `$` is expanded inside a bare or double-quoted string.
+
+**Google Play build.** Add `-p:Store=play -p:AndroidPackageFormat=aab`: the bundle leaves out the
+update from GitHub and the `REQUEST_INSTALL_PACKAGES` permission, which Google Play forbids
+for an app that updates itself. See [docs/google-play.md](docs/google-play.md).
 
 ## First run
 
@@ -372,10 +387,12 @@ aucun service intermédiaire.
 
 **Onglet Présélections**
 - Recherche de stations internet (radio-browser.info), comme dans l'application PC de STR : nom, pays, langue, pastilles de genres (dont deux choisies pour le pays), tri (popularité, écoutes, tendance, nom, débit), débit minimal, stations en service uniquement, flux que l'enceinte sait lire, adresse de flux collée, « Voir plus », et un lien pour ajouter à l'annuaire une station qui manque.
+- Écoute d'une station sur le téléphone ou la tablette avant de la diffuser sur l'enceinte : une ligne de résultat ouverte propose « 📱 ▶ Écouter sur ce téléphone » et « 🔊 Diffuser sur <enceinte> », impossibles à confondre.
 - Affectation d'une station à l'une des douze touches.
 - Renommer ou effacer une touche.
 - Présélections *Local* gardées dans le téléphone, en nombre libre : la radio qui joue, une station de la recherche ou une adresse collée ; lancées sur n'importe quelle enceinte STR.
 - Copie de toutes les touches vers une autre enceinte STR, ou vers toutes (agent STR 1.6.5 ou plus récent).
+- Favoris STR (bouton *★ STR* à côté de *Local*, aussi dans l'onglet Lecture), les stations étoilées de l'application STR sur ordinateur, partagés par toutes les enceintes STR : en lancer un, le mettre sur une touche ou dans *Local*, ajouter une station de la recherche ou ce qui joue, en retirer un (agent STR récent).
 
 **Onglet Sources**
 - Bluetooth, AUX et les sources de l'enceinte ; lecture de n'importe quelle adresse de flux.
@@ -389,14 +406,18 @@ aucun service intermédiaire.
 
 **Onglet Réglages**
 - Réveils de chaque enceinte : heure sur le cadran du téléphone, jours (raccourcis Lun → Ven, Week-end, Tous les jours), touche, volume, arrêt automatique, répétition. Les modifications faites dans les autres applications STR sont conservées.
+- Touche de répétition : la touche de la télécommande (AUX, pouce levé, pouce baissé) qui répète un réveil qui sonne ; les actions réglées ailleurs sur les autres touches sont gardées.
 - Volume de départ : le niveau que prend l'enceinte quand on l'allume.
+- Sauvegarde de l'enceinte : touches 1 à 12, réveils, volume de départ et touche de répétition d'une enceinte dans un fichier, restaurés sur la même enceinte ou recopiés sur une autre, après confirmation.
 - Sauvegarde des favoris : export des présélections *Local* et des textes gardés dans un fichier, et import.
-- Découverte des enceintes (mDNS, puis balayage du réseau) ou adresse manuelle ; signale les enceintes sans agent STR ou avec un agent antérieur à 1.8.0.
+- Mise à jour depuis GitHub : au plus une fois par jour, l'application cherche une version plus récente (désactivable) ; *Installer* télécharge l'APK, vérifie sa taille et son empreinte SHA-256 auprès de GitHub, puis ouvre l'installateur d'Android. Absent de la version Google Play.
+- Découverte des enceintes (mDNS, puis balayage du réseau) ou adresse manuelle ; signale les enceintes sans agent STR ou avec un agent antérieur à 1.8.0, et celles dont l'agent est plus ancien que la dernière version de STR sur GitHub (lue au plus une fois par jour).
 - Interface en français, anglais, allemand, néerlandais, espagnol et italien ; thème clair ou foncé ; diagnostic.
 
 **Partout**
 - Les commandes suivent le maître du groupe, puisque c'est lui qui diffuse.
 - Navigation par glissement entre les onglets. Aucun compte, aucun cloud.
+- Appui long sur l'icône de l'application : *Tout en veille* (chaque enceinte avec l'agent STR) et touches 1 à 3 de l'enceinte sélectionnée.
 
 ## Grâce à STR
 
@@ -455,6 +476,9 @@ jointes à la dernière release : [Français](https://github.com/ben240374/Sound
 | Minuterie de sommeil | onglet Lecture | `GET/POST/DELETE :8888/api/box/sleep` |
 | Réveils de l'enceinte sélectionnée (heure, jours, touche, volume, arrêt, répétition) | onglet Réglages | `GET/PUT :8888/api/alarms` avec `rev` ; sur un `409`, la modification de l'utilisateur est refaite sur le document actuel |
 | Volume de départ | onglet Réglages | `GET/POST :8888/api/box/start-volume` |
+| Touche de répétition (AUX, pouce levé, pouce baissé) | onglet Réglages | `GET/PUT :8888/api/keyactions` — le document est relu juste avant l'enregistrement et seules les touches changées par l'utilisateur sont écrites |
+| Sauvegarde et restauration d'une enceinte (touches, réveils, volume de départ, touche de répétition) | onglet Réglages | `GET :8888/api/presets`, `/api/alarms`, `/api/box/start-volume`, `/api/keyactions` ; restauration par `PUT :8888/api/presets` (jeu entier), `PUT /api/alarms` avec la `rev` de la cible, puis le reste |
+| Raccourcis de l'icône (*Tout en veille*, touches 1 à 3) | lanceur d'Android | `POST :8888/api/box/power` `{"on":false}` sur chaque enceinte avec agent ; `POST :8888/api/play/<slot>` |
 | Titre en cours, pochette, source | partout | WebSocket `:8080` (sous-protocole `gabbo`), repli sur `GET /now_playing` |
 | Sources, Bluetooth, AUX | onglet Sources | `GET :8090/sources`, `POST :8090/select`, `PUT :8888/api/box/source` |
 | Lecture d'une URL quelconque | onglet Sources | `POST :8888/api/play` |
@@ -469,6 +493,8 @@ jointes à la dernière release : [Français](https://github.com/ben240374/Sound
 | Affectation à une touche (1 à 12) | onglet Présélections | `PUT :8888/api/presets/{slot}` |
 | Renommer ou effacer une touche | onglet Présélections | `PATCH :8888/api/presets/{slot}` avec `{"name"}`, `DELETE :8888/api/presets/{slot}` |
 | Copie de toutes les touches vers une autre enceinte, ou vers toutes | onglet Présélections | `POST :8888/api/box/preset-copy` (agent 1.6.5 ou plus récent) |
+| Favoris STR | onglet Présélections | `GET`, `POST`, `DELETE :8888/api/favorites` (jamais `PUT`, réservé à la synchronisation de l'application sur ordinateur) |
+| Dernière version de l'agent STR | onglets Réglages et Lecture | `GET https://api.github.com/repos/JRpersonal/streborn/releases/latest`, au plus une fois par jour |
 | Langue de l'interface | onglet Réglages | FR, EN, DE, NL, ES, IT — changement immédiat, sans redémarrage |
 | Thème clair ou foncé | onglet Réglages | Système, Clair ou Foncé — bascule immédiate |
 | Navigation par balayage | partout | geste horizontal reconnu dans `MainActivity`, sans toucher au défilement |
@@ -550,6 +576,10 @@ dotnet publish src\SoundRebornRemote.App\SoundRebornRemote.App.csproj -f net10.0
 
 Les guillemets simples comptent : en PowerShell, `$` est développé dans une chaîne nue ou
 entre guillemets doubles.
+
+**Version Google Play.** Ajoute `-p:Store=play -p:AndroidPackageFormat=aab` : le bundle ne contient
+ni la mise à jour depuis GitHub ni la permission `REQUEST_INSTALL_PACKAGES`, que Google Play
+interdit à une application qui se met à jour elle-même. Voir [docs/google-play.md](docs/google-play.md).
 
 ## Première utilisation
 

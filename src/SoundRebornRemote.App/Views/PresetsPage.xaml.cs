@@ -26,5 +26,16 @@ public partial class PresetsPage : ContentPage
 
         // Les genres de l'annuaire, pour « Plus de genres » : lus une fois.
         _ = _viewModel.LoadGenresAsync();
+
+        // Les favoris STR : relus à chaque visite, ils changent aussi depuis l'ordinateur.
+        _ = _viewModel.Favorites.LoadAsync();
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        // L'écoute sur l'appareil est un aperçu : elle ne suit pas dans les autres onglets.
+        _viewModel.StopPreview();
     }
 }

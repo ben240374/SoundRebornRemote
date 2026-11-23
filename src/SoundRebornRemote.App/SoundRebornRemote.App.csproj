@@ -18,10 +18,20 @@
          code de version Android, qui doit rester un entier croissant. L'identifiant
          de paquet a changé avec le nom : Android voit une nouvelle application, donc
          le code de version repart à 1. -->
-    <ApplicationDisplayVersion>1.9.0</ApplicationDisplayVersion>
-    <ApplicationVersion>30</ApplicationVersion>
+    <ApplicationDisplayVersion>1.9.1</ApplicationDisplayVersion>
+    <ApplicationVersion>31</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <!--
+      Version Google Play : dotnet publish ... -p:Store=play -p:AndroidPackageFormat=aab
+      Elle ne contient ni la mise à jour depuis GitHub ni la permission
+      REQUEST_INSTALL_PACKAGES : Play interdit à une application de se mettre à jour
+      autrement que par le Play Store. Sans ce paramètre, c'est la version GitHub.
+  -->
+  <PropertyGroup Condition="'$(Store)' == 'play'">
+    <DefineConstants>$(DefineConstants);PLAY_STORE</DefineConstants>
   </PropertyGroup>
 
   <!--

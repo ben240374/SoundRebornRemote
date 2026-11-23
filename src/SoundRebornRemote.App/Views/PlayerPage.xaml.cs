@@ -18,14 +18,23 @@ public partial class PlayerPage : ContentPage
         VoiceCard.BindingContext = _voice;
         _voice.RecordingStarted += OnRecordingStarted;
 
+        // Bannière « nouvelle version » : même règle, posée avant la page.
+        _update = ServiceHelper.Get<UpdateViewModel>();
+        UpdateBanner.BindingContext = _update;
+
         _viewModel = ServiceHelper.Get<PlayerViewModel>();
         BindingContext = _viewModel;
     }
+
+    private readonly UpdateViewModel _update;
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
         _viewModel.OnAppearing();
+
+        // Au plus une fois par jour, et seulement si l'utilisateur ne l'a pas coupé.
+        _ = _update.AutoCheckAsync();
     }
 
     protected override void OnDisappearing()

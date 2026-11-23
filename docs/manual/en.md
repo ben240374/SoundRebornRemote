@@ -1,6 +1,6 @@
 # SoundReborn Remote — User manual
 
-Version 1.9.0 · Android 7 and later
+Version 1.9.1 · Android 7 and later
 
 > Languages: [Français](fr.md) · **English** · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md) · [Italiano](it.md)
 
@@ -54,6 +54,9 @@ The app is not distributed through the Play Store. Download it from the project'
 2. Open it. Android will ask permission to install from an unknown source — grant it to
    whichever app did the downloading, usually the browser.
 3. Install, then open.
+
+After that, the app itself tells you about new versions and can install them (Settings
+tab, **Update**).
 
 No special permission is requested on first launch: the app touches neither contacts,
 nor location, nor storage.
@@ -299,12 +302,28 @@ speaker.
 
 Copying needs STR agent 1.6.5 or later on the selected speaker.
 
+### STR favourites
+
+With a recent STR agent, the **★ STR** button, to the right of **Local** (Play and Presets
+tabs), shows the starred stations of the STR app on a computer in place of the keys. They
+are the same on every STR speaker: a favourite added or removed here is added or removed
+on the other speakers and on the computer too, a few seconds later. **Once** or **Twice**
+brings the keys back.
+
+- Tap a favourite to play it on the selected speaker.
+- **⋯** offers **Put on a key…**, **Add to Local** and **Remove from STR favourites**
+  (after confirmation).
+- **★ Add what's playing** keeps the radio the speaker is playing; in the search,
+  **⋯ Keys, Local…** offers **★ Add to STR favourites**.
+- A Pandora station is listed, but plays from the STR app.
+
 ### Find a station
 
 The search box queries **radio-browser.info**, an open directory maintained by
 volunteers. The search follows the one of the STR desktop app:
 
-- **Country** and **Language** narrow the search; **Sort** orders stations by popularity
+- **Country** (all in alphabetical order, overseas territories included: Martinique,
+  Réunion, Guadeloupe…) and **Language** narrow the search; **Sort** orders stations by popularity
   (votes), plays, trend, name or bitrate. Changing one of these runs the last search
   again.
 - The **genre chips** (All, Pop, Rock, Hits, Jazz, 80s…) filter by genre; the first two
@@ -334,10 +353,19 @@ search, and the number of hidden stations shows below the results header.
 **A station is missing?** The link below the results opens radio-browser.info, where
 anyone can add it: it then turns up here, and for everyone.
 
-Tap a result and an action sheet opens with
+Tap a result: the line opens and offers three choices that cannot be mistaken.
 
-- **Listen** — plays the station straight away, storing nothing;
-- **① Assign to this key** if the key is free, or **① Replace Bel RTL** if it is taken —
+- **📱 ▶ Listen on this phone** (or **this tablet**): the station plays on the device, so
+  you can hear it before playing it on the speaker. The button becomes **📱 ■ Stop**; a
+  bar above the results says what is playing, with **■ Stop** and **🔊 Play on …**. One
+  station at a time; it stops when you leave the tab or the app, and when you play the
+  station on the speaker. Away from Wi-Fi it uses mobile data (about 1 MB per minute at
+  128 kbit/s). A station that does not play on the device may still play on the speaker:
+  the STR agent converts formats Android's player cannot read.
+- **🔊 Play on Kitchen**: with the full name of the selected speaker, the station starts
+  on the speaker, storing nothing.
+- **⋯ Keys, Local…** opens an action sheet with **Play on Kitchen**, **★ Add to STR favourites** (recent agent), **Add to Local**, then
+  **① Assign to this key** if the key is free, or **① Replace Bel RTL** if it is taken —
   the name of the station already there is shown, so you do not overwrite one you cared
   about.
 
@@ -454,6 +482,14 @@ the STR agent. The time is set on the phone's clock dial. The bin on a line dele
 Tick the box, pick the level, then **Save the start volume**. A volume set while
 listening is never changed.
 
+**Snooze key** (in the alarms card): tick the remote key that snoozes a ringing alarm —
+**AUX**, **Thumbs up** or **Thumbs down** — then **Save the snooze key**. Outside an alarm,
+a thumbs key does nothing and AUX switches to the AUX input as usual. A thumbs key that
+already carries another action (sleep timer, bass…) says so; ticking it replaces that
+action, and the app says so first. Only the boxes you change are written: an action set
+elsewhere on another key stays. A key that carries a saved group is refused by the
+speaker, which says why.
+
 **Language**: English, French, German, Dutch, Spanish, Italian. The change is immediate, with no
 restart, and is remembered.
 
@@ -471,6 +507,13 @@ explanatory block then appears further down, with a link to the STR project site
 A speaker whose agent is older than version 1.8.0 brings up a similar block, **STR
 agent too old**, and its card in the Play tab reads "too old".
 
+**STR agent: new version**: at most once a day, when Settings opens, the app reads the
+latest STR agent version from GitHub. When known speakers have an older agent, a card
+names them, with **What's new** and **Later** (the card comes back with the next version),
+and their card in the Play tab shows "1.9.1 available". The agent is updated with the STR
+app on a computer. The **Check automatically** box of the **Update** card also turns this
+off.
+
 **Diagnostics**: *Query the speaker* reports on the **selected** speaker — name, model,
 device ID, firmware version, the agent with its port and its version read live on both
 17008 and 8888, the state of notifications, the bass range, the list of recognised API
@@ -484,6 +527,25 @@ requires before installing an APK signed with another key. **Export** creates a 
 opens sharing (Drive, e-mail, Files…); **Import** reads such a file back and adds what is
 missing, without replacing or deleting anything.
 
+**Speaker backup**: **Save to a file** keeps what the STR agent stores for the selected
+speaker — keys 1 to 12 (a Spotify key with its playlist), the alarms, the start volume and
+the snooze key. **Restore from a file…** puts them back, after a question naming the target
+speaker and the one the file comes from: the file can also copy these settings to another
+speaker. The keys in the file replace those of the speaker, the others stay; its alarms
+are replaced. Without a second row on the target speaker, keys 7 to 12 are skipped. The
+report says what was restored and what the speaker refused. The permanent group is not
+saved. A Spotify key only plays if the speaker is signed in to the same Spotify account.
+STR agent required.
+
+**Update** (version installed from GitHub): at most once a day, the app asks GitHub
+whether a newer version is published; the **Check automatically** box turns that off.
+**Check now** does it on request. When there is one, a banner also appears in the Play
+tab (**What's new**, **Later**, **Install**). **Install** downloads the APK, checks that it
+has exactly the size and SHA-256 fingerprint published on GitHub, then opens Android's
+installer, where you confirm. The first time, Android asks you to allow SoundReborn Remote
+to install apps. Android refuses to install over an APK signed with another key: a test
+build started from Visual Studio is not updated this way.
+
 **About**: the version, credit to the STR project with a link to its site in the chosen
 language, and the legal notices.
 
@@ -496,6 +558,12 @@ Groups → Settings. The gesture must be brisk; a slow drag is not read as a tab
 
 A swipe that starts **on a slider** is taken by the slider: that is deliberate, otherwise
 the volume would become impossible to set. Start the gesture on a neutral area.
+
+**Long press on the app icon** (Android launcher): **All standby** puts every known speaker
+with the STR agent on standby — a speaker without the agent is left alone, because its
+only standby command would switch it on if it were off —, and **Key 1** to **Key 3** play
+that key on the selected speaker. The app opens on the Play tab and says what was done.
+These shortcuts can be dropped on the home screen.
 
 ---
 

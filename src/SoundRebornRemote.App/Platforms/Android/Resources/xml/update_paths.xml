@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Seul le dossier des mises à jour, dans le cache de l'application, est partagé
+     avec l'installateur d'Android. -->
+<paths>
+  <cache-path name="updates" path="updates/" />
+</paths>

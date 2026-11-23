@@ -6,6 +6,7 @@ namespace SoundRebornRemote.App.Views;
 public partial class SettingsPage : ContentPage
 {
     private readonly SettingsViewModel _viewModel;
+    private readonly AgentUpdateViewModel _agentUpdate;
     private bool _initialized;
 
     public SettingsPage()
@@ -15,14 +16,35 @@ public partial class SettingsPage : ContentPage
         // La carte « Sauvegarde des favoris » a sa propre vue-modèle. Posée AVANT celle
         // de la page : un BindingContext déjà fixé n'hérite pas de celui de la page.
         BackupCard.BindingContext = ServiceHelper.Get<BackupViewModel>();
+        UpdateCard.BindingContext = ServiceHelper.Get<UpdateViewModel>();
+        _agentUpdate = ServiceHelper.Get<AgentUpdateViewModel>();
+        AgentUpdateCard.BindingContext = _agentUpdate;
+        var speakerBackup = ServiceHelper.Get<SpeakerBackupViewModel>();
+        SpeakerBackupCard.BindingContext = speakerBackup;
 
         _viewModel = ServiceHelper.Get<SettingsViewModel>();
         BindingContext = _viewModel;
+
+        // Après une restauration, la carte des réveils relit l'enceinte.
+        speakerBackup.Restored += async (_, _) =>
+        {
+            try
+            {
+                await _viewModel.Alarms.LoadAsync();
+            }
+            catch (Exception)
+            {
+                // La carte des réveils garde ce qu'elle affichait.
+            }
+        };
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        // Dernière version de l'agent STR : au plus une lecture par jour, en tâche de fond.
+        _ = _agentUpdate.AutoCheckAsync();
 
         if (_initialized)
         {

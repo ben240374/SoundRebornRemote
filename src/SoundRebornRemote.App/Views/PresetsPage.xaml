@@ -30,7 +30,8 @@
                         « Une fois » : les six touches. « Deux fois » : la même touche
                         pressée deux fois, seulement si l'agent de l'enceinte gère ces
                         six touches-là. « Local », à droite : les présélections gardées
-                        dans le téléphone, en nombre libre.
+                        dans le téléphone, en nombre libre. « ★ STR » : les favoris STR,
+                        les mêmes sur toutes les enceintes (agent récent).
                     -->
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
                         <HorizontalStackLayout Grid.Column="0" Spacing="8">
@@ -77,26 +78,44 @@
                             </Border>
                         </HorizontalStackLayout>
 
-                        <Border Grid.Column="2" Style="{StaticResource Chip}" Padding="14,6">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ShowLocalCommand}" />
-                            </Border.GestureRecognizers>
+                        <HorizontalStackLayout Grid.Column="2" Spacing="8">
+                            <Border Style="{StaticResource Chip}" Padding="14,6">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ShowLocalCommand}" />
+                                </Border.GestureRecognizers>
 
-                            <!-- Pastille : nombre de présélections locales. -->
-                            <HorizontalStackLayout Spacing="6">
-                                <Label Text="{DynamicResource L_RowLocal}" FontSize="13" VerticalOptions="Center" />
-                                <Border Style="{StaticResource CountBadge}" IsVisible="{Binding Local.ShowCount}">
-                                    <Label Text="{Binding Local.Count}" Style="{StaticResource CountBadgeLabel}" />
-                                </Border>
-                            </HorizontalStackLayout>
+                                <!-- Pastille : nombre de présélections locales. -->
+                                <HorizontalStackLayout Spacing="6">
+                                    <Label Text="{DynamicResource L_RowLocal}" FontSize="13" VerticalOptions="Center" />
+                                    <Border Style="{StaticResource CountBadge}" IsVisible="{Binding Local.ShowCount}">
+                                        <Label Text="{Binding Local.Count}" Style="{StaticResource CountBadgeLabel}" />
+                                    </Border>
+                                </HorizontalStackLayout>
 
-                            <Border.Triggers>
-                                <DataTrigger TargetType="Border" Binding="{Binding Local.IsShown}" Value="True">
-                                    <Setter Property="Stroke" Value="{StaticResource Accent}" />
-                                    <Setter Property="StrokeThickness" Value="2" />
-                                </DataTrigger>
-                            </Border.Triggers>
-                        </Border>
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding Local.IsShown}" Value="True">
+                                        <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                        <Setter Property="StrokeThickness" Value="2" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                            </Border>
+
+                            <!-- « ★ STR » : les favoris STR, quand l'agent les connaît (pas de pastille : la place manque). -->
+                            <Border Style="{StaticResource Chip}" Padding="14,6" IsVisible="{Binding Favorites.IsAvailable}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ShowFavoritesCommand}" />
+                                </Border.GestureRecognizers>
+
+                                <Label Text="{DynamicResource L_RowFavorites}" FontSize="13" VerticalOptions="Center" />
+
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding Favorites.IsShown}" Value="True">
+                                        <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                        <Setter Property="StrokeThickness" Value="2" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                            </Border>
+                        </HorizontalStackLayout>
                     </Grid>
 
                     <CollectionView ItemsSource="{Binding Presets}" HeightRequest="308" IsVisible="{Binding ShowKeys}">
@@ -172,6 +191,11 @@
                         <views:LocalPresetsView BindingContext="{Binding Local}" />
                     </Grid>
 
+                    <!-- La liste des favoris STR, à la place de la grille, comme « Local ». -->
+                    <Grid IsVisible="{Binding Favorites.IsShown}">
+                        <views:StrFavoritesView BindingContext="{Binding Favorites}" />
+                    </Grid>
+
                 </VerticalStackLayout>
             </Border>
 
@@ -181,26 +205,30 @@
                 Réglages : le BindingContext est posé sur le ContentView et le type
                 compilé (x:DataType) sur le bloc enfant.
             -->
-            <ContentView BindingContext="{Binding Copy}">
-                <Border x:DataType="vm:PresetCopyViewModel" Style="{StaticResource Card}" IsVisible="{Binding ShowCard}">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="{DynamicResource L_CopyTitle}" Style="{StaticResource SectionLabel}" />
-                        <Label Text="{Binding Hint}" Style="{StaticResource SubtitleLabel}" LineBreakMode="WordWrap" />
+            <!-- Visibilité portée par un conteneur extérieur : sur la carte intérieure,
+                 Android gardait la place d'une carte cachée (bloc vide). -->
+            <Grid IsVisible="{Binding Copy.ShowCard}">
+                <ContentView BindingContext="{Binding Copy}">
+                    <Border x:DataType="vm:PresetCopyViewModel" Style="{StaticResource Card}" IsVisible="{Binding ShowCard}">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="{DynamicResource L_CopyTitle}" Style="{StaticResource SectionLabel}" />
+                            <Label Text="{Binding Hint}" Style="{StaticResource SubtitleLabel}" LineBreakMode="WordWrap" />
 
-                        <Button Text="{DynamicResource L_CopyButton}" Style="{StaticResource AccentButton}"
-                                Command="{Binding CopyCommand}" IsEnabled="{Binding CanCopy}"
-                                IsVisible="{Binding ShowButton}" />
+                            <Button Text="{DynamicResource L_CopyButton}" Style="{StaticResource AccentButton}"
+                                    Command="{Binding CopyCommand}" IsEnabled="{Binding CanCopy}"
+                                    IsVisible="{Binding ShowButton}" />
 
-                        <ActivityIndicator IsRunning="{Binding IsCopying}" IsVisible="{Binding IsCopying}"
-                                           HorizontalOptions="Start" HeightRequest="24" />
+                            <ActivityIndicator IsRunning="{Binding IsCopying}" IsVisible="{Binding IsCopying}"
+                                               HorizontalOptions="Start" HeightRequest="24" />
 
-                        <Label Text="{Binding StatusMessage}"
-                               TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
-                               FontSize="13" LineBreakMode="WordWrap"
-                               IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
-                    </VerticalStackLayout>
-                </Border>
-            </ContentView>
+                            <Label Text="{Binding StatusMessage}"
+                                   TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                                   FontSize="13" LineBreakMode="WordWrap"
+                                   IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </ContentView>
+            </Grid>
 
             <!-- ================================================= Recherche -->
             <Border Style="{StaticResource Card}">
@@ -290,13 +318,28 @@
                     <Label Text="{DynamicResource L_RelaxedHint}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap"
                            TextColor="{StaticResource Warning}" IsVisible="{Binding IsRelaxed}" />
 
+                    <!-- Écoute en cours sur l'appareil : ce qui joue, où, et comment l'arrêter. -->
+                    <Border Style="{StaticResource TileCard}" Padding="10,8" IsVisible="{Binding IsPreviewActive}"
+                            Stroke="{StaticResource AccentBrush}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{Binding PreviewBarText}" FontSize="14" LineBreakMode="WordWrap" />
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                <Button Grid.Column="0" Text="{DynamicResource L_PreviewStop}" Command="{Binding StopListeningCommand}" />
+                                <Button Grid.Column="1" Text="{Binding PreviewBroadcastText}" LineBreakMode="WordWrap"
+                                        Style="{StaticResource AccentButton}" Command="{Binding BroadcastPreviewCommand}" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding Results}" Spacing="0">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="vm:RadioResult">
-                                <Grid Padding="2,10" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                <VerticalStackLayout Spacing="8" Padding="0,0,0,6">
+                                <!-- Toucher la ligne l'ouvre : écouter ici, diffuser sur l'enceinte, ou le menu. -->
+                                <Grid Padding="2,10,2,4" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                                     <Grid.GestureRecognizers>
                                         <TapGestureRecognizer
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PresetsViewModel}}, Path=StationActionCommand}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PresetsViewModel}}, Path=ToggleRowCommand}"
                                             CommandParameter="{Binding .}" />
                                     </Grid.GestureRecognizers>
 
@@ -325,6 +368,20 @@
                                     <Label Grid.Column="2" Text="›" FontSize="22" VerticalOptions="Center"
                                            TextColor="{StaticResource Accent}" />
                                 </Grid>
+
+                                <!-- Ligne ouverte : deux grands boutons sans ambiguïté, puis le menu. -->
+                                <VerticalStackLayout Spacing="8" IsVisible="{Binding IsExpanded}">
+                                    <Button Text="{Binding ListenText}" LineBreakMode="WordWrap"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PresetsViewModel}}, Path=ListenHereCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    <Button Text="{Binding BroadcastText}" LineBreakMode="WordWrap" Style="{StaticResource AccentButton}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PresetsViewModel}}, Path=BroadcastCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    <Button Text="{DynamicResource L_MoreActions}" Style="{StaticResource QuietButton}" HorizontalOptions="Start"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PresetsViewModel}}, Path=StationActionCommand}"
+                                            CommandParameter="{Binding .}" />
+                                </VerticalStackLayout>
+                                </VerticalStackLayout>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>

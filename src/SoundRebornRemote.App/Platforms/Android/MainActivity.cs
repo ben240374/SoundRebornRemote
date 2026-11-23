@@ -17,6 +17,9 @@ namespace SoundRebornRemote.App;
         | ConfigChanges.ScreenLayout
         | ConfigChanges.SmallestScreenSize
         | ConfigChanges.Density)]
+// Raccourcis de l'icône (AppActions de MAUI) : l'intention qui les porte arrive ici.
+[IntentFilter(new[] { Microsoft.Maui.ApplicationModel.Platform.Intent.ActionAppAction },
+    Categories = new[] { global::Android.Content.Intent.CategoryDefault })]
 public class MainActivity : MauiAppCompatActivity
 {
     // ---------------------------------------------------------- Balayage d'onglet
@@ -47,6 +50,24 @@ public class MainActivity : MauiAppCompatActivity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+    }
+
+    // ---------------------------------------------------------- Raccourcis de l'icône
+    //
+    // MAUI lit l'intention d'un raccourci dans ces deux points : au retour au
+    // premier plan (application lancée par le raccourci) et à l'arrivée d'une
+    // nouvelle intention (application déjà ouverte, activité « SingleTop »).
+
+    protected override void OnResume()
+    {
+        base.OnResume();
+        Microsoft.Maui.ApplicationModel.Platform.OnResume(this);
+    }
+
+    protected override void OnNewIntent(global::Android.Content.Intent? intent)
+    {
+        base.OnNewIntent(intent);
+        Microsoft.Maui.ApplicationModel.Platform.OnNewIntent(intent);
     }
 
     public override bool DispatchTouchEvent(MotionEvent? e)

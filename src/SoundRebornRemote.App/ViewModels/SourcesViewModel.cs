@@ -100,7 +100,7 @@ public sealed partial class SourcesViewModel : BaseViewModel
                 // laisser le contrôle Image charger l'URL échoue trop souvent.
                 foreach (var result in Recent.ToList())
                 {
-                    var source = await _artwork.GetImageSourceAsync(result.Entry.CardArt).ConfigureAwait(true);
+                    var source = await _artwork.GetImageSourceAsync(result.Entry.CardArt, background: true).ConfigureAwait(true);
 
                     if (source is not null)
                     {

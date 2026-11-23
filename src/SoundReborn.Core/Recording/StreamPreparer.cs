@@ -150,6 +150,69 @@ public static class StreamPreparer
         };
     }
 
+    /// <summary>
+    /// L'adresse à donner au lecteur du téléphone pour écouter une station : la
+    /// première adresse d'une liste .pls ou .m3u, l'adresse telle quelle sinon (flux
+    /// direct ou HLS .m3u8, que le lecteur d'Android ouvre lui-même). Une liste
+    /// illisible ou vide laisse l'adresse d'origine : le lecteur dira s'il la lit.
+    /// </summary>
+    public static async Task<string> ResolveForPlaybackAsync(HttpClient http, string url, CancellationToken ct)
+    {
+        if (!Uri.TryCreate(url?.Trim(), UriKind.Absolute, out var uri) ||
+            (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+        {
+            throw new ArgumentException("Adresse de flux invalide.", nameof(url));
+        }
+
+        var path = uri.AbsolutePath;
+
+        if (!path.EndsWith(".pls", StringComparison.OrdinalIgnoreCase) &&
+            !path.EndsWith(".m3u", StringComparison.OrdinalIgnoreCase))
+        {
+            return uri.ToString();
+        }
+
+        try
+        {
+            using var response = await GetAsync(http, uri.ToString(), ct).ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode || response.Content.Headers.ContentLength > MaxPlaylistBytes)
+            {
+                return uri.ToString();
+            }
+
+            // Lecture bornée en taille et en temps : une adresse en .m3u qui serait en
+            // fait un flux audio ne doit pas être lue sans fin.
+            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            timeout.CancelAfter(HeadersTimeout);
+            await using var body = await response.Content.ReadAsStreamAsync(timeout.Token).ConfigureAwait(false);
+            var buffer = new byte[MaxPlaylistBytes + 1];
+            var total = 0;
+            int read;
+
+            while (total < buffer.Length &&
+                   (read = await body.ReadAsync(buffer.AsMemory(total), timeout.Token).ConfigureAwait(false)) > 0)
+            {
+                total += read;
+            }
+
+            if (total > MaxPlaylistBytes)
+            {
+                return uri.ToString();
+            }
+
+            return FirstUrlInPlaylist(System.Text.Encoding.UTF8.GetString(buffer, 0, total)) ?? uri.ToString();
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            return uri.ToString();
+        }
+    }
+
     public static string? FirstUrlInPlaylist(string text)
     {
         foreach (var raw in text.Split('\n'))

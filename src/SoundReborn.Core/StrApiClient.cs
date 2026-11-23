@@ -170,6 +170,39 @@ public sealed class StrApiClient
         return (list ?? new List<StrPreset>()).OrderBy(p => p.Slot).ToList();
     }
 
+    /// <summary>
+    /// GET /api/presets tel quel : chaque touche avec TOUS ses champs (compte et
+    /// playlist d'une touche Spotify, dossier de bibliothèque…), pour une sauvegarde
+    /// qu'on renverra sans rien perdre. Les deux formes du magasin sont acceptées.
+    /// </summary>
+    public async Task<System.Text.Json.Nodes.JsonArray> GetPresetsRawAsync(CancellationToken ct = default)
+    {
+        var text = await GetStringAsync("/api/presets", ct).ConfigureAwait(false);
+
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return new System.Text.Json.Nodes.JsonArray();
+        }
+
+        var node = System.Text.Json.Nodes.JsonNode.Parse(text);
+
+        return node switch
+        {
+            System.Text.Json.Nodes.JsonArray array => array,
+            System.Text.Json.Nodes.JsonObject { } root when root["presets"] is System.Text.Json.Nodes.JsonArray inner
+                => (System.Text.Json.Nodes.JsonArray)inner.DeepClone(),
+            _ => throw new JsonException("Le magasin des touches n'est ni un tableau ni {\"presets\":[...]}."),
+        };
+    }
+
+    /// <summary>
+    /// PUT /api/presets — écrit un jeu de touches d'un coup (12 au plus). Les touches
+    /// que le jeu ne nomme pas restent comme elles sont. C'est le chemin d'une
+    /// restauration : l'agent ne refuse pas une station déjà sur une autre touche.
+    /// </summary>
+    public Task PutPresetsAsync(System.Text.Json.Nodes.JsonArray presets, CancellationToken ct = default)
+        => PutRawAsync("/api/presets", presets.ToJsonString(), ct);
+
     public async Task<IReadOnlyList<RecentEntry>> GetRecentAsync(CancellationToken ct = default)
         => await GetJsonAsync<List<RecentEntry>>("/api/recent", ct).ConfigureAwait(false)
            ?? (IReadOnlyList<RecentEntry>)Array.Empty<RecentEntry>();
@@ -526,8 +559,19 @@ public sealed class StrApiClient
     /// l'enceinte », ce qui désactive le relais de flux et le chemin des stations
     /// natives. Le budget est long : c'est une commande qui réveille l'enceinte.
     /// </summary>
-    public Task PlayUrlAsync(string url, string? title = null, string? codec = null, string? icon = null, CancellationToken ct = default)
-        => PostJsonAsync("/api/play", new StrPlayUrlRequest { Url = url, Title = title, Codec = codec, Icon = icon }, ct, WakeTimeout);
+    public async Task PlayUrlAsync(string url, string? title = null, string? codec = null, string? icon = null, CancellationToken ct = default)
+    {
+        await PostJsonAsync("/api/play", new StrPlayUrlRequest { Url = url, Title = title, Codec = codec, Icon = icon }, ct, WakeTimeout)
+            .ConfigureAwait(false);
+
+        LastPlayed = new StrPlayedStream(url, title, codec, icon);
+    }
+
+    /// <summary>
+    /// La dernière adresse que cette application a fait jouer sur l'enceinte, ou
+    /// null. Sert à « Ajouter ce qui joue » quand l'enceinte ne rapporte que le relais.
+    /// </summary>
+    public StrPlayedStream? LastPlayed { get; private set; }
 
     // ---------------------------------------------------------------- Réglages
 
@@ -689,6 +733,86 @@ public sealed class StrApiClient
         return new StrAlarmSaveResult { Saved = StrAlarmDocument.Parse(saved) };
     }
 
+    // ---------------------------------------------------------------- Favoris STR
+
+    /// <summary>
+    /// GET /api/favorites — les favoris de l'application STR, dans l'ordre choisi.
+    /// Un agent qui ne les connaît pas répond 404 (<see cref="SpeakerException"/>).
+    /// </summary>
+    public async Task<IReadOnlyList<StrFavorite>> GetFavoritesAsync(CancellationToken ct = default)
+    {
+        var text = await GetStringAsync("/api/favorites", ct).ConfigureAwait(false);
+        return string.IsNullOrWhiteSpace(text) ? Array.Empty<StrFavorite>() : StrFavorite.ParseList(text);
+    }
+
+    /// <summary>
+    /// POST /api/favorites — ajoute UN favori. L'agent le transmet aux autres
+    /// enceintes STR et à l'application sur ordinateur. Jamais PUT : ce point-là
+    /// sert à la synchronisation de l'application sur ordinateur, qui le défait.
+    /// </summary>
+    public async Task<StrFavoriteAdded> AddFavoriteAsync(StrFavorite favorite, CancellationToken ct = default)
+    {
+        var text = await PostJsonReadAsync("/api/favorites", favorite, ct).ConfigureAwait(false);
+
+        try
+        {
+            return (string.IsNullOrWhiteSpace(text) ? null : JsonSerializer.Deserialize<StrFavoriteAdded>(text, JsonOptions))
+                   ?? new StrFavoriteAdded { Ok = true, Added = true };
+        }
+        catch (JsonException)
+        {
+            // 200 sans corps lisible : l'agent a pris le favori.
+            return new StrFavoriteAdded { Ok = true, Added = true };
+        }
+    }
+
+    /// <summary>DELETE /api/favorites?id=&lt;clé&gt; — retire un favori, partout.</summary>
+    public async Task RemoveFavoriteAsync(string key, CancellationToken ct = default)
+    {
+        var path = "/api/favorites?id=" + Uri.EscapeDataString(key);
+        using var cts = Budget(null, ct);
+        using var response = await _http.DeleteAsync(BaseUrl + path, cts.Token).ConfigureAwait(false);
+        await EnsureSuccessAsync(response, "/api/favorites", cts.Token).ConfigureAwait(false);
+    }
+
+    // ---------------------------------------------------------------- Actions des touches
+
+    /// <summary>
+    /// GET /api/keyactions — les actions des touches pouce et AUX de la télécommande de
+    /// CETTE enceinte. Un agent qui ne les connaît pas répond 404 (<see cref="SpeakerException"/>).
+    /// </summary>
+    public async Task<StrKeyActions> GetKeyActionsAsync(CancellationToken ct = default)
+    {
+        var text = await GetStringAsync("/api/keyactions", ct).ConfigureAwait(false);
+        return string.IsNullOrWhiteSpace(text) ? StrKeyActions.Empty() : StrKeyActions.Parse(text);
+    }
+
+    /// <summary>
+    /// PUT /api/keyactions — remplace le document entier. Un refus (400 : action
+    /// impossible sur cette touche ; 409 : la touche porte un groupe) remonte en
+    /// <see cref="SpeakerException"/>, avec la raison en texte brut dans
+    /// <see cref="SpeakerException.ResponseBody"/>. Rend le document enregistré
+    /// que l'agent renvoie, ou à défaut celui qu'on a envoyé.
+    /// </summary>
+    public async Task<StrKeyActions> PutKeyActionsAsync(StrKeyActions document, CancellationToken ct = default)
+    {
+        using var content = new StringContent(document.ToPutBody(), Encoding.UTF8, "application/json");
+        using var cts = Budget(null, ct);
+        using var response = await _http.PutAsync(BaseUrl + "/api/keyactions", content, cts.Token).ConfigureAwait(false);
+        await EnsureSuccessAsync(response, "/api/keyactions", cts.Token).ConfigureAwait(false);
+
+        var saved = await response.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
+
+        try
+        {
+            return saved.Contains("\"keys\"", StringComparison.Ordinal) ? StrKeyActions.Parse(saved) : document.Clone();
+        }
+        catch (JsonException)
+        {
+            return document.Clone();
+        }
+    }
+
     // ---------------------------------------------------------------- Volume de départ
 
     /// <summary>
@@ -843,6 +967,14 @@ public sealed class StrApiClient
     private async Task PutJsonAsync<T>(string path, T body, CancellationToken ct, TimeSpan? timeout = null)
     {
         using var content = new StringContent(JsonSerializer.Serialize(body, JsonOptions), Encoding.UTF8, "application/json");
+        using var cts = Budget(timeout, ct);
+        using var response = await _http.PutAsync(BaseUrl + path, content, cts.Token).ConfigureAwait(false);
+        await EnsureSuccessAsync(response, path, cts.Token).ConfigureAwait(false);
+    }
+
+    private async Task PutRawAsync(string path, string json, CancellationToken ct, TimeSpan? timeout = null)
+    {
+        using var content = new StringContent(json, Encoding.UTF8, "application/json");
         using var cts = Budget(timeout, ct);
         using var response = await _http.PutAsync(BaseUrl + path, content, cts.Token).ConfigureAwait(false);
         await EnsureSuccessAsync(response, path, cts.Token).ConfigureAwait(false);

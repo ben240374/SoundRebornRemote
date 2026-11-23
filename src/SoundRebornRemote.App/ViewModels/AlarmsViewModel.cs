@@ -51,6 +51,7 @@ public sealed partial class AlarmsViewModel : BaseViewModel
     private static readonly int[] WeekOrder = { 1, 2, 3, 4, 5, 6, 0 };
 
     private StrAlarmDocument? _document;
+    private StrKeyActions? _keyActions;
     private StrApiClient? _agent;
     private string? _host;
     private int _loadVersion;
@@ -124,6 +125,7 @@ public sealed partial class AlarmsViewModel : BaseViewModel
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowAddButton))]
+    [NotifyPropertyChangedFor(nameof(ShowSnoozeKeys))]
     private bool _isEditing;
 
     /// <summary>Vrai pour un réveil déjà enregistré : le bouton Supprimer apparaît.</summary>
@@ -210,6 +212,52 @@ public sealed partial class AlarmsViewModel : BaseViewModel
 
     public string StartVolumeLabel => Level(StartVolumeLevel).ToString(CultureInfo.InvariantCulture);
 
+    // ---------------------------------------------------------------- Touche de répétition
+
+    /// <summary>L'agent connaît les actions de touches (GET /api/keyactions a répondu).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowSnoozeKeys))]
+    private bool _snoozeKeysAvailable;
+
+    /// <summary>Le bloc « Touche de répétition » : pas pendant la modification d'un réveil.</summary>
+    public bool ShowSnoozeKeys => SnoozeKeysAvailable && !IsEditing;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SnoozeKeysDirty))]
+    private bool _snoozeOnAux;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SnoozeKeysDirty))]
+    private bool _snoozeOnThumbsUp;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SnoozeKeysDirty))]
+    private bool _snoozeOnThumbsDown;
+
+    /// <summary>« Pouce levé », suivi de l'action qu'il porte aujourd'hui s'il en a une autre.</summary>
+    [ObservableProperty]
+    private string _thumbsUpLabel = "";
+
+    [ObservableProperty]
+    private string _thumbsDownLabel = "";
+
+    /// <summary>Avertit quand une case cochée remplacera une autre action de la touche.</summary>
+    [ObservableProperty]
+    private string _snoozeKeysWarning = "";
+
+    [ObservableProperty]
+    private bool _hasSnoozeKeysWarning;
+
+    /// <summary>Une case diffère de ce que l'enceinte a enregistré : « Enregistrer » sert à quelque chose.</summary>
+    public bool SnoozeKeysDirty => _keyActions is { } loaded &&
+        (SnoozeOnAux != loaded.IsSnooze(StrKeyActions.Aux) ||
+         SnoozeOnThumbsUp != loaded.IsSnooze(StrKeyActions.ThumbsUp) ||
+         SnoozeOnThumbsDown != loaded.IsSnooze(StrKeyActions.ThumbsDown));
+
+    partial void OnSnoozeOnThumbsUpChanged(bool value) => UpdateSnoozeKeysWarning();
+
+    partial void OnSnoozeOnThumbsDownChanged(bool value) => UpdateSnoozeKeysWarning();
+
     // ---------------------------------------------------------------- Lecture
 
     /// <summary>
@@ -229,6 +277,7 @@ public sealed partial class AlarmsViewModel : BaseViewModel
             CloseEditor();
             _document = null;
             _agent = null;
+            ApplyKeyActions(null);
         }
 
         _host = target?.Host;
@@ -308,6 +357,17 @@ public sealed partial class AlarmsViewModel : BaseViewModel
                 // Agent qui ne le gère pas : le bloc reste caché.
             }
 
+            StrKeyActions? keyActions = null;
+
+            try
+            {
+                keyActions = await agent.GetKeyActionsAsync().ConfigureAwait(true);
+            }
+            catch (Exception)
+            {
+                // Agent sans actions de touches (404) : le bloc reste caché.
+            }
+
             if (version != _loadVersion)
             {
                 return;
@@ -322,6 +382,7 @@ public sealed partial class AlarmsViewModel : BaseViewModel
             UnavailableNote = "";
             ApplyDocument(document);
             ApplyStartVolume(startVolume);
+            ApplyKeyActions(keyActions);
         }
         finally
         {
@@ -356,7 +417,14 @@ public sealed partial class AlarmsViewModel : BaseViewModel
         {
             ApplyDocument(_document);
         }
-        else if (!IsAvailable)
+
+        if (_keyActions is not null)
+        {
+            BuildSnoozeKeyLabels(_keyActions);
+            UpdateSnoozeKeysWarning();
+        }
+
+        if (_document is null && !IsAvailable)
         {
             var target = Speakers.SelectedEndpoint ?? Device?.Endpoint;
             UnavailableNote = Localization.Get(target is null
@@ -401,6 +469,7 @@ public sealed partial class AlarmsViewModel : BaseViewModel
         WarningText = "";
         ZoneText = "";
         StartVolumeAvailable = false;
+        ApplyKeyActions(null);
     }
 
     private void ApplyDocument(StrAlarmDocument document)
@@ -470,6 +539,183 @@ public sealed partial class AlarmsViewModel : BaseViewModel
             StartVolumeLevel = value > 0 ? value : 20;
         }
     }
+
+    /// <summary>Montre les touches telles que l'enceinte les a enregistrées ; null cache le bloc.</summary>
+    private void ApplyKeyActions(StrKeyActions? actions)
+    {
+        _keyActions = actions;
+        SnoozeKeysAvailable = actions is not null;
+        SnoozeOnAux = actions?.IsSnooze(StrKeyActions.Aux) ?? false;
+        SnoozeOnThumbsUp = actions?.IsSnooze(StrKeyActions.ThumbsUp) ?? false;
+        SnoozeOnThumbsDown = actions?.IsSnooze(StrKeyActions.ThumbsDown) ?? false;
+        BuildSnoozeKeyLabels(actions);
+        UpdateSnoozeKeysWarning();
+        OnPropertyChanged(nameof(SnoozeKeysDirty));
+    }
+
+    private void BuildSnoozeKeyLabels(StrKeyActions? actions)
+    {
+        ThumbsUpLabel = KeyWithAction("L_SnoozeKeyThumbsUp", actions, StrKeyActions.ThumbsUp);
+        ThumbsDownLabel = KeyWithAction("L_SnoozeKeyThumbsDown", actions, StrKeyActions.ThumbsDown);
+    }
+
+    /// <summary>« Pouce levé », ou « Pouce levé (aujourd'hui : minuterie de sommeil) ».</summary>
+    private static string KeyWithAction(string labelKey, StrKeyActions? actions, string key)
+    {
+        var label = Localization.Get(labelKey);
+        var action = actions?.ActionOf(key);
+
+        return action is null || actions!.IsSnooze(key)
+            ? label
+            : Localization.Get("L_SnoozeKeyCurrent", label, ActionText(action));
+    }
+
+    private void UpdateSnoozeKeysWarning()
+    {
+        var actions = _keyActions;
+        var replaced = new List<string>();
+
+        if (actions is not null)
+        {
+            foreach (var (key, on, labelKey) in new[]
+                     {
+                         (StrKeyActions.ThumbsUp, SnoozeOnThumbsUp, "L_SnoozeKeyThumbsUp"),
+                         (StrKeyActions.ThumbsDown, SnoozeOnThumbsDown, "L_SnoozeKeyThumbsDown"),
+                     })
+            {
+                if (on && actions.ActionOf(key) is { } action && !actions.IsSnooze(key))
+                {
+                    replaced.Add(Localization.Get("S_SnoozeKeyReplaces", Localization.Get(labelKey), ActionText(action)));
+                }
+            }
+        }
+
+        SnoozeKeysWarning = string.Join("\n", replaced);
+        HasSnoozeKeysWarning = replaced.Count > 0;
+    }
+
+    /// <summary>Le nom d'une action de touche de l'agent, dans la langue de l'application.</summary>
+    internal static string ActionText(string action)
+    {
+        switch (action.ToLowerInvariant())
+        {
+            case "snooze":
+                return Localization.Get("L_KeyActionSnooze");
+            case "sleep":
+                return Localization.Get("L_KeyActionSleep");
+            case "sleep15":
+                return Localization.Get("L_KeyActionSleepFixed", 15);
+            case "sleep30":
+                return Localization.Get("L_KeyActionSleepFixed", 30);
+            case "sleep60":
+                return Localization.Get("L_KeyActionSleepFixed", 60);
+            case "sleep90":
+                return Localization.Get("L_KeyActionSleepFixed", 90);
+            case "bassup":
+                return Localization.Get("L_KeyActionBassUp");
+            case "bassdown":
+                return Localization.Get("L_KeyActionBassDown");
+            case "shuffle":
+                return Localization.Get("L_KeyActionShuffle");
+            case "repeat":
+                return Localization.Get("L_KeyActionRepeat");
+            default:
+                // Action d'une version plus récente de l'agent : son nom tel quel.
+                return action;
+        }
+    }
+
+    /// <summary>
+    /// « Enregistrer » du bloc « Touche de répétition ». Le document est relu juste
+    /// avant : seules les touches dont l'utilisateur a changé la case sont écrites,
+    /// et une action mise entre-temps par l'application STR sur une autre touche
+    /// est gardée. Décocher retire la répétition ; une autre action reste en place.
+    /// </summary>
+    [RelayCommand]
+    private async Task SaveSnoozeKeysAsync()
+    {
+        var agent = _agent;
+        var loaded = _keyActions;
+        var host = _host;
+
+        if (agent is null || loaded is null || IsBusy)
+        {
+            return;
+        }
+
+        var wanted = new[]
+        {
+            (Key: StrKeyActions.Aux, On: SnoozeOnAux),
+            (Key: StrKeyActions.ThumbsUp, On: SnoozeOnThumbsUp),
+            (Key: StrKeyActions.ThumbsDown, On: SnoozeOnThumbsDown),
+        };
+
+        IsBusy = true;
+
+        try
+        {
+            var current = await agent.GetKeyActionsAsync().ConfigureAwait(true);
+            var working = current.Clone();
+            var changed = false;
+
+            foreach (var (key, on) in wanted)
+            {
+                if (on == loaded.IsSnooze(key))
+                {
+                    // Case non touchée : la touche garde ce que l'enceinte a maintenant.
+                    continue;
+                }
+
+                if (on && !working.IsSnooze(key))
+                {
+                    working.Set(key, StrKeyActions.Snooze);
+                    changed = true;
+                }
+                else if (!on && working.IsSnooze(key))
+                {
+                    working.Set(key, null);
+                    changed = true;
+                }
+            }
+
+            var saved = changed ? await agent.PutKeyActionsAsync(working).ConfigureAwait(true) : current;
+
+            if (!string.Equals(host, _host, StringComparison.OrdinalIgnoreCase))
+            {
+                // L'utilisateur a changé d'enceinte pendant l'envoi.
+                return;
+            }
+
+            ApplyKeyActions(saved);
+            ShowInfo(Localization.Get(SnoozeKeysSummaryKey(saved), SnoozeKeysList(saved)));
+        }
+        catch (SpeakerException ex) when (ex.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.Conflict &&
+                                          !string.IsNullOrWhiteSpace(ex.ResponseBody))
+        {
+            // L'agent explique son refus en une phrase destinée à l'utilisateur.
+            IsError = true;
+            StatusMessage = Localization.Get("S_AlarmRefused", ex.ResponseBody!.Trim());
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private static string SnoozeKeysSummaryKey(StrKeyActions actions)
+        => StrKeyActions.Keys.Any(actions.IsSnooze) ? "S_SnoozeKeysSaved" : "S_SnoozeKeysNone";
+
+    private static string SnoozeKeysList(StrKeyActions actions)
+        => string.Join(", ", StrKeyActions.Keys.Where(actions.IsSnooze).Select(key => Localization.Get(key switch
+        {
+            StrKeyActions.Aux => "L_SnoozeKeyAux",
+            StrKeyActions.ThumbsUp => "L_SnoozeKeyThumbsUp",
+            _ => "L_SnoozeKeyThumbsDown",
+        })));
 
     // ---------------------------------------------------------------- Édition
 

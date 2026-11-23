@@ -363,6 +363,14 @@ public sealed class StrAnnounceRequest
     [JsonPropertyName("volume")] public int? Volume { get; set; }
 }
 
+/// <summary>
+/// La dernière adresse que l'application a fait jouer par POST /api/play. L'agent
+/// la joue par son relais : l'enceinte ne rapporte plus que le titre et l'adresse
+/// du relais, et l'historique ne la garde pas toujours. L'application, elle, sait
+/// ce qu'elle a lancé.
+/// </summary>
+public sealed record StrPlayedStream(string Url, string? Title, string? Codec, string? Icon);
+
 /// <summary>Corps de POST /api/play (jouer une URL arbitraire).</summary>
 public sealed class StrPlayUrlRequest
 {

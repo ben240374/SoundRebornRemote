@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handbuch
 
-Version 1.9.0 · Android 7 und neuer
+Version 1.9.1 · Android 7 und neuer
 
 > Sprachen: [Français](fr.md) · [English](en.md) · **Deutsch** · [Nederlands](nl.md) · [Español](es.md) · [Italiano](it.md)
 
@@ -56,6 +56,9 @@ Projekts: <https://github.com/ben240374/SoundRebornRemote/releases>
 2. Öffne sie. Android fragt nach der Erlaubnis, aus einer unbekannten Quelle zu
    installieren — erteile sie der App, die heruntergeladen hat, meist dem Browser.
 3. Installieren, dann öffnen.
+
+Danach meldet die App neue Versionen selbst und kann sie installieren (Tab Einstellungen,
+**Aktualisierung**).
 
 Beim ersten Start wird keine besondere Berechtigung verlangt: Die App greift weder auf
 Kontakte noch auf Standort noch auf Speicher zu.
@@ -315,12 +318,28 @@ weist darauf hin. Das Ergebnis erscheint pro Lautsprecher.
 
 Das Kopieren braucht den STR-Agenten 1.6.5 oder neuer auf dem gewählten Lautsprecher.
 
+### STR-Favoriten
+
+Mit einem neuen STR-Agenten zeigt die Schaltfläche **★ STR**, rechts neben **Lokal**
+(Reiter Wiedergabe und Presets), anstelle der Tasten die mit Stern markierten Sender der
+STR-App am Computer. Sie sind auf allen STR-Lautsprechern dieselben: ein hier
+hinzugefügter oder entfernter Favorit wird es einige Sekunden später auch auf den anderen
+Lautsprechern und am Computer. **Einmal** oder **Zweimal** holt die Tasten zurück.
+
+- Antippen spielt den Favoriten auf dem ausgewählten Lautsprecher.
+- **⋯** bietet **Auf eine Taste legen…**, **Zu Lokal hinzufügen** und **Aus STR-Favoriten
+  entfernen** (nach Bestätigung).
+- **★ Laufendes hinzufügen** übernimmt das Radio, das der Lautsprecher spielt; in der Suche
+  bietet **⋯ Tasten, Local…** **★ Zu STR-Favoriten**.
+- Ein Pandora-Sender wird angezeigt, startet aber über die STR-App.
+
 ### Einen Sender finden
 
 Das Suchfeld fragt **radio-browser.info** ab, ein offenes, von Freiwilligen gepflegtes
 Verzeichnis. Die Suche folgt der der STR-Desktop-App:
 
-- **Land** und **Sprache** grenzen die Suche ein; **Sortieren** ordnet nach Beliebtheit
+- **Land** (alle in alphabetischer Reihenfolge, Überseegebiete eingeschlossen:
+  Martinique, Réunion, Guadeloupe…) und **Sprache** grenzen die Suche ein; **Sortieren** ordnet nach Beliebtheit
   (Stimmen), Aufrufen, Trend, Name oder Bitrate. Eine Änderung startet die letzte Suche
   neu.
 - Die **Genre-Chips** (Alle, Pop, Rock, Hits, Jazz, 80er…) filtern nach Genre; die ersten
@@ -350,12 +369,22 @@ neue Suche, und die Zahl der ausgeblendeten Sender steht unter der Ergebnisüber
 **Fehlt ein Sender?** Der Link unter den Ergebnissen öffnet radio-browser.info, wo jeder
 ihn eintragen kann: Dann findest du ihn hier, und alle anderen auch.
 
-Tippe auf ein Ergebnis, dann öffnet sich ein Auswahlblatt mit
+Tippe auf ein Ergebnis: Die Zeile öffnet sich und bietet drei eindeutige Möglichkeiten.
 
-- **Anhören** — startet den Sender sofort, ohne etwas zu speichern;
-- **① Dieser Taste zuweisen**, wenn die Taste frei ist, oder **① Bel RTL ersetzen**, wenn
-  sie belegt ist — der Name des bereits gespeicherten Senders wird angezeigt, damit du
-  keinen überschreibst, an dem dir lag.
+- **📱 ▶ Auf diesem Telefon anhören** (oder **diesem Tablet**): Der Sender spielt auf dem
+  Gerät, damit du ihn hörst, bevor er auf den Lautsprecher geht. Der Knopf wird zu
+  **📱 ■ Stoppen**; eine Leiste über den Ergebnissen zeigt, was spielt, mit **■ Stoppen**
+  und **🔊 Auf … abspielen**. Immer nur ein Sender; das Anhören endet beim Verlassen des
+  Tabs oder der App und wenn der Sender auf den Lautsprecher geht. Ohne WLAN nutzt es
+  mobile Daten (etwa 1 MB pro Minute bei 128 kbit/s). Ein Sender, der auf dem Gerät
+  nicht spielt, kann auf dem Lautsprecher trotzdem laufen: Der STR-Agent wandelt Formate
+  um, die der Android-Player nicht liest.
+- **🔊 Auf Küche abspielen**: mit dem vollen Namen des gewählten Lautsprechers; der Sender
+  startet dort, ohne etwas zu speichern.
+- **⋯ Tasten, Local…** öffnet ein Auswahlblatt mit **Auf Küche abspielen**, **★ Zu STR-Favoriten** (neuer Agent), **Zu Local
+  hinzufügen**, dann **① Dieser Taste zuweisen**, wenn die Taste frei ist, oder
+  **① Bel RTL ersetzen**, wenn sie belegt ist — der Name des bereits gespeicherten Senders
+  wird angezeigt, damit du keinen überschreibst, an dem dir lag.
 
 **Das Zuweisen setzt den STR-Agenten voraus.** Ohne ihn ist nur sofortiges Anhören
 möglich; gespeichert wird dann durch Gedrückthalten der Taste am Lautsprecher selbst oder
@@ -478,6 +507,15 @@ gespeichert. Anderswo geänderte Wecker — STR-Telefonseite, Desktop-App — we
 er spielt. Häkchen setzen, Lautstärke wählen, dann **Startlautstärke speichern**. Eine
 während des Hörens eingestellte Lautstärke wird nie geändert.
 
+**Schlummertaste** (in der Weckerkarte): hake die Taste der Fernbedienung an, die einen
+klingelnden Wecker schlummern lässt — **AUX**, **Daumen hoch** oder **Daumen runter** —,
+dann **Schlummertaste speichern**. Außerhalb eines Weckers tut eine Daumentaste nichts, und
+AUX schaltet wie gewohnt auf den AUX-Eingang. Eine Daumentaste mit einer anderen Aktion
+(Einschlaftimer, Bass…) zeigt diese an; das Anhaken ersetzt sie, und die App sagt es
+vorher. Nur geänderte Kästchen werden geschrieben: eine anderswo gesetzte Aktion auf einer
+anderen Taste bleibt. Eine Taste mit gespeicherter Gruppe lehnt der Lautsprecher ab und
+nennt den Grund.
+
 **Sprache**: Deutsch, Französisch, Englisch, Niederländisch, Spanisch, Italienisch. Die Umstellung
 gilt sofort, ohne Neustart, und wird gemerkt.
 
@@ -497,6 +535,13 @@ erklärender Block mit einem Link zur Seite des STR-Projekts.
 Ein Lautsprecher, dessen Agent älter als Version 1.8.0 ist, zeigt einen ähnlichen Block,
 **STR-Agent zu alt**, und seine Karte im Tab Wiedergabe trägt den Hinweis „zu alt".
 
+**STR-Agent: neue Version**: höchstens einmal am Tag, beim Öffnen der Einstellungen, liest
+die App auf GitHub die neueste Version des STR-Agenten. Haben bekannte Lautsprecher einen
+älteren Agenten, nennt eine Karte sie, mit **Neuigkeiten** und **Später** (die Karte kommt
+mit der nächsten Version wieder), und ihre Karte im Tab Wiedergabe zeigt „1.9.1
+verfügbar“. Der Agent wird mit der STR-App am Computer aktualisiert. Das Kästchen
+**Automatisch prüfen** der Karte **Aktualisierung** schaltet auch dies ab.
+
 **Diagnose**: *Lautsprecher abfragen* betrifft den **ausgewählten** Lautsprecher — Name,
 Modell, Geräte-ID, Firmware-Version, den Agenten mit Port und live auf 17008 und 8888
 gelesener Version, den Zustand der Benachrichtigungen, den Bassbereich, die Liste der
@@ -510,6 +555,27 @@ sie, auch die, die Android vor der Installation eines mit einem anderen Schlüss
 APK verlangt. **Exportieren** erstellt eine Datei und öffnet das Teilen (Drive, E-Mail,
 Dateien…); **Importieren** liest eine solche Datei wieder ein und fügt Fehlendes hinzu, ohne
 etwas zu ersetzen oder zu löschen.
+
+**Lautsprecher-Sicherung**: **In eine Datei sichern** bewahrt, was der STR-Agent für den
+ausgewählten Lautsprecher speichert — die Tasten 1 bis 12 (eine Spotify-Taste mit ihrer
+Playlist), die Wecker, die Startlautstärke und die Schlummertaste. **Aus einer Datei
+wiederherstellen…** spielt sie zurück, nach einer Frage, die den Ziellautsprecher und den
+Ursprung der Datei nennt: die Datei kann diese Einstellungen auch auf einen anderen
+Lautsprecher übertragen. Die Tasten der Datei ersetzen die des Lautsprechers, die anderen
+bleiben; seine Wecker werden ersetzt. Ohne zweite Reihe am Ziel werden die Tasten 7 bis 12
+übersprungen. Der Bericht nennt, was wiederhergestellt und was abgelehnt wurde. Die feste
+Gruppe wird nicht gesichert. Eine Spotify-Taste spielt nur, wenn der Lautsprecher mit
+demselben Spotify-Konto verbunden ist. STR-Agent erforderlich.
+
+**Aktualisierung** (von GitHub installierte Version): Höchstens einmal am Tag fragt
+die App bei GitHub, ob eine neuere Version veröffentlicht ist; das Kästchen **Automatisch
+prüfen** schaltet das ab. **Jetzt prüfen** tut es auf Wunsch. Gibt es eine, erscheint auch
+im Tab Wiedergabe ein Hinweis (**Neuigkeiten**, **Später**, **Installieren**).
+**Installieren** lädt die APK, prüft, dass Größe und SHA-256-Prüfsumme genau denen auf
+GitHub entsprechen, und öffnet dann den Android-Installer, in dem du bestätigst. Beim
+ersten Mal fragt Android, ob SoundReborn Remote Apps installieren darf. Android lehnt es
+ab, über eine mit einem anderen Schlüssel signierte APK zu installieren: Eine aus Visual
+Studio gestartete Testversion wird so nicht aktualisiert.
 
 **Über**: die Version, der Dank an das STR-Projekt mit einem Link zu dessen Seite in der
 gewählten Sprache, und die rechtlichen Hinweise.
@@ -525,6 +591,13 @@ Ziehen wird nicht als Reiterwechsel gelesen.
 Ein Wischen, das **auf einem Regler** beginnt, gehört dem Regler: Das ist gewollt, sonst
 ließe sich die Lautstärke nicht mehr einstellen. Beginne die Geste auf einer freien
 Fläche.
+
+**Langes Drücken auf das App-Symbol** (Android-Launcher): **Alle Standby** setzt jeden
+bekannten Lautsprecher mit STR-Agent in Standby — ein Lautsprecher ohne Agent wird nicht
+angetastet, denn sein einziger Standby-Befehl würde ihn einschalten, wenn er aus wäre —,
+und **Taste 1** bis **Taste 3** spielen die Taste auf dem ausgewählten Lautsprecher. Die App
+öffnet sich im Tab Wiedergabe und sagt, was getan wurde. Diese Verknüpfungen lassen sich
+auf den Startbildschirm legen.
 
 ---
 

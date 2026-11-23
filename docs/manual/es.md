@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manual de uso
 
-Versión 1.9.0 · Android 7 y posteriores
+Versión 1.9.1 · Android 7 y posteriores
 
 > Idiomas: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · **Español** · [Italiano](it.md)
 
@@ -55,6 +55,9 @@ proyecto: <https://github.com/ben240374/SoundRebornRemote/releases>
 2. Ábrelo. Android pedirá permiso para instalar desde un origen desconocido: concédeselo a
    la aplicación que ha descargado, normalmente el navegador.
 3. Instala y abre.
+
+Después, la aplicación avisa ella misma de las nuevas versiones y sabe instalarlas
+(pestaña Ajustes, **Actualización**).
 
 En el primer arranque no se pide ningún permiso especial: la aplicación no accede ni a los
 contactos, ni a la ubicación, ni al almacenamiento.
@@ -308,12 +311,28 @@ confirmación lo recuerda. El resultado se muestra por altavoz.
 
 La copia requiere el agente STR 1.6.5 o posterior en el altavoz seleccionado.
 
+### Favoritos STR
+
+Con un agente STR reciente, el botón **★ STR**, a la derecha de **Local** (pestañas
+Reproducción y Presintonías), muestra en lugar de las teclas las emisoras con estrella de
+la aplicación STR del ordenador. Son las mismas en todos los altavoces STR: un favorito
+añadido o quitado aquí también lo es, unos segundos después, en los demás altavoces y en
+el ordenador. **Una vez** o **Dos veces** devuelve las teclas.
+
+- Toca un favorito para ponerlo en el altavoz seleccionado.
+- **⋯** ofrece **Poner en una tecla…**, **Añadir a Local** y **Quitar de favoritos STR**
+  (tras confirmar).
+- **★ Añadir lo que suena** guarda la radio que suena en el altavoz; en la búsqueda,
+  **⋯ Teclas, Local…** ofrece **★ Añadir a favoritos STR**.
+- Una emisora de Pandora aparece en la lista, pero se pone desde la aplicación STR.
+
 ### Encontrar una emisora
 
 El campo de búsqueda consulta **radio-browser.info**, un directorio abierto mantenido por
 voluntarios. La búsqueda sigue la de la aplicación de escritorio de STR:
 
-- **País** e **Idioma** acotan la búsqueda; **Ordenar** clasifica por popularidad (votos),
+- **País** (todos por orden alfabético, territorios de ultramar incluidos: Martinica,
+  Reunión, Guadalupe…) e **Idioma** acotan la búsqueda; **Ordenar** clasifica por popularidad (votos),
   escuchas, tendencia, nombre o tasa de bits. Cambiar una de estas opciones repite la
   última búsqueda.
 - Las **etiquetas de género** (Todos, Pop, Rock, Éxitos, Jazz, Años 80…) filtran por
@@ -345,12 +364,21 @@ resultados.
 **¿Falta una emisora?** El enlace bajo los resultados abre radio-browser.info, donde
 cualquiera puede añadirla: aparecerá aquí, y para todos.
 
-Toca un resultado y se abre una hoja de acciones con
+Toca un resultado: la línea se abre y ofrece tres opciones que no se pueden confundir.
 
-- **Escuchar** — lanza la emisora al instante, sin guardar nada;
-- **① Asignar a esta tecla** si la tecla está libre, o **① Sustituir Bel RTL** si está
-  ocupada: se muestra el nombre de la emisora que ya hay, para que no sobrescribas una a
-  la que tenías aprecio.
+- **📱 ▶ Escuchar en este teléfono** (o **esta tableta**): la emisora suena en el
+  dispositivo, para oírla antes de enviarla al altavoz. El botón pasa a **📱 ■ Detener**;
+  una barra encima de los resultados dice qué suena, con **■ Detener** y **🔊 Reproducir
+  en …**. Una emisora a la vez; se detiene al salir de la pestaña o de la aplicación, y al
+  enviar la emisora al altavoz. Sin Wi-Fi usa datos móviles (alrededor de 1 MB por minuto
+  a 128 kbit/s). Una emisora que no suena en el dispositivo puede sonar igualmente en el
+  altavoz: el agente STR convierte formatos que el reproductor de Android no lee.
+- **🔊 Reproducir en Cocina**: con el nombre completo del altavoz elegido; la emisora
+  arranca allí, sin guardar nada.
+- **⋯ Teclas, Local…** abre una hoja de acciones con **Reproducir en Cocina**, **★ Añadir a favoritos STR** (agente reciente), **Añadir a
+  Local**, y después **① Asignar a esta tecla** si la tecla está libre, o **① Sustituir
+  Bel RTL** si está ocupada: se muestra el nombre de la emisora que ya hay, para que no
+  sobrescribas una a la que tenías aprecio.
 
 **La asignación exige el agente STR.** Sin él solo es posible la escucha inmediata; el
 guardado se hace entonces manteniendo pulsada la tecla en el propio altavoz, o desde la
@@ -468,6 +496,14 @@ lo que usted cambió. Requiere el agente STR. La hora se ajusta en el reloj del 
 Marque la casilla, elija el nivel y pulse **Guardar el volumen de inicio**. Un volumen
 ajustado durante la escucha nunca se modifica.
 
+**Tecla de repetición** (en la tarjeta de alarmas): marca la tecla del mando que repite una
+alarma que suena — **AUX**, **Pulgar arriba** o **Pulgar abajo** — y luego **Guardar la
+tecla de repetición**. Fuera de una alarma, un pulgar no hace nada y AUX cambia como siempre
+a la entrada AUX. Un pulgar que ya lleva otra acción (temporizador, graves…) lo indica;
+marcarlo la sustituye, y la aplicación lo dice antes. Solo se escriben las casillas que
+cambias: una acción puesta en otro sitio sobre otra tecla se queda. Una tecla que lleva un
+grupo guardado la rechaza el altavoz, que dice por qué.
+
 **Idioma**: español, francés, inglés, alemán, neerlandés, italiano. El cambio es inmediato, sin
 reiniciar, y queda memorizado.
 
@@ -488,6 +524,13 @@ Un altavoz cuyo agente es anterior a la versión 1.8.0 muestra un bloque parecid
 **Agente STR demasiado antiguo**, y su tarjeta en la pestaña Reproducción indica
 «demasiado antiguo».
 
+**Agente STR: nueva versión**: como mucho una vez al día, al abrir Ajustes, la aplicación
+lee en GitHub la última versión del agente STR. Cuando altavoces conocidos tienen un agente
+más antiguo, una tarjeta los nombra, con **Novedades** y **Más tarde** (la tarjeta vuelve
+con la versión siguiente), y su tarjeta en la pestaña Reproducción muestra «1.9.1
+disponible». El agente se actualiza con la aplicación STR del ordenador. La casilla
+**Comprobar automáticamente** de la tarjeta **Actualización** también desactiva esto.
+
 **Diagnóstico**: *Consultar el altavoz* se refiere al altavoz **seleccionado** — nombre,
 modelo, identificador, versión del firmware, el agente con su puerto y su versión leída
 en directo en 17008 y 8888, el estado de las notificaciones, el rango de graves, la
@@ -500,6 +543,27 @@ voz solo viven en el teléfono. Una actualización los conserva; una desinstalac
 incluida la que Android exige antes de instalar un APK firmado con otra clave. **Exportar**
 crea un archivo y abre el menú de compartir (Drive, correo, Archivos…); **Importar** vuelve a
 leer ese archivo y añade lo que falta, sin reemplazar ni borrar nada.
+
+**Copia del altavoz**: **Guardar en un archivo** conserva lo que el agente STR guarda para
+el altavoz seleccionado: las teclas 1 a 12 (una tecla de Spotify con su lista), las
+alarmas, el volumen de inicio y la tecla de repetición. **Restaurar desde un archivo…** los
+devuelve, tras una pregunta que nombra el altavoz de destino y el de origen del archivo: el
+archivo también sirve para copiar estos ajustes a otro altavoz. Las teclas del archivo
+sustituyen a las del altavoz, las demás se quedan; sus alarmas se sustituyen. Sin segunda
+fila en el altavoz de destino, se omiten las teclas 7 a 12. El informe dice qué se
+restauró y qué rechazó el altavoz. El grupo permanente no se guarda. Una tecla de Spotify
+solo suena si el altavoz está conectado a la misma cuenta de Spotify. Requiere el agente
+STR.
+
+**Actualización** (versión instalada desde GitHub): como mucho una vez al día, la
+aplicación pregunta a GitHub si hay una versión más reciente; la casilla **Comprobar
+automáticamente** lo desactiva. **Comprobar ahora** lo hace a petición. Si la hay, aparece
+también un aviso en la pestaña Reproducción (**Novedades**, **Más tarde**, **Instalar**).
+**Instalar** descarga el APK, comprueba que tiene exactamente el tamaño y la huella SHA-256
+publicados en GitHub y abre el instalador de Android, donde confirmas. La primera vez,
+Android pide permitir que SoundReborn Remote instale aplicaciones. Android se niega a
+instalar encima un APK firmado con otra clave: una versión de prueba lanzada desde Visual
+Studio no se actualiza así.
 
 **Acerca de**: la versión, el crédito al proyecto STR con un enlace a su sitio en el
 idioma elegido, y los avisos legales.
@@ -515,6 +579,13 @@ lento no se interpreta como cambio de pestaña.
 Un deslizamiento que empieza **sobre un control deslizante** lo capta ese control: es
 deliberado, de lo contrario el volumen sería imposible de ajustar. Empieza el gesto en una
 zona libre.
+
+**Pulsación larga en el icono de la aplicación** (lanzador de Android): **Todo en espera**
+pone en espera cada altavoz conocido con agente STR —un altavoz sin agente no se toca,
+porque su única orden de espera lo encendería si estuviera apagado—, y **Tecla 1** a
+**Tecla 3** ponen esa tecla en el altavoz seleccionado. La aplicación se abre en la pestaña
+Reproducción y dice lo que se hizo. Estos accesos directos se pueden poner en la pantalla de
+inicio.
 
 ---
 

@@ -1187,6 +1187,54 @@ public static class Localization
             "Manca una stazione? Aggiungila su radio-browser.info: comparirà qui, e per tutti.");
         Add("L_PastedAddress", "Adresse collée", "Pasted address", "Eingefügte Adresse", "Geplakt adres", "Dirección pegada", "Indirizzo incollato");
 
+        // ---------------------------------------------------------- Écoute sur l'appareil / diffusion sur l'enceinte
+        // Deux verbes distincts dans chaque langue : écouter (appareil), diffuser (enceinte).
+        Add("L_ThisPhone", "ce téléphone", "this phone", "diesem Telefon", "deze telefoon", "este teléfono", "questo telefono");
+        Add("L_ThisTablet", "cette tablette", "this tablet", "diesem Tablet", "deze tablet", "esta tableta", "questo tablet");
+        Add("L_ThisDevice", "cet appareil", "this device", "diesem Gerät", "dit apparaat", "este dispositivo", "questo dispositivo");
+        Add("L_ListenOnDevice", "📱 ▶  Écouter sur {0}", "📱 ▶  Listen on {0}", "📱 ▶  Auf {0} anhören", "📱 ▶  Beluisteren op {0}", "📱 ▶  Escuchar en {0}", "📱 ▶  Ascolta su {0}");
+        Add("L_StopOnDevice", "📱 ■  Arrêter sur {0}", "📱 ■  Stop on {0}", "📱 ■  Auf {0} stoppen", "📱 ■  Stoppen op {0}", "📱 ■  Detener en {0}", "📱 ■  Ferma su {0}");
+        Add("L_BroadcastOn", "🔊  Diffuser sur {0}", "🔊  Play on {0}", "🔊  Auf {0} abspielen", "🔊  Afspelen op {0}", "🔊  Reproducir en {0}", "🔊  Riproduci su {0}");
+        Add("L_BroadcastNoSpeaker",
+            "🔊  Diffuser sur l'enceinte (aucune choisie)",
+            "🔊  Play on the speaker (none selected)",
+            "🔊  Auf dem Lautsprecher abspielen (keiner gewählt)",
+            "🔊  Afspelen op de speaker (geen gekozen)",
+            "🔊  Reproducir en el altavoz (ninguno elegido)",
+            "🔊  Riproduci sul diffusore (nessuno scelto)");
+        Add("L_MoreActions", "⋯  Touches, Local…", "⋯  Keys, Local…", "⋯  Tasten, Local…", "⋯  Toetsen, Local…", "⋯  Teclas, Local…", "⋯  Tasti, Local…");
+        Add("L_PreviewConnecting", "📱  Connexion à {0}…", "📱  Connecting to {0}…", "📱  Verbindung zu {0}…", "📱  Verbinden met {0}…", "📱  Conectando con {0}…", "📱  Connessione a {0}…");
+        Add("L_PreviewPlaying", "📱  Sur {0} : {1}", "📱  On {0}: {1}", "📱  Auf {0}: {1}", "📱  Op {0}: {1}", "📱  En {0}: {1}", "📱  Su {0}: {1}");
+        Add("L_PreviewStop", "■  Arrêter", "■  Stop", "■  Stoppen", "■  Stoppen", "■  Detener", "■  Ferma");
+        Add("S_PreviewUnsupported",
+            "L'écoute sur l'appareil n'est pas disponible ici.",
+            "Listening on the device is not available here.",
+            "Das Anhören auf dem Gerät ist hier nicht verfügbar.",
+            "Beluisteren op het apparaat is hier niet beschikbaar.",
+            "Escuchar en el dispositivo no está disponible aquí.",
+            "L'ascolto sul dispositivo non è disponibile qui.");
+        Add("S_PreviewFailed",
+            "Cette station ne joue pas sur {0}. Elle peut quand même jouer sur l'enceinte : l'agent STR convertit ce que l'appareil ne lit pas.",
+            "This station does not play on {0}. It may still play on the speaker: the STR agent converts what the device cannot read.",
+            "Dieser Sender spielt nicht auf {0}. Auf dem Lautsprecher kann er trotzdem laufen: Der STR-Agent wandelt um, was das Gerät nicht liest.",
+            "Deze zender speelt niet op {0}. Op de speaker kan hij toch spelen: de STR-agent zet om wat het apparaat niet leest.",
+            "Esta emisora no suena en {0}. Puede sonar igualmente en el altavoz: el agente STR convierte lo que el dispositivo no lee.",
+            "Questa stazione non si sente su {0}. Può comunque suonare sul diffusore: l'agente STR converte ciò che il dispositivo non legge.");
+        Add("S_PreviewMobileData",
+            "Hors Wi-Fi, l'écoute utilise les données mobiles (environ 1 Mo par minute à 128 kbit/s).",
+            "Away from Wi-Fi, listening uses mobile data (about 1 MB per minute at 128 kbit/s).",
+            "Ohne WLAN nutzt das Anhören mobile Daten (etwa 1 MB pro Minute bei 128 kbit/s).",
+            "Zonder wifi gebruikt beluisteren mobiele data (ongeveer 1 MB per minuut bij 128 kbit/s).",
+            "Sin Wi-Fi, escuchar usa datos móviles (alrededor de 1 MB por minuto a 128 kbit/s).",
+            "Senza Wi-Fi, l'ascolto usa i dati mobili (circa 1 MB al minuto a 128 kbit/s).");
+        Add("S_PreviewEnded",
+            "L'écoute sur {0} s'est arrêtée : le flux s'est coupé.",
+            "Listening on {0} stopped: the stream dropped.",
+            "Das Anhören auf {0} wurde beendet: Der Stream ist abgebrochen.",
+            "Het beluisteren op {0} is gestopt: de stream viel weg.",
+            "La escucha en {0} se detuvo: el flujo se cortó.",
+            "L'ascolto su {0} si è fermato: il flusso si è interrotto.");
+
         // ---------------------------------------------------------- Pays
         // Traduits à la main : sur Android, RegionInfo.DisplayName renvoie le nom
         // NATIF du pays (« België », « Lëtzebuerg »), pas sa traduction.
@@ -1218,6 +1266,19 @@ public static class Localization
         Add("L_CtryAR", "Argentine", "Argentina", "Argentinien", "Argentinië", "Argentina", "Argentina");
         Add("L_CtryAU", "Australie", "Australia", "Australien", "Australië", "Australia", "Australia");
         Add("L_CtryJP", "Japon", "Japan", "Japan", "Japan", "Japón", "Giappone");
+        Add("L_CtryMQ", "Martinique", "Martinique", "Martinique", "Martinique", "Martinica", "Martinica");
+        Add("L_CtryRE", "La Réunion", "Réunion", "Réunion", "Réunion", "Reunión", "Riunione");
+        Add("L_CtryGP", "Guadeloupe", "Guadeloupe", "Guadeloupe", "Guadeloupe", "Guadalupe", "Guadalupa");
+        Add("L_CtryGF", "Guyane", "French Guiana", "Französisch-Guayana", "Frans-Guyana", "Guayana Francesa", "Guyana francese");
+        Add("L_CtryYT", "Mayotte", "Mayotte", "Mayotte", "Mayotte", "Mayotte", "Mayotte");
+        Add("L_CtryNC", "Nouvelle-Calédonie", "New Caledonia", "Neukaledonien", "Nieuw-Caledonië", "Nueva Caledonia", "Nuova Caledonia");
+        Add("L_CtryPF", "Polynésie française", "French Polynesia", "Französisch-Polynesien", "Frans-Polynesië", "Polinesia Francesa", "Polinesia francese");
+        Add("L_CtryPM", "Saint-Pierre-et-Miquelon", "Saint Pierre and Miquelon", "Saint-Pierre und Miquelon", "Saint-Pierre en Miquelon", "San Pedro y Miquelón", "Saint-Pierre e Miquelon");
+        Add("L_CtryDZ", "Algérie", "Algeria", "Algerien", "Algerije", "Argelia", "Algeria");
+        Add("L_CtryCI", "Côte d'Ivoire", "Côte d'Ivoire", "Elfenbeinküste", "Ivoorkust", "Costa de Marfil", "Costa d'Avorio");
+        Add("L_CtryTN", "Tunisie", "Tunisia", "Tunesien", "Tunesië", "Túnez", "Tunisia");
+        Add("L_CtryCM", "Cameroun", "Cameroon", "Kamerun", "Kameroen", "Camerún", "Camerun");
+        Add("L_CtrySN", "Sénégal", "Senegal", "Senegal", "Senegal", "Senegal", "Senegal");
 
         // ---------------------------------------------------------- Affectation d'une station
         Add("L_ReplacePreset", "Remplacer {0}", "Replace {0}", "{0} ersetzen", "{0} vervangen", "Sustituir {0}", "Sostituisci {0}");
@@ -1875,12 +1936,12 @@ public static class Localization
             "Repetición",
             "Posticipa");
         Add("L_AlarmSnoozeNote",
-            "La répétition ne sert que si une touche de la télécommande (pouce ou AUX) est réglée sur « répéter le réveil » dans l'application STR sur ordinateur.",
-            "Snooze only works if a remote key (thumbs or AUX) is set to \"snooze\" in the STR app on a computer.",
-            "Schlummern wirkt nur, wenn eine Taste der Fernbedienung (Daumen oder AUX) in der STR-App am Computer auf „Schlummern“ gestellt ist.",
-            "Sluimeren werkt alleen als een toets van de afstandsbediening (duim of AUX) in de STR-app op de computer op \"sluimeren\" staat.",
-            "La repetición solo funciona si una tecla del mando (pulgar o AUX) está ajustada a «repetir» en la aplicación STR del ordenador.",
-            "Il posticipo funziona solo se un tasto del telecomando (pollici o AUX) è impostato su \"posticipa\" nell'app STR su computer.");
+            "La répétition ne sert que si une touche de la télécommande (pouce ou AUX) répète le réveil : voir « Touche de répétition » plus bas.",
+            "Snooze only works if a remote key (thumbs or AUX) snoozes the alarm: see \"Snooze key\" below.",
+            "Schlummern wirkt nur, wenn eine Taste der Fernbedienung (Daumen oder AUX) den Wecker schlummern lässt: siehe „Schlummertaste“ weiter unten.",
+            "Sluimeren werkt alleen als een toets van de afstandsbediening (duim of AUX) de wekker laat sluimeren: zie \"Sluimertoets\" hieronder.",
+            "La repetición solo funciona si una tecla del mando (pulgar o AUX) repite la alarma: ver «Tecla de repetición» más abajo.",
+            "Il posticipo funziona solo se un tasto del telecomando (pollici o AUX) posticipa la sveglia: vedi \"Tasto posticipa\" più sotto.");
         Add("L_AlarmEnabled",
             "Réveil activé",
             "Alarm on",
@@ -1923,6 +1984,125 @@ public static class Localization
             "Startvolume opslaan",
             "Guardar el volumen de inicio",
             "Salva il volume di avvio");
+        Add("L_SnoozeKeysTitle",
+            "TOUCHE DE RÉPÉTITION",
+            "SNOOZE KEY",
+            "SCHLUMMERTASTE",
+            "SLUIMERTOETS",
+            "TECLA DE REPETICIÓN",
+            "TASTO POSTICIPA");
+        Add("L_SnoozeKeysNote",
+            "La touche cochée répète un réveil qui sonne, après le délai choisi pour ce réveil. Hors réveil, un pouce ne fait rien ; AUX passe comme d'habitude sur l'entrée AUX.",
+            "The ticked key snoozes a ringing alarm, for the delay chosen for that alarm. Outside an alarm, a thumbs key does nothing; AUX switches to the AUX input as usual.",
+            "Die angehakte Taste lässt einen klingelnden Wecker schlummern, für die bei diesem Wecker gewählte Dauer. Außerhalb eines Weckers tut eine Daumentaste nichts; AUX schaltet wie gewohnt auf den AUX-Eingang.",
+            "De aangevinkte toets laat een afgaande wekker sluimeren, voor de tijd die voor die wekker is gekozen. Buiten een wekker doet een duimtoets niets; AUX schakelt zoals gewoonlijk naar de AUX-ingang.",
+            "La tecla marcada repite una alarma que suena, tras el tiempo elegido para esa alarma. Fuera de una alarma, un pulgar no hace nada; AUX cambia como siempre a la entrada AUX.",
+            "Il tasto spuntato posticipa una sveglia che suona, del tempo scelto per quella sveglia. Fuori da una sveglia, un tasto pollice non fa nulla; AUX passa come sempre all'ingresso AUX.");
+        Add("L_SnoozeKeyAux",
+            "AUX",
+            "AUX",
+            "AUX",
+            "AUX",
+            "AUX",
+            "AUX");
+        Add("L_SnoozeKeyThumbsUp",
+            "Pouce levé 👍",
+            "Thumbs up 👍",
+            "Daumen hoch 👍",
+            "Duim omhoog 👍",
+            "Pulgar arriba 👍",
+            "Pollice su 👍");
+        Add("L_SnoozeKeyThumbsDown",
+            "Pouce baissé 👎",
+            "Thumbs down 👎",
+            "Daumen runter 👎",
+            "Duim omlaag 👎",
+            "Pulgar abajo 👎",
+            "Pollice giù 👎");
+        Add("L_SnoozeKeyCurrent",
+            "{0} (aujourd'hui : {1})",
+            "{0} (now: {1})",
+            "{0} (derzeit: {1})",
+            "{0} (nu: {1})",
+            "{0} (ahora: {1})",
+            "{0} (ora: {1})");
+        Add("L_SnoozeKeysSave",
+            "Enregistrer la touche de répétition",
+            "Save the snooze key",
+            "Schlummertaste speichern",
+            "Sluimertoets opslaan",
+            "Guardar la tecla de repetición",
+            "Salva il tasto posticipa");
+        Add("S_SnoozeKeyReplaces",
+            "{0} : la répétition remplacera « {1} ».",
+            "{0}: snooze will replace \"{1}\".",
+            "{0}: Schlummern ersetzt „{1}“.",
+            "{0}: sluimeren vervangt \"{1}\".",
+            "{0}: la repetición sustituirá «{1}».",
+            "{0}: il posticipo sostituirà \"{1}\".");
+        Add("S_SnoozeKeysSaved",
+            "Répétition du réveil enregistrée sur : {0}.",
+            "Snooze saved on: {0}.",
+            "Schlummern gespeichert auf: {0}.",
+            "Sluimeren opgeslagen op: {0}.",
+            "Repetición guardada en: {0}.",
+            "Posticipo salvato su: {0}.");
+        Add("S_SnoozeKeysNone",
+            "Plus aucune touche ne répète le réveil.",
+            "No key snoozes the alarm any more.",
+            "Keine Taste lässt den Wecker mehr schlummern.",
+            "Geen enkele toets laat de wekker nog sluimeren.",
+            "Ya ninguna tecla repite la alarma.",
+            "Nessun tasto posticipa più la sveglia.");
+        Add("L_KeyActionSnooze",
+            "répéter le réveil",
+            "snooze",
+            "Schlummern",
+            "sluimeren",
+            "repetir la alarma",
+            "posticipa");
+        Add("L_KeyActionSleep",
+            "minuterie de sommeil",
+            "sleep timer",
+            "Einschlaftimer",
+            "slaaptimer",
+            "temporizador de apagado",
+            "timer di spegnimento");
+        Add("L_KeyActionSleepFixed",
+            "minuterie {0} min",
+            "sleep timer {0} min",
+            "Einschlaftimer {0} Min.",
+            "slaaptimer {0} min",
+            "temporizador {0} min",
+            "timer {0} min");
+        Add("L_KeyActionBassUp",
+            "graves +",
+            "bass +",
+            "Bass +",
+            "bas +",
+            "graves +",
+            "bassi +");
+        Add("L_KeyActionBassDown",
+            "graves −",
+            "bass −",
+            "Bass −",
+            "bas −",
+            "graves −",
+            "bassi −");
+        Add("L_KeyActionShuffle",
+            "lecture aléatoire Spotify",
+            "Spotify shuffle",
+            "Spotify-Zufallswiedergabe",
+            "Spotify shuffle",
+            "aleatorio de Spotify",
+            "riproduzione casuale Spotify");
+        Add("L_KeyActionRepeat",
+            "répétition Spotify",
+            "Spotify repeat",
+            "Spotify-Wiederholung",
+            "Spotify herhalen",
+            "repetición de Spotify",
+            "ripetizione Spotify");
 
         // ---------------------------------------------------------- Garder ce qui joue
         Add("L_KeepPlaying",
@@ -2031,6 +2211,13 @@ public static class Localization
             "Lokaal",
             "Local",
             "Locale");
+        Add("L_RowFavorites",
+            "★ STR",
+            "★ STR",
+            "★ STR",
+            "★ STR",
+            "★ STR",
+            "★ STR");
         Add("L_AddLocal",
             "Ajouter à Local",
             "Add to Local",
@@ -2038,6 +2225,111 @@ public static class Localization
             "Toevoegen aan Lokaal",
             "Añadir a Local",
             "Aggiungi a Locale");
+        Add("L_FavNote",
+            "Les stations étoilées de l'application STR : les mêmes sur toutes les enceintes STR et sur l'ordinateur. Un favori ajouté ou retiré ici l'est aussi là-bas. Toucher un favori le lance sur l'enceinte.",
+            "The starred stations of the STR app: the same on every STR speaker and on the computer. A favourite added or removed here is added or removed there too. Tap a favourite to play it on the speaker.",
+            "Die mit Stern markierten Sender der STR-App: dieselben auf allen STR-Lautsprechern und am Computer. Ein hier hinzugefügter oder entfernter Favorit wird auch dort hinzugefügt oder entfernt. Antippen spielt ihn auf dem Lautsprecher.",
+            "De zenders met een ster in de STR-app: dezelfde op elke STR-speaker en op de computer. Een favoriet die je hier toevoegt of verwijdert, verandert daar ook. Tik op een favoriet om hem op de speaker te spelen.",
+            "Las emisoras con estrella de la aplicación STR: las mismas en todos los altavoces STR y en el ordenador. Un favorito añadido o quitado aquí también lo es allí. Toca un favorito para ponerlo en el altavoz.",
+            "Le stazioni con la stella dell'app STR: le stesse su tutti i diffusori STR e sul computer. Un preferito aggiunto o tolto qui lo è anche là. Tocca un preferito per avviarlo sul diffusore.");
+        Add("L_FavEmpty",
+            "Aucun favori pour l'instant. Ajoute une station depuis la recherche (⋯ puis « ★ Ajouter aux favoris STR ») ou ce qui joue.",
+            "No favourites yet. Add a station from the search (⋯ then \"★ Add to STR favourites\") or what is playing.",
+            "Noch keine Favoriten. Füge einen Sender aus der Suche hinzu (⋯ und dann „★ Zu STR-Favoriten“) oder das, was gerade läuft.",
+            "Nog geen favorieten. Voeg een zender toe vanuit het zoeken (⋯ en dan \"★ Aan STR-favorieten toevoegen\") of wat nu speelt.",
+            "Aún no hay favoritos. Añade una emisora desde la búsqueda (⋯ y luego «★ Añadir a favoritos STR») o lo que suena.",
+            "Nessun preferito per ora. Aggiungi una stazione dalla ricerca (⋯ poi \"★ Aggiungi ai preferiti STR\") o ciò che suona.");
+        Add("L_FavAddPlaying",
+            "★ Ajouter ce qui joue",
+            "★ Add what's playing",
+            "★ Laufendes hinzufügen",
+            "★ Wat nu speelt toevoegen",
+            "★ Añadir lo que suena",
+            "★ Aggiungi ciò che suona");
+        Add("L_AddFavorite",
+            "★ Ajouter aux favoris STR",
+            "★ Add to STR favourites",
+            "★ Zu STR-Favoriten",
+            "★ Aan STR-favorieten toevoegen",
+            "★ Añadir a favoritos STR",
+            "★ Aggiungi ai preferiti STR");
+        Add("L_FavOnKey",
+            "Mettre sur une touche…",
+            "Put on a key…",
+            "Auf eine Taste legen…",
+            "Op een toets zetten…",
+            "Poner en una tecla…",
+            "Metti su un tasto…");
+        Add("L_FavRemove",
+            "Retirer des favoris STR",
+            "Remove from STR favourites",
+            "Aus STR-Favoriten entfernen",
+            "Uit STR-favorieten verwijderen",
+            "Quitar de favoritos STR",
+            "Togli dai preferiti STR");
+        Add("L_FavRemoveGo",
+            "Retirer",
+            "Remove",
+            "Entfernen",
+            "Verwijderen",
+            "Quitar",
+            "Togli");
+        Add("L_FavRemoveConfirm",
+            "Retirer « {0} » des favoris STR ? Il disparaît aussi des autres enceintes et de l'ordinateur.",
+            "Remove \"{0}\" from the STR favourites? It also goes from the other speakers and the computer.",
+            "„{0}“ aus den STR-Favoriten entfernen? Er verschwindet auch von den anderen Lautsprechern und vom Computer.",
+            "\"{0}\" uit de STR-favorieten verwijderen? Hij verdwijnt ook van de andere speakers en van de computer.",
+            "¿Quitar «{0}» de los favoritos STR? También desaparece de los demás altavoces y del ordenador.",
+            "Togliere \"{0}\" dai preferiti STR? Sparisce anche dagli altri diffusori e dal computer.");
+        Add("S_FavNotPlayable",
+            "« {0} » se lance depuis l'application STR (station sans adresse de flux).",
+            "\"{0}\" plays from the STR app (station without a stream address).",
+            "„{0}“ startet über die STR-App (Sender ohne Streamadresse).",
+            "\"{0}\" start vanuit de STR-app (zender zonder streamadres).",
+            "«{0}» se pone desde la aplicación STR (emisora sin dirección de flujo).",
+            "\"{0}\" si avvia dall'app STR (stazione senza indirizzo di flusso).");
+        Add("S_FavRemoved",
+            "« {0} » retiré des favoris STR.",
+            "\"{0}\" removed from the STR favourites.",
+            "„{0}“ aus den STR-Favoriten entfernt.",
+            "\"{0}\" uit de STR-favorieten verwijderd.",
+            "«{0}» quitado de los favoritos STR.",
+            "\"{0}\" tolto dai preferiti STR.");
+        Add("S_FavNotRemoved",
+            "« {0} » est toujours dans les favoris STR : l'enceinte ne l'a pas retiré.",
+            "\"{0}\" is still in the STR favourites: the speaker did not remove it.",
+            "„{0}“ ist noch in den STR-Favoriten: der Lautsprecher hat ihn nicht entfernt.",
+            "\"{0}\" staat nog in de STR-favorieten: de speaker heeft hem niet verwijderd.",
+            "«{0}» sigue en los favoritos STR: el altavoz no lo ha quitado.",
+            "\"{0}\" è ancora nei preferiti STR: il diffusore non l'ha tolto.");
+        Add("S_FavAdded",
+            "« {0} » ajouté aux favoris STR.",
+            "\"{0}\" added to the STR favourites.",
+            "„{0}“ zu den STR-Favoriten hinzugefügt.",
+            "\"{0}\" aan de STR-favorieten toegevoegd.",
+            "«{0}» añadido a los favoritos STR.",
+            "\"{0}\" aggiunto ai preferiti STR.");
+        Add("S_FavAlready",
+            "« {0} » est déjà dans les favoris STR.",
+            "\"{0}\" is already in the STR favourites.",
+            "„{0}“ ist schon in den STR-Favoriten.",
+            "\"{0}\" staat al in de STR-favorieten.",
+            "«{0}» ya está en los favoritos STR.",
+            "\"{0}\" è già nei preferiti STR.");
+        Add("S_FavNothing",
+            "Rien à ajouter : l'enceinte ne joue pas de radio internet.",
+            "Nothing to add: the speaker is not playing an internet radio.",
+            "Nichts hinzuzufügen: der Lautsprecher spielt kein Internetradio.",
+            "Niets toe te voegen: de speaker speelt geen internetradio.",
+            "Nada que añadir: el altavoz no está poniendo una radio por internet.",
+            "Niente da aggiungere: il diffusore non sta suonando una radio internet.");
+        Add("S_FavAgentTooOld",
+            "L'agent STR de cette enceinte ne sait pas encore ajouter un favori depuis le téléphone : mets-le à jour avec l'application STR sur ordinateur.",
+            "The STR agent on this speaker cannot add a favourite from the phone yet: update it with the STR app on a computer.",
+            "Der STR-Agent dieses Lautsprechers kann noch keinen Favoriten vom Telefon hinzufügen: aktualisiere ihn mit der STR-App am Computer.",
+            "De STR-agent van deze speaker kan nog geen favoriet vanaf de telefoon toevoegen: werk hem bij met de STR-app op de computer.",
+            "El agente STR de este altavoz aún no puede añadir un favorito desde el teléfono: actualízalo con la aplicación STR del ordenador.",
+            "L'agente STR di questo diffusore non sa ancora aggiungere un preferito dal telefono: aggiornalo con l'app STR sul computer.");
         Add("L_LocalEmpty",
             "Aucune présélection locale. Ajoute la radio qui joue, une adresse, ou une station trouvée par la recherche (« Ajouter à Local »). Elles restent dans ce téléphone.",
             "No local presets yet. Add the radio that is playing, an address, or a station found by the search (“Add to Local”). They stay on this phone.",
@@ -2200,12 +2492,12 @@ public static class Localization
             "Leer",
             "Leggi");
         Add("L_VoiceHint",
-            "L'enceinte joue le message puis reprend ce qu'elle jouait. Le texte est lu par la voix de Google : il passe par Google, et l'enceinte doit avoir accès à internet. En groupe, le message passe par l'enceinte choisie.",
-            "The speaker plays the message, then goes back to what it was playing. The text is read by Google's voice: it goes through Google, and the speaker needs internet access. In a group, the message goes to the selected speaker.",
-            "Der Lautsprecher spielt die Nachricht und setzt dann fort, was er gespielt hat. Der Text wird von der Google-Stimme gelesen: Er läuft über Google, und der Lautsprecher braucht Internetzugang. In einer Gruppe geht die Nachricht an den gewählten Lautsprecher.",
-            "De luidspreker speelt het bericht en gaat daarna verder met wat hij speelde. De tekst wordt voorgelezen door de stem van Google: hij gaat via Google, en de luidspreker heeft internettoegang nodig. In een groep gaat het bericht naar de gekozen luidspreker.",
-            "El altavoz reproduce el mensaje y luego vuelve a lo que sonaba. El texto lo lee la voz de Google: pasa por Google, y el altavoz necesita acceso a internet. En un grupo, el mensaje va al altavoz elegido.",
-            "Il diffusore riproduce il messaggio, poi riprende ciò che suonava. Il testo è letto dalla voce di Google: passa da Google, e il diffusore deve avere accesso a internet. In un gruppo, il messaggio va al diffusore scelto.");
+            "Le micro n'enregistre que pendant l'appui sur le bouton rond ; le son part vers ton enceinte, sur le réseau local, puis est effacé du téléphone. L'enceinte joue le message puis reprend ce qu'elle jouait. Le texte est lu par la voix de Google : il passe par Google, et l'enceinte doit avoir accès à internet. En groupe, le message passe par l'enceinte choisie.",
+            "The microphone records only while you hold the round button; the sound goes to your speaker over the local network, then is deleted from the phone. The speaker plays the message, then goes back to what it was playing. The text is read by Google's voice: it goes through Google, and the speaker needs internet access. In a group, the message goes to the selected speaker.",
+            "Das Mikrofon nimmt nur auf, solange du den runden Knopf hältst; der Ton geht über das lokale Netz an deinen Lautsprecher und wird danach vom Telefon gelöscht. Der Lautsprecher spielt die Nachricht und setzt dann fort, was er gespielt hat. Der Text wird von der Google-Stimme gelesen: Er läuft über Google, und der Lautsprecher braucht Internetzugang. In einer Gruppe geht die Nachricht an den gewählten Lautsprecher.",
+            "De microfoon neemt alleen op terwijl je de ronde knop vasthoudt; het geluid gaat via het lokale netwerk naar je speaker en wordt daarna van de telefoon gewist. De luidspreker speelt het bericht en gaat daarna verder met wat hij speelde. De tekst wordt voorgelezen door de stem van Google: hij gaat via Google, en de luidspreker heeft internettoegang nodig. In een groep gaat het bericht naar de gekozen luidspreker.",
+            "El micrófono solo graba mientras mantienes el botón redondo; el sonido va a tu altavoz por la red local y luego se borra del teléfono. El altavoz reproduce el mensaje y luego vuelve a lo que sonaba. El texto lo lee la voz de Google: pasa por Google, y el altavoz necesita acceso a internet. En un grupo, el mensaje va al altavoz elegido.",
+            "Il microfono registra solo mentre tieni premuto il pulsante rotondo; il suono va al tuo diffusore sulla rete locale, poi viene cancellato dal telefono. Il diffusore riproduce il messaggio, poi riprende ciò che suonava. Il testo è letto dalla voce di Google: passa da Google, e il diffusore deve avere accesso a internet. In un gruppo, il messaggio va al diffusore scelto.");
         Add("S_VoiceNoMic",
             "Le micro n'est pas autorisé. Autorise-le dans les réglages d'Android.",
             "The microphone is not allowed. Allow it in the Android settings.",
@@ -2418,6 +2710,105 @@ public static class Localization
             "Volume van aankondigingen: {0} %",
             "Volumen de los anuncios: {0} %",
             "Volume degli annunci: {0} %");
+        // ---------------------------------------------------------- Mise à jour (version GitHub)
+        Add("L_UpdateTitle", "MISE À JOUR", "UPDATE", "AKTUALISIERUNG", "UPDATE", "ACTUALIZACIÓN", "AGGIORNAMENTO");
+        Add("L_UpdateInstalled", "Version installée : {0}", "Installed version: {0}", "Installierte Version: {0}", "Geïnstalleerde versie: {0}", "Versión instalada: {0}", "Versione installata: {0}");
+        Add("L_UpdateAuto",
+            "Vérifier automatiquement (une fois par jour au plus, auprès de GitHub)",
+            "Check automatically (at most once a day, with GitHub)",
+            "Automatisch prüfen (höchstens einmal am Tag, bei GitHub)",
+            "Automatisch controleren (hoogstens één keer per dag, bij GitHub)",
+            "Comprobar automáticamente (como mucho una vez al día, en GitHub)",
+            "Controlla automaticamente (al massimo una volta al giorno, su GitHub)");
+        Add("L_UpdateCheck", "Vérifier maintenant", "Check now", "Jetzt prüfen", "Nu controleren", "Comprobar ahora", "Controlla ora");
+        Add("L_UpdateAvailable", "Version {0} disponible", "Version {0} available", "Version {0} verfügbar", "Versie {0} beschikbaar", "Versión {0} disponible", "Versione {0} disponibile");
+        Add("L_UpdateNotes", "Nouveautés", "What's new", "Neuigkeiten", "Nieuw", "Novedades", "Novità");
+        Add("L_UpdateInstall", "Installer", "Install", "Installieren", "Installeren", "Instalar", "Installa");
+        Add("L_UpdateLater", "Plus tard", "Later", "Später", "Later", "Más tarde", "Più tardi");
+        Add("L_AgentNewTitle",
+            "AGENT STR : NOUVELLE VERSION",
+            "STR AGENT: NEW VERSION",
+            "STR-AGENT: NEUE VERSION",
+            "STR-AGENT: NIEUWE VERSIE",
+            "AGENTE STR: NUEVA VERSIÓN",
+            "AGENTE STR: NUOVA VERSIONE");
+        Add("L_AgentNewSummary",
+            "La version {0} de l'agent STR est disponible.",
+            "Version {0} of the STR agent is available.",
+            "Version {0} des STR-Agenten ist verfügbar.",
+            "Versie {0} van de STR-agent is beschikbaar.",
+            "La versión {0} del agente STR está disponible.",
+            "La versione {0} dell'agente STR è disponibile.");
+        Add("L_AgentNewSpeakers",
+            "À mettre à jour : {0}",
+            "To update: {0}",
+            "Zu aktualisieren: {0}",
+            "Bij te werken: {0}",
+            "Por actualizar: {0}",
+            "Da aggiornare: {0}");
+        Add("L_AgentNewBody",
+            "L'agent se met à jour avec l'application STR sur ordinateur, pas depuis le téléphone. La version est lue sur GitHub au plus une fois par jour.",
+            "The agent is updated with the STR app on a computer, not from the phone. The version is read from GitHub at most once a day.",
+            "Der Agent wird mit der STR-App am Computer aktualisiert, nicht vom Telefon aus. Die Version wird höchstens einmal am Tag auf GitHub gelesen.",
+            "De agent wordt bijgewerkt met de STR-app op de computer, niet vanaf de telefoon. De versie wordt hoogstens één keer per dag op GitHub gelezen.",
+            "El agente se actualiza con la aplicación STR del ordenador, no desde el teléfono. La versión se lee en GitHub como mucho una vez al día.",
+            "L'agente si aggiorna con l'app STR sul computer, non dal telefono. La versione viene letta su GitHub al massimo una volta al giorno.");
+        Add("L_AgentNewShort",
+            "{0} dispo",
+            "{0} available",
+            "{0} verfügbar",
+            "{0} beschikbaar",
+            "{0} disponible",
+            "{0} disponibile");
+        Add("L_UpdateOpenPage", "Ouvrir la page de la version", "Open the release page", "Versionsseite öffnen", "Versiepagina openen", "Abrir la página de la versión", "Apri la pagina della versione");
+        Add("L_UpdateDownloading", "Téléchargement… {0} %", "Downloading… {0}%", "Download… {0} %", "Downloaden… {0}%", "Descargando… {0} %", "Download… {0}%");
+        Add("L_UpdateHint",
+            "Le fichier est vérifié avant l'installation (taille et empreinte publiées sur GitHub). Android te demande ensuite de confirmer.",
+            "The file is checked before installing (size and fingerprint published on GitHub). Android then asks you to confirm.",
+            "Die Datei wird vor der Installation geprüft (auf GitHub veröffentlichte Größe und Prüfsumme). Danach fragt Android nach deiner Bestätigung.",
+            "Het bestand wordt vóór de installatie gecontroleerd (grootte en vingerafdruk zoals op GitHub). Daarna vraagt Android om te bevestigen.",
+            "El archivo se comprueba antes de instalar (tamaño y huella publicados en GitHub). Después Android te pide confirmar.",
+            "Il file viene controllato prima dell'installazione (dimensione e impronta pubblicate su GitHub). Poi Android ti chiede di confermare.");
+        Add("S_UpdateChecking", "Vérification…", "Checking…", "Prüfung…", "Controleren…", "Comprobando…", "Controllo…");
+        Add("S_UpdateNone", "Tu as la dernière version ({0}).", "You have the latest version ({0}).", "Du hast die neueste Version ({0}).", "Je hebt de nieuwste versie ({0}).", "Tienes la última versión ({0}).", "Hai l'ultima versione ({0}).");
+        Add("S_UpdateFound", "La version {0} est disponible.", "Version {0} is available.", "Version {0} ist verfügbar.", "Versie {0} is beschikbaar.", "La versión {0} está disponible.", "La versione {0} è disponibile.");
+        Add("S_UpdateCheckFailed",
+            "Vérification impossible : GitHub n'a pas répondu. Le téléphone a-t-il accès à internet ?",
+            "Could not check: GitHub did not answer. Does the phone have internet access?",
+            "Prüfung nicht möglich: GitHub hat nicht geantwortet. Hat das Telefon Internetzugang?",
+            "Controle niet mogelijk: GitHub antwoordde niet. Heeft de telefoon internet?",
+            "No se pudo comprobar: GitHub no respondió. ¿Tiene el teléfono acceso a internet?",
+            "Controllo impossibile: GitHub non ha risposto. Il telefono ha accesso a internet?");
+        Add("S_UpdateAllowInstall",
+            "Autorise SoundReborn Remote à installer des applications dans l'écran qui vient de s'ouvrir, puis reviens et touche « Installer ».",
+            "Allow SoundReborn Remote to install apps in the screen that just opened, then come back and tap \"Install\".",
+            "Erlaube SoundReborn Remote im eben geöffneten Bildschirm, Apps zu installieren, komm zurück und tippe auf „Installieren“.",
+            "Sta SoundReborn Remote toe om apps te installeren in het scherm dat net openging, kom terug en tik op „Installeren”.",
+            "Permite que SoundReborn Remote instale aplicaciones en la pantalla que se acaba de abrir, vuelve y toca «Instalar».",
+            "Consenti a SoundReborn Remote di installare app nella schermata appena aperta, poi torna e tocca «Installa».");
+        Add("S_UpdateInstallerOpened",
+            "Fichier vérifié. Confirme l'installation dans l'écran d'Android.",
+            "File checked. Confirm the installation in Android's screen.",
+            "Datei geprüft. Bestätige die Installation im Android-Bildschirm.",
+            "Bestand gecontroleerd. Bevestig de installatie in het scherm van Android.",
+            "Archivo comprobado. Confirma la instalación en la pantalla de Android.",
+            "File controllato. Conferma l'installazione nella schermata di Android.");
+        Add("S_UpdateCancelled", "Téléchargement annulé.", "Download cancelled.", "Download abgebrochen.", "Download geannuleerd.", "Descarga cancelada.", "Download annullato.");
+        Add("S_UpdateBadFile",
+            "Le fichier téléchargé ne correspond pas à celui publié sur GitHub : il n'est pas installé.",
+            "The downloaded file does not match the one published on GitHub: it is not installed.",
+            "Die heruntergeladene Datei entspricht nicht der auf GitHub veröffentlichten: Sie wird nicht installiert.",
+            "Het gedownloade bestand komt niet overeen met dat op GitHub: het wordt niet geïnstalleerd.",
+            "El archivo descargado no coincide con el publicado en GitHub: no se instala.",
+            "Il file scaricato non corrisponde a quello pubblicato su GitHub: non viene installato.");
+        Add("S_UpdateDownloadFailed",
+            "Le téléchargement a échoué. Tu peux réessayer, ou installer depuis la page de la version.",
+            "The download failed. You can try again, or install from the release page.",
+            "Der Download ist fehlgeschlagen. Versuch es noch einmal oder installiere über die Versionsseite.",
+            "De download is mislukt. Probeer opnieuw of installeer via de versiepagina.",
+            "La descarga falló. Puedes reintentarlo o instalar desde la página de la versión.",
+            "Il download non è riuscito. Puoi riprovare o installare dalla pagina della versione.");
+
         Add("L_BackupTitle",
             "SAUVEGARDE DES FAVORIS",
             "FAVOURITES BACKUP",
@@ -2446,6 +2837,258 @@ public static class Localization
             "Importeren",
             "Importar",
             "Importa");
+        Add("L_SpeakerBackupTitle",
+            "SAUVEGARDE DE L'ENCEINTE",
+            "SPEAKER BACKUP",
+            "LAUTSPRECHER-SICHERUNG",
+            "BACK-UP VAN DE SPEAKER",
+            "COPIA DEL ALTAVOZ",
+            "BACKUP DEL DIFFUSORE");
+        Add("L_SpeakerBackupTarget",
+            "Enceinte : {0}",
+            "Speaker: {0}",
+            "Lautsprecher: {0}",
+            "Speaker: {0}",
+            "Altavoz: {0}",
+            "Diffusore: {0}");
+        Add("L_SpeakerBackupNoAgent",
+            "{0} : l'agent STR est nécessaire.",
+            "{0}: the STR agent is needed.",
+            "{0}: der STR-Agent wird benötigt.",
+            "{0}: de STR-agent is nodig.",
+            "{0}: se necesita el agente STR.",
+            "{0}: serve l'agente STR.");
+        Add("L_SpeakerBackupHint",
+            "Les touches 1 à 12, les réveils, le volume de départ et la touche de répétition de l'enceinte sélectionnée, dans un fichier. La restauration peut aussi recopier ces réglages sur une autre enceinte. Le groupe permanent n'y est pas. Une touche Spotify ne joue que si l'enceinte est connectée au même compte Spotify.",
+            "Keys 1 to 12, the alarms, the start volume and the snooze key of the selected speaker, in a file. Restoring can also copy these settings to another speaker. The permanent group is not included. A Spotify key only plays if the speaker is signed in to the same Spotify account.",
+            "Die Tasten 1 bis 12, die Wecker, die Startlautstärke und die Schlummertaste des ausgewählten Lautsprechers, in einer Datei. Die Wiederherstellung kann diese Einstellungen auch auf einen anderen Lautsprecher übertragen. Die feste Gruppe ist nicht enthalten. Eine Spotify-Taste spielt nur, wenn der Lautsprecher mit demselben Spotify-Konto verbunden ist.",
+            "De toetsen 1 tot 12, de wekkers, het startvolume en de sluimertoets van de geselecteerde speaker, in een bestand. Terugzetten kan deze instellingen ook naar een andere speaker kopiëren. De vaste groep zit er niet in. Een Spotify-toets speelt alleen als de speaker met hetzelfde Spotify-account verbonden is.",
+            "Las teclas 1 a 12, las alarmas, el volumen de inicio y la tecla de repetición del altavoz seleccionado, en un archivo. La restauración también puede copiar estos ajustes a otro altavoz. El grupo permanente no está incluido. Una tecla de Spotify solo suena si el altavoz está conectado a la misma cuenta de Spotify.",
+            "I tasti da 1 a 12, le sveglie, il volume di avvio e il tasto posticipa del diffusore selezionato, in un file. Il ripristino può anche copiare queste impostazioni su un altro diffusore. Il gruppo permanente non è incluso. Un tasto Spotify suona solo se il diffusore è collegato allo stesso account Spotify.");
+        Add("L_SpeakerBackupSave",
+            "Sauvegarder dans un fichier",
+            "Save to a file",
+            "In eine Datei sichern",
+            "In een bestand opslaan",
+            "Guardar en un archivo",
+            "Salva in un file");
+        Add("L_SpeakerBackupRestore",
+            "Restaurer depuis un fichier…",
+            "Restore from a file…",
+            "Aus einer Datei wiederherstellen…",
+            "Terugzetten uit een bestand…",
+            "Restaurar desde un archivo…",
+            "Ripristina da un file…");
+        Add("L_SpeakerRestoreAsk",
+            "Restaurer sur {0} la sauvegarde de {1} du {2} ({3} touches, {4} réveils) ? Les touches du fichier remplacent celles de {0} (les autres ne changent pas). Les réveils de {0} sont remplacés.",
+            "Restore onto {0} the backup of {1} from {2} ({3} keys, {4} alarms)? The keys in the file replace those of {0} (the others stay). The alarms of {0} are replaced.",
+            "Auf {0} die Sicherung von {1} vom {2} wiederherstellen ({3} Tasten, {4} Wecker)? Die Tasten der Datei ersetzen die von {0} (die anderen bleiben). Die Wecker von {0} werden ersetzt.",
+            "Op {0} de back-up van {1} van {2} terugzetten ({3} toetsen, {4} wekkers)? De toetsen uit het bestand vervangen die van {0} (de andere blijven). De wekkers van {0} worden vervangen.",
+            "¿Restaurar en {0} la copia de {1} del {2} ({3} teclas, {4} alarmas)? Las teclas del archivo sustituyen a las de {0} (las demás no cambian). Las alarmas de {0} se sustituyen.",
+            "Ripristinare su {0} il backup di {1} del {2} ({3} tasti, {4} sveglie)? I tasti del file sostituiscono quelli di {0} (gli altri restano). Le sveglie di {0} vengono sostituite.");
+        Add("L_SpeakerRestoreGo",
+            "Restaurer",
+            "Restore",
+            "Wiederherstellen",
+            "Terugzetten",
+            "Restaurar",
+            "Ripristina");
+        Add("L_ShortcutStandbyShort",
+            "Tout en veille",
+            "All standby",
+            "Alle Standby",
+            "Alles stand-by",
+            "Todo en espera",
+            "Tutto standby");
+        Add("L_ShortcutStandbyLong",
+            "Tout mettre en veille",
+            "All speakers to standby",
+            "Alle in Standby",
+            "Alles op stand-by zetten",
+            "Poner todo en espera",
+            "Metti tutto in standby");
+        Add("L_ShortcutKeyShort",
+            "Touche {0}",
+            "Key {0}",
+            "Taste {0}",
+            "Toets {0}",
+            "Tecla {0}",
+            "Tasto {0}");
+        Add("L_ShortcutKeyLong",
+            "Lancer la touche {0}",
+            "Play key {0}",
+            "Taste {0} abspielen",
+            "Toets {0} afspelen",
+            "Poner la tecla {0}",
+            "Avvia il tasto {0}");
+        Add("S_ShortcutNoSpeaker",
+            "Aucune enceinte joignable : choisis-en une dans Réglages.",
+            "No speaker reachable: pick one in Settings.",
+            "Kein Lautsprecher erreichbar: wähle einen in den Einstellungen.",
+            "Geen speaker bereikbaar: kies er een in Instellingen.",
+            "Ningún altavoz accesible: elige uno en Ajustes.",
+            "Nessun diffusore raggiungibile: scegline uno in Impostazioni.");
+        Add("S_ShortcutNoAgent",
+            "Aucune enceinte avec l'agent STR : rien n'a été mis en veille.",
+            "No speaker with the STR agent: nothing was put on standby.",
+            "Kein Lautsprecher mit dem STR-Agenten: nichts wurde in Standby gesetzt.",
+            "Geen speaker met de STR-agent: er is niets op stand-by gezet.",
+            "Ningún altavoz con el agente STR: no se ha puesto nada en espera.",
+            "Nessun diffusore con l'agente STR: nulla è stato messo in standby.");
+        Add("S_ShortcutStandbyDone",
+            "{0} enceinte(s) mise(s) en veille.",
+            "{0} speaker(s) put on standby.",
+            "{0} Lautsprecher in Standby gesetzt.",
+            "{0} speaker(s) op stand-by gezet.",
+            "{0} altavoz/altavoces en espera.",
+            "{0} diffusore/i in standby.");
+        Add("S_ShortcutStandbyPartly",
+            "{0} sur {1} mise(s) en veille ; sans réponse : {2}.",
+            "{0} of {1} put on standby; no answer: {2}.",
+            "{0} von {1} in Standby; keine Antwort: {2}.",
+            "{0} van {1} op stand-by; geen antwoord: {2}.",
+            "{0} de {1} en espera; sin respuesta: {2}.",
+            "{0} su {1} in standby; nessuna risposta: {2}.");
+        Add("S_ShortcutStandbySkipped",
+            "{0} enceinte(s) sans agent STR non touchée(s) : leur seule commande de mise en veille les allumerait si elles étaient éteintes.",
+            "{0} speaker(s) without the STR agent left alone: their only standby command would switch them on if they were off.",
+            "{0} Lautsprecher ohne STR-Agent nicht angetastet: ihr einziger Standby-Befehl würde sie einschalten, wenn sie aus wären.",
+            "{0} speaker(s) zonder STR-agent niet aangeraakt: hun enige stand-byopdracht zou ze aanzetten als ze uit stonden.",
+            "{0} altavoz/altavoces sin agente STR sin tocar: su única orden de espera los encendería si estuvieran apagados.",
+            "{0} diffusore/i senza agente STR non toccato/i: il loro unico comando di standby li accenderebbe se fossero spenti.");
+        Add("S_ShortcutKeyPlayed",
+            "Touche {0} lancée sur {1}.",
+            "Key {0} playing on {1}.",
+            "Taste {0} spielt auf {1}.",
+            "Toets {0} speelt op {1}.",
+            "Tecla {0} sonando en {1}.",
+            "Tasto {0} avviato su {1}.");
+        Add("S_SpeakerBackupReading",
+            "Lecture de l'enceinte…",
+            "Reading the speaker…",
+            "Lautsprecher wird gelesen…",
+            "Speaker wordt gelezen…",
+            "Leyendo el altavoz…",
+            "Lettura del diffusore…");
+        Add("S_SpeakerBackupSaved",
+            "Sauvegarde de {0} prête : {1} touches, {2} réveils.",
+            "Backup of {0} ready: {1} keys, {2} alarms.",
+            "Sicherung von {0} bereit: {1} Tasten, {2} Wecker.",
+            "Back-up van {0} klaar: {1} toetsen, {2} wekkers.",
+            "Copia de {0} lista: {1} teclas, {2} alarmas.",
+            "Backup di {0} pronto: {1} tasti, {2} sveglie.");
+        Add("S_SpeakerBackupNotRecognized",
+            "Ce fichier n'est pas une sauvegarde d'enceinte de SoundReborn Remote.",
+            "This file is not a SoundReborn Remote speaker backup.",
+            "Diese Datei ist keine Lautsprecher-Sicherung von SoundReborn Remote.",
+            "Dit bestand is geen speaker-back-up van SoundReborn Remote.",
+            "Este archivo no es una copia de altavoz de SoundReborn Remote.",
+            "Questo file non è un backup di diffusore di SoundReborn Remote.");
+        Add("S_SpeakerRestoreChanged",
+            "L'enceinte sélectionnée a changé : rien n'a été restauré.",
+            "The selected speaker changed: nothing was restored.",
+            "Der ausgewählte Lautsprecher hat gewechselt: nichts wurde wiederhergestellt.",
+            "De geselecteerde speaker is veranderd: er is niets teruggezet.",
+            "El altavoz seleccionado ha cambiado: no se ha restaurado nada.",
+            "Il diffusore selezionato è cambiato: non è stato ripristinato nulla.");
+        Add("S_SpeakerRestoring",
+            "Restauration sur {0}…",
+            "Restoring onto {0}…",
+            "Wiederherstellung auf {0}…",
+            "Terugzetten op {0}…",
+            "Restaurando en {0}…",
+            "Ripristino su {0}…");
+        Add("S_SpeakerRestored",
+            "Restauré sur {0} :",
+            "Restored onto {0}:",
+            "Auf {0} wiederhergestellt:",
+            "Teruggezet op {0}:",
+            "Restaurado en {0}:",
+            "Ripristinato su {0}:");
+        Add("S_SpeakerRestoredPartly",
+            "Restauré en partie sur {0} :",
+            "Partly restored onto {0}:",
+            "Teilweise auf {0} wiederhergestellt:",
+            "Gedeeltelijk teruggezet op {0}:",
+            "Restaurado en parte en {0}:",
+            "Ripristinato in parte su {0}:");
+        Add("S_SpeakerRestorePresets",
+            "{0} touches",
+            "{0} keys",
+            "{0} Tasten",
+            "{0} toetsen",
+            "{0} teclas",
+            "{0} tasti");
+        Add("S_SpeakerRestorePresetsFailed",
+            "Touches non restaurées : {0}",
+            "Keys not restored: {0}",
+            "Tasten nicht wiederhergestellt: {0}",
+            "Toetsen niet teruggezet: {0}",
+            "Teclas no restauradas: {0}",
+            "Tasti non ripristinati: {0}");
+        Add("S_SpeakerRestoreNoSecondRow",
+            "{0} touches de la seconde rangée passées : cette enceinte ne l'a pas.",
+            "{0} second-row keys skipped: this speaker does not have it.",
+            "{0} Tasten der zweiten Reihe übersprungen: dieser Lautsprecher hat sie nicht.",
+            "{0} toetsen van de tweede rij overgeslagen: deze speaker heeft die niet.",
+            "{0} teclas de la segunda fila omitidas: este altavoz no la tiene.",
+            "{0} tasti della seconda fila saltati: questo diffusore non ce l'ha.");
+        Add("S_SpeakerRestoreAlarms",
+            "{0} réveils",
+            "{0} alarms",
+            "{0} Wecker",
+            "{0} wekkers",
+            "{0} alarmas",
+            "{0} sveglie");
+        Add("S_SpeakerRestoreAlarmsFailed",
+            "Réveils non restaurés : {0}",
+            "Alarms not restored: {0}",
+            "Wecker nicht wiederhergestellt: {0}",
+            "Wekkers niet teruggezet: {0}",
+            "Alarmas no restauradas: {0}",
+            "Sveglie non ripristinate: {0}");
+        Add("S_SpeakerRestoreStartVolume",
+            "volume de départ {0}",
+            "start volume {0}",
+            "Startlautstärke {0}",
+            "startvolume {0}",
+            "volumen de inicio {0}",
+            "volume di avvio {0}");
+        Add("S_SpeakerRestoreStartVolumeOff",
+            "volume de départ désactivé",
+            "start volume off",
+            "Startlautstärke aus",
+            "startvolume uit",
+            "volumen de inicio desactivado",
+            "volume di avvio disattivato");
+        Add("S_SpeakerRestoreStartVolumeFailed",
+            "Volume de départ non restauré : {0}",
+            "Start volume not restored: {0}",
+            "Startlautstärke nicht wiederhergestellt: {0}",
+            "Startvolume niet teruggezet: {0}",
+            "Volumen de inicio no restaurado: {0}",
+            "Volume di avvio non ripristinato: {0}");
+        Add("S_SpeakerRestoreKeyActions",
+            "touches de la télécommande",
+            "remote keys",
+            "Tasten der Fernbedienung",
+            "toetsen van de afstandsbediening",
+            "teclas del mando",
+            "tasti del telecomando");
+        Add("S_SpeakerRestoreKeyActionsFailed",
+            "Touches de la télécommande non restaurées : {0}",
+            "Remote keys not restored: {0}",
+            "Tasten der Fernbedienung nicht wiederhergestellt: {0}",
+            "Toetsen van de afstandsbediening niet teruggezet: {0}",
+            "Teclas del mando no restauradas: {0}",
+            "Tasti del telecomando non ripristinati: {0}");
+        Add("S_SpeakerRestoreUnsupported",
+            "l'agent de cette enceinte ne le gère pas",
+            "the agent on this speaker does not support it",
+            "der Agent dieses Lautsprechers unterstützt das nicht",
+            "de agent van deze speaker ondersteunt dat niet",
+            "el agente de este altavoz no lo admite",
+            "l'agente di questo diffusore non lo supporta");
         Add("L_BackupShareTitle",
             "Sauvegarde des favoris SoundReborn Remote",
             "SoundReborn Remote favourites backup",

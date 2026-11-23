@@ -129,6 +129,26 @@ public sealed partial class RadioResult : ObservableObject
     /// <summary>Le logo a déjà été demandé : un changement de filtre ne le retélécharge pas.</summary>
     public bool LogoTried { get; set; }
 
+    /// <summary>Ligne ouverte : ses boutons « Écouter sur ce téléphone » et « Diffuser sur … » sont visibles.</summary>
+    [ObservableProperty]
+    private bool _isExpanded;
+
+    /// <summary>Cette station joue en ce moment sur l'appareil.</summary>
+    [ObservableProperty]
+    private bool _isPreviewing;
+
+    /// <summary>L'écoute sur l'appareil n'a pas démarré pour cette station.</summary>
+    [ObservableProperty]
+    private bool _previewFailed;
+
+    /// <summary>« 📱 ▶ Écouter sur ce téléphone », ou « 📱 ■ Arrêter sur ce téléphone ».</summary>
+    [ObservableProperty]
+    private string _listenText = "";
+
+    /// <summary>« 🔊 Diffuser sur Cuisine », avec le nom complet de l'enceinte.</summary>
+    [ObservableProperty]
+    private string _broadcastText = "";
+
     [ObservableProperty]
     private ImageSource? _logo;
 
@@ -178,6 +198,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
     private readonly ArtworkCache _artwork;
     private readonly RadioBrowserClient _radio;
+    private readonly IStreamPreview _preview;
 
     /// <summary>Dernière URL de logo connue par touche, persistée entre deux lancements.</summary>
     private readonly Dictionary<int, string> _artCache;
@@ -216,19 +237,54 @@ public sealed partial class PresetsViewModel : BaseViewModel
     /// </summary>
     public LocalPresetsViewModel Local { get; }
 
-    public PresetsViewModel(SpeakerManager speakers, ArtworkCache artwork, RadioBrowserClient radio) : base(speakers)
+    /// <summary>
+    /// Les favoris STR (agent récent) : les mêmes sur toutes les enceintes STR et dans
+    /// l'application sur ordinateur. Leur propre vue-modèle, montrée par cet onglet.
+    /// </summary>
+    public StrFavoritesViewModel Favorites { get; }
+
+    public PresetsViewModel(SpeakerManager speakers, ArtworkCache artwork, RadioBrowserClient radio, IStreamPreview? preview = null)
+        : base(speakers)
     {
         _artwork = artwork;
         _radio = radio;
+        _preview = preview ?? new NoStreamPreview();
+        _preview.Ended += (_, _) => OnMainThread(OnPreviewEnded);
         _artCache = LoadArtCache();
         Copy = new PresetCopyViewModel(speakers);
         Local = new LocalPresetsViewModel(speakers, artwork);
+        Favorites = new StrFavoritesViewModel(speakers, artwork)
+        {
+            PickKey = PickKeyForFavoriteAsync,
+            KeepLocal = KeepFavoriteLocal,
+        };
 
-        // Le sélecteur « Une fois / Deux fois / Local » suit la liste locale.
+        // Le sélecteur « Une fois / Deux fois / Local / ★ STR » suit les deux listes.
+        // Une seule à la fois remplace la grille : montrer l'une referme l'autre.
         Local.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(LocalPresetsViewModel.IsShown))
             {
+                if (Local.IsShown)
+                {
+                    Favorites.IsShown = false;
+                }
+
+                OnPropertyChanged(nameof(OnceSelected));
+                OnPropertyChanged(nameof(TwiceSelected));
+                OnPropertyChanged(nameof(ShowKeys));
+            }
+        };
+
+        Favorites.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(StrFavoritesViewModel.IsShown))
+            {
+                if (Favorites.IsShown)
+                {
+                    Local.IsShown = false;
+                }
+
                 OnPropertyChanged(nameof(OnceSelected));
                 OnPropertyChanged(nameof(TwiceSelected));
                 OnPropertyChanged(nameof(ShowKeys));
@@ -254,6 +310,12 @@ public sealed partial class PresetsViewModel : BaseViewModel
         {
             RelabelEmptyTiles();
             BuildFilters();
+            Favorites.RebuildLabels();
+
+            foreach (var row in Results)
+            {
+                RelabelRow(row);
+            }
 
             foreach (var tile in Presets)
             {
@@ -298,18 +360,29 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
     public bool IsFirstRow => !IsSecondRow;
 
-    /// <summary>Le sélecteur « Une fois » est en avant : première rangée, liste locale fermée.</summary>
-    public bool OnceSelected => !IsSecondRow && !Local.IsShown;
+    /// <summary>Le sélecteur « Une fois » est en avant : première rangée, aucune liste à la place.</summary>
+    public bool OnceSelected => !IsSecondRow && ShowKeys;
 
-    /// <summary>Le sélecteur « Deux fois » est en avant : seconde rangée, liste locale fermée.</summary>
-    public bool TwiceSelected => IsSecondRow && !Local.IsShown;
+    /// <summary>Le sélecteur « Deux fois » est en avant : seconde rangée, aucune liste à la place.</summary>
+    public bool TwiceSelected => IsSecondRow && ShowKeys;
 
-    /// <summary>La grille des touches de l'enceinte est montrée : la liste locale ne l'a pas remplacée.</summary>
-    public bool ShowKeys => !Local.IsShown;
+    /// <summary>La grille des touches de l'enceinte est montrée : ni « Local » ni « ★ STR » ne l'ont remplacée.</summary>
+    public bool ShowKeys => !Local.IsShown && !Favorites.IsShown;
 
     /// <summary>Le sélecteur « Local » : la liste des présélections du téléphone remplace la grille.</summary>
     [RelayCommand]
     private void ShowLocal() => Local.IsShown = true;
+
+    /// <summary>Le sélecteur « ★ STR » : la liste des favoris STR remplace la grille, relue au passage.</summary>
+    [RelayCommand]
+    private void ShowFavorites() => OpenFavorites();
+
+    /// <summary>Montre les favoris STR et les relit : ils changent aussi depuis l'ordinateur.</summary>
+    public void OpenFavorites()
+    {
+        Favorites.IsShown = true;
+        _ = Favorites.LoadAsync();
+    }
 
     // ================================================================ Les six touches
 
@@ -441,6 +514,12 @@ public sealed partial class PresetsViewModel : BaseViewModel
             // plus haut, un silence n'est pas une grille vide.
             var secondRowUnread = false;
 
+            // Les six tuiles sont garnies ensemble, comme au changement de rangée :
+            // une tuile n'attend plus le logo d'une autre. Lues l'une après l'autre,
+            // la touche 6 attendait que les logos des touches 1 à 5 soient arrivés,
+            // ou qu'un site de station mort ait fini d'expirer.
+            var pending = new List<Task>(Presets.Count);
+
             foreach (var tile in Presets)
             {
                 if (PresetKeys.InSecondRow(tile.Slot) && !storeRead)
@@ -450,9 +529,10 @@ public sealed partial class PresetsViewModel : BaseViewModel
                     continue;
                 }
 
-                await ApplyAsync(tile, hardware.GetValueOrDefault(tile.Slot), store.GetValueOrDefault(tile.Slot))
-                    .ConfigureAwait(true);
+                pending.Add(ApplyAsync(tile, hardware.GetValueOrDefault(tile.Slot), store.GetValueOrDefault(tile.Slot)));
             }
+
+            await Task.WhenAll(pending).ConfigureAwait(true);
 
             SaveArtCache();
 
@@ -621,6 +701,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
     {
         _lastSync = (source, stationName, location, isIdle);
         Local.SyncActive(stationName, isIdle);
+        Favorites.SyncActive(stationName, isIdle);
 
         if (DateTime.UtcNow < _optimisticUntil)
         {
@@ -677,7 +758,13 @@ public sealed partial class PresetsViewModel : BaseViewModel
         // la relève dès que le logo de la station ne s'affichait pas, alors qu'il
         // peut dater d'une station rangée là auparavant : la touche montrait le
         // logo d'une autre station.
-        var art = JoinCandidates(store?.Art, hardware?.ArtUrl) ?? _artCache.GetValueOrDefault(tile.Slot);
+        //
+        // En revanche, quand ce logo retenu fait partie des candidats de la station,
+        // il passe en tête : c'est le même logo, déjà vérifié, et il évite d'attendre
+        // un premier candidat qui ne répond pas.
+        var proposed = JoinCandidates(store?.Art, hardware?.ArtUrl);
+        var remembered = RememberedArt(tile.Slot);
+        var art = proposed is null ? remembered : PreferKnown(proposed, remembered);
 
         if (store is not null)
         {
@@ -732,7 +819,46 @@ public sealed partial class PresetsViewModel : BaseViewModel
         tile.HasArt = false;
         tile.ArtSlot = 0;
         tile.IsActive = false;
-        _artCache.Remove(tile.Slot);
+
+        lock (_artCache)
+        {
+            _artCache.Remove(tile.Slot);
+        }
+    }
+
+    /// <summary>Logo retenu la dernière fois pour cet emplacement, ou null.</summary>
+    private string? RememberedArt(int slot)
+    {
+        lock (_artCache)
+        {
+            return _artCache.GetValueOrDefault(slot);
+        }
+    }
+
+    /// <summary>
+    /// La chaîne de candidats, avec <paramref name="known"/> en tête s'il en fait
+    /// partie. Un logo retenu qui n'est PAS dans la chaîne est ignoré : il peut
+    /// venir d'une station rangée là auparavant.
+    /// </summary>
+    private static string PreferKnown(string chain, string? known)
+    {
+        if (string.IsNullOrWhiteSpace(known))
+        {
+            return chain;
+        }
+
+        var candidates = ArtworkCache.SplitCandidates(chain).ToList();
+        var index = candidates.FindIndex(c => string.Equals(c, known.Trim(), StringComparison.OrdinalIgnoreCase));
+
+        if (index <= 0)
+        {
+            return chain;
+        }
+
+        var first = candidates[index];
+        candidates.RemoveAt(index);
+        candidates.Insert(0, first);
+        return string.Join('|', candidates);
     }
 
     /// <summary>
@@ -785,8 +911,12 @@ public sealed partial class PresetsViewModel : BaseViewModel
         tile.HasArt = true;
         tile.ArtSlot = slot;
 
-        // On mémorise l'adresse qui a réellement marché, pas toute la chaîne.
-        _artCache[slot] = used;
+        // On mémorise l'adresse qui a réellement marché, pas toute la chaîne. Les
+        // tuiles se garnissent en parallèle : l'accès au dictionnaire est protégé.
+        lock (_artCache)
+        {
+            _artCache[slot] = used;
+        }
     }
 
     /// <summary>
@@ -864,8 +994,14 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
     // ================================================================ Seconde rangée
 
-    /// <summary>Commande du sélecteur « Une fois / Deux fois ». Le paramètre vaut "1" ou "2".</summary>
-    [RelayCommand]
+    /// <summary>
+    /// Commande du sélecteur « Une fois / Deux fois ». Le paramètre vaut "1" ou "2".
+    /// Toujours disponible : le changement de rangée attend la fin du chargement des
+    /// logos, et le bouton restait inactif pendant ce temps — « Une fois » ne
+    /// répondait plus tant qu'un logo de « Deux fois » se téléchargeait. Un appel
+    /// dépassé ne touche plus aux tuiles (contrôle de l'emplacement dans SetArtAsync).
+    /// </summary>
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private Task ShowRowAsync(string? row) => SelectRowAsync(row == "2");
 
     /// <summary>
@@ -878,9 +1014,10 @@ public sealed partial class PresetsViewModel : BaseViewModel
     {
         second = second && HasSecondRow;
 
-        // « Une fois » ou « Deux fois » referme la liste locale, même sur la
-        // rangée déjà affichée : c'est le seul moyen de revenir aux touches.
+        // « Une fois » ou « Deux fois » referme les listes « Local » et « ★ STR »,
+        // même sur la rangée déjà affichée : c'est le moyen de revenir aux touches.
         Local.IsShown = false;
+        Favorites.IsShown = false;
 
         if (second == IsSecondRow)
         {
@@ -1149,7 +1286,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
                 continue;
             }
 
-            var art = JoinCandidates(_artCache.GetValueOrDefault(slot), stored.Art);
+            var art = JoinCandidates(RememberedArt(slot), stored.Art);
 
             if (art is not null)
             {
@@ -1525,8 +1662,11 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
             ApplyLocalFilters();
 
-            // Les logos arrivent après la liste : l'utilisateur voit les noms tout
-            // de suite, les images se remplissent au fil des téléchargements.
+            // La recherche est finie dès que la liste est là : l'indicateur s'éteint
+            // et « Voir plus » redevient possible. Les logos arrivent ensuite, sans
+            // le rallumer : un site de station lent pouvait le laisser tourner des
+            // dizaines de secondes, comme si la recherche ne finissait jamais.
+            EndSearch(cts);
             await LoadLogosAsync(ct).ConfigureAwait(true);
         }
         catch (OperationCanceledException)
@@ -1542,11 +1682,16 @@ public sealed partial class PresetsViewModel : BaseViewModel
         }
         finally
         {
-            // Une recherche remplacée ne doit pas éteindre l'indicateur de la suivante.
-            if (ReferenceEquals(_searchCts, cts))
-            {
-                IsSearching = false;
-            }
+            EndSearch(cts);
+        }
+    }
+
+    /// <summary>Éteint l'indicateur — sauf si une recherche plus récente l'a rallumé.</summary>
+    private void EndSearch(CancellationTokenSource cts)
+    {
+        if (ReferenceEquals(_searchCts, cts))
+        {
+            IsSearching = false;
         }
     }
 
@@ -1600,6 +1745,13 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
         HasSearched = true;
         ApplyLocalFilters(ignoreFilters: true);
+
+        // Comme pour une recherche par nom : l'indicateur ne dépend pas des logos.
+        if (_searchCts is { } current)
+        {
+            EndSearch(current);
+        }
+
         await LoadLogosAsync(ct).ConfigureAwait(true);
     }
 
@@ -1664,31 +1816,64 @@ public sealed partial class PresetsViewModel : BaseViewModel
             : Localization.Get("L_NoResults"));
     }
 
+    /// <summary>Téléchargements de logos menés de front par la liste de résultats.</summary>
+    private const int LogoParallelism = 6;
+
+    /// <summary>
+    /// Pose les logos des lignes affichées, plusieurs à la fois : un site de station
+    /// lent (jusqu'à 12 s avant abandon) ne retient plus les logos des suivantes.
+    /// Une ligne déjà essayée — avant un changement de filtre — n'est pas reprise.
+    /// </summary>
     private async Task LoadLogosAsync(CancellationToken ct)
     {
-        foreach (var result in Results.ToList())
+        var pending = Results.Where(r => !r.LogoTried).ToList();
+
+        foreach (var result in pending)
         {
-            if (ct.IsCancellationRequested)
+            result.LogoTried = true;
+        }
+
+        using var gate = new SemaphoreSlim(LogoParallelism);
+
+        async Task LoadOneAsync(RadioResult result)
+        {
+            try
             {
+                await gate.WaitAsync(ct).ConfigureAwait(true);
+            }
+            catch (OperationCanceledException)
+            {
+                // Recherche remplacée avant le tour de cette ligne : elle pourra
+                // être reprise si elle revient à l'écran.
+                result.LogoTried = false;
                 return;
             }
 
-            // Une ligne déjà essayée (avant un changement de filtre) ne se retélécharge pas.
-            if (result.LogoTried)
+            try
             {
-                continue;
+                var source = await _artwork.GetImageSourceAsync(result.Station.Favicon, ct, background: true).ConfigureAwait(true);
+
+                if (source is not null)
+                {
+                    result.Logo = source;
+                    result.HasLogo = true;
+                }
             }
-
-            result.LogoTried = true;
-
-            var source = await _artwork.GetImageSourceAsync(result.Station.Favicon, ct).ConfigureAwait(true);
-
-            if (source is not null)
+            catch (OperationCanceledException)
             {
-                result.Logo = source;
-                result.HasLogo = true;
+                result.LogoTried = false;
+            }
+            catch (Exception)
+            {
+                // Pas de logo : la ligne garde son symbole.
+            }
+            finally
+            {
+                gate.Release();
             }
         }
+
+        await Task.WhenAll(pending.Select(LoadOneAsync)).ConfigureAwait(true);
     }
 
     /// <summary>Reconstruit les pastilles de genres : pays, genres de l'annuaire, choix en cours.</summary>
@@ -1746,6 +1931,230 @@ public sealed partial class PresetsViewModel : BaseViewModel
         return new string(chars);
     }
 
+    // ================================================================ Écoute sur l'appareil
+    //
+    // Toucher une ligne de résultat l'ouvre : « 📱 ▶ Écouter sur ce téléphone »
+    // (ou « cette tablette ») joue la station sur l'appareil, « 🔊 Diffuser sur
+    // Cuisine » la lance sur l'enceinte, « ⋯ » ouvre le menu des touches et de
+    // Local. Deux verbes, pour qu'on ne confonde jamais : on ÉCOUTE sur l'appareil,
+    // on DIFFUSE sur l'enceinte.
+
+    private const string MobileDataNotedKey = "preview_mobile_noted";
+
+    /// <summary>La station qui joue sur l'appareil, ou null.</summary>
+    private RadioResult? _previewing;
+
+    private CancellationTokenSource? _previewCts;
+
+    /// <summary>Une écoute est en cours (ou démarre) : la barre au-dessus des résultats est visible.</summary>
+    [ObservableProperty]
+    private bool _isPreviewActive;
+
+    /// <summary>« 📱 Sur ce téléphone : Nostalgie ».</summary>
+    [ObservableProperty]
+    private string _previewBarText = "";
+
+    /// <summary>« 🔊 Diffuser sur Cuisine » pour la barre.</summary>
+    [ObservableProperty]
+    private string _previewBroadcastText = "";
+
+    /// <summary>« ce téléphone », « cette tablette » ou « cet appareil ».</summary>
+    private string DeviceWords => _preview.DeviceKind switch
+    {
+        "phone" => Localization.Get("L_ThisPhone"),
+        "tablet" => Localization.Get("L_ThisTablet"),
+        _ => Localization.Get("L_ThisDevice"),
+    };
+
+    private string BroadcastLabel()
+        => Device is { } device
+            ? Localization.Get("L_BroadcastOn", device.Endpoint.DisplayName)
+            : Localization.Get("L_BroadcastNoSpeaker");
+
+    /// <summary>Ouvre une ligne (et referme les autres), ou la referme.</summary>
+    [RelayCommand]
+    private void ToggleRow(RadioResult? result)
+    {
+        if (result is null)
+        {
+            return;
+        }
+
+        var open = !result.IsExpanded;
+
+        foreach (var row in Results)
+        {
+            row.IsExpanded = false;
+        }
+
+        result.IsExpanded = open;
+        RelabelRow(result);
+    }
+
+    /// <summary>Remet à jour les deux libellés d'une ligne : appareil, état de l'écoute, nom de l'enceinte.</summary>
+    private void RelabelRow(RadioResult result)
+    {
+        result.ListenText = result.IsPreviewing
+            ? Localization.Get("L_StopOnDevice", DeviceWords)
+            : Localization.Get("L_ListenOnDevice", DeviceWords);
+        result.BroadcastText = BroadcastLabel();
+    }
+
+    /// <summary>
+    /// « Écouter sur ce téléphone » ; une seconde fois : arrêter. Les appuis peuvent
+    /// se chevaucher (AllowConcurrentExecutions) : sans cela, le bouton de toutes les
+    /// stations restait inactif tant que la première n'avait pas fini de se connecter
+    /// — jusqu'à 20 s pour un flux muet. Le nouvel appui coupe la connexion en cours.
+    /// </summary>
+    [RelayCommand(AllowConcurrentExecutions = true)]
+    private async Task ListenHereAsync(RadioResult? result)
+    {
+        if (result is null)
+        {
+            return;
+        }
+
+        if (ReferenceEquals(_previewing, result))
+        {
+            StopPreview();
+            return;
+        }
+
+        if (!_preview.IsSupported)
+        {
+            IsError = true;
+            StatusMessage = Localization.Get("S_PreviewUnsupported");
+            return;
+        }
+
+        StopPreview();
+
+        var cts = new CancellationTokenSource();
+        _previewCts = cts;
+        _previewing = result;
+        result.IsPreviewing = true;
+        result.PreviewFailed = false;
+        RelabelRow(result);
+        IsPreviewActive = true;
+        PreviewBarText = Localization.Get("L_PreviewConnecting", result.Name);
+        PreviewBroadcastText = BroadcastLabel();
+
+        try
+        {
+            await _preview.StartAsync(result.Station.PlayableUrl, cts.Token).ConfigureAwait(true);
+
+            if (!ReferenceEquals(_previewing, result))
+            {
+                return;
+            }
+
+            PreviewBarText = Localization.Get("L_PreviewPlaying", DeviceWords, result.Name);
+
+            // Hors Wi-Fi, une fois : l'écoute passe par les données mobiles.
+            if (_preview.IsOnMobileData && !Preferences.Default.Get(MobileDataNotedKey, false))
+            {
+                Preferences.Default.Set(MobileDataNotedKey, true);
+                ShowInfo(Localization.Get("S_PreviewMobileData"));
+            }
+        }
+        catch (Exception) when (cts.IsCancellationRequested && !ReferenceEquals(_previewing, result))
+        {
+            // Arrêtée ou remplacée pendant le démarrage.
+        }
+        catch (Exception)
+        {
+            if (!ReferenceEquals(_previewing, result))
+            {
+                return;
+            }
+
+            StopPreview();
+            result.PreviewFailed = true;
+
+            // L'enceinte passe par l'agent STR, qui convertit ce que le téléphone ne
+            // lit pas : l'échec ici ne dit rien de l'enceinte.
+            IsError = true;
+            StatusMessage = Localization.Get("S_PreviewFailed", DeviceWords);
+        }
+    }
+
+    /// <summary>Le bouton ■ de la barre.</summary>
+    [RelayCommand]
+    private void StopListening() => StopPreview();
+
+    /// <summary>« Diffuser sur … » depuis la barre : la station écoutée part sur l'enceinte.</summary>
+    [RelayCommand]
+    private Task BroadcastPreviewAsync() => _previewing is { } result ? BroadcastAsync(result) : Task.CompletedTask;
+
+    /// <summary>« 🔊 Diffuser sur Cuisine » : la station part sur l'enceinte, l'écoute locale s'arrête.</summary>
+    [RelayCommand]
+    private async Task BroadcastAsync(RadioResult? result)
+    {
+        if (result is null)
+        {
+            return;
+        }
+
+        // Pas les deux en même temps, décalés de quelques secondes.
+        StopPreview();
+
+        var device = Device;
+
+        if (device is null)
+        {
+            IsError = true;
+            StatusMessage = Localization.Get("S_NoSpeaker");
+            return;
+        }
+
+        if (device.Str is null)
+        {
+            IsError = true;
+            StatusMessage = Localization.Get("S_NeedAgentStation");
+            return;
+        }
+
+        await RunAsync(
+            d => d.PlayStationAsync(result.Station),
+            Localization.Get("S_StationPlaying", result.Name)).ConfigureAwait(true);
+
+        _ = _radio.ReportClickAsync(result.Station.Uuid);
+    }
+
+    /// <summary>
+    /// Arrête l'écoute sur l'appareil. Appelée aussi quand on quitte l'onglet ou que
+    /// l'application passe à l'arrière-plan : c'est un aperçu, pas un lecteur radio.
+    /// </summary>
+    public void StopPreview()
+    {
+        _previewCts?.Cancel();
+        _previewCts = null;
+        _preview.Stop();
+
+        var result = _previewing;
+        _previewing = null;
+        IsPreviewActive = false;
+        PreviewBarText = "";
+
+        if (result is not null)
+        {
+            result.IsPreviewing = false;
+            RelabelRow(result);
+        }
+    }
+
+    /// <summary>Le flux s'est coupé de lui-même pendant l'écoute.</summary>
+    private void OnPreviewEnded()
+    {
+        if (_previewing is null)
+        {
+            return;
+        }
+
+        StopPreview();
+        ShowInfo(Localization.Get("S_PreviewEnded", DeviceWords));
+    }
+
     /// <summary>
     /// Propose d'écouter la station tout de suite, ou de l'affecter à l'une des
     /// touches — six, ou douze avec la seconde rangée. La feuille d'actions est la façon native de poser ce choix
@@ -1775,8 +2184,14 @@ public sealed partial class PresetsViewModel : BaseViewModel
             return;
         }
 
-        var listen = Localization.Get("L_Listen");
+        var listen = Localization.Get("L_BroadcastOn", device.Endpoint.DisplayName);
         var addLocal = Localization.Get("L_AddLocal");
+        var addFavorite = Localization.Get("L_AddFavorite");
+
+        // Les favoris STR seulement quand l'agent de cette enceinte les connaît.
+        var head = Favorites.IsAvailable
+            ? new[] { listen, addFavorite, addLocal }
+            : new[] { listen, addLocal };
 
         if (!IsSnapshotOf(device))
         {
@@ -1794,7 +2209,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
             result.Name,
             Localization.Get("L_Cancel"),
             null,
-            new[] { listen, addLocal }.Concat(slots).ToArray()).ConfigureAwait(true);
+            head.Concat(slots).ToArray()).ConfigureAwait(true);
 
         if (string.IsNullOrWhiteSpace(choice) || choice == Localization.Get("L_Cancel"))
         {
@@ -1803,11 +2218,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
         if (choice == listen)
         {
-            await RunAsync(
-                d => d.PlayStationAsync(result.Station),
-                Localization.Get("S_StationPlaying", result.Name)).ConfigureAwait(true);
-
-            _ = _radio.ReportClickAsync(result.Station.Uuid);
+            await BroadcastAsync(result).ConfigureAwait(true);
             return;
         }
 
@@ -1821,6 +2232,15 @@ public sealed partial class PresetsViewModel : BaseViewModel
             return;
         }
 
+        if (choice == addFavorite)
+        {
+            // Même chose pour les favoris : la carte s'ouvre, le message est redit ici.
+            await Favorites.AddStationAsync(result.Station).ConfigureAwait(true);
+            IsError = Favorites.IsError;
+            StatusMessage = Favorites.StatusMessage;
+            return;
+        }
+
         var index = Array.IndexOf(slots, choice);
 
         if (index < 0)
@@ -1828,10 +2248,67 @@ public sealed partial class PresetsViewModel : BaseViewModel
             return;
         }
 
-        var slot = choices[index].Slot;
-        var saved = Localization.Get("S_StationSaved", result.Name, PresetKeys.Label(slot));
+        await SaveOnKeyAsync(result.Station, result.Name, choices[index].Slot).ConfigureAwait(true);
+    }
 
-        await RunAsync(d => d.SaveStationAsync(result.Station, slot), saved).ConfigureAwait(true);
+    /// <summary>
+    /// « Mettre sur une touche » d'un favori STR : la feuille des touches seule, puis
+    /// l'enregistrement, comme pour une station trouvée par la recherche.
+    /// </summary>
+    private async Task PickKeyForFavoriteAsync(RadioStation station)
+    {
+        var device = Device;
+
+        if (device?.Str is null)
+        {
+            IsError = true;
+            StatusMessage = Localization.Get(device is null ? "S_NoSpeaker" : "S_NeedAgentStation");
+            return;
+        }
+
+        if (!IsSnapshotOf(device))
+        {
+            await RefreshAsync().ConfigureAwait(true);
+        }
+
+        var choices = SlotChoices();
+        var slots = choices.Select(c => c.Label).ToArray();
+
+        var choice = await Shell.Current.DisplayActionSheetAsync(
+            station.Name,
+            Localization.Get("L_Cancel"),
+            null,
+            slots).ConfigureAwait(true);
+
+        var index = string.IsNullOrWhiteSpace(choice) ? -1 : Array.IndexOf(slots, choice);
+
+        if (index < 0)
+        {
+            return;
+        }
+
+        await SaveOnKeyAsync(station, station.Name, choices[index].Slot).ConfigureAwait(true);
+
+        // Le message s'affiche aussi sous la carte des favoris, d'où l'on vient.
+        Favorites.IsError = IsError;
+        Favorites.StatusMessage = StatusMessage;
+    }
+
+    /// <summary>« Garder dans Local » d'un favori STR ; le message est redit sous la carte des favoris.</summary>
+    private bool KeepFavoriteLocal(RadioStation station)
+    {
+        var added = Local.AddStation(station);
+        Favorites.IsError = Local.IsError;
+        Favorites.StatusMessage = Local.StatusMessage;
+        return added;
+    }
+
+    /// <summary>Enregistre la station sur la touche, puis montre la touche garnie.</summary>
+    private async Task SaveOnKeyAsync(RadioStation station, string name, int slot)
+    {
+        var saved = Localization.Get("S_StationSaved", name, PresetKeys.Label(slot));
+
+        await RunAsync(d => d.SaveStationAsync(station, slot), saved).ConfigureAwait(true);
 
         if (IsError)
         {
@@ -1900,23 +2377,24 @@ public sealed partial class PresetsViewModel : BaseViewModel
             _countries.Add(new FilterOption { Label = Localization.Get("L_AllCountries"), Value = null });
 
             // Clés littérales plutôt qu'une concaténation : une clé manquante se voit
-            // alors à la relecture, pas à l'exécution. Les pays proches d'abord, dans
-            // l'ordre de toujours ; les autres ensuite, par ordre alphabétique.
-            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryBE"), Value = "BE" });
-            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryFR"), Value = "FR" });
-            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryNL"), Value = "NL" });
-            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryDE"), Value = "DE" });
-            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryLU"), Value = "LU" });
-            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryCH"), Value = "CH" });
-            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryGB"), Value = "GB" });
-            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryES"), Value = "ES" });
-            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryIT"), Value = "IT" });
-            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryPT"), Value = "PT" });
-            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryUS"), Value = "US" });
-            _countries.Add(new FilterOption { Label = Localization.Get("L_CtryCA"), Value = "CA" });
-
-            var more = new List<FilterOption>
+            // alors à la relecture, pas à l'exécution. Tous les pays sont rangés par
+            // ordre alphabétique dans la langue de l'application, « Tous les pays »
+            // restant en tête. Les départements et territoires d'outre-mer ont leur
+            // propre code dans l'annuaire (MQ, RE…) : ils ne sont pas rangés sous FR.
+            var countries = new List<FilterOption>
             {
+                new() { Label = Localization.Get("L_CtryBE"), Value = "BE" },
+                new() { Label = Localization.Get("L_CtryFR"), Value = "FR" },
+                new() { Label = Localization.Get("L_CtryNL"), Value = "NL" },
+                new() { Label = Localization.Get("L_CtryDE"), Value = "DE" },
+                new() { Label = Localization.Get("L_CtryLU"), Value = "LU" },
+                new() { Label = Localization.Get("L_CtryCH"), Value = "CH" },
+                new() { Label = Localization.Get("L_CtryGB"), Value = "GB" },
+                new() { Label = Localization.Get("L_CtryES"), Value = "ES" },
+                new() { Label = Localization.Get("L_CtryIT"), Value = "IT" },
+                new() { Label = Localization.Get("L_CtryPT"), Value = "PT" },
+                new() { Label = Localization.Get("L_CtryUS"), Value = "US" },
+                new() { Label = Localization.Get("L_CtryCA"), Value = "CA" },
                 new() { Label = Localization.Get("L_CtryAT"), Value = "AT" },
                 new() { Label = Localization.Get("L_CtryIE"), Value = "IE" },
                 new() { Label = Localization.Get("L_CtryDK"), Value = "DK" },
@@ -1933,10 +2411,23 @@ public sealed partial class PresetsViewModel : BaseViewModel
                 new() { Label = Localization.Get("L_CtryAR"), Value = "AR" },
                 new() { Label = Localization.Get("L_CtryAU"), Value = "AU" },
                 new() { Label = Localization.Get("L_CtryJP"), Value = "JP" },
+                new() { Label = Localization.Get("L_CtryMQ"), Value = "MQ" },
+                new() { Label = Localization.Get("L_CtryRE"), Value = "RE" },
+                new() { Label = Localization.Get("L_CtryGP"), Value = "GP" },
+                new() { Label = Localization.Get("L_CtryGF"), Value = "GF" },
+                new() { Label = Localization.Get("L_CtryYT"), Value = "YT" },
+                new() { Label = Localization.Get("L_CtryNC"), Value = "NC" },
+                new() { Label = Localization.Get("L_CtryPF"), Value = "PF" },
+                new() { Label = Localization.Get("L_CtryPM"), Value = "PM" },
+                new() { Label = Localization.Get("L_CtryDZ"), Value = "DZ" },
+                new() { Label = Localization.Get("L_CtryCI"), Value = "CI" },
+                new() { Label = Localization.Get("L_CtryTN"), Value = "TN" },
+                new() { Label = Localization.Get("L_CtryCM"), Value = "CM" },
+                new() { Label = Localization.Get("L_CtrySN"), Value = "SN" },
             };
 
             var culture = Localization.CultureOf(Localization.Current);
-            _countries.AddRange(more.OrderBy(o => o.Label, StringComparer.Create(culture, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace)));
+            _countries.AddRange(countries.OrderBy(o => o.Label, StringComparer.Create(culture, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace)));
 
             _languages.Clear();
             _languages.Add(new FilterOption { Label = Localization.Get("L_AllLanguages"), Value = null });
@@ -2038,7 +2529,14 @@ public sealed partial class PresetsViewModel : BaseViewModel
     {
         try
         {
-            Preferences.Default.Set(ArtCacheKey, JsonSerializer.Serialize(_artCache));
+            string json;
+
+            lock (_artCache)
+            {
+                json = JsonSerializer.Serialize(_artCache);
+            }
+
+            Preferences.Default.Set(ArtCacheKey, json);
         }
         catch (Exception)
         {

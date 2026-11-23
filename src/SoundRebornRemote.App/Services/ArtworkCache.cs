@@ -54,6 +54,15 @@ public sealed class ArtworkCache
     private readonly SemaphoreSlim _gate = new(4);
 
     /// <summary>
+    /// Téléchargements « de fond » : les listes longues (favoris STR, résultats de
+    /// recherche, présélections Local, historique). Ils ont leurs propres places et
+    /// ne prennent jamais celles des touches et de « En ce moment » : seize logos de
+    /// favoris dont les sites tardent faisaient attendre le logo d'une touche de
+    /// toute la durée de leurs délais d'attente.
+    /// </summary>
+    private readonly SemaphoreSlim _backgroundGate = new(2);
+
+    /// <summary>
     /// Fichiers déjà passés au décodeur d'images pendant cette session : vrai quand
     /// il sait les lire. Voir <see cref="CanDecode(string)"/>.
     /// </summary>
@@ -79,7 +88,8 @@ public sealed class ArtworkCache
     /// Null quand l'image est introuvable ou illisible — l'appelant affiche alors
     /// son symbole de repli.
     /// </summary>
-    public async Task<string?> GetLocalPathAsync(string? url, CancellationToken ct = default)
+    /// <param name="background">Vrai pour un logo d'une liste longue : il passe après les touches.</param>
+    public async Task<string?> GetLocalPathAsync(string? url, CancellationToken ct = default, bool background = false)
     {
         if (string.IsNullOrWhiteSpace(url) || !url!.StartsWith("http", StringComparison.OrdinalIgnoreCase))
         {
@@ -125,7 +135,8 @@ public sealed class ArtworkCache
                 // Task.Run : le téléchargement démarre hors du verrou, et hors du
                 // fil de l'interface.
                 var target = url;
-                running = Task.Run(() => DownloadToFileAsync(target, path));
+                var gate = background ? _backgroundGate : _gate;
+                running = Task.Run(() => DownloadToFileAsync(target, path, gate));
                 _inFlight[url] = running;
             }
 
@@ -142,9 +153,9 @@ public sealed class ArtworkCache
     /// Télécharge une image vers son fichier de cache. Un seul appel à la fois par
     /// URL (voir <see cref="_inFlight"/>). Ne lève jamais : null en cas d'échec.
     /// </summary>
-    private async Task<string?> DownloadToFileAsync(string url, string path)
+    private async Task<string?> DownloadToFileAsync(string url, string path, SemaphoreSlim gate)
     {
-        await _gate.WaitAsync().ConfigureAwait(false);
+        await gate.WaitAsync().ConfigureAwait(false);
 
         try
         {
@@ -181,13 +192,52 @@ public sealed class ArtworkCache
         }
         finally
         {
-            _gate.Release();
+            gate.Release();
 
             lock (_resolved)
             {
                 _inFlight.Remove(url);
             }
         }
+    }
+
+    /// <summary>
+    /// Chemin du logo s'il est déjà sur le téléphone (résolu pendant la session, ou
+    /// fichier du cache), sans aucun accès réseau ; null sinon. Ne lève jamais.
+    /// </summary>
+    private string? LocalPathIfReady(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url) || !url!.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        url = url.Trim();
+
+        lock (_resolved)
+        {
+            if (_resolved.TryGetValue(url, out var known) && known is not null)
+            {
+                return known;
+            }
+        }
+
+        try
+        {
+            var path = Path.Combine(_directory, FileNameFor(url));
+
+            if (IsUsable(path))
+            {
+                Remember(url, path);
+                return path;
+            }
+        }
+        catch (Exception)
+        {
+            // Adresse inutilisable comme nom de fichier : rien en cache.
+        }
+
+        return null;
     }
 
     /// <summary>Vrai quand le fichier existe et n'est pas vide. Ne lève jamais.</summary>
@@ -225,11 +275,30 @@ public sealed class ArtworkCache
     /// Essaie chaque candidat de la chaîne et renvoie le premier qui donne une
     /// image, avec l'URL retenue. (null, null) si aucun ne répond.
     /// </summary>
-    public async Task<(ImageSource? Source, string? Url)> GetFromChainAsync(string? art, CancellationToken ct = default)
+    /// <param name="background">Vrai pour un logo d'une liste longue : il passe après les touches.</param>
+    public async Task<(ImageSource? Source, string? Url)> GetFromChainAsync(string? art, CancellationToken ct = default, bool background = false)
     {
-        foreach (var candidate in SplitCandidates(art))
+        var candidates = SplitCandidates(art);
+
+        // Premier passage, sans réseau : un candidat déjà dans le cache s'affiche
+        // tout de suite. Sans cela, un premier candidat mort (site de la station
+        // hors ligne) était retenté à chaque ouverture de l'onglet passé le délai
+        // d'une minute, et faisait attendre plusieurs secondes un logo pourtant
+        // présent sur le téléphone, deux candidats plus loin.
+        foreach (var candidate in candidates)
         {
-            var source = await GetImageSourceAsync(candidate, ct).ConfigureAwait(false);
+            var local = LocalPathIfReady(candidate);
+
+            if (local is not null && IsDecodable(local))
+            {
+                return (ImageSource.FromStream(() => (Stream)File.OpenRead(local)), candidate);
+            }
+        }
+
+        // Second passage : téléchargement, dans l'ordre de préférence.
+        foreach (var candidate in candidates)
+        {
+            var source = await GetImageSourceAsync(candidate, ct, background).ConfigureAwait(false);
 
             if (source is not null)
             {
@@ -249,9 +318,10 @@ public sealed class ArtworkCache
     /// évite cette ambiguïté, et une image qui ne s'affiche pas redevient une
     /// erreur visible plutôt qu'une tuile vide.
     /// </summary>
-    public async Task<ImageSource?> GetImageSourceAsync(string? url, CancellationToken ct = default)
+    /// <param name="background">Vrai pour un logo d'une liste longue : il passe après les touches.</param>
+    public async Task<ImageSource?> GetImageSourceAsync(string? url, CancellationToken ct = default, bool background = false)
     {
-        var path = await GetLocalPathAsync(url, ct).ConfigureAwait(false);
+        var path = await GetLocalPathAsync(url, ct, background).ConfigureAwait(false);
 
         // Un fichier que le décodeur ne sait pas lire — un logo SVG, notamment, ou
         // une image déjà en cache avant ce contrôle — compte comme une image
@@ -365,17 +435,44 @@ public sealed class ArtworkCache
 
     private async Task<byte[]?> DownloadAsync(string url, CancellationToken ct)
     {
-        var bytes = await TryDownloadAsync(_strict, url, ct).ConfigureAwait(false);
+        var (bytes, tlsFailed) = await TryDownloadAsync(_strict, url, ct).ConfigureAwait(false);
 
-        if (bytes is not null)
+        // Le client tolérant ne sert qu'après un échec de certificat. Un hôte qui ne
+        // répond pas, un 404 ou une page HTML ne changeraient pas avec lui : le
+        // retenter doublait l'attente (jusqu'à 2 × 12 s) pour rien.
+        if (bytes is not null || !tlsFailed)
         {
             return bytes;
         }
 
-        return await TryDownloadAsync(_lenient, url, ct).ConfigureAwait(false);
+        return (await TryDownloadAsync(_lenient, url, ct).ConfigureAwait(false)).Bytes;
     }
 
-    private static async Task<byte[]?> TryDownloadAsync(HttpClient client, string url, CancellationToken ct)
+    /// <summary>
+    /// Vrai quand l'échec vient de la poignée de main TLS (certificat périmé,
+    /// auto-signé, nom qui ne correspond pas). Sur Android, l'exception de Java
+    /// (SSLHandshakeException…) arrive enveloppée : on reconnaît son nom.
+    /// </summary>
+    internal static bool IsTlsFailure(Exception? ex)
+    {
+        for (var e = ex; e is not null; e = e.InnerException)
+        {
+            var name = e.GetType().Name;
+
+            if (e is System.Security.Authentication.AuthenticationException ||
+                name.Contains("Ssl", StringComparison.OrdinalIgnoreCase) ||
+                name.Contains("Certificate", StringComparison.OrdinalIgnoreCase) ||
+                e.Message.Contains("SSL", StringComparison.Ordinal) ||
+                e.Message.Contains("certificate", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static async Task<(byte[]? Bytes, bool TlsFailed)> TryDownloadAsync(HttpClient client, string url, CancellationToken ct)
     {
         try
         {
@@ -388,7 +485,7 @@ public sealed class ArtworkCache
 
             if (!response.IsSuccessStatusCode)
             {
-                return null;
+                return (null, false);
             }
 
             // Beaucoup de stations renvoient une page HTML d'erreur avec un code 200 ;
@@ -397,26 +494,26 @@ public sealed class ArtworkCache
 
             if (mediaType.Length > 0 && !mediaType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
             {
-                return null;
+                return (null, false);
             }
 
             if (response.Content.Headers.ContentLength is > MaxBytes)
             {
-                return null;
+                return (null, false);
             }
 
             var bytes = await response.Content.ReadAsByteArrayAsync(cts.Token).ConfigureAwait(false);
 
             if (bytes.Length == 0 || bytes.Length > MaxBytes || !LooksLikeImage(bytes))
             {
-                return null;
+                return (null, false);
             }
 
-            return bytes;
+            return (bytes, false);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return null;
+            return (null, IsTlsFailure(ex));
         }
     }
 

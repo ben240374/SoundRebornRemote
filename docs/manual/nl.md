@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handleiding
 
-Versie 1.9.0 · Android 7 en hoger
+Versie 1.9.1 · Android 7 en hoger
 
 > Talen: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · **Nederlands** · [Español](es.md) · [Italiano](it.md)
 
@@ -54,6 +54,9 @@ het project: <https://github.com/ben240374/SoundRebornRemote/releases>
 2. Open het. Android vraagt toestemming om uit een onbekende bron te installeren — geef
    die aan de app die gedownload heeft, meestal de browser.
 3. Installeren, daarna openen.
+
+Daarna meldt de app zelf nieuwe versies en kan ze installeren (tabblad Instellingen,
+**Update**).
 
 Bij de eerste start wordt geen bijzondere toestemming gevraagd: de app raakt contacten,
 locatie noch opslag aan.
@@ -305,12 +308,28 @@ bevestigingsvraag zegt het. Het resultaat verschijnt per speaker.
 
 Kopiëren vereist STR-agent 1.6.5 of nieuwer op de gekozen speaker.
 
+### STR-favorieten
+
+Met een recente STR-agent toont de knop **★ STR**, rechts van **Lokaal** (tabbladen
+Afspelen en Presets), in plaats van de toetsen de zenders met een ster in de STR-app op
+de computer. Ze zijn op elke STR-speaker dezelfde: een favoriet die je hier toevoegt of
+verwijdert, verandert enkele seconden later ook op de andere speakers en op de computer.
+**Eén keer** of **Twee keer** brengt de toetsen terug.
+
+- Tik op een favoriet om hem op de geselecteerde speaker te spelen.
+- **⋯** biedt **Op een toets zetten…**, **Toevoegen aan Lokaal** en **Uit STR-favorieten
+  verwijderen** (na bevestiging).
+- **★ Wat nu speelt toevoegen** bewaart de radio die de speaker speelt; in het zoeken biedt
+  **⋯ Toetsen, Local…** **★ Aan STR-favorieten toevoegen**.
+- Een Pandora-zender staat in de lijst, maar start vanuit de STR-app.
+
 ### Een zender vinden
 
 Het zoekveld bevraagt **radio-browser.info**, een open gids die door vrijwilligers wordt
 bijgehouden. Het zoeken volgt dat van de STR-desktopapp:
 
-- **Land** en **Taal** beperken de zoekactie; **Sorteren** rangschikt op populariteit
+- **Land** (alle in alfabetische volgorde, overzeese gebieden inbegrepen: Martinique,
+  Réunion, Guadeloupe…) en **Taal** beperken de zoekactie; **Sorteren** rangschikt op populariteit
   (stemmen), beluisteringen, trend, naam of bitrate. Een wijziging herhaalt de laatste
   zoekactie.
 - De **genrechips** (Alle, Pop, Rock, Hits, Jazz, Jaren 80…) filteren op genre; de eerste
@@ -341,12 +360,21 @@ zoekactie, en het aantal verborgen zenders staat onder de titel van de resultate
 **Mist er een zender?** De link onder de resultaten opent radio-browser.info, waar iedereen
 hem kan toevoegen: dan vind je hem hier, en iedereen met jou.
 
-Tik op een resultaat en er opent een actieblad met
+Tik op een resultaat: de regel opent en biedt drie keuzes die je niet kunt verwarren.
 
-- **Beluisteren** — start de zender meteen, zonder iets op te slaan;
-- **① Aan deze toets toewijzen** als de toets vrij is, of **① Bel RTL vervangen** als hij
-  bezet is — de naam van de zender die er al staat wordt getoond, zodat je er geen
-  overschrijft waar je aan hechtte.
+- **📱 ▶ Beluisteren op deze telefoon** (of **deze tablet**): de zender speelt op het
+  apparaat, zodat je hem hoort voor je hem op de speaker zet. De knop wordt
+  **📱 ■ Stoppen**; een balk boven de resultaten toont wat er speelt, met **■ Stoppen** en
+  **🔊 Afspelen op …**. Eén zender tegelijk; het stopt als je het tabblad of de app verlaat,
+  en als je de zender op de speaker zet. Zonder wifi gebruikt het mobiele data (ongeveer
+  1 MB per minuut bij 128 kbit/s). Een zender die niet op het apparaat speelt, kan toch op
+  de speaker spelen: de STR-agent zet formaten om die de speler van Android niet leest.
+- **🔊 Afspelen op Keuken**: met de volledige naam van de gekozen speaker; de zender start
+  daar, zonder iets op te slaan.
+- **⋯ Toetsen, Local…** opent een actieblad met **Afspelen op Keuken**, **★ Aan STR-favorieten toevoegen** (recente agent), **Toevoegen aan
+  Local**, dan **① Aan deze toets toewijzen** als de toets vrij is, of **① Bel RTL
+  vervangen** als hij bezet is — de naam van de zender die er al staat wordt getoond, zodat
+  je er geen overschrijft waar je aan hechtte.
 
 **Toewijzen vereist de STR-agent.** Zonder hem kun je alleen meteen luisteren; opslaan
 gebeurt dan door de toets op de speaker zelf ingedrukt te houden, of via de
@@ -467,6 +495,14 @@ Vereist de STR-agent. Het uur stel je in op de klok van de telefoon. Het prullen
 spelen. Vink het vakje aan, kies het niveau en tik op **Startvolume opslaan**. Een volume
 dat tijdens het luisteren is ingesteld, wordt nooit gewijzigd.
 
+**Sluimertoets** (in de wekkerkaart): vink de toets van de afstandsbediening aan die een
+afgaande wekker laat sluimeren — **AUX**, **Duim omhoog** of **Duim omlaag** — en dan
+**Sluimertoets opslaan**. Buiten een wekker doet een duimtoets niets en schakelt AUX zoals
+gewoonlijk naar de AUX-ingang. Een duimtoets die al een andere actie heeft (slaaptimer,
+bas…) zegt dat; aanvinken vervangt die, en de app zegt het vooraf. Alleen de vakjes die je
+verandert worden geschreven: een actie die elders op een andere toets is gezet, blijft.
+Een toets met een opgeslagen groep weigert de speaker, met de reden.
+
 **Taal**: Nederlands, Frans, Engels, Duits, Spaans, Italiaans. De wijziging geldt meteen, zonder
 herstart, en wordt onthouden.
 
@@ -485,6 +521,13 @@ van het STR-project.
 Een speaker waarvan de agent ouder is dan versie 1.8.0 toont een vergelijkbaar blok,
 **STR-agent te oud**, en zijn kaart in het tabblad Afspelen vermeldt "te oud".
 
+**STR-agent: nieuwe versie**: hoogstens één keer per dag, bij het openen van Instellingen,
+leest de app op GitHub de nieuwste versie van de STR-agent. Hebben bekende speakers een
+oudere agent, dan noemt een kaart ze, met **Nieuw** en **Later** (de kaart komt terug bij
+de volgende versie), en hun kaart in het tabblad Afspelen toont "1.9.1 beschikbaar". De
+agent wordt bijgewerkt met de STR-app op de computer. Het vakje **Automatisch controleren**
+van de kaart **Update** zet ook dit uit.
+
 **Diagnose**: *Speaker bevragen* gaat over de **gekozen** speaker — naam, model,
 apparaat-ID, firmwareversie, de agent met zijn poort en zijn live op 17008 en 8888
 gelezen versie, de staat van de meldingen, het bassbereik, de lijst met herkende
@@ -497,6 +540,27 @@ leven alleen op de telefoon. Een update houdt ze; een verwijdering wist ze, ook 
 Android eist voor het installeren van een APK met een andere sleutel. **Exporteren** maakt een
 bestand en opent delen (Drive, e-mail, Bestanden…); **Importeren** leest zo'n bestand terug en
 voegt toe wat ontbreekt, zonder iets te vervangen of te verwijderen.
+
+**Back-up van de speaker**: **In een bestand opslaan** bewaart wat de STR-agent voor de
+geselecteerde speaker opslaat — de toetsen 1 tot 12 (een Spotify-toets met zijn playlist),
+de wekkers, het startvolume en de sluimertoets. **Terugzetten uit een bestand…** zet ze
+terug, na een vraag die de doelspeaker en de herkomst van het bestand noemt: het bestand
+kan deze instellingen ook naar een andere speaker kopiëren. De toetsen uit het bestand
+vervangen die van de speaker, de andere blijven; zijn wekkers worden vervangen. Zonder
+tweede rij op de doelspeaker worden de toetsen 7 tot 12 overgeslagen. Het verslag zegt wat
+teruggezet is en wat de speaker weigerde. De vaste groep wordt niet bewaard. Een
+Spotify-toets speelt alleen als de speaker met hetzelfde Spotify-account verbonden is.
+STR-agent vereist.
+
+**Update** (versie geïnstalleerd vanaf GitHub): hoogstens één keer per dag vraagt de
+app aan GitHub of er een nieuwere versie is; het vakje **Automatisch controleren** zet dat
+uit. **Nu controleren** doet het op verzoek. Is er een, dan verschijnt ook een balk in het
+tabblad Afspelen (**Nieuw**, **Later**, **Installeren**). **Installeren** downloadt de APK,
+controleert dat grootte en SHA-256-vingerafdruk precies die van GitHub zijn, en opent dan
+het installatiescherm van Android, waar je bevestigt. De eerste keer vraagt Android om
+SoundReborn Remote toe te staan apps te installeren. Android weigert te installeren over
+een APK die met een andere sleutel is ondertekend: een testversie vanuit Visual Studio
+wordt zo niet bijgewerkt.
 
 **Over**: de versie, de vermelding van het STR-project met een link naar zijn site in de
 gekozen taal, en de juridische vermeldingen.
@@ -512,6 +576,12 @@ als tabbladwissel gelezen.
 Een veeg die **op een schuifregelaar** begint, wordt door die regelaar opgevangen: dat is
 bewust, anders zou het volume niet meer in te stellen zijn. Begin het gebaar op een vrij
 stuk.
+
+**Lang drukken op het app-pictogram** (Android-launcher): **Alles stand-by** zet elke
+bekende speaker met STR-agent op stand-by — een speaker zonder agent wordt niet aangeraakt,
+want zijn enige stand-byopdracht zou hem aanzetten als hij uit stond —, en **Toets 1** tot
+**Toets 3** spelen die toets op de geselecteerde speaker. De app opent op het tabblad
+Afspelen en zegt wat er gedaan is. Deze snelkoppelingen kun je op het startscherm zetten.
 
 ---
 

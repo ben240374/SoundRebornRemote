@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manuel d'utilisation
 
-Version 1.9.0 · Android 7 et suivants
+Version 1.9.1 · Android 7 et suivants
 
 > Langues : **Français** · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md) · [Italiano](it.md)
 
@@ -57,6 +57,9 @@ du projet, section *Releases* :
 2. Ouvre-le. Android demandera l'autorisation d'installer depuis une source inconnue —
    accepte pour l'application qui a servi au téléchargement (le navigateur, en général).
 3. Installe, puis ouvre.
+
+Ensuite, l'application signale elle-même les nouvelles versions et sait les installer
+(onglet Réglages, **Mise à jour**).
 
 Aucune autorisation particulière n'est demandée au premier lancement : l'application
 n'accède ni aux contacts, ni à la position, ni au stockage.
@@ -315,12 +318,28 @@ cible : la question de confirmation le rappelle. Le résultat s'affiche par ence
 
 La copie demande l'agent STR 1.6.5 ou plus récent sur l'enceinte sélectionnée.
 
+### Favoris STR
+
+Avec un agent STR récent, le bouton **★ STR**, à droite de **Local** (onglets Lecture et
+Présélections), montre à la place des touches les stations étoilées de l'application STR
+sur ordinateur. Ce sont les mêmes sur toutes les enceintes STR : un favori ajouté ou
+retiré ici l'est aussi sur les autres enceintes et sur l'ordinateur, quelques secondes
+plus tard. **Une fois** ou **Deux fois** ramène les touches.
+
+- Toucher un favori le lance sur l'enceinte sélectionnée.
+- **⋯** propose **Mettre sur une touche…**, **Ajouter à Local** et **Retirer des favoris
+  STR** (après confirmation).
+- **★ Ajouter ce qui joue** garde la radio que l'enceinte joue ; dans la recherche,
+  **⋯ Touches, Local…** propose **★ Ajouter aux favoris STR**.
+- Une station Pandora s'affiche, mais se lance depuis l'application STR.
+
 ### Trouver une station
 
 Le champ de recherche interroge **radio-browser.info**, un annuaire ouvert tenu par des
 bénévoles. La recherche reprend celle de l'application PC de STR :
 
-- **Pays** et **Langue** limitent la recherche ; **Trier** range les stations par
+- **Pays** (tous par ordre alphabétique, outre-mer compris : Martinique, La Réunion,
+  Guadeloupe…) et **Langue** limitent la recherche ; **Trier** range les stations par
   popularité (votes), par écoutes, par tendance, par nom ou par débit. Changer l'un de ces
   choix relance la dernière recherche.
 - Les **pastilles de genres** (Tous, Pop, Rock, Tubes, Jazz, Années 80…) filtrent par
@@ -351,12 +370,23 @@ recherche, et le nombre de stations masquées s'affiche sous le titre des résul
 **Une station manque ?** Le lien sous les résultats ouvre radio-browser.info, où chacun
 peut l'ajouter : elle devient trouvable ici, et pour tout le monde.
 
-Touche un résultat : une feuille d'actions s'ouvre, avec
+Touche un résultat : la ligne s'ouvre et propose trois choix, sans ambiguïté possible.
 
-- **Écouter** — lance la station tout de suite, sans rien enregistrer ;
-- **① Affecter à cette touche** si la touche est libre, ou **① Remplacer Bel RTL** si
-  elle est occupée — le nom de la station déjà présente est affiché, pour éviter
-  d'écraser celle à laquelle on tenait.
+- **📱 ▶ Écouter sur ce téléphone** (ou **cette tablette**) : la station joue sur
+  l'appareil, pour l'entendre avant de la diffuser. Le bouton devient **📱 ■ Arrêter** ;
+  une barre au-dessus des résultats dit ce qui joue, avec **■ Arrêter** et **🔊 Diffuser
+  sur …**. Une seule écoute à la fois ; elle s'arrête quand on quitte l'onglet ou
+  l'application, et quand on diffuse la station sur l'enceinte. Hors Wi-Fi, elle utilise
+  les données mobiles (environ 1 Mo par minute à 128 kbit/s). Si une station ne joue pas
+  sur l'appareil, elle peut quand même jouer sur l'enceinte : l'agent STR convertit des
+  formats que le lecteur d'Android ne lit pas.
+- **🔊 Diffuser sur Cuisine** : avec le nom complet de l'enceinte sélectionnée, la station
+  part sur l'enceinte, sans rien enregistrer.
+- **⋯ Touches, Local…** ouvre une feuille d'actions avec **Diffuser sur Cuisine**,
+  **★ Ajouter aux favoris STR** (agent récent),
+  **Ajouter à Local**, puis **① Affecter à cette touche** si la touche est libre, ou
+  **① Remplacer Bel RTL** si elle est occupée — le nom de la station déjà présente est
+  affiché, pour éviter d'écraser celle à laquelle on tenait.
 
 **L'affectation exige l'agent STR.** Sans lui, seule l'écoute immédiate est possible ;
 l'enregistrement se fait alors en maintenant la touche appuyée sur l'enceinte elle-même,
@@ -478,6 +508,15 @@ n'enregistre que ce que tu as changé. Agent STR requis. L'heure se règle sur l
 à jouer. Coche la case, choisis le niveau, puis **Enregistrer le volume de départ**. Un
 volume réglé pendant l'écoute n'est jamais modifié.
 
+**Touche de répétition** (dans la carte des réveils) : coche la touche de la télécommande
+qui répète un réveil qui sonne — **AUX**, **Pouce levé** ou **Pouce baissé** — puis
+**Enregistrer la touche de répétition**. Hors réveil, un pouce ne fait rien et AUX passe
+sur l'entrée AUX comme d'habitude. Un pouce qui porte déjà une autre action (minuterie de
+sommeil, graves…) l'indique ; la cocher la remplace, et l'application le dit avant.
+Seules les cases que tu changes sont écrites : une action réglée ailleurs sur une autre
+touche reste. Une touche qui porte un groupe enregistré est refusée par l'enceinte, qui
+dit pourquoi.
+
 **Langue** : français, anglais, allemand, néerlandais, espagnol, italien. Le changement est
 immédiat, sans redémarrage, et il est mémorisé.
 
@@ -498,6 +537,13 @@ Une enceinte dont l'agent est antérieur à la version 1.8.0 fait apparaître un
 semblable, **Agent STR trop ancien**, et sa carte dans l'onglet Lecture porte la mention
 « trop ancien ».
 
+**Agent STR : nouvelle version** : au plus une fois par jour, à l'ouverture des Réglages,
+l'application lit sur GitHub la dernière version de l'agent STR. Quand des enceintes
+connues ont un agent plus ancien, une carte les nomme, avec **Nouveautés** et **Plus
+tard** (la carte revient à la version suivante), et leur carte dans l'onglet Lecture porte
+« 1.9.1 dispo ». L'agent se met à jour avec l'application STR sur ordinateur. La case
+**Vérifier automatiquement** de la carte **Mise à jour** coupe aussi cette lecture.
+
 **Diagnostic** : *Interroger l'enceinte* porte sur l'enceinte **sélectionnée** — nom,
 modèle, identifiant, version du firmware, l'agent avec son port et sa version relue en
 direct sur 17008 et 8888, l'état des notifications, la plage de graves, la liste des
@@ -510,6 +556,27 @@ vocal ne vivent que dans le téléphone. Une mise à jour les garde ; une désin
 efface, y compris celle qu'Android impose avant d'installer un APK signé d'une autre clé.
 **Exporter** crée un fichier et ouvre le partage (Drive, e-mail, Fichiers…) ; **Importer**
 relit un tel fichier et ajoute ce qui manque, sans rien remplacer ni supprimer.
+
+**Sauvegarde de l'enceinte** : **Sauvegarder dans un fichier** garde ce que l'agent STR
+conserve pour l'enceinte sélectionnée — les touches 1 à 12 (une touche Spotify avec sa
+playlist), les réveils, le volume de départ et la touche de répétition. **Restaurer depuis
+un fichier…** les remet, après une question qui nomme l'enceinte visée et celle d'où vient
+le fichier : il sert aussi à recopier ces réglages sur une autre enceinte. Les touches du
+fichier remplacent celles de l'enceinte, les autres restent ; ses réveils sont remplacés.
+Sans seconde rangée sur l'enceinte visée, les touches 7 à 12 sont passées. Le compte rendu
+dit ce qui a été restauré et ce que l'enceinte a refusé. Le groupe permanent n'est pas
+sauvegardé. Une touche Spotify ne joue que si l'enceinte est connectée au même compte
+Spotify. Agent STR requis.
+
+**Mise à jour** (version installée depuis GitHub) : l'application regarde au plus une
+fois par jour, auprès de GitHub, si une version plus récente est publiée ; la case
+**Vérifier automatiquement** le coupe. **Vérifier maintenant** le fait à la demande. Quand
+une version existe, une bannière apparaît aussi dans l'onglet Lecture (**Nouveautés**,
+**Plus tard**, **Installer**). **Installer** télécharge l'APK, vérifie qu'il a exactement
+la taille et l'empreinte SHA-256 publiées sur GitHub, puis ouvre l'installateur d'Android,
+où tu confirmes. La première fois, Android demande d'autoriser SoundReborn Remote à
+installer des applications. Android refuse d'installer par-dessus un APK signé d'une
+autre clé : une version de test lancée depuis Visual Studio ne se met pas à jour ainsi.
 
 **À propos** : la version, le crédit au projet STR avec un lien vers son site dans la
 langue choisie, et les mentions légales.
@@ -524,6 +591,13 @@ rapide ; un glissement lent n'est pas interprété comme un changement d'onglet.
 
 Un balayage qui commence **sur un curseur** est capté par le curseur : c'est voulu, sans
 quoi le volume deviendrait impossible à régler. Commence le geste sur une zone neutre.
+
+**Appui long sur l'icône de l'application** (lanceur d'Android) : **Tout en veille** met
+en veille chaque enceinte connue qui a l'agent STR — une enceinte sans agent n'est pas
+touchée, car sa seule commande de veille l'allumerait si elle était éteinte —, et
+**Touche 1** à **Touche 3** lancent la touche sur l'enceinte sélectionnée. L'application
+s'ouvre sur l'onglet Lecture et dit ce qui a été fait. On peut poser ces raccourcis sur
+l'écran d'accueil.
 
 ---
 

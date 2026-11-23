@@ -63,7 +63,7 @@ for f, text in text_of.items():
                     note(fm.group(1)[0].upper() + fm.group(1)[1:], cls)
                     break
 
-        if "[RelayCommand]" in line:
+        if "[RelayCommand]" in line or "[RelayCommand(" in line:
             for j in range(i + 1, min(i + 8, len(lines))):
                 cm = re.search(r"\s(\w+?)(Async)?\s*\(", lines[j])
                 if cm and cls and not lines[j].lstrip().startswith("//"):
@@ -112,6 +112,8 @@ for m in re.finditer(r'Add\("([^"]+)"\s*,(.*?)\);', loc, re.S):
 # ------------------------------------------------------------ 3. injection résolue
 program = (APP / "MauiProgram.cs").read_text(encoding="utf-8")
 registered = set(re.findall(r"AddSingleton<(\w+)>", program))
+# Une interface inscrite avec son implémentation : « AddSingleton<IX, X>() ».
+registered |= set(re.findall(r"AddSingleton<(\w+)\s*,", program))
 registered |= {"HttpClient"}
 # Un type inscrit par une fabrique (« AddSingleton<X>(services => new X(...)) »)
 # reçoit ses paramètres de la fabrique elle-même : rien à vérifier pour lui.
@@ -124,6 +126,9 @@ for f, text in text_of.items():
             continue
         for arg in args.split(","):
             parts = arg.strip().split()
+            # « IX? x = null » : le type sans le point d'interrogation.
+            if parts:
+                parts[0] = parts[0].rstrip("?")
             if len(parts) >= 2 and parts[0] not in registered and parts[0][0].isupper():
                 problems.append(f"Dépendance non enregistrée : {cls} demande {parts[0]}")
 

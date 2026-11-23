@@ -17,6 +17,11 @@ public static class MauiProgram
             .ConfigureFonts(fonts =>
             {
                 // Aucune police n'est embarquée : l'application utilise celle du système.
+            })
+            .ConfigureEssentials(essentials =>
+            {
+                // Raccourcis de l'icône (publiés par App) : leur réception.
+                essentials.OnAppAction(App.HandleAppAction);
             });
 
 #if DEBUG
@@ -79,6 +84,39 @@ public static class MauiProgram
             services.GetRequiredService<PresetsViewModel>(),
             services.GetRequiredService<VoiceMessageViewModel>(),
             services.GetRequiredService<IFileExchange>()));
+
+        // Mise à jour depuis GitHub. La version Google Play (PLAY_STORE) n'installe
+        // rien elle-même : c'est le Play Store qui met l'application à jour.
+#if ANDROID && !PLAY_STORE
+        builder.Services.AddSingleton<IAppInstaller, AndroidAppInstaller>();
+#else
+        builder.Services.AddSingleton<IAppInstaller, NoAppInstaller>();
+#endif
+        builder.Services.AddSingleton<UpdateViewModel>(services => new UpdateViewModel(
+            services.GetRequiredService<SpeakerManager>(),
+            services.GetRequiredService<HttpClient>(),
+            services.GetRequiredService<IAppInstaller>()));
+
+        // Raccourcis de l'icône : « Tout mettre en veille », touches 1 à 3.
+        builder.Services.AddSingleton<ShortcutRunner>();
+
+        // Sauvegarde de l'enceinte sélectionnée : touches, réveils, volume de départ, télécommande.
+        builder.Services.AddSingleton<SpeakerBackupViewModel>(services => new SpeakerBackupViewModel(
+            services.GetRequiredService<SpeakerManager>(),
+            services.GetRequiredService<IFileExchange>()));
+
+        // Dernière version de l'agent STR sur GitHub : la carte des Réglages et la
+        // pastille de la liste des enceintes. Rien n'est installé d'ici.
+        builder.Services.AddSingleton<AgentUpdateViewModel>(services => new AgentUpdateViewModel(
+            services.GetRequiredService<SpeakerManager>(),
+            services.GetRequiredService<HttpClient>()));
+
+        // Écoute d'une station sur l'appareil, avant de la diffuser sur l'enceinte.
+#if ANDROID
+        builder.Services.AddSingleton<IStreamPreview, AndroidStreamPreview>();
+#else
+        builder.Services.AddSingleton<IStreamPreview, NoStreamPreview>();
+#endif
 
         builder.Services.AddSingleton<PlayerViewModel>();
         builder.Services.AddSingleton<PresetsViewModel>();

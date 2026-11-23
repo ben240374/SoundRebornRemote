@@ -41,7 +41,7 @@ public sealed class RadioBrowserClient
     /// ce qui permet aux mainteneurs de voir d'où vient le trafic. Le service le
     /// demande explicitement, et répond mal à un agent vide.
     /// </summary>
-    private const string UserAgent = "SoundRebornRemote/1.9.0 (+https://github.com/ben240374/SoundRebornRemote)";
+    private const string UserAgent = "SoundRebornRemote/1.9.1 (+https://github.com/ben240374/SoundRebornRemote)";
 
     /// <summary>Budget d'un appel à l'annuaire de stations.</summary>
     public static TimeSpan RequestTimeout { get; set; } = TimeSpan.FromSeconds(10);
@@ -110,6 +110,22 @@ public sealed class RadioBrowserClient
             relaxed = true;
         }
 
+        // Une page montre au plus « limit » stations, comme l'application PC : la
+        // page élargie (3 × limit) ne sert qu'à compenser les stations écartées.
+        // La page suivante reprend juste après la dernière station montrée, pour
+        // n'en sauter aucune. Une page de 180 lignes alourdissait l'écran et faisait
+        // attendre autant de logos.
+        var nextOffset = offset + raw.Count;
+        var truncated = false;
+
+        if (kept.Count > limit)
+        {
+            var last = kept[limit - 1];
+            kept = kept.Take(limit).ToList();
+            nextOffset = offset + raw.IndexOf(last) + 1;
+            truncated = true;
+        }
+
         // Ordre d'affichage : le nom tapé d'abord, puis le même nom sans
         // ponctuation, puis les mots trouvés dans les genres. Dans chaque groupe,
         // l'ordre de l'annuaire (votes, écoutes…) est gardé ; pour l'ordre
@@ -134,15 +150,16 @@ public sealed class RadioBrowserClient
             }
         }
 
-        var stations = Filter(ranked, options);
+        // Les trouvailles par les genres complètent la page, sans la dépasser.
+        var stations = Filter(ranked, options).Take(limit).ToList();
 
         return new RadioSearchPage
         {
             Stations = stations,
             Relaxed = relaxed,
             Fetched = raw.Count,
-            NextOffset = offset + raw.Count,
-            HasMore = raw.Count >= fetchLimit,
+            NextOffset = nextOffset,
+            HasMore = truncated || raw.Count >= fetchLimit,
         };
     }
 

@@ -101,6 +101,35 @@
                                 <Button Text="{DynamicResource L_AlarmAdd}" Command="{Binding AddAlarmCommand}"
                                         IsVisible="{Binding ShowAddButton}" />
 
+                                <!-- Touche de répétition : quelle touche de la télécommande répète un réveil qui sonne. -->
+                                <VerticalStackLayout Spacing="6" IsVisible="{Binding ShowSnoozeKeys}" Margin="0,8,0,0">
+                                    <Label Text="{DynamicResource L_SnoozeKeysTitle}" Style="{StaticResource SectionLabel}" />
+
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                        <CheckBox Grid.Column="0" IsChecked="{Binding SnoozeOnAux, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Grid.Column="1" Text="{DynamicResource L_SnoozeKeyAux}" Style="{StaticResource SubtitleLabel}"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                        <CheckBox Grid.Column="0" IsChecked="{Binding SnoozeOnThumbsUp, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Grid.Column="1" Text="{Binding ThumbsUpLabel}" Style="{StaticResource SubtitleLabel}"
+                                               VerticalOptions="Center" LineBreakMode="WordWrap" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                        <CheckBox Grid.Column="0" IsChecked="{Binding SnoozeOnThumbsDown, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Grid.Column="1" Text="{Binding ThumbsDownLabel}" Style="{StaticResource SubtitleLabel}"
+                                               VerticalOptions="Center" LineBreakMode="WordWrap" />
+                                    </Grid>
+
+                                    <Label Text="{Binding SnoozeKeysWarning}" TextColor="{StaticResource Warning}" FontSize="13"
+                                           LineBreakMode="WordWrap" IsVisible="{Binding HasSnoozeKeysWarning}" />
+
+                                    <Label Text="{DynamicResource L_SnoozeKeysNote}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+
+                                    <Button Text="{DynamicResource L_SnoozeKeysSave}" Command="{Binding SaveSnoozeKeysCommand}"
+                                            IsEnabled="{Binding SnoozeKeysDirty}" />
+                                </VerticalStackLayout>
+
                                 <!-- Éditeur d'un réveil -->
                                 <VerticalStackLayout Spacing="8" IsVisible="{Binding IsEditing}">
                                     <Label Text="{Binding EditorTitle}" Style="{StaticResource SectionLabel}" Margin="0,6,0,0" />
@@ -351,6 +380,31 @@
                 </VerticalStackLayout>
             </Border>
 
+            <!--
+                Nouvelle version de l'agent STR sur GitHub, pour des enceintes connues.
+                Sa propre vue-modèle (posée par le code de la page) ; visibilité sur le
+                ContentView lui-même, pour ne pas laisser de bloc vide.
+            -->
+            <ContentView x:Name="AgentUpdateCard" x:DataType="vm:AgentUpdateViewModel" IsVisible="{Binding ShowCard}">
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{DynamicResource L_AgentNewTitle}" Style="{StaticResource SectionLabel}" />
+
+                        <Label Text="{Binding Summary}" FontAttributes="Bold" FontSize="14" LineBreakMode="WordWrap" />
+
+                        <Label Text="{Binding SpeakersText}" Style="{StaticResource SubtitleLabel}" LineBreakMode="WordWrap" />
+
+                        <Label Text="{DynamicResource L_AgentNewBody}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Button Grid.Column="0" Text="{DynamicResource L_UpdateNotes}" Command="{Binding OpenPageCommand}" />
+                            <Button Grid.Column="1" Text="{DynamicResource L_UpdateLater}" Style="{StaticResource QuietButton}"
+                                    Command="{Binding LaterCommand}" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+            </ContentView>
+
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="{DynamicResource L_Diagnostics}" Style="{StaticResource SectionLabel}" />
@@ -389,6 +443,89 @@
                                TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
                                FontSize="13" LineBreakMode="WordWrap"
                                IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+                    </VerticalStackLayout>
+                </Border>
+            </ContentView>
+
+            <!--
+                ================================================= Sauvegarde de l'enceinte
+                Sa propre vue-modèle (SpeakerBackupViewModel), posée par la page dans son code.
+            -->
+            <ContentView x:Name="SpeakerBackupCard" x:DataType="vm:SpeakerBackupViewModel">
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{DynamicResource L_SpeakerBackupTitle}" Style="{StaticResource SectionLabel}" />
+                        <Label Text="{Binding TargetText}" FontAttributes="Bold" FontSize="14" LineBreakMode="WordWrap" />
+                        <Label Text="{DynamicResource L_SpeakerBackupHint}" Style="{StaticResource SubtitleLabel}" LineBreakMode="WordWrap" />
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Button Grid.Column="0" Text="{DynamicResource L_SpeakerBackupSave}" Command="{Binding ExportCommand}"
+                                    IsEnabled="{Binding CanUse}" LineBreakMode="WordWrap" />
+                            <Button Grid.Column="1" Text="{DynamicResource L_SpeakerBackupRestore}" Command="{Binding RestoreCommand}"
+                                    IsEnabled="{Binding CanUse}" LineBreakMode="WordWrap" />
+                        </Grid>
+
+                        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                           HorizontalOptions="Start" HeightRequest="24" />
+
+                        <Label Text="{Binding StatusMessage}"
+                               TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                               FontSize="13" LineBreakMode="WordWrap"
+                               IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+                    </VerticalStackLayout>
+                </Border>
+            </ContentView>
+
+            <!--
+                ================================================= Mise à jour
+                Sa propre vue-modèle (UpdateViewModel), posée par la page dans son
+                code. Absente de la version Google Play (ShowCard faux).
+            -->
+            <!-- IsVisible sur le ContentView lui-même : posé sur la carte, Android en gardait la place. -->
+            <ContentView x:Name="UpdateCard" x:DataType="vm:UpdateViewModel" IsVisible="{Binding ShowCard}">
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{DynamicResource L_UpdateTitle}" Style="{StaticResource SectionLabel}" />
+                        <Label Text="{Binding CurrentVersionText}" Style="{StaticResource SubtitleLabel}" />
+
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4">
+                            <CheckBox Grid.Column="0" IsChecked="{Binding AutoCheck, Mode=TwoWay}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{DynamicResource L_UpdateAuto}" Style="{StaticResource SubtitleLabel}"
+                                   VerticalOptions="Center" LineBreakMode="WordWrap" />
+                        </Grid>
+
+                        <Button Text="{DynamicResource L_UpdateCheck}" Command="{Binding CheckCommand}"
+                                IsVisible="{Binding IsDownloading, Converter={StaticResource InvertedBool}}" />
+
+                        <!-- Une version plus récente : son numéro, ses nouveautés, l'installation. -->
+                        <VerticalStackLayout Spacing="8" IsVisible="{Binding HasUpdate}">
+                            <Label Text="{Binding UpdateTitle}" FontAttributes="Bold" FontSize="15" TextColor="{StaticResource Accent}" />
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8" IsVisible="{Binding IsDownloading, Converter={StaticResource InvertedBool}}">
+                                <Button Grid.Column="0" Text="{DynamicResource L_UpdateNotes}" Command="{Binding OpenPageCommand}" />
+                                <Button Grid.Column="1" Text="{DynamicResource L_UpdateInstall}" Style="{StaticResource AccentButton}"
+                                        Command="{Binding InstallCommand}" />
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <!-- Téléchargement en cours : avancement et annulation. -->
+                        <VerticalStackLayout Spacing="6" IsVisible="{Binding IsDownloading}">
+                            <ProgressBar Progress="{Binding Progress}" ProgressColor="{StaticResource Accent}" />
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <Label Grid.Column="0" Text="{Binding ProgressText}" Style="{StaticResource CaptionLabel}" VerticalOptions="Center" />
+                                <Button Grid.Column="1" Text="{DynamicResource L_Cancel}" Style="{StaticResource QuietButton}"
+                                        Command="{Binding CancelDownloadCommand}" />
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <Label Text="{Binding StatusMessage}"
+                               TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                               FontSize="13" LineBreakMode="WordWrap"
+                               IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+
+                        <Button Text="{DynamicResource L_UpdateOpenPage}" Style="{StaticResource QuietButton}"
+                                Command="{Binding OpenPageCommand}" IsVisible="{Binding CanOpenPage}" />
+
+                        <Label Text="{DynamicResource L_UpdateHint}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
                     </VerticalStackLayout>
                 </Border>
             </ContentView>
