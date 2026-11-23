@@ -109,6 +109,21 @@ public sealed partial class PresetTile : ObservableObject
     /// l'écran est celle de l'autre rangée tant que cette valeur diffère de Slot.
     /// </summary>
     public int ArtSlot { get; set; }
+
+    /// <summary>
+    /// La station (adresse du flux ou de la playlist) à laquelle appartient l'image
+    /// affichée. Une touche qui change de station ne garde pas le logo de l'ancienne,
+    /// même quand celui de la nouvelle ne se charge pas.
+    /// </summary>
+    public string ArtKey { get; set; } = "";
+
+    /// <summary>
+    /// Ce que l'enceinte joue quand on appuie sur sa touche physique, quand ce
+    /// n'est pas l'adresse rangée par l'agent : le relais de l'agent
+    /// (…/stream/n) pour une touche posée par STR. Sert aussi à
+    /// reconnaître la touche qui joue. Vide sinon.
+    /// </summary>
+    public string BoxKey { get; set; } = "";
 }
 
 /// <summary>Une station de l'annuaire, avec son logo déjà téléchargé.</summary>
@@ -532,9 +547,16 @@ public sealed partial class PresetsViewModel : BaseViewModel
                 pending.Add(ApplyAsync(tile, hardware.GetValueOrDefault(tile.Slot), store.GetValueOrDefault(tile.Slot)));
             }
 
+            // Ce qui joue a pu être lu AVANT les touches (au démarrage, Lecture est
+            // plus rapide) : la touche correspondante n'était pas encore là pour
+            // passer au vert. Les noms et adresses sont posés ; on réaligne tout de
+            // suite, sans attendre les logos, puis une fois ceux-ci arrivés.
+            ResyncActive();
+
             await Task.WhenAll(pending).ConfigureAwait(true);
 
             SaveArtCache();
+            ResyncActive();
 
             if (secondRowUnread)
             {
@@ -722,12 +744,20 @@ public sealed partial class PresetsViewModel : BaseViewModel
                 !t.IsEmpty &&
                 !string.IsNullOrWhiteSpace(t.SourceKey) &&
                 string.Equals(t.SourceKey, location, StringComparison.OrdinalIgnoreCase));
+
+            // Touche physique appuyée sur l'enceinte : celle-ci joue le relais de
+            // l'agent, pas l'adresse rangée par l'agent, et le nom annoncé peut être
+            // celui du flux (« BEL RTL - … »). L'adresse de la touche la reconnaît.
+            match ??= Presets.FirstOrDefault(t =>
+                !t.IsEmpty &&
+                !string.IsNullOrWhiteSpace(t.BoxKey) &&
+                string.Equals(t.BoxKey, location, StringComparison.OrdinalIgnoreCase));
         }
 
         if (match is null && !string.IsNullOrWhiteSpace(stationName))
         {
             match = Presets.FirstOrDefault(t =>
-                !t.IsEmpty && string.Equals(t.Name, stationName, StringComparison.OrdinalIgnoreCase));
+                !t.IsEmpty && string.Equals(t.Name.Trim(), stationName.Trim(), StringComparison.OrdinalIgnoreCase));
         }
 
         if (match is null && source.Equals("SPOTIFY", StringComparison.OrdinalIgnoreCase))
@@ -747,6 +777,15 @@ public sealed partial class PresetsViewModel : BaseViewModel
         MarkActive(match);
     }
 
+    /// <summary>Réapplique la dernière lecture de ce qui joue aux touches telles qu'elles sont.</summary>
+    private void ResyncActive()
+    {
+        if (_lastSync is { } last)
+        {
+            SyncActive(last.Source, last.Station, last.Location, last.IsIdle);
+        }
+    }
+
     private async Task ApplyAsync(PresetTile tile, PresetInfo? hardware, StrPreset? store)
     {
         // L'agent stocke l'art comme une CHAÎNE de candidats séparés par des « | ».
@@ -759,12 +798,10 @@ public sealed partial class PresetsViewModel : BaseViewModel
         // peut dater d'une station rangée là auparavant : la touche montrait le
         // logo d'une autre station.
         //
-        // En revanche, quand ce logo retenu fait partie des candidats de la station,
-        // il passe en tête : c'est le même logo, déjà vérifié, et il évite d'attendre
-        // un premier candidat qui ne répond pas.
-        var proposed = JoinCandidates(store?.Art, hardware?.ArtUrl);
-        var remembered = RememberedArt(tile.Slot);
-        var art = proposed is null ? remembered : PreferKnown(proposed, remembered);
+        // L'ordre des candidats est celui de l'agent, et il est respecté : le logo
+        // retenu n'est jamais remis en tête. Il pouvait venir d'une autre station
+        // rangée là avant, et restait alors affiché pour de bon (1.9.1).
+        var art = JoinCandidates(store?.Art, hardware?.ArtUrl) ?? RememberedArt(tile.Slot);
 
         if (store is not null)
         {
@@ -785,6 +822,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
             tile.Glyph = SlotNumber(tile.Slot);
             tile.Kind = store.Type ?? "";
             tile.SourceKey = FirstNonEmpty(store.StreamUrl, store.Uri) ?? "";
+            tile.BoxKey = hardware is { IsEmpty: false } ? hardware.Content?.Location ?? "" : "";
             await SetArtAsync(tile, art).ConfigureAwait(true);
             return;
         }
@@ -800,6 +838,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
             tile.Glyph = SlotNumber(tile.Slot);
             tile.Kind = hardware.Source;
             tile.SourceKey = hardware.Content?.Location ?? "";
+            tile.BoxKey = "";
             await SetArtAsync(tile, art).ConfigureAwait(true);
             return;
         }
@@ -814,10 +853,12 @@ public sealed partial class PresetsViewModel : BaseViewModel
         tile.Glyph = SlotNumber(tile.Slot);
         tile.Kind = "";
         tile.SourceKey = "";
+        tile.BoxKey = "";
         tile.ArtUrl = null;
         tile.ArtSource = null;
         tile.HasArt = false;
         tile.ArtSlot = 0;
+        tile.ArtKey = "";
         tile.IsActive = false;
 
         lock (_artCache)
@@ -836,32 +877,6 @@ public sealed partial class PresetsViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// La chaîne de candidats, avec <paramref name="known"/> en tête s'il en fait
-    /// partie. Un logo retenu qui n'est PAS dans la chaîne est ignoré : il peut
-    /// venir d'une station rangée là auparavant.
-    /// </summary>
-    private static string PreferKnown(string chain, string? known)
-    {
-        if (string.IsNullOrWhiteSpace(known))
-        {
-            return chain;
-        }
-
-        var candidates = ArtworkCache.SplitCandidates(chain).ToList();
-        var index = candidates.FindIndex(c => string.Equals(c, known.Trim(), StringComparison.OrdinalIgnoreCase));
-
-        if (index <= 0)
-        {
-            return chain;
-        }
-
-        var first = candidates[index];
-        candidates.RemoveAt(index);
-        candidates.Insert(0, first);
-        return string.Join('|', candidates);
-    }
-
-    /// <summary>
     /// Pose l'image d'une tuile.
     ///
     /// Une image déjà affichée n'est jamais retirée pour être reposée aussitôt :
@@ -872,9 +887,11 @@ public sealed partial class PresetsViewModel : BaseViewModel
     /// </summary>
     private async Task SetArtAsync(PresetTile tile, string? art)
     {
-        // L'emplacement est relevé AVANT toute attente : si l'utilisateur change de
-        // rangée pendant le téléchargement, cette image n'est plus celle de la tuile.
+        // L'emplacement et la station sont relevés AVANT toute attente : si
+        // l'utilisateur change de rangée, ou si la touche change de station pendant
+        // le téléchargement, cette image n'est plus celle de la tuile.
         var slot = tile.Slot;
+        var key = tile.SourceKey;
 
         ImageSource? source = null;
         string? used = null;
@@ -892,7 +909,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
 
             (source, used) = await pending.ConfigureAwait(true);
 
-            if (tile.Slot != slot)
+            if (tile.Slot != slot || !string.Equals(tile.SourceKey, key, StringComparison.Ordinal))
             {
                 return;
             }
@@ -910,6 +927,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
         tile.ArtSource = source;
         tile.HasArt = true;
         tile.ArtSlot = slot;
+        tile.ArtKey = key;
 
         // On mémorise l'adresse qui a réellement marché, pas toute la chaîne. Les
         // tuiles se garnissent en parallèle : l'accès au dictionnaire est protégé.
@@ -920,12 +938,12 @@ public sealed partial class PresetsViewModel : BaseViewModel
     }
 
     /// <summary>
-    /// Retire l'image d'une tuile quand elle appartient à un autre emplacement que
-    /// celui que la tuile porte maintenant. Sans effet sinon.
+    /// Retire l'image d'une tuile quand elle appartient à un autre emplacement, ou à
+    /// une autre station, que ce que la tuile porte maintenant. Sans effet sinon.
     /// </summary>
     private static void ClearArtOfAnotherSlot(PresetTile tile)
     {
-        if (tile.ArtSlot == tile.Slot)
+        if (tile.ArtSlot == tile.Slot && string.Equals(tile.ArtKey, tile.SourceKey, StringComparison.Ordinal))
         {
             return;
         }
@@ -934,6 +952,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
         tile.ArtSource = null;
         tile.HasArt = false;
         tile.ArtSlot = 0;
+        tile.ArtKey = "";
     }
 
     /// <summary>Première valeur non vide parmi celles proposées, null si toutes le sont.</summary>
@@ -1054,14 +1073,13 @@ public sealed partial class PresetsViewModel : BaseViewModel
                 pending.Add(ApplyAsync(tile, _lastHardware.GetValueOrDefault(tile.Slot), _lastStore.GetValueOrDefault(tile.Slot)));
             }
 
+            // Même règle que RefreshAsync : le vert n'attend pas les logos.
+            ResyncActive();
+
             await Task.WhenAll(pending).ConfigureAwait(true);
 
             SaveArtCache();
-
-            if (_lastSync is { } last)
-            {
-                SyncActive(last.Source, last.Station, last.Location, last.IsIdle);
-            }
+            ResyncActive();
         }
         catch (Exception ex)
         {
@@ -1113,6 +1131,7 @@ public sealed partial class PresetsViewModel : BaseViewModel
             tile.Glyph = SlotNumber(tile.Slot);
             tile.Kind = "";
             tile.SourceKey = "";
+            tile.BoxKey = "";
         }
     }
 

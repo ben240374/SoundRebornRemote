@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manuel d'utilisation
 
-Version 1.9.1 · Android 7 et suivants
+Version 1.9.2 · Android 7 et suivants
 
 > Langues : **Français** · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md) · [Italiano](it.md)
 
@@ -181,7 +181,8 @@ seconde rangée portent une station.
 
 À droite des pastilles, **Local** remplace les tuiles par tes présélections locales,
 gardées dans le téléphone (voir l'onglet Présélections) ; **Une fois** ramène les touches
-de l'enceinte.
+de l'enceinte. Sur un écran étroit, **Local** et **★ STR** passent à la ligne, sous
+**Une fois** et **Deux fois**.
 
 La pastille **Une fois** porte elle aussi un petit nombre : combien de touches de la
 première rangée portent une station.

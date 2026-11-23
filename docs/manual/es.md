@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manual de uso
 
-Versión 1.9.1 · Android 7 y posteriores
+Versión 1.9.2 · Android 7 y posteriores
 
 > Idiomas: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · **Español** · [Italiano](it.md)
 
@@ -176,7 +176,8 @@ tienen una emisora.
 
 A la derecha de los botones, **Local** sustituye las tarjetas por tus presintonías
 locales, guardadas en el teléfono (ver la pestaña Presintonías); **Una vez** devuelve las
-teclas del altavoz.
+teclas del altavoz. En una pantalla estrecha, **Local** y **★ STR** pasan a una segunda
+línea, debajo de **Una vez** y **Dos veces**.
 
 El botón **Una vez** también lleva un pequeño número: cuántas teclas de la primera fila
 tienen una emisora.

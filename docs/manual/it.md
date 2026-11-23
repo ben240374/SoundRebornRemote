@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manuale d'uso
 
-Versione 1.9.1 · Android 7 e successivi
+Versione 1.9.2 · Android 7 e successivi
 
 > Lingue: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md) · **Italiano**
 
@@ -178,7 +178,8 @@ stazione.
 
 A destra dei pulsanti, **Locale** sostituisce i riquadri con le tue preselezioni locali,
 salvate nel telefono (vedi la scheda Preselezioni); **Una volta** riporta i tasti del
-diffusore.
+diffusore. Su uno schermo stretto, **Locale** e **★ STR** vanno a capo, sotto
+**Una volta** e **Due volte**.
 
 Anche il pulsante **Una volta** porta un piccolo numero: quanti tasti della prima fila
 hanno una stazione.

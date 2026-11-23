@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handleiding
 
-Versie 1.9.1 · Android 7 en hoger
+Versie 1.9.2 · Android 7 en hoger
 
 > Talen: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · **Nederlands** · [Español](es.md) · [Italiano](it.md)
 
@@ -177,7 +177,8 @@ hebben.
 
 Rechts van de knoppen vervangt **Lokaal** de tegels door je lokale presets, die op de
 telefoon blijven (zie het tabblad Presets); **Eén keer** brengt de toetsen van de speaker
-terug.
+terug. Op een smal scherm schuiven **Lokaal** en **★ STR** naar een tweede regel, onder
+**Eén keer** en **Twee keer**.
 
 Ook de knop **Eén keer** draagt een klein getal: hoeveel toetsen van de eerste rij een
 zender hebben.

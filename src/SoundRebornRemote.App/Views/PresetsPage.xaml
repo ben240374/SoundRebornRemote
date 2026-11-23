@@ -32,9 +32,15 @@
                         six touches-là. « Local », à droite : les présélections gardées
                         dans le téléphone, en nombre libre. « ★ STR » : les favoris STR,
                         les mêmes sur toutes les enceintes (agent récent).
+
+                        Deux groupes, chacun d'un seul tenant : « Une fois » et « Deux fois » à
+                        gauche, « Local » et « ★ STR » à droite. Quand la largeur ne suffit pas
+                        (petit téléphone), le groupe de droite passe à la ligne au lieu de
+                        chevaucher celui de gauche. Une puce masquée ne laisse pas de trou : elle
+                        est dans un groupe, et le groupe ne compte que ses puces visibles.
                     -->
-                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
-                        <HorizontalStackLayout Grid.Column="0" Spacing="8">
+                    <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="SpaceBetween" AlignItems="Center">
+                        <HorizontalStackLayout Spacing="8" Margin="0,3" FlexLayout.Shrink="0">
                             <Border Style="{StaticResource Chip}" Padding="14,6">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding ShowRowCommand}" CommandParameter="1" />
@@ -78,7 +84,7 @@
                             </Border>
                         </HorizontalStackLayout>
 
-                        <HorizontalStackLayout Grid.Column="2" Spacing="8">
+                        <HorizontalStackLayout Spacing="8" Margin="0,3" FlexLayout.Shrink="0">
                             <Border Style="{StaticResource Chip}" Padding="14,6">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding ShowLocalCommand}" />
@@ -116,7 +122,7 @@
                                 </Border.Triggers>
                             </Border>
                         </HorizontalStackLayout>
-                    </Grid>
+                    </FlexLayout>
 
                     <CollectionView ItemsSource="{Binding Presets}" HeightRequest="308" IsVisible="{Binding ShowKeys}">
                         <CollectionView.ItemsLayout>

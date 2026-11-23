@@ -240,6 +240,18 @@ public sealed class ArtworkCache
         return null;
     }
 
+    /// <summary>Vrai quand cette adresse a échoué il y a moins de <see cref="RetryFailedAfter"/>.</summary>
+    private bool FailedRecently(string url)
+    {
+        url = url.Trim();
+
+        lock (_resolved)
+        {
+            return _resolved.TryGetValue(url, out var known) && known is null &&
+                   _failedAt.TryGetValue(url, out var when) && DateTime.UtcNow - when < RetryFailedAfter;
+        }
+    }
+
     /// <summary>Vrai quand le fichier existe et n'est pas vide. Ne lève jamais.</summary>
     private static bool IsUsable(string path)
     {
@@ -280,11 +292,12 @@ public sealed class ArtworkCache
     {
         var candidates = SplitCandidates(art);
 
-        // Premier passage, sans réseau : un candidat déjà dans le cache s'affiche
-        // tout de suite. Sans cela, un premier candidat mort (site de la station
-        // hors ligne) était retenté à chaque ouverture de l'onglet passé le délai
-        // d'une minute, et faisait attendre plusieurs secondes un logo pourtant
-        // présent sur le téléphone, deux candidats plus loin.
+        // Premier passage, sans réseau, DANS L'ORDRE de la chaîne : un candidat déjà
+        // dans le cache s'affiche tout de suite, et un candidat qui vient d'échouer
+        // est sauté. Le passage s'arrête au premier candidat à télécharger : un logo
+        // moins sûr déjà sur le téléphone ne passe jamais devant le logo de la
+        // station. En 1.9.1, il le faisait, et une touche montrait pour de bon le
+        // logo d'une autre station.
         foreach (var candidate in candidates)
         {
             var local = LocalPathIfReady(candidate);
@@ -292,6 +305,11 @@ public sealed class ArtworkCache
             if (local is not null && IsDecodable(local))
             {
                 return (ImageSource.FromStream(() => (Stream)File.OpenRead(local)), candidate);
+            }
+
+            if (!FailedRecently(candidate))
+            {
+                break;
             }
         }
 

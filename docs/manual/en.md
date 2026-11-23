@@ -1,6 +1,6 @@
 # SoundReborn Remote — User manual
 
-Version 1.9.1 · Android 7 and later
+Version 1.9.2 · Android 7 and later
 
 > Languages: [Français](fr.md) · **English** · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md) · [Italiano](it.md)
 
@@ -170,7 +170,8 @@ pressed twice. The choice applies to both tabs. Each tile shows the name of its 
 **Twice** chip carries a small number: how many keys of the second row hold a station.
 
 To the right of the chips, **Local** replaces the tiles with your local presets, kept
-on the phone (see the Presets tab); **Once** brings back the speaker's keys.
+on the phone (see the Presets tab); **Once** brings back the speaker's keys. On a narrow screen, **Local** and **★ STR** move to a
+second line, below **Once** and **Twice**.
 
 The **Once** chip also carries a small number: how many keys of the first row hold a
 station.

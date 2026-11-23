@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handbuch
 
-Version 1.9.1 · Android 7 und neuer
+Version 1.9.2 · Android 7 und neuer
 
 > Sprachen: [Français](fr.md) · [English](en.md) · **Deutsch** · [Nederlands](nl.md) · [Español](es.md) · [Italiano](it.md)
 
@@ -181,7 +181,8 @@ einen Sender tragen.
 
 Rechts neben den Schaltflächen ersetzt **Lokal** die Kacheln durch deine lokalen
 Presets, die auf dem Telefon bleiben (siehe Reiter Presets); **Einmal** bringt die Tasten
-des Lautsprechers zurück.
+des Lautsprechers zurück. Auf einem schmalen Bildschirm rücken **Lokal** und **★ STR** in eine
+zweite Zeile, unter **Einmal** und **Zweimal**.
 
 Auch die Schaltfläche **Einmal** zeigt eine kleine Zahl: wie viele Tasten der ersten
 Reihe einen Sender tragen.
