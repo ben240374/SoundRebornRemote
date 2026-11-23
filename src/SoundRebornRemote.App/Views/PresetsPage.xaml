@@ -33,6 +33,11 @@
                         dans le téléphone, en nombre libre. « ★ STR » : les favoris STR,
                         les mêmes sur toutes les enceintes (agent récent).
 
+                        Les pastilles portent un dessin plutôt qu'un mot, pour tenir sur une
+                        ligne : un doigt levé (une fois), deux doigts (deux fois), un téléphone
+                        (Local), une étoile (STR). Leur nom reste lu par TalkBack et s'affiche
+                        sur un appui long.
+
                         Deux groupes, chacun d'un seul tenant : « Une fois » et « Deux fois » à
                         gauche, « Local » et « ★ STR » à droite. Quand la largeur ne suffit pas
                         (petit téléphone), le groupe de droite passe à la ligne au lieu de
@@ -41,14 +46,18 @@
                     -->
                     <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="SpaceBetween" AlignItems="Center">
                         <HorizontalStackLayout Spacing="8" Margin="0,3" FlexLayout.Shrink="0">
-                            <Border Style="{StaticResource Chip}" Padding="14,6">
+                            <Border Style="{StaticResource Chip}" Padding="12,6"
+                                    SemanticProperties.Description="{DynamicResource L_RowOnce}"
+                                    ToolTipProperties.Text="{DynamicResource L_RowOnce}">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding ShowRowCommand}" CommandParameter="1" />
                                 </Border.GestureRecognizers>
 
                                 <!-- Pastille : nombre de touches garnies dans la première rangée. -->
                                 <HorizontalStackLayout Spacing="6">
-                                    <Label Text="{DynamicResource L_RowOnce}" FontSize="13" VerticalOptions="Center" />
+                                    <!-- Un doigt levé : une pression sur la touche. -->
+                                    <Path Style="{StaticResource IconPath}" WidthRequest="18" HeightRequest="18"
+                                          Data="F1 M6.4,14 V3.5 A2,2 0 0 1 10.4,3.5 V14 Z M10.65,13.2 V12.6 A1.75,1.75 0 0 1 14.15,12.6 V13.2 Z M13.85,13.2 V12.6 A1.75,1.75 0 0 1 17.35,12.6 V13.2 Z M8.8,12 H15.4 A3.2,3.2 0 0 1 18.6,15.2 V19.3 A3.2,3.2 0 0 1 15.4,22.5 H8.8 A3.2,3.2 0 0 1 5.6,19.3 V15.2 A3.2,3.2 0 0 1 8.8,12 Z" />
                                     <Border Style="{StaticResource CountBadge}" IsVisible="{Binding ShowFirstRowCount}">
                                         <Label Text="{Binding FirstRowCount}" Style="{StaticResource CountBadgeLabel}" />
                                     </Border>
@@ -62,14 +71,18 @@
                                 </Border.Triggers>
                             </Border>
 
-                            <Border Style="{StaticResource Chip}" Padding="14,6" IsVisible="{Binding HasSecondRow}">
+                            <Border Style="{StaticResource Chip}" Padding="12,6" IsVisible="{Binding HasSecondRow}"
+                                    SemanticProperties.Description="{DynamicResource L_RowTwice}"
+                                    ToolTipProperties.Text="{DynamicResource L_RowTwice}">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding ShowRowCommand}" CommandParameter="2" />
                                 </Border.GestureRecognizers>
 
                                 <!-- Pastille : nombre de touches garnies dans cette rangée. -->
                                 <HorizontalStackLayout Spacing="6">
-                                    <Label Text="{DynamicResource L_RowTwice}" FontSize="13" VerticalOptions="Center" />
+                                    <!-- Deux doigts levés : deux pressions sur la touche. -->
+                                    <Path Style="{StaticResource IconPath}" WidthRequest="18" HeightRequest="18"
+                                          Data="F1 M5.6,14 V4.5 A1.9,1.9 0 0 1 9.4,4.5 V14 Z M9.9,14 V3.4 A1.9,1.9 0 0 1 13.7,3.4 V14 Z M13.9,13.4 V12.8 A1.6,1.6 0 0 1 17.1,12.8 V13.4 Z M8.4,12 H15.4 A3.2,3.2 0 0 1 18.6,15.2 V19.3 A3.2,3.2 0 0 1 15.4,22.5 H8.4 A3.2,3.2 0 0 1 5.2,19.3 V15.2 A3.2,3.2 0 0 1 8.4,12 Z" />
                                     <Border Style="{StaticResource CountBadge}" IsVisible="{Binding ShowSecondRowCount}">
                                         <Label Text="{Binding SecondRowCount}" Style="{StaticResource CountBadgeLabel}" />
                                     </Border>
@@ -85,14 +98,18 @@
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Spacing="8" Margin="0,3" FlexLayout.Shrink="0">
-                            <Border Style="{StaticResource Chip}" Padding="14,6">
+                            <Border Style="{StaticResource Chip}" Padding="12,6"
+                                    SemanticProperties.Description="{DynamicResource L_RowLocal}"
+                                    ToolTipProperties.Text="{DynamicResource L_RowLocal}">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding ShowLocalCommand}" />
                                 </Border.GestureRecognizers>
 
                                 <!-- Pastille : nombre de présélections locales. -->
                                 <HorizontalStackLayout Spacing="6">
-                                    <Label Text="{DynamicResource L_RowLocal}" FontSize="13" VerticalOptions="Center" />
+                                    <!-- Un téléphone : les présélections gardées dans le téléphone. -->
+                                    <Path Style="{StaticResource IconPath}" WidthRequest="18" HeightRequest="18"
+                                          Data="F0 M9.0,1.5 H15.0 A2.5,2.5 0 0 1 17.5,4.0 V20.0 A2.5,2.5 0 0 1 15.0,22.5 H9.0 A2.5,2.5 0 0 1 6.5,20.0 V4.0 A2.5,2.5 0 0 1 9.0,1.5 Z M8.9,4.2 H15.1 A0.6,0.6 0 0 1 15.7,4.8 V17.2 A0.6,0.6 0 0 1 15.1,17.8 H8.9 A0.6,0.6 0 0 1 8.3,17.2 V4.8 A0.6,0.6 0 0 1 8.9,4.2 Z M12,19 A1.2,1.2 0 1 1 12,21.4 A1.2,1.2 0 1 1 12,19 Z" />
                                     <Border Style="{StaticResource CountBadge}" IsVisible="{Binding Local.ShowCount}">
                                         <Label Text="{Binding Local.Count}" Style="{StaticResource CountBadgeLabel}" />
                                     </Border>
@@ -106,13 +123,17 @@
                                 </Border.Triggers>
                             </Border>
 
-                            <!-- « ★ STR » : les favoris STR, quand l'agent les connaît (pas de pastille : la place manque). -->
-                            <Border Style="{StaticResource Chip}" Padding="14,6" IsVisible="{Binding Favorites.IsAvailable}">
+                            <!-- Favoris STR, quand l'agent les connaît (pas de pastille : la place manque). -->
+                            <Border Style="{StaticResource Chip}" Padding="12,6" IsVisible="{Binding Favorites.IsAvailable}"
+                                    SemanticProperties.Description="{DynamicResource L_RowFavorites}"
+                                    ToolTipProperties.Text="{DynamicResource L_RowFavorites}">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding ShowFavoritesCommand}" />
                                 </Border.GestureRecognizers>
 
-                                <Label Text="{DynamicResource L_RowFavorites}" FontSize="13" VerticalOptions="Center" />
+                                <!-- Une étoile : les favoris STR. -->
+                                <Path Style="{StaticResource IconPath}" WidthRequest="18" HeightRequest="18"
+                                      Data="F0 M12,2.3 L14.53,9.32 L21.99,9.56 L16.09,14.13 L18.17,21.29 L12,17.1 L5.83,21.29 L7.91,14.13 L2.01,9.56 L9.47,9.32 Z" />
 
                                 <Border.Triggers>
                                     <DataTrigger TargetType="Border" Binding="{Binding Favorites.IsShown}" Value="True">

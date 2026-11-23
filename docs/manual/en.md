@@ -170,8 +170,9 @@ pressed twice. The choice applies to both tabs. Each tile shows the name of its 
 **Twice** chip carries a small number: how many keys of the second row hold a station.
 
 To the right of the chips, **Local** replaces the tiles with your local presets, kept
-on the phone (see the Presets tab); **Once** brings back the speaker's keys. On a narrow screen, **Local** and **★ STR** move to a
-second line, below **Once** and **Twice**.
+on the phone (see the Presets tab); **Once** brings back the speaker's keys. These chips show a drawing rather
+than a word: one raised finger for **Once**, two fingers for **Twice**, a phone for
+**Local**, a star for **★ STR**. A long press shows their name.
 
 The **Once** chip also carries a small number: how many keys of the first row hold a
 station.

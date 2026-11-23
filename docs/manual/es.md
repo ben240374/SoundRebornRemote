@@ -176,8 +176,9 @@ tienen una emisora.
 
 A la derecha de los botones, **Local** sustituye las tarjetas por tus presintonías
 locales, guardadas en el teléfono (ver la pestaña Presintonías); **Una vez** devuelve las
-teclas del altavoz. En una pantalla estrecha, **Local** y **★ STR** pasan a una segunda
-línea, debajo de **Una vez** y **Dos veces**.
+teclas del altavoz. Estos botones muestran un dibujo en
+lugar de una palabra: un dedo levantado para **Una vez**, dos dedos para **Dos veces**, un
+teléfono para **Local**, una estrella para **★ STR**. Una pulsación larga muestra su nombre.
 
 El botón **Una vez** también lleva un pequeño número: cuántas teclas de la primera fila
 tienen una emisora.

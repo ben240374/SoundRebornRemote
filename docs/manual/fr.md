@@ -181,8 +181,9 @@ seconde rangée portent une station.
 
 À droite des pastilles, **Local** remplace les tuiles par tes présélections locales,
 gardées dans le téléphone (voir l'onglet Présélections) ; **Une fois** ramène les touches
-de l'enceinte. Sur un écran étroit, **Local** et **★ STR** passent à la ligne, sous
-**Une fois** et **Deux fois**.
+de l'enceinte. Ces pastilles portent un dessin plutôt
+qu'un mot : un doigt levé pour **Une fois**, deux doigts pour **Deux fois**, un téléphone
+pour **Local**, une étoile pour **★ STR**. Un appui long affiche leur nom.
 
 La pastille **Une fois** porte elle aussi un petit nombre : combien de touches de la
 première rangée portent une station.

@@ -2211,13 +2211,14 @@ public static class Localization
             "Lokaal",
             "Local",
             "Locale");
+        // Nom de la pastille à l'étoile : lu par TalkBack, affiché sur un appui long.
         Add("L_RowFavorites",
-            "★ STR",
-            "★ STR",
-            "★ STR",
-            "★ STR",
-            "★ STR",
-            "★ STR");
+            "Favoris STR",
+            "STR favourites",
+            "STR-Favoriten",
+            "STR-favorieten",
+            "Favoritos STR",
+            "Preferiti STR");
         Add("L_AddLocal",
             "Ajouter à Local",
             "Add to Local",

@@ -178,8 +178,9 @@ stazione.
 
 A destra dei pulsanti, **Locale** sostituisce i riquadri con le tue preselezioni locali,
 salvate nel telefono (vedi la scheda Preselezioni); **Una volta** riporta i tasti del
-diffusore. Su uno schermo stretto, **Locale** e **★ STR** vanno a capo, sotto
-**Una volta** e **Due volte**.
+diffusore. Questi pulsanti mostrano un disegno invece di
+una parola: un dito alzato per **Una volta**, due dita per **Due volte**, un telefono per
+**Locale**, una stella per **★ STR**. Una pressione lunga mostra il loro nome.
 
 Anche il pulsante **Una volta** porta un piccolo numero: quanti tasti della prima fila
 hanno una stazione.

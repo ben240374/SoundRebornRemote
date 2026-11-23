@@ -181,8 +181,9 @@ einen Sender tragen.
 
 Rechts neben den Schaltflächen ersetzt **Lokal** die Kacheln durch deine lokalen
 Presets, die auf dem Telefon bleiben (siehe Reiter Presets); **Einmal** bringt die Tasten
-des Lautsprechers zurück. Auf einem schmalen Bildschirm rücken **Lokal** und **★ STR** in eine
-zweite Zeile, unter **Einmal** und **Zweimal**.
+des Lautsprechers zurück. Die Schaltflächen zeigen ein Bild statt
+eines Wortes: ein erhobener Finger für **Einmal**, zwei Finger für **Zweimal**, ein Telefon
+für **Lokal**, ein Stern für **★ STR**. Langes Drücken zeigt ihren Namen.
 
 Auch die Schaltfläche **Einmal** zeigt eine kleine Zahl: wie viele Tasten der ersten
 Reihe einen Sender tragen.

@@ -177,8 +177,9 @@ hebben.
 
 Rechts van de knoppen vervangt **Lokaal** de tegels door je lokale presets, die op de
 telefoon blijven (zie het tabblad Presets); **Eén keer** brengt de toetsen van de speaker
-terug. Op een smal scherm schuiven **Lokaal** en **★ STR** naar een tweede regel, onder
-**Eén keer** en **Twee keer**.
+terug. De knoppen tonen een tekening in plaats van een woord: één opgestoken vinger
+voor **Eén keer**, twee vingers voor **Twee keer**, een telefoon voor **Lokaal**, een ster
+voor **★ STR**. Lang drukken toont hun naam.
 
 Ook de knop **Eén keer** draagt een klein getal: hoeveel toetsen van de eerste rij een
 zender hebben.
