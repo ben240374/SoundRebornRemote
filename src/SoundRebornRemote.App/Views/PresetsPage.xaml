@@ -7,6 +7,11 @@
              x:DataType="vm:PresetsViewModel"
              Title="{DynamicResource L_TabPresets}">
 
+    <!-- Titre de la page et nom de l'application (AppTitleBar). -->
+    <Shell.TitleView>
+        <views:AppTitleBar TitleKey="L_TabPresets" />
+    </Shell.TitleView>
+
     <!--
         Toute la page défile d'un seul bloc. Les résultats de recherche sont posés
         par un BindableLayout et non par une CollectionView : une liste défilante
@@ -123,7 +128,7 @@
                                 </Border.Triggers>
                             </Border>
 
-                            <!-- Favoris STR, quand l'agent les connaît (pas de pastille : la place manque). -->
+                            <!-- Favoris STR, quand l'agent les connaît, avec leur nombre en pastille. -->
                             <Border Style="{StaticResource Chip}" Padding="12,6" IsVisible="{Binding Favorites.IsAvailable}"
                                     SemanticProperties.Description="{DynamicResource L_RowFavorites}"
                                     ToolTipProperties.Text="{DynamicResource L_RowFavorites}">
@@ -131,9 +136,14 @@
                                     <TapGestureRecognizer Command="{Binding ShowFavoritesCommand}" />
                                 </Border.GestureRecognizers>
 
-                                <!-- Une étoile : les favoris STR. -->
-                                <Path Style="{StaticResource IconPath}" WidthRequest="18" HeightRequest="18"
-                                      Data="F0 M12,2.3 L14.53,9.32 L21.99,9.56 L16.09,14.13 L18.17,21.29 L12,17.1 L5.83,21.29 L7.91,14.13 L2.01,9.56 L9.47,9.32 Z" />
+                                <!-- Une étoile : les favoris STR ; pastille : leur nombre. -->
+                                <HorizontalStackLayout Spacing="6">
+                                    <Path Style="{StaticResource IconPath}" WidthRequest="18" HeightRequest="18"
+                                          Data="F0 M12,2.3 L14.53,9.32 L21.99,9.56 L16.09,14.13 L18.17,21.29 L12,17.1 L5.83,21.29 L7.91,14.13 L2.01,9.56 L9.47,9.32 Z" />
+                                    <Border Style="{StaticResource CountBadge}" IsVisible="{Binding Favorites.ShowCount}">
+                                        <Label Text="{Binding Favorites.Count}" Style="{StaticResource CountBadgeLabel}" />
+                                    </Border>
+                                </HorizontalStackLayout>
 
                                 <Border.Triggers>
                                     <DataTrigger TargetType="Border" Binding="{Binding Favorites.IsShown}" Value="True">

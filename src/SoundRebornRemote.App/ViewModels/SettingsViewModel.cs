@@ -27,6 +27,7 @@ public sealed partial class SettingsViewModel : BaseViewModel
         _artwork = artwork;
         _zones = zones;
         Alarms = new AlarmsViewModel(speakers);
+        Display = new DisplaySettingsViewModel(speakers);
 
         foreach (var speaker in Speakers.KnownSpeakers)
         {
@@ -86,10 +87,16 @@ public sealed partial class SettingsViewModel : BaseViewModel
 
         // Les réveils appartiennent à l'enceinte désignée : ils suivent la sélection.
         _ = Alarms.LoadAsync();
+
+        // L'écran aussi : chaque enceinte a ses propres réglages.
+        _ = Display.LoadAsync();
     }
 
     /// <summary>Réveils et volume de départ de l'enceinte désignée.</summary>
     public AlarmsViewModel Alarms { get; }
+
+    /// <summary>Réglages de l'écran de l'enceinte désignée.</summary>
+    public DisplaySettingsViewModel Display { get; }
 
     /// <summary>Vrai quand les commandes partent vers le maître du groupe, pas vers la sélection.</summary>
     [ObservableProperty]
@@ -211,6 +218,50 @@ public sealed partial class SettingsViewModel : BaseViewModel
         AppLanguage.Spanish => "https://st-reborn.de/es/",
         _ => "https://st-reborn.de/",
     };
+
+    /// <summary>Le développeur de l'application, montré dans « À propos ».</summary>
+    public const string DeveloperNameText = "Benoît Barbaix";
+
+    /// <summary>L'adresse de contact publique du développeur.</summary>
+    public const string DeveloperEmailText = "bno.it.dev@gmail.com";
+
+    public string DeveloperName => DeveloperNameText;
+
+    public string DeveloperEmail => DeveloperEmailText;
+
+    /// <summary>Ouvre l'application de messagerie, l'adresse déjà remplie.</summary>
+    public string DeveloperMailto => "mailto:" + DeveloperEmailText;
+
+    /// <summary>La page Ko-fi du développeur : un lien, aucun paiement dans l'application.</summary>
+    public const string DonationUrl = "https://ko-fi.com/bnoitdev";
+
+    public string SupportUrl => DonationUrl;
+
+    /// <summary>Faux dans la version Google Play, aux règles de paiement plus strictes.</summary>
+    public static bool SupportAvailable =>
+#if PLAY_STORE
+        false;
+#else
+        true;
+#endif
+
+    public bool ShowSupport => SupportAvailable;
+
+    /// <summary>« V1.9.3 », sous le nom de l'application dans « À propos ».</summary>
+    public string VersionNumber
+    {
+        get
+        {
+            try
+            {
+                return $"V{AppInfo.Current.VersionString}";
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+    }
 
     /// <summary>« SoundReborn Remote V1.6.4 » — le code de version Android n'intéresse personne.</summary>
     public string AppVersion
@@ -555,6 +606,19 @@ public sealed partial class SettingsViewModel : BaseViewModel
             // DeviceChanged a déjà remis l'étiquette à jour.
             ShowInfo(null);
         }
+    }
+
+    /// <summary>
+    /// Remet la langue et le thème choisis en accord avec ceux en vigueur, après
+    /// l'importation d'une sauvegarde qui les a changés sans passer par ces listes.
+    /// </summary>
+    public void SyncAppSettings()
+    {
+        _suppressLanguageApply = true;
+        SelectedLanguageIndex = Localization.Available.ToList().IndexOf(Localization.Current);
+        _suppressLanguageApply = false;
+
+        BuildThemeLabels();
     }
 
     private void RefreshLabels()

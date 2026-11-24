@@ -1297,8 +1297,254 @@ public sealed partial class PlayerViewModel : BaseViewModel
         await d.Bose.PressKeyAsync(RemoteKey.Stop).ConfigureAwait(false);
     });
 
+    /// <summary>
+    /// Juste après un appui sur la sourdine, l'enceinte annonce encore l'ancien
+    /// état le temps d'un aller-retour : une lecture tombant dans ce creux
+    /// rebasculerait l'icône. Même délai que la page téléphone de STR.
+    /// </summary>
+    private static readonly TimeSpan MuteEcho = TimeSpan.FromMilliseconds(1500);
+
+    private DateTime _muteSetAt = DateTime.MinValue;
+
+    /// <summary>
+    /// Sourdine. On demande un état DÉCIDÉ (le contraire de celui affiché), jamais
+    /// une bascule : deux appuis, ou deux télécommandes, ne s'annulent plus.
+    ///
+    /// En groupe, la sourdine d'une enceinte ne touche qu'elle (le firmware et STR
+    /// la gardent locale) : on coupe donc CHAQUE membre. Le maître par sa sourdine
+    /// propre ; les autres par leur volume (voir <see cref="MuteFollowerAsync"/>).
+    /// </summary>
     [RelayCommand]
-    private Task ToggleMuteAsync() => RunAsync(d => d.ToggleMuteAsync());
+    private async Task ToggleMuteAsync()
+    {
+        var device = Device;
+
+        if (device is null)
+        {
+            IsError = true;
+            StatusMessage = Localization.Get("S_NoSpeaker");
+            return;
+        }
+
+        var wanted = !IsMuted;
+        var members = IsGroupActive ? CurrentZoneMembers(device) : new List<StrZoneMemberRef>();
+
+        _muteSetAt = DateTime.UtcNow;
+        IsMuted = wanted;
+
+        try
+        {
+            if (members.Count <= 1)
+            {
+                IsMuted = await device.SetMuteAsync(wanted).ConfigureAwait(true);
+                _muteSetAt = DateTime.UtcNow;
+                ShowInfo(null);
+                return;
+            }
+
+            var results = await Task.WhenAll(members.Select(m => MuteMemberAsync(device, m.Ip, wanted))).ConfigureAwait(true);
+            var failed = members.Where((_, i) => !results[i]).Select(m => MemberName(m.Ip)).ToList();
+
+            _muteSetAt = DateTime.UtcNow;
+
+            if (failed.Count == 0)
+            {
+                ShowInfo(null);
+                return;
+            }
+
+            IsError = true;
+            StatusMessage = Localization.Get("S_GroupMutePartly", string.Join(", ", failed));
+
+            // Le maître (l'enceinte commandée) dit l'état affiché.
+            if (failed.Count == members.Count)
+            {
+                IsMuted = !wanted;
+            }
+        }
+        catch (Exception ex)
+        {
+            IsMuted = !wanted;
+            ShowError(ex);
+        }
+    }
+
+    /// <summary>Coupe ou rend le son d'un membre du groupe ; faux s'il n'a pas suivi.</summary>
+    private async Task<bool> MuteMemberAsync(SpeakerDevice device, string ip, bool muted)
+    {
+        try
+        {
+            if (string.Equals(ip, device.Host, StringComparison.OrdinalIgnoreCase))
+            {
+                await device.SetMuteAsync(muted).ConfigureAwait(false);
+                return true;
+            }
+
+            await MuteFollowerAsync(device, ip, muted).ConfigureAwait(false);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Sourdine d'une enceinte qui SUIT le groupe : son volume va à 0, puis revient.
+    ///
+    /// La sourdine propre d'une suiveuse — touche MUTE ou POST /api/box/mute de son
+    /// agent, qui presse la même touche — ne la faisait pas taire : en groupe, le
+    /// maître seul se coupait. Le volume, lui, appartient à chaque enceinte du
+    /// groupe (c'est celui des curseurs par enceinte) : à 0, elle se tait à coup sûr.
+    ///
+    /// Le niveau d'avant est gardé, même si l'application est fermée entre-temps,
+    /// et rendu à la levée de la sourdine — sauf si quelqu'un a remonté ce volume
+    /// entre-temps : son choix est alors gardé.
+    /// </summary>
+    private async Task MuteFollowerAsync(SpeakerDevice device, string ip, bool muted)
+    {
+        var bose = new BoseApiClient(ip, Speakers.Http);
+        var state = await bose.GetVolumeAsync().ConfigureAwait(false);
+
+        if (muted)
+        {
+            // Déjà à 0 (coupée par un appui précédent, ou baissée à fond) : le niveau
+            // gardé, s'il y en a un, reste le bon.
+            if (state.Target > 0)
+            {
+                RememberFollowerLevel(ip, state.Target);
+            }
+
+            await SetFollowerVolumeAsync(device, bose, ip, 0).ConfigureAwait(false);
+            return;
+        }
+
+        // Une sourdine propre laissée sur la suiveuse (version précédente de
+        // l'application, télécommande Bose) est levée aussi, par l'état décidé.
+        if (state.IsMuted)
+        {
+            var endpoint = Speakers.KnownSpeakers.FirstOrDefault(e => string.Equals(e.Host, ip, StringComparison.OrdinalIgnoreCase));
+            var agent = endpoint?.StrPort is int port ? new StrApiClient(ip, port, Speakers.Http) : null;
+
+            await MuteControl.SetAsync(agent, bose, false).ConfigureAwait(false);
+        }
+
+        var saved = TakeFollowerLevel(ip);
+
+        if (state.Target > 0)
+        {
+            return;
+        }
+
+        // Sans niveau gardé (application réinstallée), celui du maître : mieux
+        // qu'une enceinte qui reste muette sans raison visible.
+        var level = saved ?? (await device.GetVolumeAsync().ConfigureAwait(false)).Target;
+
+        if (level > 0)
+        {
+            await SetFollowerVolumeAsync(device, bose, ip, level).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Volume d'une suiveuse : par l'agent du maître, qui règle les membres de sa
+    /// zone (comme les curseurs par enceinte), sinon directement sur l'enceinte.
+    /// </summary>
+    private static async Task SetFollowerVolumeAsync(SpeakerDevice device, BoseApiClient bose, string ip, int level)
+    {
+        if (device.Str is not null)
+        {
+            try
+            {
+                await device.Str.SetZoneVolumeAsync(level, ip).ConfigureAwait(false);
+                return;
+            }
+            catch (Exception)
+            {
+                // Agent qui refuse ou ne connaît pas ce membre : en direct, ci-dessous.
+            }
+        }
+
+        await bose.SetVolumeAsync(level).ConfigureAwait(false);
+    }
+
+    private const string FollowerLevelsKey = "group_mute_levels";
+
+    private readonly object _followerLevelsLock = new();
+
+    /// <summary>Niveau d'avant la sourdine de chaque suiveuse, par adresse ; chargé à la demande.</summary>
+    private Dictionary<string, int>? _followerLevels;
+
+    private void RememberFollowerLevel(string ip, int level)
+    {
+        lock (_followerLevelsLock)
+        {
+            FollowerLevels()[ip] = level;
+            SaveFollowerLevels();
+        }
+    }
+
+    private int? TakeFollowerLevel(string ip)
+    {
+        lock (_followerLevelsLock)
+        {
+            if (!FollowerLevels().Remove(ip, out var level))
+            {
+                return null;
+            }
+
+            SaveFollowerLevels();
+            return level;
+        }
+    }
+
+    private Dictionary<string, int> FollowerLevels()
+    {
+        if (_followerLevels is null)
+        {
+            _followerLevels = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+            try
+            {
+                var raw = Preferences.Default.Get(FollowerLevelsKey, string.Empty);
+
+                if (!string.IsNullOrWhiteSpace(raw) &&
+                    System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(raw) is { } stored)
+                {
+                    foreach (var (ip, level) in stored)
+                    {
+                        if (level is > 0 and <= 100)
+                        {
+                            _followerLevels[ip] = level;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Valeur illisible : on repart de rien, la sourdine marche quand même.
+            }
+        }
+
+        return _followerLevels;
+    }
+
+    private void SaveFollowerLevels()
+    {
+        try
+        {
+            Preferences.Default.Set(FollowerLevelsKey, System.Text.Json.JsonSerializer.Serialize(_followerLevels));
+        }
+        catch (Exception)
+        {
+            // Sans stockage, le niveau reste au moins connu jusqu'à la fermeture.
+        }
+    }
+
+    private string MemberName(string ip)
+        => GroupMembers.FirstOrDefault(m => string.Equals(m.Ip, ip, StringComparison.OrdinalIgnoreCase))?.Name
+           ?? Speakers.KnownSpeakers.FirstOrDefault(e => string.Equals(e.Host, ip, StringComparison.OrdinalIgnoreCase))?.DisplayName
+           ?? ip;
 
     /// <summary>Allume ou met en veille, selon l'état courant.</summary>
     [RelayCommand]
@@ -1577,9 +1823,11 @@ public sealed partial class PlayerViewModel : BaseViewModel
     /// Garde ce qui joue sur une touche, au choix de l'utilisateur.
     ///
     /// C'est l'agent qui décide de ce qu'il enregistre — la station, le dossier ou
-    /// la piste de bibliothèque — d'après ce que l'enceinte joue réellement. La
-    /// commande part donc vers l'enceinte qui reçoit les ordres : en groupe, le
-    /// maître, puisque c'est lui qui joue.
+    /// la piste de bibliothèque — d'après ce que l'enceinte joue réellement. Une
+    /// playlist Spotify ou Deezer est gardée comme le fait la page téléphone de
+    /// STR (StrApiClient.KeepPlayingAsync), d'après ce que l'enceinte joue à
+    /// l'instant. La commande part vers l'enceinte qui reçoit les ordres : en
+    /// groupe, le maître, puisque c'est lui qui joue.
     /// </summary>
     [RelayCommand]
     private async Task SavePlayingAsync()
@@ -1609,7 +1857,10 @@ public sealed partial class PlayerViewModel : BaseViewModel
                 return;
             }
 
-            var kept = await device.Str.SavePlayingAsync(key).ConfigureAwait(true);
+            // Relu à l'instant, comme la page téléphone : l'affichage peut avoir
+            // quelques secondes de retard sur l'enceinte.
+            var playing = await device.GetNowPlayingAsync().ConfigureAwait(true);
+            var kept = await device.Str.KeepPlayingAsync(key, playing).ConfigureAwait(true);
 
             await _presetsViewModel.RevealSlotAsync(key).ConfigureAwait(true);
 
@@ -1619,9 +1870,16 @@ public sealed partial class PlayerViewModel : BaseViewModel
         }
         catch (SpeakerException ex) when (ex.StatusCode is { } code && (int)code == 422)
         {
-            // Veille, AUX, Bluetooth, Spotify : rien que l'agent sache garder.
+            // Veille, AUX, Bluetooth : rien que l'agent sache garder.
             IsError = true;
             StatusMessage = Localization.Get("S_NothingToKeep");
+        }
+        catch (SpeakerException ex) when (!IsKnownRefusal(ex))
+        {
+            // Un refus que l'agent explique (une touche Spotify sans Premium, par
+            // exemple) : sa phrase plutôt que « a répondu 409 ».
+            IsError = true;
+            StatusMessage = Localization.Get("S_KeepFailed", AgentMessage(ex));
         }
         catch (Exception ex)
         {
@@ -1717,6 +1975,11 @@ public sealed partial class PlayerViewModel : BaseViewModel
     /// Sans agent on sait seulement qui suit qui : le firmware ne publie pas les
     /// volumes des autres enceintes.
     /// </summary>
+    /// <summary>Lectures de zone ratées d'affilée, et l'enceinte qu'elles concernaient.</summary>
+    private int _zoneReadFailures;
+
+    private string? _zoneReadHost;
+
     private async Task LoadZoneAsync()
     {
         var device = Device;
@@ -1825,11 +2088,25 @@ public sealed partial class PlayerViewModel : BaseViewModel
         }
         catch (Exception)
         {
-            // Une zone illisible ne doit pas casser la page : on la considère absente.
+            // Une seule lecture ratée (maître occupé, Wi-Fi qui hoquette) n'est pas
+            // une dissolution : le groupe affiché reste, le temps d'une relecture.
+            // C'est ce qui faisait disparaître le groupe de l'écran alors que les
+            // enceintes jouaient toujours ensemble. Au second échec d'affilée, ou
+            // pour une autre enceinte, la zone est considérée absente, comme avant.
+            if (IsGroupActive && _zoneReadFailures == 0 &&
+                string.Equals(_zoneReadHost, device.Host, StringComparison.OrdinalIgnoreCase))
+            {
+                _zoneReadFailures++;
+                return;
+            }
+
             IsGroupActive = false;
             HasGroupVolume = false;
             GroupMembers.Clear();
         }
+
+        _zoneReadFailures = 0;
+        _zoneReadHost = device.Host;
 
         // L'agent d'une enceinte qui SUIT un groupe ne le décrit pas toujours : il
         // voit la zone depuis le maître, et le firmware d'une esclave n'est pas plus
@@ -2455,6 +2732,135 @@ public sealed partial class PlayerViewModel : BaseViewModel
         }
     }
 
+    // ---------------------------------------------------------------- Avancement du morceau
+
+    /// <summary>Au-delà, ce n'est pas la durée d'un morceau (un flux sans fin, par exemple).</summary>
+    private const int MaxTrackSeconds = 6 * 3600;
+
+    /// <summary>L'enceinte donne la durée du morceau : la barre d'avancement s'affiche.</summary>
+    [ObservableProperty]
+    private bool _hasProgress;
+
+    /// <summary>Avancement, de 0 à 1.</summary>
+    [ObservableProperty]
+    private double _progress;
+
+    /// <summary>« 1:23 / 3:45 ».</summary>
+    [ObservableProperty]
+    private string _progressText = "";
+
+    private double _progressBase;
+    private int _progressDuration;
+    private DateTime _progressAt;
+    private bool _progressRunning;
+    private IDispatcherTimer? _progressTimer;
+
+    /// <summary>
+    /// La barre d'avancement de « En ce moment », quand l'enceinte connaît la durée
+    /// du morceau : l'entrée Spotify propre à l'enceinte (Spotify Connect), un
+    /// morceau de la bibliothèque. La position annoncée est prolongée seconde par
+    /// seconde entre deux annonces, comme une horloge.
+    ///
+    /// Pas de barre pour une radio (pas de durée) ni pour une touche Spotify de STR :
+    /// l'enceinte y joue un flux continu, sans durée de morceau, et l'agent ne donne
+    /// pas encore la position du morceau.
+    /// </summary>
+    private void UpdateProgress(NowPlaying nowPlaying)
+    {
+        var location = nowPlaying.Content?.Location ?? "";
+
+        if (nowPlaying.IsIdle ||
+            nowPlaying.DurationSeconds <= 0 ||
+            nowPlaying.DurationSeconds > MaxTrackSeconds ||
+            location.Contains("/spotify/stream", StringComparison.OrdinalIgnoreCase))
+        {
+            HasProgress = false;
+            StopProgressTimer();
+            return;
+        }
+
+        _progressDuration = nowPlaying.DurationSeconds;
+        _progressBase = Math.Clamp(nowPlaying.PositionSeconds, 0, _progressDuration);
+        _progressAt = DateTime.UtcNow;
+        _progressRunning = nowPlaying.IsPlaying;
+        HasProgress = true;
+        PaintProgress();
+
+        if (_progressRunning)
+        {
+            StartProgressTimer();
+        }
+        else
+        {
+            StopProgressTimer();
+        }
+    }
+
+    private void PaintProgress()
+    {
+        if (!HasProgress || _progressDuration <= 0)
+        {
+            return;
+        }
+
+        var elapsed = _progressRunning ? (DateTime.UtcNow - _progressAt).TotalSeconds : 0;
+        var shown = Math.Clamp(_progressBase + elapsed, 0, _progressDuration);
+
+        Progress = shown / _progressDuration;
+        ProgressText = $"{TrackClock(shown)} / {TrackClock(_progressDuration)}";
+    }
+
+    private void StartProgressTimer()
+    {
+        try
+        {
+            if (_progressTimer is null)
+            {
+                var timer = Application.Current?.Dispatcher.CreateTimer();
+
+                if (timer is null)
+                {
+                    return;
+                }
+
+                timer.Interval = TimeSpan.FromSeconds(1);
+                timer.Tick += (_, _) => PaintProgress();
+                _progressTimer = timer;
+            }
+
+            if (!_progressTimer.IsRunning)
+            {
+                _progressTimer.Start();
+            }
+        }
+        catch (Exception)
+        {
+            // Sans minuterie, la barre avance à chaque annonce de l'enceinte.
+        }
+    }
+
+    private void StopProgressTimer()
+    {
+        try
+        {
+            _progressTimer?.Stop();
+        }
+        catch (Exception)
+        {
+            // Rien à arrêter.
+        }
+    }
+
+    /// <summary>« 3:07 », ou « 1:02:07 » au-delà d'une heure.</summary>
+    public static string TrackClock(double seconds)
+    {
+        var value = TimeSpan.FromSeconds(Math.Max(0, Math.Floor(seconds)));
+
+        return value.TotalHours >= 1
+            ? $"{(int)value.TotalHours}:{value.Minutes:00}:{value.Seconds:00}"
+            : $"{(int)value.TotalMinutes}:{value.Seconds:00}";
+    }
+
     private async Task ApplyNowPlayingAsync(NowPlaying nowPlaying)
     {
         _lastNowPlaying = nowPlaying;
@@ -2463,6 +2869,7 @@ public sealed partial class PlayerViewModel : BaseViewModel
         ShowRegularTitle(nowPlaying);
         ArtGlyph = GlyphFor(nowPlaying.Source);
         IsPlaying = nowPlaying.IsPlaying;
+        UpdateProgress(nowPlaying);
         // Pendant le sursis, l'état demandé prime sur celui que l'enceinte annonce
         // encore : elle n'a pas fini de se réveiller, elle ne ment pas.
         var pendingPower = DateTime.UtcNow - _powerRequestedAt < PowerGrace;
@@ -2811,7 +3218,10 @@ public sealed partial class PlayerViewModel : BaseViewModel
 
     private void ApplyVolume(VolumeState state)
     {
-        IsMuted = state.IsMuted;
+        if (DateTime.UtcNow - _muteSetAt >= MuteEcho)
+        {
+            IsMuted = state.IsMuted;
+        }
 
         // En groupe, le curseur du haut affiche la moyenne du groupe : le volume
         // propre à l'enceinte pilotée ne doit pas venir l'écraser.

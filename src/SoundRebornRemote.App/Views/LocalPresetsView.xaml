@@ -21,12 +21,28 @@
         <VerticalStackLayout BindableLayout.ItemsSource="{Binding Items}" Spacing="0">
             <BindableLayout.ItemTemplate>
                 <DataTemplate x:DataType="vm:LocalPresetItem">
+                    <!--
+                        Appui court : la station joue. Appui long puis glisser sur une
+                        autre ligne : la station prend sa place dans la liste.
+                    -->
                     <Grid Padding="2,8" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=PlayCommand}"
                                 CommandParameter="{Binding .}" />
+                            <DragGestureRecognizer CanDrag="True"
+                                DragStartingCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=DragStartCommand}"
+                                DragStartingCommandParameter="{Binding .}"
+                                DropCompletedCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=EndDragCommand}" />
+                            <DropGestureRecognizer AllowDrop="True"
+                                DropCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=DropOnCommand}"
+                                DropCommandParameter="{Binding .}" />
                         </Grid.GestureRecognizers>
+                        <Grid.Triggers>
+                            <DataTrigger TargetType="Grid" Binding="{Binding IsDragged}" Value="True">
+                                <Setter Property="Opacity" Value="0.4" />
+                            </DataTrigger>
+                        </Grid.Triggers>
 
                         <Border Grid.Column="0" Style="{StaticResource TileCard}"
                                 WidthRequest="46" HeightRequest="46">
@@ -59,26 +75,71 @@
                         </VerticalStackLayout>
 
                         <!-- Des boutons et non des gestes : l'appui ne lance pas la station par la même occasion. -->
-                        <Button Grid.Column="2" Text="✎" Style="{StaticResource TileIconButton}" VerticalOptions="Center"
-                                SemanticProperties.Description="{DynamicResource L_KeyRenameGo}"
-                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=RenameCommand}"
-                                CommandParameter="{Binding .}" />
-                        <Button Grid.Column="3" Text="✕" Style="{StaticResource TileIconButton}" VerticalOptions="Center"
-                                TextColor="{StaticResource Danger}"
-                                SemanticProperties.Description="{DynamicResource L_LocalRemoveGo}"
-                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=RemoveCommand}"
-                                CommandParameter="{Binding .}" />
+                        <Grid Grid.Column="2" Grid.ColumnSpan="2" ColumnDefinitions="Auto,Auto" ColumnSpacing="10" VerticalOptions="Center"
+                              IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=IsReordering, Converter={StaticResource InvertedBool}}">
+                            <Button Grid.Column="0" Text="✎" Style="{StaticResource TileIconButton}"
+                                    SemanticProperties.Description="{DynamicResource L_KeyRenameGo}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=RenameCommand}"
+                                    CommandParameter="{Binding .}" />
+                            <Button Grid.Column="1" Text="✕" Style="{StaticResource TileIconButton}"
+                                    TextColor="{StaticResource Danger}"
+                                    SemanticProperties.Description="{DynamicResource L_LocalRemoveGo}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=RemoveCommand}"
+                                    CommandParameter="{Binding .}" />
+                        </Grid>
+
+                        <!--
+                            Rangement : monter, descendre. La flèche inutile (en tête,
+                            en fin de liste) est effacée mais garde sa place, pour que
+                            les flèches restent alignées d'une ligne à l'autre.
+                        -->
+                        <Grid Grid.Column="2" Grid.ColumnSpan="2" ColumnDefinitions="Auto,Auto" ColumnSpacing="10" VerticalOptions="Center"
+                              IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=IsReordering}">
+                            <Button Grid.Column="0" Text="▲" FontSize="15" Style="{StaticResource TileIconButton}"
+                                    IsEnabled="{Binding IsFirst, Converter={StaticResource InvertedBool}}"
+                                    SemanticProperties.Description="{DynamicResource L_LocalMoveUp}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=MoveUpCommand}"
+                                    CommandParameter="{Binding .}">
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button" Binding="{Binding IsFirst}" Value="True">
+                                        <Setter Property="Opacity" Value="0" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+                            <Button Grid.Column="1" Text="▼" FontSize="15" Style="{StaticResource TileIconButton}"
+                                    IsEnabled="{Binding IsLast, Converter={StaticResource InvertedBool}}"
+                                    SemanticProperties.Description="{DynamicResource L_LocalMoveDown}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:LocalPresetsViewModel}}, Path=MoveDownCommand}"
+                                    CommandParameter="{Binding .}">
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button" Binding="{Binding IsLast}" Value="True">
+                                        <Setter Property="Opacity" Value="0" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+                        </Grid>
                     </Grid>
                 </DataTemplate>
             </BindableLayout.ItemTemplate>
         </VerticalStackLayout>
 
-        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+        <!-- Pendant le rangement, un seul bouton : « Terminé ». -->
+        <Button Text="{DynamicResource L_LocalReorderDone}" Style="{StaticResource AccentButton}"
+                Command="{Binding ToggleReorderCommand}" IsVisible="{Binding IsReordering}" />
+
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="8"
+              IsVisible="{Binding IsReordering, Converter={StaticResource InvertedBool}}">
             <Button Grid.Column="0" Text="{DynamicResource L_LocalAddPlaying}" Style="{StaticResource QuietButton}"
                     Command="{Binding AddPlayingCommand}" LineBreakMode="WordWrap" />
             <Button Grid.Column="1" Text="{DynamicResource L_LocalAddUrl}" Style="{StaticResource QuietButton}"
                     Command="{Binding AddUrlCommand}" LineBreakMode="WordWrap" />
         </Grid>
+
+        <Label Text="{DynamicResource L_LocalDragHint}" Style="{StaticResource CaptionLabel}"
+               LineBreakMode="WordWrap" IsVisible="{Binding ShowReorder}" />
+
+        <Button Text="{DynamicResource L_LocalReorder}" Style="{StaticResource QuietButton}"
+                Command="{Binding ToggleReorderCommand}" IsVisible="{Binding ShowReorder}" />
 
         <Label Text="{Binding StatusMessage}"
                TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"

@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:views="clr-namespace:SoundRebornRemote.App.Views"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:SoundRebornRemote.App.ViewModels"
              xmlns:models="clr-namespace:SoundReborn.Core.Models;assembly=SoundReborn.Core"
              x:Class="SoundRebornRemote.App.Views.SourcesPage"
              x:DataType="vm:SourcesViewModel"
              Title="{DynamicResource L_TabSources}">
+
+    <!-- Titre de la page et nom de l'application (AppTitleBar). -->
+    <Shell.TitleView>
+        <views:AppTitleBar TitleKey="L_TabSources" />
+    </Shell.TitleView>
 
     <ScrollView>
         <VerticalStackLayout Padding="16,12,16,24" Spacing="14">

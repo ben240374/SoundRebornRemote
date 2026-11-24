@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:views="clr-namespace:SoundRebornRemote.App.Views"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:SoundRebornRemote.App.ViewModels"
              xmlns:models="clr-namespace:SoundReborn.Core.Models;assembly=SoundReborn.Core"
              x:Class="SoundRebornRemote.App.Views.SettingsPage"
              x:DataType="vm:SettingsViewModel"
              Title="{DynamicResource L_TabSettings}">
+
+    <!-- Titre de la page et nom de l'application (AppTitleBar). -->
+    <Shell.TitleView>
+        <views:AppTitleBar TitleKey="L_TabSettings" />
+    </Shell.TitleView>
 
     <ScrollView>
         <VerticalStackLayout Padding="16,12,16,24" Spacing="14">
@@ -259,6 +265,120 @@
                 </VerticalStackLayout>
             </ContentView>
 
+            <!--
+                Écran de l'enceinte DÉSIGNÉE : les réglages « Son et affichage » de
+                l'application de bureau de STR. La carte n'apparaît que si l'enceinte a un
+                écran sur lequel STR dessine (ST20, ST30, Portable) ; chaque ligne, que si
+                l'enceinte sait la faire. Une case s'enregistre dès qu'on la touche.
+            -->
+            <ContentView BindingContext="{Binding Display}">
+                <Border x:DataType="vm:DisplaySettingsViewModel" Style="{StaticResource Card}" IsVisible="{Binding IsAvailable}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{DynamicResource L_DisplayTitle}" Style="{StaticResource SectionLabel}" />
+                        <Label Text="{DynamicResource L_DisplayNote}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" IsVisible="{Binding TrackVisible}">
+                            <CheckBox Grid.Column="0" IsChecked="{Binding TrackEnabled, Mode=TwoWay}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{DynamicResource L_DisplayTrack}" Style="{StaticResource SubtitleLabel}"
+                                   VerticalOptions="Center" LineBreakMode="WordWrap" />
+                        </Grid>
+
+                        <!-- Artiste, titre ou les deux : une pastille par choix, la choisie encadrée. -->
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8" Margin="40,0,0,4" IsVisible="{Binding ModeRowVisible}">
+                            <Border Grid.Column="0" Style="{StaticResource Chip}" Padding="8,6">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SetModeCommand}" CommandParameter="artist" />
+                                </Border.GestureRecognizers>
+                                <Label Text="{DynamicResource L_DisplayArtist}" FontSize="13" HorizontalOptions="Center" />
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding ModeArtist}" Value="True">
+                                        <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                        <Setter Property="StrokeThickness" Value="2" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                            </Border>
+                            <Border Grid.Column="1" Style="{StaticResource Chip}" Padding="8,6">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SetModeCommand}" CommandParameter="title" />
+                                </Border.GestureRecognizers>
+                                <Label Text="{DynamicResource L_DisplayTitleOnly}" FontSize="13" HorizontalOptions="Center" />
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding ModeTitle}" Value="True">
+                                        <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                        <Setter Property="StrokeThickness" Value="2" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                            </Border>
+                            <Border Grid.Column="2" Style="{StaticResource Chip}" Padding="8,6">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SetModeCommand}" CommandParameter="both" />
+                                </Border.GestureRecognizers>
+                                <Label Text="{DynamicResource L_DisplayBoth}" FontSize="13" HorizontalOptions="Center" />
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding ModeBoth}" Value="True">
+                                        <Setter Property="Stroke" Value="{StaticResource Accent}" />
+                                        <Setter Property="StrokeThickness" Value="2" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                            </Border>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" IsVisible="{Binding ClockVisible}">
+                            <CheckBox Grid.Column="0" IsChecked="{Binding ClockEnabled, Mode=TwoWay}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{DynamicResource L_DisplayClock}" Style="{StaticResource SubtitleLabel}"
+                                   VerticalOptions="Center" LineBreakMode="WordWrap" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" IsVisible="{Binding MessagesVisible}">
+                            <CheckBox Grid.Column="0" IsChecked="{Binding MessagesEnabled, Mode=TwoWay}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{DynamicResource L_DisplayMessages}" Style="{StaticResource SubtitleLabel}"
+                                   VerticalOptions="Center" LineBreakMode="WordWrap" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" IsVisible="{Binding NoticesVisible}">
+                            <CheckBox Grid.Column="0" IsChecked="{Binding NoticesEnabled, Mode=TwoWay}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{DynamicResource L_DisplayNotices}" Style="{StaticResource SubtitleLabel}"
+                                   VerticalOptions="Center" LineBreakMode="WordWrap" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" IsVisible="{Binding SplashVisible}">
+                            <CheckBox Grid.Column="0" IsChecked="{Binding SplashEnabled, Mode=TwoWay}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{DynamicResource L_DisplaySplash}" Style="{StaticResource SubtitleLabel}"
+                                   VerticalOptions="Center" LineBreakMode="WordWrap" />
+                        </Grid>
+
+                        <Label Text="{Binding StatusMessage}"
+                               TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                               FontSize="13" LineBreakMode="WordWrap"
+                               IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+
+                        <BoxView HeightRequest="1" Margin="0,4"
+                                 Color="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}" />
+
+                        <!-- « Trouver cette enceinte » : HELLO et son nom sur l'écran, quelques secondes. -->
+                        <Label Text="{DynamicResource L_IdentifyNote}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+                        <Button Text="{DynamicResource L_IdentifyButton}" Command="{Binding IdentifyCommand}"
+                                IsEnabled="{Binding IsIdentifying, Converter={StaticResource InvertedBool}}" />
+                        <Label Text="{Binding IdentifyMessage}"
+                               TextColor="{Binding IdentifyIsError, Converter={StaticResource ErrorColor}}"
+                               FontSize="13" LineBreakMode="WordWrap"
+                               IsVisible="{Binding IdentifyMessage, Converter={StaticResource StringNotEmpty}}" />
+                    </VerticalStackLayout>
+                </Border>
+            </ContentView>
+
+            <!--
+                Spotify et Deezer : une page à part, comme la vue « Spotify & Deezer » de
+                l'application de bureau de STR.
+            -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{DynamicResource L_StreamingTitle}" Style="{StaticResource SectionLabel}" />
+                    <Label Text="{DynamicResource L_StreamingCardNote}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+                    <Button Text="{DynamicResource L_StreamingOpen}" Style="{StaticResource AccentButton}" Clicked="OnOpenStreaming" />
+                </VerticalStackLayout>
+            </Border>
+
             <!-- Apparence -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Spacing="10">
@@ -424,45 +544,23 @@
                    IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
 
             <!--
-                ================================================= Sauvegarde des favoris
-                Sa propre vue-modèle (BackupViewModel), posée par la page dans son
-                code, avant celle de la page.
+                ================================================= Sauvegarde
+                Une seule sauvegarde : le téléphone (Local, textes, réglages) et
+                l'enceinte sélectionnée. Sa propre vue-modèle (BackupViewModel),
+                posée par la page dans son code, avant celle de la page.
             -->
             <ContentView x:Name="BackupCard" x:DataType="vm:BackupViewModel">
                 <Border Style="{StaticResource Card}">
                     <VerticalStackLayout Spacing="8">
                         <Label Text="{DynamicResource L_BackupTitle}" Style="{StaticResource SectionLabel}" />
+                        <Label Text="{Binding TargetText}" FontAttributes="Bold" FontSize="14" LineBreakMode="WordWrap" />
                         <Label Text="{DynamicResource L_BackupHint}" Style="{StaticResource SubtitleLabel}" LineBreakMode="WordWrap" />
 
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                            <Button Grid.Column="0" Text="{DynamicResource L_BackupExport}" Command="{Binding ExportCommand}" />
-                            <Button Grid.Column="1" Text="{DynamicResource L_BackupImport}" Command="{Binding ImportCommand}" />
-                        </Grid>
-
-                        <Label Text="{Binding StatusMessage}"
-                               TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
-                               FontSize="13" LineBreakMode="WordWrap"
-                               IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
-                    </VerticalStackLayout>
-                </Border>
-            </ContentView>
-
-            <!--
-                ================================================= Sauvegarde de l'enceinte
-                Sa propre vue-modèle (SpeakerBackupViewModel), posée par la page dans son code.
-            -->
-            <ContentView x:Name="SpeakerBackupCard" x:DataType="vm:SpeakerBackupViewModel">
-                <Border Style="{StaticResource Card}">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="{DynamicResource L_SpeakerBackupTitle}" Style="{StaticResource SectionLabel}" />
-                        <Label Text="{Binding TargetText}" FontAttributes="Bold" FontSize="14" LineBreakMode="WordWrap" />
-                        <Label Text="{DynamicResource L_SpeakerBackupHint}" Style="{StaticResource SubtitleLabel}" LineBreakMode="WordWrap" />
-
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
                             <Button Grid.Column="0" Text="{DynamicResource L_SpeakerBackupSave}" Command="{Binding ExportCommand}"
-                                    IsEnabled="{Binding CanUse}" LineBreakMode="WordWrap" />
+                                    LineBreakMode="WordWrap" />
                             <Button Grid.Column="1" Text="{DynamicResource L_SpeakerBackupRestore}" Command="{Binding RestoreCommand}"
-                                    IsEnabled="{Binding CanUse}" LineBreakMode="WordWrap" />
+                                    LineBreakMode="WordWrap" />
                         </Grid>
 
                         <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
@@ -530,15 +628,78 @@
                 </Border>
             </ContentView>
 
+            <!--
+                ================================================= Soutenir
+                Un lien vers la page Ko-fi, rien de plus : aucun paiement dans
+                l'application, rien de débloqué en échange. Absente de la version
+                Google Play, dont les règles de paiement sont plus strictes.
+            -->
+            <Border Style="{StaticResource Card}" IsVisible="{Binding ShowSupport}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{DynamicResource L_SupportTitle}" Style="{StaticResource SectionLabel}" />
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <!-- Une tasse : le café offert. -->
+                        <Border Grid.Column="0" Style="{StaticResource IconCircle}" WidthRequest="40" HeightRequest="40"
+                                StrokeShape="RoundRectangle 20" VerticalOptions="Start" InputTransparent="True">
+                            <Path Style="{StaticResource IconPath}"
+                                  Data="M4,8 H16 V12.5 C16,15.5 13.5,18 10.5,18 H9.5 C6.5,18 4,15.5 4,12.5 Z M16,9 H17.5 C19.4,9 21,10.6 21,12.5 C21,14.4 19.4,16 17.5,16 H16 V14.5 H17.5 C18.6,14.5 19.5,13.6 19.5,12.5 C19.5,11.4 18.6,10.5 17.5,10.5 H16 Z M3,19.5 H17 V21 H3 Z M7.25,3 H8.75 V6.5 H7.25 Z M11.25,3 H12.75 V6.5 H11.25 Z" />
+                        </Border>
+                        <Label Grid.Column="1" Text="{DynamicResource L_SupportBody}" Style="{StaticResource SubtitleLabel}"
+                               LineBreakMode="WordWrap" VerticalOptions="Center" />
+                    </Grid>
+
+                    <Button Text="{DynamicResource L_SupportButton}" Style="{StaticResource AccentButton}"
+                            Command="{Binding OpenUrlCommand}" CommandParameter="{Binding SupportUrl}" />
+
+                    <Label Text="{DynamicResource L_SupportNote}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Border>
+
             <!-- ================================================= À propos -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="{DynamicResource L_About}" Style="{StaticResource SectionLabel}" />
 
-                    <VerticalStackLayout Spacing="2">
-                        <Label Text="{Binding AppVersion}" FontAttributes="Bold" FontSize="15" />
-                        <Label Text="{DynamicResource L_AppTagline}" Style="{StaticResource CaptionLabel}" />
-                    </VerticalStackLayout>
+                    <!--
+                        Le nom de l'application en grand, comme dans la barre de titre :
+                        l'emblème, « SoundReborn » et « REMOTE » en petites capitales.
+                    -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" SemanticProperties.Description="{Binding AppVersion}">
+                        <!-- Sur le fond sombre de l'icône : le logo est le même dans les deux thèmes. -->
+                        <Border Grid.Column="0" WidthRequest="64" HeightRequest="64" Padding="6" VerticalOptions="Center"
+                                BackgroundColor="#101418" StrokeThickness="0" StrokeShape="RoundRectangle 16">
+                            <Image Source="brand_emblem.png" Aspect="AspectFit" />
+                        </Border>
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                            <Label Text="SoundReborn" FontSize="22" FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                            <Label Text="REMOTE" FontSize="12" FontAttributes="Bold" CharacterSpacing="3.4" Margin="1,-2,0,0"
+                                   TextColor="{AppThemeBinding Light={StaticResource Accent}, Dark={StaticResource AccentSoft}}" />
+                            <Label Text="{Binding VersionNumber}" Style="{StaticResource CaptionLabel}" Margin="1,4,0,0" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Label Text="{DynamicResource L_AppTagline}" Style="{StaticResource CaptionLabel}" />
+
+                    <!-- Le développeur de l'application : son badge, son nom, son adresse de contact. -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" Margin="0,4,0,0">
+                        <Image Grid.Column="0" Source="developer_badge.png" WidthRequest="56" HeightRequest="56"
+                               Aspect="AspectFit" VerticalOptions="Center" />
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                            <Label Text="{DynamicResource L_DeveloperBy}" Style="{StaticResource CaptionLabel}" />
+                            <Label Text="{Binding DeveloperName}" FontSize="15" FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                            <Label Text="{Binding DeveloperEmail}" FontSize="14" TextDecorations="Underline"
+                                   TextColor="{AppThemeBinding Light={StaticResource Accent}, Dark={StaticResource AccentSoft}}">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenUrlCommand}" CommandParameter="{Binding DeveloperMailto}" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </VerticalStackLayout>
+                    </Grid>
 
                     <BoxView HeightRequest="1" Margin="0,4"
                              Color="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}" />

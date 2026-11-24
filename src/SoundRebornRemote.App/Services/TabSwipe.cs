@@ -28,7 +28,14 @@ public static class TabSwipe
             return;
         }
 
-        if (Shell.Current?.CurrentItem is not ShellItem bar)
+        if (Shell.Current is not { } shell || shell.CurrentItem is not ShellItem bar)
+        {
+            return;
+        }
+
+        // Une page posée par-dessus les onglets (« Spotify & Deezer ») : le geste
+        // changerait d'onglet derrière elle, sans que rien ne se voie.
+        if (shell.Navigation.ModalStack.Count > 0)
         {
             return;
         }

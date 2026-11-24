@@ -10,8 +10,10 @@ namespace SoundReborn.Core.Models;
 ///   compris le compte et la playlist d'une touche Spotify) ;
 /// - les réveils, sans la révision ni le bloc d'état, qui ne valent que sur
 ///   l'enceinte d'origine au moment de la lecture ;
-/// - le volume de départ ;
-/// - les actions des touches pouce et AUX de la télécommande.
+/// - le volume de départ et le volume maximum ;
+/// - les actions des touches pouce et AUX de la télécommande ;
+/// - les réglages de l'écran que l'enceinte sait faire (titre, horloge, messages,
+///   avis, écran d'accueil).
 ///
 /// Ni l'adresse IP, ni l'identifiant de l'enceinte : le fichier sert aussi à
 /// recopier ces réglages sur une autre enceinte. Le groupe permanent n'y est pas :
@@ -56,6 +58,17 @@ public sealed class SpeakerBackup
     /// <summary>Les actions des touches de la télécommande, ou null si l'agent ne les connaît pas.</summary>
     public StrKeyActions? KeyActions { get; init; }
 
+    /// <summary>Le volume maximum (0 = aucun), ou null si l'agent ne le gère pas.</summary>
+    public int? MaxVolume { get; init; }
+
+    /// <summary>
+    /// Les réglages de l'écran, par nom (<see cref="StrDisplaySetting.Kinds"/>) :
+    /// <c>{"enabled":bool}</c>, plus <c>"mode"</c> pour le titre. Null : non lus.
+    /// </summary>
+    public JsonObject? Display { get; init; }
+
+    public int DisplayCount => Display?.Count ?? 0;
+
     public int PresetCount => Presets.Count;
 
     public int AlarmCount => Alarms?["alarms"] is JsonArray alarms ? alarms.Count : 0;
@@ -70,7 +83,7 @@ public sealed class SpeakerBackup
         var root = new JsonObject
         {
             ["kind"] = Kind,
-            ["version"] = 1,
+            ["version"] = 2,
             ["savedAt"] = SavedAt?.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
             ["speaker"] = new JsonObject
             {
@@ -82,6 +95,8 @@ public sealed class SpeakerBackup
             ["alarms"] = Alarms?.DeepClone(),
             ["startVolume"] = StartVolume,
             ["keyActions"] = KeyActions is null ? null : JsonNode.Parse(KeyActions.ToPutBody()),
+            ["maxVolume"] = MaxVolume,
+            ["display"] = Display?.DeepClone(),
         };
 
         return root.ToJsonString(Indented);
@@ -99,7 +114,9 @@ public sealed class SpeakerBackup
         JsonArray presets,
         StrAlarmDocument? alarms,
         int? startVolume,
-        StrKeyActions? keyActions)
+        StrKeyActions? keyActions,
+        int? maxVolume = null,
+        IEnumerable<StrDisplaySetting>? display = null)
     {
         JsonObject? alarmNode = null;
 
@@ -120,7 +137,69 @@ public sealed class SpeakerBackup
             Alarms = alarmNode,
             StartVolume = startVolume is int v ? Math.Clamp(v, 0, 100) : null,
             KeyActions = keyActions,
+            MaxVolume = maxVolume is int m ? Math.Clamp(m, 0, 100) : null,
+            Display = DisplayNode(display),
         };
+    }
+
+    /// <summary>Les réglages d'écran que l'enceinte sait faire, sous la forme du fichier.</summary>
+    private static JsonObject? DisplayNode(IEnumerable<StrDisplaySetting>? settings)
+    {
+        if (settings is null)
+        {
+            return null;
+        }
+
+        var node = new JsonObject();
+
+        foreach (var setting in settings.Where(s => s.Supported && StrDisplaySetting.Kinds.Contains(s.Kind)))
+        {
+            var entry = new JsonObject { ["enabled"] = setting.Enabled };
+
+            if (setting.Kind == StrDisplaySetting.Track)
+            {
+                entry["mode"] = setting.Mode;
+            }
+
+            node[setting.Kind] = entry;
+        }
+
+        return node.Count == 0 ? null : node;
+    }
+
+    /// <summary>Les réglages d'écran d'un fichier : noms connus, booléens, mode reconnu.</summary>
+    private static JsonObject? CleanDisplay(JsonObject? display)
+    {
+        if (display is null)
+        {
+            return null;
+        }
+
+        var node = new JsonObject();
+
+        foreach (var kind in StrDisplaySetting.Kinds)
+        {
+            if (display[kind] is not JsonObject entry ||
+                entry["enabled"] is not JsonValue enabledValue ||
+                !enabledValue.TryGetValue<bool>(out var enabled))
+            {
+                continue;
+            }
+
+            var clean = new JsonObject { ["enabled"] = enabled };
+
+            if (kind == StrDisplaySetting.Track)
+            {
+                var mode = Text(entry, "mode");
+                clean["mode"] = mode is StrDisplaySetting.ModeArtist or StrDisplaySetting.ModeTitle or StrDisplaySetting.ModeBoth
+                    ? mode
+                    : StrDisplaySetting.ModeBoth;
+            }
+
+            node[kind] = clean;
+        }
+
+        return node.Count == 0 ? null : node;
     }
 
     /// <summary>
@@ -188,6 +267,10 @@ public sealed class SpeakerBackup
             ? Math.Clamp(volume, 0, 100)
             : null;
 
+        int? maxVolume = root["maxVolume"] is JsonValue mv && mv.TryGetValue<int>(out var ceiling)
+            ? Math.Clamp(ceiling, 0, 100)
+            : null;
+
         DateTimeOffset? savedAt = Text(root, "savedAt") is { } at &&
                                   DateTimeOffset.TryParse(at, System.Globalization.CultureInfo.InvariantCulture,
                                       System.Globalization.DateTimeStyles.RoundtripKind, out var when)
@@ -204,6 +287,8 @@ public sealed class SpeakerBackup
             Alarms = alarms,
             StartVolume = startVolume,
             KeyActions = keyActions,
+            MaxVolume = maxVolume,
+            Display = CleanDisplay(root["display"] as JsonObject),
         };
     }
 

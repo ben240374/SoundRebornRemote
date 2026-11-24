@@ -304,7 +304,7 @@ public sealed class ArtworkCache
 
             if (local is not null && IsDecodable(local))
             {
-                return (ImageSource.FromStream(() => (Stream)File.OpenRead(local)), candidate);
+                return (SourceOf(local), candidate);
             }
 
             if (!FailedRecently(candidate))
@@ -329,12 +329,6 @@ public sealed class ArtworkCache
 
     /// <summary>
     /// Renvoie une source d'image utilisable dans une vue.
-    ///
-    /// On passe par un flux plutôt que par ImageSource.FromFile : sur Android, une
-    /// source de type fichier commence par chercher une ressource du même nom dans
-    /// l'APK et ne retombe sur le chemin qu'ensuite. Lire le fichier nous-mêmes
-    /// évite cette ambiguïté, et une image qui ne s'affiche pas redevient une
-    /// erreur visible plutôt qu'une tuile vide.
     /// </summary>
     /// <param name="background">Vrai pour un logo d'une liste longue : il passe après les touches.</param>
     public async Task<ImageSource?> GetImageSourceAsync(string? url, CancellationToken ct = default, bool background = false)
@@ -349,8 +343,26 @@ public sealed class ArtworkCache
             return null;
         }
 
-        return ImageSource.FromStream(() => (Stream)File.OpenRead(path));
+        return SourceOf(path);
     }
+
+    /// <summary>
+    /// La source d'image d'un fichier du cache : son chemin complet (1.9.3).
+    ///
+    /// Jusqu'en 1.9.2, un flux (ImageSource.FromStream). Sur Android, une image
+    /// chargée depuis un flux n'est pas annulée quand la source change : quand on
+    /// passait vite d'« Une fois » à « Deux fois », le logo de la rangée quittée
+    /// finissait de se charger APRÈS celui de la nouvelle et le recouvrait (une
+    /// touche montrait le logo d'une autre station). Un flux peut aussi rester
+    /// vide quand Android reprend un chargement interrompu (MAUI #23240, #37834).
+    /// Avec un chemin, le chargeur d'images d'Android remplace proprement la
+    /// demande précédente. Un chemin complet ne peut pas être pris pour une
+    /// ressource de l'APK : MAUI lit d'abord le fichier quand il existe.
+    /// </summary>
+    private static ImageSource SourceOf(string path)
+        => Path.IsPathRooted(path)
+            ? ImageSource.FromFile(path)
+            : ImageSource.FromStream(() => (Stream)File.OpenRead(path));
 
     /// <summary>
     /// <see cref="CanDecode(string)"/>, mémorisé pour la session : un fichier du

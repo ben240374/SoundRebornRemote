@@ -100,11 +100,6 @@ public static class MauiProgram
         // Raccourcis de l'icône : « Tout mettre en veille », touches 1 à 3.
         builder.Services.AddSingleton<ShortcutRunner>();
 
-        // Sauvegarde de l'enceinte sélectionnée : touches, réveils, volume de départ, télécommande.
-        builder.Services.AddSingleton<SpeakerBackupViewModel>(services => new SpeakerBackupViewModel(
-            services.GetRequiredService<SpeakerManager>(),
-            services.GetRequiredService<IFileExchange>()));
-
         // Dernière version de l'agent STR sur GitHub : la carte des Réglages et la
         // pastille de la liste des enceintes. Rien n'est installé d'ici.
         builder.Services.AddSingleton<AgentUpdateViewModel>(services => new AgentUpdateViewModel(
@@ -123,6 +118,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<SourcesViewModel>();
         builder.Services.AddSingleton<MultiroomViewModel>();
         builder.Services.AddSingleton<SettingsViewModel>();
+        builder.Services.AddSingleton<SpotifyDeezerViewModel>();
 
         builder.Services.AddSingleton<PlayerPage>();
         builder.Services.AddSingleton<PresetsPage>();

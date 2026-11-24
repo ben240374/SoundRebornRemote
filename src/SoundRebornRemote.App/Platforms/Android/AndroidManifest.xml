@@ -18,6 +18,11 @@
       <action android:name="android.intent.action.VIEW" />
       <data android:scheme="https" />
     </intent>
+    <!-- « Ouvrir Spotify » (page Spotify & Deezer) : savoir si l'application est là. -->
+    <intent>
+      <action android:name="android.intent.action.VIEW" />
+      <data android:scheme="spotify" />
+    </intent>
   </queries>
 
   <uses-permission android:name="android.permission.INTERNET" />

@@ -1,6 +1,6 @@
 # SoundReborn Remote — Handleiding
 
-Versie 1.9.2 · Android 7 en hoger
+Versie 1.9.3 · Android 7 en hoger
 
 > Talen: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · **Nederlands** · [Español](es.md) · [Italiano](it.md)
 
@@ -109,6 +109,11 @@ zichtbaar wordt.
 De hoes, de titel en de bron van wat er speelt. Bij een radiozender diens logo en naam,
 bij Spotify de albumhoes.
 
+Als de speaker de lengte van het nummer kent (de eigen Spotify-ingang van de speaker, een
+nummer uit de bibliotheek), verschijnt onder de titel een voortgangsbalk met de verstreken
+tijd en de lengte. Geen balk voor een radiozender of een Spotify-toets van STR: de agent
+geeft de lengte van zijn nummers nog niet door.
+
 Als Spotify speelt en de STR-agent versie 1.8.1 of nieuwer heeft, verschijnen onder de
 titel twee knoppen: **Vind ik leuk** voegt het huidige nummer toe aan Gelikete nummers,
 **Vind ik niet leuk** haalt het eruit, zoals de duimtoetsen van de afstandsbediening. Het
@@ -143,7 +148,11 @@ alleen als de agent de timer kent.
 
 ### Volume
 
-Demping, gelijkzetten, min, schuif, plus. Het percentage staat rechts.
+Demping, gelijkzetten, min, schuif, plus. Het percentage staat rechts. In een groep dempt de dempknop alle speakers van
+de groep en zet ze allemaal weer aan: de hoofdspeaker via zijn eigen demping, de andere door
+hun volume op 0 te zetten en daarna hun vorige niveau terug te geven (ook als de app
+tussendoor gesloten werd; een tussendoor verhoogd volume blijft). Een speaker die niet
+volgde, wordt genoemd.
 
 Hoort de speaker bij een groep, dan wordt deze schuif **het volume van de hele groep**:
 hij verschuift alle speakers met dezelfde stap en houdt zo de verhouding aan die je hebt
@@ -186,7 +195,8 @@ zender hebben.
 
 **Wat nu speelt op een toets zetten**, onder de tegels, bewaart wat de speaker op dit
 moment speelt — zender, album of nummer uit de bibliotheek — op de toets van je keuze.
-Spotify, AUX en Bluetooth kunnen zo niet worden bewaard.
+Een Spotify- of Deezer-afspeellijst of -album kan ook worden bewaard (Spotify-toetsen
+vereisen Spotify Premium); AUX en Bluetooth kunnen zo niet worden bewaard.
 
 ### Spraakbericht
 
@@ -277,6 +287,11 @@ de speaker, zoveel je wilt (hoogstens 100). Tik op een regel om de zender op de 
 speaker te starten; **✎** hernoemt hem, **✕** verwijdert hem na bevestiging. De regel van
 de zender die speelt is groen.
 
+Om de volgorde te wijzigen, houd je een zender lang ingedrukt en sleep je hem op een
+andere: hij neemt diens plaats in. **Lijst ordenen** (onder de lijst, vanaf twee zenders) vervangt **✎** en **✕** door **▲**
+en **▼**: elke tik zet de zender één plaats hoger of lager. **Klaar** stopt het ordenen.
+De volgorde blijft op de telefoon en in de back-up.
+
 Om er toe te voegen:
 
 - **Wat speelt toevoegen** bewaart de zender die de speaker nu speelt, met het
@@ -286,7 +301,7 @@ Om er toe te voegen:
 
 Deze presets blijven op deze telefoon: de toetsen van de speaker kennen ze niet, en een
 andere telefoon ziet ze niet. Een Spotify-afspeellijst kan er niet in: de STR-agent start
-een afspeellijst alleen vanaf een van zijn toetsen. Om ze bij een herinstallatie te bewaren, exporteer je ze in het tabblad Instellingen (**Back-up van favorieten**).
+een afspeellijst alleen vanaf een van zijn toetsen. Om ze bij een herinstallatie te bewaren, exporteer je ze in het tabblad Instellingen (**Back-up**).
 
 ### Een toets hernoemen en wissen
 
@@ -324,6 +339,7 @@ verwijdert, verandert enkele seconden later ook op de andere speakers en op de c
 - **★ Wat nu speelt toevoegen** bewaart de radio die de speaker speelt; in het zoeken biedt
   **⋯ Toetsen, Local…** **★ Aan STR-favorieten toevoegen**.
 - Een Pandora-zender staat in de lijst, maar start vanuit de STR-app.
+- Het badge op de knop **★ STR** toont het aantal favorieten.
 
 ### Een zender vinden
 
@@ -497,6 +513,25 @@ Vereist de STR-agent. Het uur stel je in op de klok van de telefoon. Het prullen
 spelen. Vink het vakje aan, kies het niveau en tik op **Startvolume opslaan**. Een volume
 dat tijdens het luisteren is ingesteld, wordt nooit gewijzigd.
 
+**Display van de speaker**: op een speaker waarop STR het display kan tekenen
+(SoundTouch 20, 30, Portable), dezelfde instellingen als in de STR-desktopapp: **Huidig
+nummer** (met **Artiest**, **Titel** of **Beide**), **Tijd tijdens afspelen, bij
+Bluetooth en AUX**, **Melding als een toets niet kan spelen**, **Meldingen (toets
+opgeslagen, toets leeg)** en **STR-logo bij het opstarten**. Alleen de regels die de
+speaker kan, verschijnen; een speaker zonder display toont geen kaart. Elk vakje wordt
+opgeslagen zodra je het aantikt. **Hallo zeggen** toont een paar seconden HELLO en de naam
+van de speaker op zijn display: handig om te weten welke speaker welke is.
+
+**Spotify & Deezer**: **Openen** toont een pagina voor de speaker die de opdrachten
+ontvangt. In de app hoef je niet in te loggen: het Spotify-account komt op de speaker als
+je hem in Spotify kiest (de ingang die eindigt op „(STR)”), en een nieuwe Deezer-aanmelding
+is zonder de Bose-cloud niet mogelijk. De pagina toont welk Spotify-account op de speaker
+staat (en of Spotify het weigert), opent Spotify, toont de Deezer-status (**Opnieuw
+controleren**, **Loskoppelen** na bevestiging), speelt een Deezer-link af — geplakt, of
+gedeeld vanuit de Deezer-app met **Delen → SoundReborn Remote** — en zet wat nu speelt op
+een toets, Spotify- en Deezer-afspeellijsten inbegrepen. Deezer vereist STR 1.9.0 of
+nieuwer; bij STR is het nog bèta.
+
 **Sluimertoets** (in de wekkerkaart): vink de toets van de afstandsbediening aan die een
 afgaande wekker laat sluimeren — **AUX**, **Duim omhoog** of **Duim omlaag** — en dan
 **Sluimertoets opslaan**. Buiten een wekker doet een duimtoets niets en schakelt AUX zoals
@@ -537,22 +572,27 @@ API-eindpunten, en wat elke bekende speaker over de huidige zone verklaart. Dit 
 informatie die bij een probleemmelding hoort. *Logocache legen* dwingt het opnieuw
 ophalen van zenderafbeeldingen af.
 
-**Back-up van favorieten**: de lokale presets en de bewaarde teksten van het spraakbericht
-leven alleen op de telefoon. Een update houdt ze; een verwijdering wist ze, ook die welke
-Android eist voor het installeren van een APK met een andere sleutel. **Exporteren** maakt een
-bestand en opent delen (Drive, e-mail, Bestanden…); **Importeren** leest zo'n bestand terug en
-voegt toe wat ontbreekt, zonder iets te vervangen of te verwijderen.
+**Back-up**: één bestand met alles wat verloren kan gaan. Eerst wat alleen op de telefoon
+leeft — de lokale presets, de bewaarde teksten van het spraakbericht en de app-instellingen
+(taal, thema, **Automatisch controleren**, berichtvolume, bekende speakers); een update houdt
+ze, een verwijdering wist ze, ook die welke Android eist voor het installeren van een APK met
+een andere sleutel. Daarna wat de STR-agent voor de geselecteerde speaker bewaart — de
+toetsen 1 tot 12 (een Spotify-toets met zijn afspeellijst), de wekkers, het start- en
+maximumvolume, de sluimertoets en de scherminstellingen. De kaart noemt de speaker die
+erbij zit; zonder speaker met de STR-agent wordt alleen de app bewaard.
 
-**Back-up van de speaker**: **In een bestand opslaan** bewaart wat de STR-agent voor de
-geselecteerde speaker opslaat — de toetsen 1 tot 12 (een Spotify-toets met zijn playlist),
-de wekkers, het startvolume en de sluimertoets. **Terugzetten uit een bestand…** zet ze
-terug, na een vraag die de doelspeaker en de herkomst van het bestand noemt: het bestand
-kan deze instellingen ook naar een andere speaker kopiëren. De toetsen uit het bestand
-vervangen die van de speaker, de andere blijven; zijn wekkers worden vervangen. Zonder
-tweede rij op de doelspeaker worden de toetsen 7 tot 12 overgeslagen. Het verslag zegt wat
-teruggezet is en wat de speaker weigerde. De vaste groep wordt niet bewaard. Een
-Spotify-toets speelt alleen als de speaker met hetzelfde Spotify-account verbonden is.
-STR-agent vereist.
+**In een bestand opslaan** maakt het bestand en opent delen (Drive, e-mail, Bestanden…).
+**Terugzetten uit een bestand…** zegt eerst wat er gaat gebeuren, en na bevestiging:
+ontbrekende presets en teksten uit het bestand worden toegevoegd, zonder iets te vervangen
+of te verwijderen; de instellingen vervangen die van de app, en de speakers komen bij de
+lijst; het speakerdeel gaat naar de geselecteerde speaker — zo kun je ook een speaker naar
+een andere kopiëren. De toetsen uit het bestand vervangen die van de speaker, de andere
+blijven; de wekkers worden vervangen; zonder tweede rij op het doel worden toetsen 7 tot 12
+overslagen; maximumvolume en scherm worden alleen geschreven als de doelspeaker ze kent.
+Het verslag zegt wat teruggezet is en wat de speaker weigerde. De vaste groep wordt niet
+bewaard. Een Spotify-toets speelt alleen als de speaker met hetzelfde Spotify-account
+verbonden is. Bestanden van eerdere versies (alleen favorieten of alleen een speaker) zijn
+ook terug te zetten.
 
 **Update** (versie geïnstalleerd vanaf GitHub): hoogstens één keer per dag vraagt de
 app aan GitHub of er een nieuwere versie is; het vakje **Automatisch controleren** zet dat
@@ -564,8 +604,14 @@ SoundReborn Remote toe te staan apps te installeren. Android weigert te installe
 een APK die met een andere sleutel is ondertekend: een testversie vanuit Visual Studio
 wordt zo niet bijgewerkt.
 
-**Over**: de versie, de vermelding van het STR-project met een link naar zijn site in de
-gekozen taal, en de juridische vermeldingen.
+**SoundReborn Remote steunen**: **Een koffie trakteren op Ko-fi** opent de pagina
+[ko-fi.com/bnoitdev](https://ko-fi.com/bnoitdev) in de browser. De gift gebeurt op de
+website van Ko-fi; er wordt niets ontgrendeld in ruil, de app blijft voor iedereen dezelfde.
+Deze kaart bestaat niet in de Google Play-versie.
+
+**Over**: het logo en de versie van de app, de ontwikkelaar (naam en contactadres, dat in
+de mailapp opent), de vermelding van het STR-project met een link
+naar zijn site in de gekozen taal, en de juridische vermeldingen.
 
 ---
 
@@ -633,7 +679,7 @@ ongewijzigd opnieuw, zonder nieuwe opname.
 Een gewone update houdt ze. Ze verdwijnen als de app verwijderd werd — Android eist dat om
 over te stappen naar een versie met een andere sleutel, bijvoorbeeld van een testversie uit
 Visual Studio naar de gepubliceerde versie. Exporteer ze eerst via Instellingen → **Back-up
-van favorieten** en importeer daarna het bestand.
+van de app** en importeer daarna het bestand.
 
 ---
 
@@ -662,6 +708,9 @@ van favorieten** en importeer daarna het bestand.
   op de STR-agent. De voorgelezen tekst gaat via de stem van Google: hij verlaat je
   netwerk, en de speaker heeft internettoegang nodig.
 - **Lokale presets: alleen zenders**, bewaard op deze telefoon.
+- **Spotify: niet verspringen in het nummer.** De voortgangsbalk is af te lezen, maar noch
+  de STR-agent noch de Bose-firmware laat toe vooruit of terug te springen in een
+  Spotify-nummer. Vorige en volgende blijven onder **Bediening**.
 
 ---
 
@@ -685,3 +734,5 @@ hem zou deze app niets te besturen hebben.
 De zendergids komt van [radio-browser.info](https://www.radio-browser.info).
 
 De code is geschreven met Claude (Anthropic).
+
+Om de app te steunen: <https://ko-fi.com/bnoitdev>.

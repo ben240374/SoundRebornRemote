@@ -1,6 +1,6 @@
 # SoundReborn Remote — User manual
 
-Version 1.9.2 · Android 7 and later
+Version 1.9.3 · Android 7 and later
 
 > Languages: [Français](fr.md) · **English** · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md) · [Italiano](it.md)
 
@@ -106,6 +106,11 @@ change made from another remote takes a second or two to appear.
 The artwork, title and source of what is playing. For a radio station, its logo and
 name; for Spotify, the album cover.
 
+When the speaker knows the length of the track (the speaker's own Spotify entry, a library
+track), a progress bar appears below the title with the elapsed time and the length. No
+bar for a radio station or an STR Spotify key: the agent does not give the length of its
+tracks yet.
+
 When Spotify plays and the STR agent is version 1.8.1 or later, two buttons appear under
 the title: **Like** adds the current song to Liked Songs, **Dislike** removes it, like the
 thumbs keys of the remote. The song goes to the Spotify account the **speaker** is logged
@@ -138,7 +143,11 @@ timer.
 
 ### Volume
 
-Mute, level, minus, slider, plus. The percentage is shown on the right.
+Mute, level, minus, slider, plus. The percentage is shown on the right. In a group, mute silences every speaker of the
+group and brings them all back: the main speaker through its own mute, the others by
+setting their volume to 0 and then giving back their previous level (even if the app was
+closed in between; a volume raised in between is kept). A speaker that did not follow is
+named.
 
 When the speaker is part of a group, this slider becomes **the volume of the whole
 group**: moving it shifts every speaker by the same amount, which preserves the balance
@@ -178,8 +187,9 @@ The **Once** chip also carries a small number: how many keys of the first row ho
 station.
 
 **Keep what's playing on a key**, below the tiles, stores what the speaker is playing
-right now — station, album or library track — on the key you pick. Spotify, AUX and
-Bluetooth cannot be kept this way.
+right now — station, album or library track — on the key you pick. A Spotify or Deezer
+playlist or album is kept too (Spotify keys need Spotify Premium); AUX and Bluetooth
+cannot be kept this way.
 
 ### Voice message
 
@@ -271,6 +281,11 @@ keys, as many as you like (100 at most). Tap a line to start the radio on the se
 speaker; **✎** renames it, **✕** removes it after confirmation. The line of the radio that
 is playing is green.
 
+To change the order, long-press a station, then drag it onto another one: it takes its
+place. **Reorder the list** (below the list, from two stations) replaces **✎** and **✕** with **▲**
+and **▼**: each tap moves the station up or down one place. **Done** leaves reordering.
+The order is kept on the phone and in the backup.
+
 To add some:
 
 - **Add what is playing** keeps the radio the speaker is playing right now, with the
@@ -280,7 +295,7 @@ To add some:
 
 These presets stay on this phone: the speaker's keys do not know them, and another phone
 does not see them. A Spotify playlist cannot be kept there: the STR agent only starts a
-playlist from one of its keys. To keep them across a reinstall, export them from the Settings tab (**Favourites backup**).
+playlist from one of its keys. To keep them across a reinstall, export them from the Settings tab (**Backup**).
 
 ### Renaming and clearing a key
 
@@ -318,6 +333,7 @@ brings the keys back.
 - **★ Add what's playing** keeps the radio the speaker is playing; in the search,
   **⋯ Keys, Local…** offers **★ Add to STR favourites**.
 - A Pandora station is listed, but plays from the STR app.
+- The badge on the **★ STR** button shows how many favourites there are.
 
 ### Find a station
 
@@ -484,6 +500,23 @@ the STR agent. The time is set on the phone's clock dial. The bin on a line dele
 Tick the box, pick the level, then **Save the start volume**. A volume set while
 listening is never changed.
 
+**Speaker display**: on a speaker whose display STR can draw on (SoundTouch 20, 30,
+Portable), the same settings as in the STR desktop app: **Current track** (with
+**Artist**, **Title** or **Both**), **Time during playback, on Bluetooth and AUX**,
+**Notes when a key cannot play**, **Notices (key saved, key empty)** and **STR logo at
+start-up**. Only the rows the speaker can do appear, and a speaker without a display shows
+no card. Each box is saved as soon as you tap it. **Say hello** shows HELLO and the
+speaker's name on its display for a few seconds: handy to tell which speaker is which.
+
+**Spotify & Deezer**: **Open** shows a page for the speaker that receives the commands.
+There is no sign-in in the app: the Spotify account reaches the speaker when you pick it in
+Spotify (the entry ending in "(STR)"), and a new Deezer sign-in is not possible without the
+Bose cloud. The page says which Spotify account is on the speaker (and whether Spotify
+refuses it), opens Spotify, shows the Deezer state (**Check again**, **Disconnect**, after a
+confirmation), plays a Deezer link — pasted, or shared from the Deezer app with **Share →
+SoundReborn Remote** — and keeps what's playing on a key, Spotify or Deezer playlists
+included. Deezer needs STR 1.9.0 or later; it is still in beta in STR.
+
 **Snooze key** (in the alarms card): tick the remote key that snoozes a ringing alarm —
 **AUX**, **Thumbs up** or **Thumbs down** — then **Save the snooze key**. Outside an alarm,
 a thumbs key does nothing and AUX switches to the AUX input as usual. A thumbs key that
@@ -523,21 +556,25 @@ endpoints, and what each known speaker declares about the current zone. This is 
 information to attach to a problem report. *Clear the logo cache* forces station images
 to be downloaded again.
 
-**Favourites backup**: the local presets and the kept texts of the voice message only live
-on the phone. An update keeps them; an uninstall erases them, including the one Android
-requires before installing an APK signed with another key. **Export** creates a file and
-opens sharing (Drive, e-mail, Files…); **Import** reads such a file back and adds what is
-missing, without replacing or deleting anything.
+**Backup**: one file with everything that can be lost. First what only lives on the
+phone — the local presets, the kept texts of the voice message and the app settings
+(language, theme, **Check automatically**, message volume, known speakers); an update keeps
+them, an uninstall erases them, including the one Android requires before installing an
+APK signed with another key. Then what the STR agent keeps for the selected speaker — keys
+1 to 12 (a Spotify key with its playlist), alarms, start and maximum volumes, the snooze key
+and the display settings. The card names the speaker included; without a speaker with the
+STR agent, only the app is backed up.
 
-**Speaker backup**: **Save to a file** keeps what the STR agent stores for the selected
-speaker — keys 1 to 12 (a Spotify key with its playlist), the alarms, the start volume and
-the snooze key. **Restore from a file…** puts them back, after a question naming the target
-speaker and the one the file comes from: the file can also copy these settings to another
-speaker. The keys in the file replace those of the speaker, the others stay; its alarms
-are replaced. Without a second row on the target speaker, keys 7 to 12 are skipped. The
-report says what was restored and what the speaker refused. The permanent group is not
-saved. A Spotify key only plays if the speaker is signed in to the same Spotify account.
-STR agent required.
+**Save to a file** creates the file and opens sharing (Drive, e-mail, Files…). **Restore
+from a file…** first says what it will do, then, after confirmation: the file's presets and
+texts that are missing are added, without replacing or deleting anything; its settings
+replace the app's, and its speakers are added to the list; the speaker part goes onto the
+selected speaker — which also copies one speaker onto another. The keys in the file replace
+the speaker's, the others stay; its alarms are replaced; without a second row on the target,
+keys 7 to 12 are skipped; maximum volume and display are only written if the target speaker
+handles them. The report says what was restored and what the speaker refused. The permanent
+group is not saved. A Spotify key only plays if the speaker is signed in to the same Spotify
+account. Files from earlier versions (favourites only or speaker only) restore too.
 
 **Update** (version installed from GitHub): at most once a day, the app asks GitHub
 whether a newer version is published; the **Check automatically** box turns that off.
@@ -548,8 +585,14 @@ installer, where you confirm. The first time, Android asks you to allow SoundReb
 to install apps. Android refuses to install over an APK signed with another key: a test
 build started from Visual Studio is not updated this way.
 
-**About**: the version, credit to the STR project with a link to its site in the chosen
-language, and the legal notices.
+**Support SoundReborn Remote**: **Buy a coffee on Ko-fi** opens the page
+[ko-fi.com/bnoitdev](https://ko-fi.com/bnoitdev) in the browser. The donation is made on the
+Ko-fi website; nothing is unlocked in return, the app stays the same for everyone. This
+card is not in the Google Play version.
+
+**About**: the app's logo and version, the developer (name and contact address, which
+opens in the mail app), credit to the STR project with a link to its site in
+the chosen language, and the legal notices.
 
 ---
 
@@ -615,7 +658,7 @@ without recording it again.
 A normal update keeps them. They disappear when the app has been uninstalled — Android
 requires it to go from a version signed with another key, for example from a test build
 started from Visual Studio to the published version. Export them first in Settings →
-**Favourites backup**, then import the file.
+**Backup**, then import the file.
 
 ---
 
@@ -643,6 +686,9 @@ started from Visual Studio to the published version. Export them first in Settin
   for the STR agent. The read text goes through Google's voice: it leaves your network,
   and the speaker needs internet access.
 - **Local presets: radios only**, kept on this phone.
+- **Spotify: no moving within the track.** The progress bar can be read, but neither the
+  STR agent nor the Bose firmware can skip forward or back within a Spotify track.
+  Previous and next stay under **Controls**.
 
 ---
 
@@ -665,3 +711,5 @@ it, this app would have nothing to control.
 The station directory is provided by [radio-browser.info](https://www.radio-browser.info).
 
 The code was written with Claude (Anthropic).
+
+To support the app: <https://ko-fi.com/bnoitdev>.

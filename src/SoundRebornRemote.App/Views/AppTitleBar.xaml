@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Barre de titre des onglets : le titre de la page à gauche, et à droite le nom
+    de l'application, discret — l'emblème de l'icône, « SoundReborn » et, dessous,
+    « REMOTE » en petites capitales. Le nom n'est jamais plus grand que le titre.
+
+    Posée par Shell.TitleView sur chaque page à onglet. Le titre vient des textes
+    traduits (TitleKey) et suit le changement de langue.
+-->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SoundRebornRemote.App.Views.AppTitleBar"
+             HorizontalOptions="Fill"
+             VerticalOptions="Center">
+
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" Padding="0,0,16,0" VerticalOptions="Center">
+
+        <Label x:Name="TitleLabel" Grid.Column="0" FontSize="20" VerticalOptions="Center"
+               LineBreakMode="TailTruncation" MaxLines="1"
+               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+
+        <HorizontalStackLayout Grid.Column="1" Spacing="7" VerticalOptions="Center"
+                               SemanticProperties.Description="SoundReborn Remote">
+            <Image Source="brand_emblem.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
+
+            <VerticalStackLayout Spacing="0" VerticalOptions="Center">
+                <Label Text="SoundReborn" FontSize="14" FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                <Label Text="REMOTE" FontSize="9.5" FontAttributes="Bold" CharacterSpacing="2.6" Margin="1,-1,0,0"
+                       TextColor="{AppThemeBinding Light={StaticResource Accent}, Dark={StaticResource AccentSoft}}" />
+            </VerticalStackLayout>
+        </HorizontalStackLayout>
+    </Grid>
+
+</ContentView>

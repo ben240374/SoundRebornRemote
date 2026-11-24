@@ -23,7 +23,8 @@ namespace SoundRebornRemote.App.ViewModels;
 /// </summary>
 public sealed partial class UpdateViewModel : BaseViewModel
 {
-    private const string AutoKey = "update_auto";
+    /// <summary>« Vérifier automatiquement » ; la même clé sert à l'agent STR (AgentUpdateViewModel).</summary>
+    public const string AutoKey = "update_auto";
     private const string LastCheckKey = "update_last_check";
     private const string SkippedKey = "update_skipped";
 
@@ -78,6 +79,9 @@ public sealed partial class UpdateViewModel : BaseViewModel
     private bool _autoCheck;
 
     partial void OnAutoCheckChanged(bool value) => Preferences.Default.Set(AutoKey, value);
+
+    /// <summary>Relit le réglage, après la restauration d'une sauvegarde.</summary>
+    public void ReloadAutoCheck() => AutoCheck = Preferences.Default.Get(AutoKey, true);
 
     /// <summary>La version plus récente trouvée, ou null.</summary>
     [ObservableProperty]

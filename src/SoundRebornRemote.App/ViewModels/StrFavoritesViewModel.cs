@@ -77,10 +77,13 @@ public sealed partial class StrFavoritesViewModel : BaseViewModel
     private bool _isLoading;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsEmpty))]
+    [NotifyPropertyChangedFor(nameof(IsEmpty), nameof(ShowCount))]
     private int _count;
 
     public bool IsEmpty => Count == 0;
+
+    /// <summary>La pastille du choix « Favoris STR » : seulement s'il y en a.</summary>
+    public bool ShowCount => Count > 0;
 
     /// <summary>Vrai quand les onglets montrent cette liste à la place des touches de l'enceinte.</summary>
     [ObservableProperty]

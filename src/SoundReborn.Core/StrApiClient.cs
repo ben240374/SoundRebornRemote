@@ -846,6 +846,37 @@ public sealed class StrApiClient
     public Task SetStartVolumeAsync(int volume, CancellationToken ct = default)
         => PostJsonAsync("/api/box/start-volume", new { volume = Math.Clamp(volume, 0, 100) }, ct);
 
+    /// <summary>
+    /// GET /api/box/max-volume — le plafond de volume de l'enceinte (0 : aucun), ou
+    /// null quand l'enceinte ne le gère pas. Même forme que le volume de départ.
+    /// </summary>
+    public async Task<int?> GetMaxVolumeAsync(CancellationToken ct = default)
+    {
+        using var document = await GetJsonDocumentAsync("/api/box/max-volume", ct).ConfigureAwait(false);
+
+        if (document is null || document.RootElement.ValueKind != JsonValueKind.Object)
+        {
+            return null;
+        }
+
+        var root = document.RootElement;
+
+        if (root.TryGetProperty("supported", out var supported) && supported.ValueKind == JsonValueKind.False)
+        {
+            return null;
+        }
+
+        return root.TryGetProperty("volume", out var volume) &&
+               volume.ValueKind == JsonValueKind.Number &&
+               volume.TryGetInt32(out var level)
+            ? Math.Clamp(level, 0, 100)
+            : null;
+    }
+
+    /// <summary>POST /api/box/max-volume — 1 à 100, ou 0 pour le retirer. Enregistré sur l'enceinte.</summary>
+    public Task SetMaxVolumeAsync(int volume, CancellationToken ct = default)
+        => PostJsonAsync("/api/box/max-volume", new { volume = Math.Clamp(volume, 0, 100) }, ct);
+
     // ---------------------------------------------------------------- Titres likés Spotify
 
     /// <summary>
@@ -859,6 +890,240 @@ public sealed class StrApiClient
         var text = await PostJsonReadAsync("/api/spotify/liked", new { liked }, ct).ConfigureAwait(false);
         return StrLikedResult.Parse(text);
     }
+
+    // ---------------------------------------------------------------- Son coupé
+
+    /// <summary>
+    /// POST /api/box/mute : coupe ou rend le son, dans l'état demandé — jamais une
+    /// bascule : deux télécommandes qui basculent en même temps s'annuleraient.
+    /// C'est le MUTE de l'enceinte elle-même, celui que sa télécommande et
+    /// l'application de bureau voient. Rend l'état annoncé par l'agent, ou l'état
+    /// demandé quand sa réponse ne le dit pas. Un agent trop ancien répond 404 :
+    /// une <see cref="SpeakerException"/>.
+    /// </summary>
+    public async Task<bool> SetMuteAsync(bool muted, CancellationToken ct = default)
+    {
+        var text = await PostJsonReadAsync("/api/box/mute", new { muted }, ct).ConfigureAwait(false);
+
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            try
+            {
+                using var document = JsonDocument.Parse(text);
+
+                if (document.RootElement.ValueKind == JsonValueKind.Object &&
+                    document.RootElement.TryGetProperty("muted", out var answer) &&
+                    answer.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                {
+                    return answer.GetBoolean();
+                }
+            }
+            catch (JsonException)
+            {
+                // Réponse illisible : on s'en tient à ce qui a été demandé.
+            }
+        }
+
+        return muted;
+    }
+
+    // ---------------------------------------------------------------- Spotify, Deezer : touches et état
+
+    /// <summary>
+    /// Délai des appels Deezer qui attendent l'enceinte : retirer un compte, rendre
+    /// la connexion gardée, lancer un lien (l'agent suit un lien de partage auprès
+    /// de Deezer). Ce sont les délais de la page téléphone de STR.
+    /// </summary>
+    public static TimeSpan DeezerTimeout { get; set; } = TimeSpan.FromSeconds(30);
+
+    /// <summary>Délai de lecture de l'état Deezer : l'agent relit une fois la liste des sources de l'enceinte.</summary>
+    public static TimeSpan DeezerReadTimeout { get; set; } = TimeSpan.FromSeconds(12);
+
+    /// <summary>
+    /// GET /spotify/info : le moteur Spotify de l'agent — compte connecté, formule,
+    /// refus de Spotify, playlist chargée. Un agent sans moteur Spotify répond par
+    /// une erreur : une <see cref="SpeakerException"/>.
+    /// </summary>
+    public async Task<StrSpotifyInfo> GetSpotifyInfoAsync(CancellationToken ct = default)
+        => StrSpotifyInfo.Parse(await GetStringAsync("/spotify/info", ct).ConfigureAwait(false));
+
+    /// <summary>GET /api/deezer/account (agent 1.9.0) : où en est Deezer sur l'enceinte.</summary>
+    public async Task<StrDeezerState> GetDeezerStateAsync(CancellationToken ct = default)
+        => StrDeezerState.Parse(await GetStringAsync("/api/deezer/account", ct, DeezerReadTimeout).ConfigureAwait(false));
+
+    /// <summary>
+    /// POST /api/deezer/recheck : « Vérifier à nouveau ». Quand l'agent garde une
+    /// connexion Deezer que l'enceinte a perdue, il la lui rend. Répond comme
+    /// <see cref="GetDeezerStateAsync"/>, avec ce qui a été tenté.
+    /// </summary>
+    public async Task<StrDeezerState> RecheckDeezerAsync(CancellationToken ct = default)
+        => StrDeezerState.Parse(await PostJsonReadAsync("/api/deezer/recheck", new { }, ct, DeezerTimeout).ConfigureAwait(false));
+
+    /// <summary>
+    /// DELETE /api/deezer/account : l'enceinte oublie son compte Deezer, et l'agent
+    /// sa copie. Sans le cloud Bose, aucun compte ne peut être relié ensuite. Un
+    /// refus (502 remove-refused, still-linked…) remonte en <see cref="SpeakerException"/>.
+    /// </summary>
+    public async Task DisconnectDeezerAsync(CancellationToken ct = default)
+    {
+        using var cts = Budget(DeezerTimeout, ct);
+        using var response = await _http.DeleteAsync($"{BaseUrl}/api/deezer/account", cts.Token).ConfigureAwait(false);
+        await EnsureSuccessAsync(response, "/api/deezer/account", cts.Token).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// POST /api/deezer/play : fait jouer une playlist, un album ou un titre Deezer
+    /// par le client Deezer de l'enceinte. Un refus (409 deezer-not-linked,
+    /// native-service-unavailable, 422 deezer-link-unresolved, 502…) remonte en
+    /// <see cref="SpeakerException"/> ; <see cref="StrRefusal.From"/> en lit le code.
+    /// </summary>
+    public async Task<StrDeezerPlayed> PlayDeezerAsync(string url, CancellationToken ct = default)
+    {
+        var text = await PostJsonReadAsync("/api/deezer/play", new { url = url.Trim() }, ct, DeezerTimeout).ConfigureAwait(false);
+        var kind = "";
+        var name = "";
+
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            try
+            {
+                using var document = JsonDocument.Parse(text);
+
+                if (document.RootElement.ValueKind == JsonValueKind.Object)
+                {
+                    kind = TextOf(document.RootElement, "kind");
+                    name = TextOf(document.RootElement, "name");
+                }
+            }
+            catch (JsonException)
+            {
+                // Lecture partie quand même : seul le nom manque.
+            }
+        }
+
+        return new StrDeezerPlayed(kind, name);
+    }
+
+    /// <summary>
+    /// Garde ce que l'enceinte joue sur une touche (1 à 12), comme l'appui long de
+    /// la page téléphone de STR (saveHeldSlot) :
+    ///   – un service propre à l'enceinte (Deezer, Pandora, iHeartRadio) : la touche
+    ///     reçoit { type: "native" } et l'agent prend l'élément dans ce que
+    ///     l'enceinte joue ;
+    ///   – Spotify : la touche reçoit la playlist (<see cref="SpotifyContext.SaveUri"/>)
+    ///     et le compte du moteur ;
+    ///   – le reste (station, dossier, piste…) : POST /api/box/save-playing, comme
+    ///     avant.
+    /// Un refus remonte en <see cref="SpeakerException"/> : 409 « already-on-slot »
+    /// quand c'est déjà sur une autre touche, 422 quand rien ne peut être gardé.
+    /// </summary>
+    public async Task<StrKeptPlaying> KeepPlayingAsync(int slot, NowPlaying nowPlaying, CancellationToken ct = default)
+    {
+        if (slot is < 1 or > 12)
+        {
+            throw new ArgumentOutOfRangeException(nameof(slot), slot, "Présélection 1 à 12 uniquement");
+        }
+
+        var source = (nowPlaying.Source ?? "").Trim().ToUpperInvariant();
+        var location = nowPlaying.Content?.Location ?? "";
+        var name = (nowPlaying.Content?.ItemName ?? "").Trim();
+
+        if (source is "DEEZER" or "PANDORA" or "IHEART" or "IHEARTRADIO")
+        {
+            await PutJsonAsync($"/api/presets/{slot}", new { slot, name, type = "native" }, ct).ConfigureAwait(false);
+            return new StrKeptPlaying(KeptKind.Native, name, false);
+        }
+
+        StrSpotifyInfo? info = null;
+
+        try
+        {
+            info = await GetSpotifyInfoAsync(ct).ConfigureAwait(false);
+        }
+        catch (Exception) when (!ct.IsCancellationRequested)
+        {
+            // Pas de moteur Spotify sur cet agent : seule l'adresse de l'enceinte compte.
+        }
+
+        var uri = SpotifyContext.SaveUri(source, location, info?.Context);
+
+        if (SpotifyContext.IsUri(uri))
+        {
+            var label = name.Length > 0 ? name
+                : !string.IsNullOrWhiteSpace(info?.Track) ? info!.Track
+                : "Spotify";
+
+            await PutJsonAsync(
+                $"/api/presets/{slot}?save=live",
+                new { slot, name = label, type = "spotify", uri, account = info?.Account ?? "" },
+                ct).ConfigureAwait(false);
+
+            return new StrKeptPlaying(KeptKind.Spotify, label, false);
+        }
+
+        var kept = await SavePlayingAsync(slot, ct).ConfigureAwait(false);
+        return new StrKeptPlaying(KeptKind.Playing, kept.Name ?? "", kept.Unchanged);
+    }
+
+    // ---------------------------------------------------------------- Écran de l'enceinte
+
+    /// <summary>
+    /// GET d'un réglage de l'écran (<see cref="StrDisplaySetting.Kinds"/>). Un agent
+    /// qui ne le connaît pas répond par une erreur : une <see cref="SpeakerException"/>.
+    /// </summary>
+    public async Task<StrDisplaySetting> GetDisplaySettingAsync(string kind, CancellationToken ct = default)
+        => StrDisplaySetting.Parse(kind, await GetStringAsync(StrDisplaySetting.PathOf(kind), ct).ConfigureAwait(false));
+
+    /// <summary>
+    /// Active ou coupe un réglage de l'écran. Pour le titre en cours,
+    /// <paramref name="mode"/> dit quoi montrer : artist, title ou both.
+    /// </summary>
+    public Task SetDisplaySettingAsync(string kind, bool enabled, string? mode = null, CancellationToken ct = default)
+    {
+        var path = StrDisplaySetting.PathOf(kind);
+
+        return kind == StrDisplaySetting.Track
+            ? PostJsonAsync(path, new { enabled, mode = mode ?? StrDisplaySetting.ModeBoth }, ct)
+            : PostJsonAsync(path, new { enabled }, ct);
+    }
+
+    /// <summary>POST /api/box/identify : « Trouver cette enceinte », HELLO et son nom sur l'écran.</summary>
+    public async Task<StrIdentifyOutcome> IdentifyAsync(CancellationToken ct = default)
+    {
+        var text = await PostJsonReadAsync("/api/box/identify", new { }, ct).ConfigureAwait(false);
+
+        try
+        {
+            using var document = JsonDocument.Parse(string.IsNullOrWhiteSpace(text) ? "{}" : text);
+            var root = document.RootElement;
+
+            if (root.ValueKind == JsonValueKind.Object)
+            {
+                if (root.TryGetProperty("shown", out var shown) && shown.ValueKind == JsonValueKind.True)
+                {
+                    return StrIdentifyOutcome.Shown;
+                }
+
+                return TextOf(root, "reason") switch
+                {
+                    "no display" => StrIdentifyOutcome.NoDisplay,
+                    "busy" => StrIdentifyOutcome.Busy,
+                    _ => StrIdentifyOutcome.Failed,
+                };
+            }
+        }
+        catch (JsonException)
+        {
+            // Réponse illisible : rien n'est sûr.
+        }
+
+        return StrIdentifyOutcome.Failed;
+    }
+
+    private static string TextOf(JsonElement root, string name)
+        => root.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String
+            ? (value.GetString() ?? "").Trim()
+            : "";
 
     // ---------------------------------------------------------------- Annonce (message vocal)
 

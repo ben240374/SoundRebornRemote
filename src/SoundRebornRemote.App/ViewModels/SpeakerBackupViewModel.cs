@@ -11,8 +11,9 @@ namespace SoundRebornRemote.App.ViewModels;
 
 /// <summary>
 /// La carte « Sauvegarde de l'enceinte » des Réglages : ce que l'agent STR garde
-/// pour l'enceinte SÉLECTIONNÉE — ses douze touches, ses réveils, son volume de
-/// départ, les actions des touches de sa télécommande — dans un fichier, et retour.
+/// pour l'enceinte SÉLECTIONNÉE — ses douze touches, ses réveils, ses volumes de
+/// départ et maximum, les actions des touches de sa télécommande, les réglages de
+/// son écran — dans un fichier, et retour.
 ///
 /// - La restauration demande confirmation, en nommant l'enceinte visée et celle
 ///   d'où vient le fichier : il peut servir à recopier les réglages sur une autre.
@@ -105,6 +106,8 @@ public sealed partial class SpeakerBackupViewModel : BaseViewModel
             var alarms = await OptionalAsync(() => str.GetAlarmsAsync()).ConfigureAwait(true);
             var startVolume = await OptionalValueAsync(() => str.GetStartVolumeAsync()).ConfigureAwait(true);
             var keyActions = await OptionalAsync(() => str.GetKeyActionsAsync()).ConfigureAwait(true);
+            var maxVolume = await OptionalValueAsync(() => str.GetMaxVolumeAsync()).ConfigureAwait(true);
+            var display = await ReadDisplayAsync(str).ConfigureAwait(true);
 
             var now = _clock.GetLocalNow();
             var backup = SpeakerBackup.Create(
@@ -115,7 +118,9 @@ public sealed partial class SpeakerBackupViewModel : BaseViewModel
                 presets,
                 alarms,
                 startVolume,
-                keyActions);
+                keyActions,
+                maxVolume,
+                display);
 
             Directory.CreateDirectory(_directory);
             var path = Path.Combine(_directory, $"SoundRebornRemote-{FileNamePart(device.Endpoint.DisplayName)}-{now:yyyy-MM-dd}.json");
@@ -222,6 +227,8 @@ public sealed partial class SpeakerBackupViewModel : BaseViewModel
             await RestoreAlarmsAsync(str, backup, done, failed).ConfigureAwait(true);
             await RestoreStartVolumeAsync(str, backup, done, failed).ConfigureAwait(true);
             await RestoreKeyActionsAsync(str, backup, done, failed).ConfigureAwait(true);
+            await RestoreMaxVolumeAsync(str, backup, done, failed).ConfigureAwait(true);
+            await RestoreDisplayAsync(str, backup, done, failed).ConfigureAwait(true);
         }
         finally
         {
@@ -369,6 +376,105 @@ public sealed partial class SpeakerBackupViewModel : BaseViewModel
         {
             failed.Add(Localization.Get("S_SpeakerRestoreKeyActionsFailed", Reason(ex)));
         }
+    }
+
+    private static async Task RestoreMaxVolumeAsync(StrApiClient str, SpeakerBackup backup, List<string> done, List<string> failed)
+    {
+        if (backup.MaxVolume is not int level)
+        {
+            return;
+        }
+
+        try
+        {
+            if (await OptionalValueAsync(() => str.GetMaxVolumeAsync()).ConfigureAwait(true) is null)
+            {
+                // L'enceinte visée ne le gère pas : rien à écrire.
+                return;
+            }
+
+            await str.SetMaxVolumeAsync(level).ConfigureAwait(true);
+            done.Add(level == 0
+                ? Localization.Get("S_SpeakerRestoreMaxVolumeOff")
+                : Localization.Get("S_SpeakerRestoreMaxVolume", level));
+        }
+        catch (Exception ex)
+        {
+            failed.Add(Localization.Get("S_SpeakerRestoreMaxVolumeFailed", Reason(ex)));
+        }
+    }
+
+    /// <summary>
+    /// Les réglages de l'écran : seulement ceux que l'enceinte visée sait faire.
+    /// Une enceinte sans écran (SoundTouch 10) les passe tous, sans rien signaler.
+    /// </summary>
+    private static async Task RestoreDisplayAsync(StrApiClient str, SpeakerBackup backup, List<string> done, List<string> failed)
+    {
+        if (backup.Display is null)
+        {
+            return;
+        }
+
+        var written = 0;
+        Exception? refusal = null;
+
+        foreach (var kind in StrDisplaySetting.Kinds)
+        {
+            if (backup.Display[kind] is not JsonObject entry ||
+                entry["enabled"] is not JsonValue enabledValue ||
+                !enabledValue.TryGetValue<bool>(out var enabled))
+            {
+                continue;
+            }
+
+            try
+            {
+                var current = await str.GetDisplaySettingAsync(kind).ConfigureAwait(true);
+
+                if (!current.Supported)
+                {
+                    continue;
+                }
+
+                var mode = entry["mode"] is JsonValue modeValue && modeValue.TryGetValue<string>(out var m) ? m : null;
+                await str.SetDisplaySettingAsync(kind, enabled, mode).ConfigureAwait(true);
+                written++;
+            }
+            catch (SpeakerException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                // Agent antérieur à ce réglage : rien à écrire.
+            }
+            catch (Exception ex)
+            {
+                refusal ??= ex;
+            }
+        }
+
+        if (written > 0)
+        {
+            done.Add(Localization.Get("S_SpeakerRestoreDisplay", written));
+        }
+
+        if (refusal is not null)
+        {
+            failed.Add(Localization.Get("S_SpeakerRestoreDisplayFailed", Reason(refusal)));
+        }
+    }
+
+    /// <summary>Les réglages de l'écran de l'enceinte ; null quand l'agent n'en connaît aucun.</summary>
+    private static async Task<List<StrDisplaySetting>?> ReadDisplayAsync(StrApiClient str)
+    {
+        var settings = new List<StrDisplaySetting>();
+
+        foreach (var kind in StrDisplaySetting.Kinds)
+        {
+            if (await OptionalAsync(() => str.GetDisplaySettingAsync(kind)).ConfigureAwait(true) is { } setting)
+            {
+                settings.Add(setting);
+            }
+        }
+
+        return settings.Count == 0 ? null : settings;
     }
 
     // ================================================================ Outils

@@ -107,7 +107,7 @@ footer a { color: var(--muted); }
 </div></header>
 <div class="wrap">
 <h1 id="soundreborn-remote--handbuch">SoundReborn Remote — Handbuch</h1>
-<p>Version 1.9.2 · Android 7 und neuer</p>
+<p>Version 1.9.3 · Android 7 und neuer</p>
 <ul class="langbar"><li><a href="fr.html">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html" aria-current="page">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li><li><a href="it.html">Italiano</a></li></ul><hr />
 <h2 id="inhalt">Inhalt</h2>
 <ol>
@@ -191,6 +191,10 @@ Sekunden.</p>
 <h3 id="gerade-läuft">Gerade läuft</h3>
 <p>Cover, Titel und Quelle des Laufenden. Bei einem Radiosender dessen Logo und Name, bei
 Spotify das Albumcover.</p>
+<p>Kennt der Lautsprecher die Länge des Titels (der eigene Spotify-Eintrag des Lautsprechers,
+ein Titel aus der Bibliothek), erscheint unter dem Titel ein Fortschrittsbalken mit
+abgelaufener Zeit und Länge. Kein Balken bei einem Radiosender oder einer Spotify-Taste
+von STR: Der Agent gibt die Länge seiner Titel noch nicht an.</p>
 <p>Wenn Spotify läuft und der STR-Agent Version 1.8.1 oder neuer hat, erscheinen unter dem
 Titel zwei Tasten: <strong>Gefällt mir</strong> fügt den laufenden Song zu den Lieblingssongs hinzu,
 <strong>Gefällt mir nicht</strong> entfernt ihn, wie die Daumentasten der Fernbedienung. Der Song landet
@@ -217,7 +221,11 @@ ausgewählte Lautsprecher ausgehen soll. Der Timer lebt im STR-Agenten des Lauts
 Er läuft weiter, wenn du die App schließt, ein Neustart des Lautsprechers bricht ihn aber
 ab. Der Link erscheint nur, wenn der Agent den Timer kennt.</p>
 <h3 id="lautstärke">Lautstärke</h3>
-<p>Stumm, Angleichen, Minus, Regler, Plus. Der Prozentwert steht rechts.</p>
+<p>Stumm, Angleichen, Minus, Regler, Plus. Der Prozentwert steht rechts. In einer Gruppe schaltet Stumm alle Lautsprecher
+der Gruppe stumm und wieder laut: den Hauptlautsprecher über seine eigene Stummschaltung,
+die anderen, indem ihre Lautstärke auf 0 geht und danach ihr vorheriger Pegel zurückkommt
+(auch wenn die App zwischendurch geschlossen wurde; eine zwischendurch erhöhte Lautstärke
+bleibt). Ein Lautsprecher, der nicht gefolgt ist, wird genannt.</p>
 <p>Gehört der Lautsprecher zu einer Gruppe, wird dieser Regler zur <strong>Lautstärke der ganzen
 Gruppe</strong>: Er verschiebt alle Lautsprecher um denselben Betrag und erhält damit das
 Verhältnis, das du eingestellt hast. Küche auf 60, Wohnzimmer auf 30 — die Gruppe um 10
@@ -250,7 +258,8 @@ für <strong>Lokal</strong>, ein Stern für <strong>★ STR</strong>. Langes Dr�
 Reihe einen Sender tragen.</p>
 <p><strong>Laufendes auf eine Taste legen</strong>, unter den Kacheln, speichert das, was der
 Lautsprecher gerade spielt — Sender, Album oder Titel aus der Bibliothek — auf der Taste
-deiner Wahl. Spotify, AUX und Bluetooth lassen sich so nicht speichern.</p>
+deiner Wahl. Eine Spotify- oder Deezer-Playlist oder ein Album lässt sich ebenfalls speichern
+(Spotify-Tasten brauchen Spotify Premium); AUX und Bluetooth lassen sich so nicht speichern.</p>
 <h3 id="sprachnachricht">Sprachnachricht</h3>
 <p>Die Karte <strong>Sprachnachricht</strong> lässt den Lautsprecher sprechen und danach fortsetzen, was
 er gespielt hat.</p>
@@ -321,6 +330,10 @@ leer: Ein einfacher Druck am Lautsprecher startet dann den Sender der zweiten Re
 den Tasten des Lautsprechers und in beliebiger Zahl (höchstens 100). Tippe auf eine Zeile,
 um den Sender auf dem gewählten Lautsprecher zu starten; <strong>✎</strong> benennt ihn um, <strong>✕</strong>
 entfernt ihn nach Bestätigung. Die Zeile des laufenden Senders ist grün.</p>
+<p>Um die Reihenfolge zu ändern, drücke lange auf einen Sender und ziehe ihn auf einen
+anderen: Er nimmt dessen Platz ein. <strong>Liste ordnen</strong> (unter der Liste, ab zwei Sendern) ersetzt <strong>✎</strong> und <strong>✕</strong> durch <strong>▲</strong>
+und <strong>▼</strong>: Jedes Tippen schiebt den Sender um eine Stelle nach oben oder unten. <strong>Fertig</strong>
+beendet das Ordnen. Die Reihenfolge bleibt auf dem Telefon und in der Sicherung.</p>
 <p>Zum Hinzufügen:</p>
 <ul>
 <li><strong>Laufenden Sender hinzufügen</strong> behält den Sender, den der Lautsprecher gerade spielt,
@@ -331,7 +344,7 @@ entfernt ihn nach Bestätigung. Die Zeile des laufenden Senders ist grün.</p>
 </ul>
 <p>Diese Presets bleiben auf diesem Telefon: Die Tasten des Lautsprechers kennen sie nicht,
 und ein anderes Telefon sieht sie nicht. Eine Spotify-Playlist lässt sich dort nicht
-ablegen: Der STR-Agent startet eine Playlist nur von einer seiner Tasten. Um sie bei einer Neuinstallation zu behalten, exportiere sie im Reiter Einstellungen (<strong>Sicherung der Favoriten</strong>).</p>
+ablegen: Der STR-Agent startet eine Playlist nur von einer seiner Tasten. Um sie bei einer Neuinstallation zu behalten, exportiere sie im Reiter Einstellungen (<strong>Sicherung</strong>).</p>
 <h3 id="eine-taste-umbenennen-und-löschen">Eine Taste umbenennen und löschen</h3>
 <p>Jede Kachel trägt oben den Namen ihrer Taste. Bei einer Taste, die der STR-Agent gespeichert
 hat, stehen daneben zwei kleine Schaltflächen: <strong>✎</strong> benennt die Taste um, <strong>✕</strong> löscht sie
@@ -361,6 +374,7 @@ Lautsprechern und am Computer. <strong>Einmal</strong> oder <strong>Zweimal</str
 <li><strong>★ Laufendes hinzufügen</strong> übernimmt das Radio, das der Lautsprecher spielt; in der Suche
   bietet <strong>⋯ Tasten, Local…</strong> <strong>★ Zu STR-Favoriten</strong>.</li>
 <li>Ein Pandora-Sender wird angezeigt, startet aber über die STR-App.</li>
+<li>Die Plakette auf der Schaltfläche <strong>★ STR</strong> zeigt die Zahl der Favoriten.</li>
 </ul>
 <h3 id="einen-sender-finden">Einen Sender finden</h3>
 <p>Das Suchfeld fragt <strong>radio-browser.info</strong> ab, ein offenes, von Freiwilligen gepflegtes
@@ -501,6 +515,24 @@ gespeichert. Anderswo geänderte Wecker — STR-Telefonseite, Desktop-App — we
 <p><strong>Startlautstärke</strong>: die Lautstärke, die der Lautsprecher beim Einschalten annimmt, sobald
 er spielt. Häkchen setzen, Lautstärke wählen, dann <strong>Startlautstärke speichern</strong>. Eine
 während des Hörens eingestellte Lautstärke wird nie geändert.</p>
+<p><strong>Lautsprecher-Display</strong>: auf einem Lautsprecher, auf dessen Display STR zeichnen kann
+(SoundTouch 20, 30, Portable), dieselben Einstellungen wie in der STR-Desktop-App:
+<strong>Aktueller Titel</strong> (mit <strong>Interpret</strong>, <strong>Titel</strong> oder <strong>Beides</strong>), <strong>Uhrzeit bei
+Wiedergabe, Bluetooth und AUX</strong>, <strong>Hinweise, wenn eine Taste nicht spielen kann</strong>,
+<strong>Meldungen (Taste gespeichert, Taste leer)</strong> und <strong>STR-Logo beim Start</strong>. Nur die Zeilen,
+die der Lautsprecher kann, erscheinen; ein Lautsprecher ohne Display zeigt keine Karte.
+Jedes Kästchen wird gespeichert, sobald du es antippst. <strong>Hallo sagen</strong> zeigt HELLO und den
+Namen des Lautsprechers für ein paar Sekunden auf seinem Display: praktisch, um die
+Lautsprecher auseinanderzuhalten.</p>
+<p><strong>Spotify &amp; Deezer</strong>: <strong>Öffnen</strong> zeigt eine Seite für den Lautsprecher, der die Befehle
+erhält. In der App gibt es keine Anmeldung: Das Spotify-Konto kommt auf den Lautsprecher,
+wenn du ihn in Spotify auswählst (der Eintrag mit „(STR)“ am Ende), und eine neue
+Deezer-Anmeldung ist ohne die Bose-Cloud nicht möglich. Die Seite zeigt, welches
+Spotify-Konto auf dem Lautsprecher ist (und ob Spotify es sperrt), öffnet Spotify, zeigt
+den Deezer-Zustand (<strong>Neu prüfen</strong>, <strong>Trennen</strong> nach Rückfrage), spielt einen Deezer-Link
+ab — eingefügt oder aus der Deezer-App mit <strong>Teilen → SoundReborn Remote</strong> geteilt — und
+legt Laufendes auf eine Taste, Spotify- und Deezer-Playlists eingeschlossen. Deezer
+braucht STR 1.9.0 oder neuer; bei STR ist es noch Beta.</p>
 <p><strong>Schlummertaste</strong> (in der Weckerkarte): hake die Taste der Fernbedienung an, die einen
 klingelnden Wecker schlummern lässt — <strong>AUX</strong>, <strong>Daumen hoch</strong> oder <strong>Daumen runter</strong> —,
 dann <strong>Schlummertaste speichern</strong>. Außerhalb eines Weckers tut eine Daumentaste nichts, und
@@ -535,22 +567,28 @@ gelesener Version, den Zustand der Benachrichtigungen, den Bassbereich, die List
 erkannten API-Endpunkte und das, was jeder bekannte Lautsprecher über die aktuelle Zone
 sagt. Das sind die Angaben, die in eine Fehlermeldung gehören. <em>Logo-Cache leeren</em>
 erzwingt das erneute Laden der Senderbilder.</p>
-<p><strong>Sicherung der Favoriten</strong>: Die lokalen Presets und die gespeicherten Texte der
-Sprachnachricht leben nur auf dem Telefon. Ein Update behält sie; eine Deinstallation löscht
-sie, auch die, die Android vor der Installation eines mit einem anderen Schlüssel signierten
-APK verlangt. <strong>Exportieren</strong> erstellt eine Datei und öffnet das Teilen (Drive, E-Mail,
-Dateien…); <strong>Importieren</strong> liest eine solche Datei wieder ein und fügt Fehlendes hinzu, ohne
-etwas zu ersetzen oder zu löschen.</p>
-<p><strong>Lautsprecher-Sicherung</strong>: <strong>In eine Datei sichern</strong> bewahrt, was der STR-Agent für den
-ausgewählten Lautsprecher speichert — die Tasten 1 bis 12 (eine Spotify-Taste mit ihrer
-Playlist), die Wecker, die Startlautstärke und die Schlummertaste. <strong>Aus einer Datei
-wiederherstellen…</strong> spielt sie zurück, nach einer Frage, die den Ziellautsprecher und den
-Ursprung der Datei nennt: die Datei kann diese Einstellungen auch auf einen anderen
-Lautsprecher übertragen. Die Tasten der Datei ersetzen die des Lautsprechers, die anderen
-bleiben; seine Wecker werden ersetzt. Ohne zweite Reihe am Ziel werden die Tasten 7 bis 12
-übersprungen. Der Bericht nennt, was wiederhergestellt und was abgelehnt wurde. Die feste
-Gruppe wird nicht gesichert. Eine Spotify-Taste spielt nur, wenn der Lautsprecher mit
-demselben Spotify-Konto verbunden ist. STR-Agent erforderlich.</p>
+<p><strong>Sicherung</strong>: eine einzige Datei mit allem, was verloren gehen kann. Zuerst, was nur auf
+dem Telefon lebt — die lokalen Presets, die gespeicherten Texte der Sprachnachricht und die
+App-Einstellungen (Sprache, Design, <strong>Automatisch prüfen</strong>, Nachrichtenlautstärke, bekannte
+Lautsprecher); ein Update behält sie, eine Deinstallation löscht sie, auch die, die Android
+vor der Installation eines mit einem anderen Schlüssel signierten APK verlangt. Dann, was
+der STR-Agent für den ausgewählten Lautsprecher bewahrt — die Tasten 1 bis 12 (eine
+Spotify-Taste mit ihrer Playlist), die Wecker, Start- und Höchstlautstärke, die
+Schlummertaste und die Display-Einstellungen. Die Karte nennt den enthaltenen Lautsprecher;
+ohne Lautsprecher mit STR-Agent wird nur die App gesichert.</p>
+<p><strong>In eine Datei sichern</strong> erstellt die Datei und öffnet das Teilen (Drive, E-Mail,
+Dateien…). <strong>Aus einer Datei wiederherstellen…</strong> sagt zuerst, was geschehen wird, und nach
+Bestätigung: Fehlende Presets und Texte der Datei werden hinzugefügt, ohne etwas zu ersetzen
+oder zu löschen; ihre Einstellungen ersetzen die der App, und ihre Lautsprecher kommen zur
+Liste hinzu; der Lautsprecher-Teil geht auf den ausgewählten Lautsprecher — so lässt sich
+auch ein Lautsprecher auf einen anderen übertragen. Die Tasten der Datei ersetzen die des
+Lautsprechers, die anderen bleiben; seine Wecker werden ersetzt; ohne zweite Reihe auf dem
+Ziel werden die Tasten 7 bis 12 übersprungen; Höchstlautstärke und Display werden nur
+geschrieben, wenn der Ziel-Lautsprecher sie beherrscht. Der Bericht sagt, was
+wiederhergestellt wurde und was der Lautsprecher abgelehnt hat. Die feste Gruppe wird nicht
+gesichert. Eine Spotify-Taste spielt nur, wenn der Lautsprecher mit demselben Spotify-Konto
+verbunden ist. Dateien früherer Versionen (nur Favoriten oder nur Lautsprecher) lassen sich
+ebenfalls wiederherstellen.</p>
 <p><strong>Aktualisierung</strong> (von GitHub installierte Version): Höchstens einmal am Tag fragt
 die App bei GitHub, ob eine neuere Version veröffentlicht ist; das Kästchen <strong>Automatisch
 prüfen</strong> schaltet das ab. <strong>Jetzt prüfen</strong> tut es auf Wunsch. Gibt es eine, erscheint auch
@@ -560,8 +598,13 @@ GitHub entsprechen, und öffnet dann den Android-Installer, in dem du bestätigs
 ersten Mal fragt Android, ob SoundReborn Remote Apps installieren darf. Android lehnt es
 ab, über eine mit einem anderen Schlüssel signierte APK zu installieren: Eine aus Visual
 Studio gestartete Testversion wird so nicht aktualisiert.</p>
-<p><strong>Über</strong>: die Version, der Dank an das STR-Projekt mit einem Link zu dessen Seite in der
-gewählten Sprache, und die rechtlichen Hinweise.</p>
+<p><strong>SoundReborn Remote unterstützen</strong>: <strong>Einen Kaffee auf Ko-fi spendieren</strong> öffnet die
+Seite <a href="https://ko-fi.com/bnoitdev">ko-fi.com/bnoitdev</a> im Browser. Die Spende erfolgt auf
+der Ko-fi-Website; dafür wird nichts freigeschaltet, die App bleibt für alle gleich. Diese
+Karte gibt es in der Google-Play-Version nicht.</p>
+<p><strong>Über</strong>: Logo und Version der App, der Entwickler (Name und Kontaktadresse, die sich in
+der Mail-App öffnet), der Dank an das STR-Projekt mit einem Link zu dessen
+Seite in der gewählten Sprache, und die rechtlichen Hinweise.</p>
 <hr />
 <h2 id="9-gesten">9. Gesten</h2>
 <p><strong>Waagerechtes Wischen</strong> wechselt zum nächsten oder vorherigen Reiter: Wiedergabe →
@@ -614,7 +657,7 @@ unverändert noch einmal, ohne neue Aufnahme.</p>
 Ein normales Update behält sie. Sie verschwinden, wenn die App deinstalliert wurde — Android
 verlangt das beim Wechsel zu einer mit einem anderen Schlüssel signierten Version, etwa von
 einer aus Visual Studio gestarteten Testversion zur veröffentlichten Version. Exportiere sie
-vorher unter Einstellungen → <strong>Sicherung der Favoriten</strong> und importiere dann die Datei.</p>
+vorher unter Einstellungen → <strong>Sicherung</strong> und importiere dann die Datei.</p>
 <hr />
 <h2 id="11-bekannte-grenzen">11. Bekannte Grenzen</h2>
 <ul>
@@ -641,6 +684,9 @@ vorher unter Einstellungen → <strong>Sicherung der Favoriten</strong> und impo
   Gruppe wartet auf den STR-Agenten. Der vorgelesene Text läuft über die Google-Stimme: Er
   verlässt dein Netz, und der Lautsprecher braucht Internetzugang.</li>
 <li><strong>Lokale Presets: nur Sender</strong>, auf diesem Telefon gespeichert.</li>
+<li><strong>Spotify: kein Springen im Titel.</strong> Der Fortschrittsbalken lässt sich ablesen, aber
+  weder der STR-Agent noch die Bose-Firmware erlauben es, in einem Spotify-Titel vor- oder
+  zurückzuspringen. Zurück und Weiter bleiben unter <strong>Steuerung</strong>.</li>
 </ul>
 <hr />
 <h2 id="12-hinweise">12. Hinweise</h2>
@@ -657,6 +703,7 @@ nicht beim STR-Projekt.</p>
 hätte diese App nichts zu steuern.</p>
 <p>Das Senderverzeichnis stellt <a href="https://www.radio-browser.info">radio-browser.info</a> bereit.</p>
 <p>Der Code wurde mit Claude (Anthropic) geschrieben.</p>
+<p>Um die App zu unterstützen: <a href="https://ko-fi.com/bnoitdev">https://ko-fi.com/bnoitdev</a>.</p>
 <footer>
   <p>SoundReborn Remote — MIT-Lizenz. Persönliches Projekt, ohne Verbindung zu Bose Corporation. „Bose“ und „SoundTouch“ sind Marken der Bose Corporation, hier nur zur Angabe der Kompatibilität genannt. Unabhängig vom Projekt <a href="https://st-reborn.de">STR</a>, das keinen Support dafür leistet.</p>
 </footer>

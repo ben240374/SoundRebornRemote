@@ -28,7 +28,7 @@ no service in between.
 - Listen to a station on the phone or tablet before playing it on the speaker: an open result line offers "📱 ▶ Listen on this phone" and "🔊 Play on <speaker>", which cannot be mistaken for one another.
 - Assign a station to any of the twelve keys.
 - Rename or clear a key.
-- *Local* presets kept on the phone, as many as you like: the radio that is playing, a station from the search or a pasted address; started on any STR speaker.
+- *Local* presets kept on the phone, as many as you like, in the order you choose (drag and drop, or arrows): the radio that is playing, a station from the search or a pasted address; started on any STR speaker.
 - Copy all the keys to another STR speaker, or to all of them (STR agent 1.6.5 or later).
 - STR favourites (*★ STR* button next to *Local*, also in the Play tab), the starred stations of the STR desktop app, shared by every STR speaker: play one, put it on a key or in *Local*, add a station from the search or what is playing, remove one (recent STR agent).
 
@@ -46,8 +46,7 @@ no service in between.
 - Alarms of each speaker: time on the phone's clock dial, days (with Mon → Fri, Weekend and Every day shortcuts), key, volume, automatic switch-off, snooze. Changes made in other STR apps are kept.
 - Snooze key: choose which remote key (AUX, thumbs up, thumbs down) snoozes a ringing alarm; actions set elsewhere on other keys are kept.
 - Start volume: the level the speaker takes when it is switched on.
-- Speaker backup: keys 1 to 12, alarms, start volume and snooze key of a speaker in a file, restored on the same speaker or copied to another one, after confirmation.
-- Favourites backup: export the local presets and kept texts to a file, and import them back.
+- One backup file: the local presets, kept texts and app settings (language, theme, update check, message volume, known speakers), plus the selected speaker's keys 1 to 12, alarms, start and maximum volumes, snooze key and display settings; restored after one confirmation, on the same speaker or onto another one.
 - Update from GitHub: at most once a day the app looks for a newer release (can be turned off); *Install* downloads the APK, checks its size and SHA-256 fingerprint against GitHub, then opens Android's installer. Not in the Google Play build.
 - Speaker discovery (mDNS, then a network sweep) or manual address; flags speakers without the STR agent or with an agent older than 1.8.0, and those whose agent is older than the latest STR release on GitHub (read at most once a day).
 - Interface in English, French, German, Dutch, Spanish and Italian; light or dark theme; diagnostics.
@@ -114,7 +113,7 @@ attached to the latest release: [English](https://github.com/ben240374/SoundRebo
 | Alarms of the selected speaker (time, days, key, volume, switch-off, snooze) | Settings tab | `GET/PUT :8888/api/alarms` with `rev`; on `409` the user's change is applied again to the current document |
 | Start volume | Settings tab | `GET/POST :8888/api/box/start-volume` |
 | Snooze key (AUX, thumbs up, thumbs down) | Settings tab | `GET/PUT :8888/api/keyactions` — the document is read again just before saving and only the keys the user changed are written |
-| Speaker backup and restore (keys, alarms, start volume, snooze key) | Settings tab | `GET :8888/api/presets`, `/api/alarms`, `/api/box/start-volume`, `/api/keyactions`; restore with `PUT :8888/api/presets` (whole set), `PUT /api/alarms` with the target's `rev`, then the others |
+| Speaker backup and restore (keys, alarms, start and maximum volumes, snooze key, display) | Settings tab | `GET :8888/api/presets`, `/api/alarms`, `/api/box/start-volume`, `/api/box/max-volume`, `/api/keyactions`, `/api/box/display-*`; restore with `PUT :8888/api/presets` (whole set), `PUT /api/alarms` with the target's `rev`, then the others |
 | Shortcuts on the app icon (*All standby*, keys 1 to 3) | Android launcher | `POST :8888/api/box/power` `{"on":false}` on each speaker with the agent; `POST :8888/api/play/<slot>` |
 | Now playing, artwork, source | everywhere | WebSocket `:8080` (subprotocol `gabbo`), falling back to `GET /now_playing` |
 | Sources, Bluetooth, AUX | Sources tab | `GET :8090/sources`, `POST :8090/select`, `PUT :8888/api/box/source` |
@@ -353,6 +352,11 @@ the models and this document are in English.
 - Agent API, ports, firmware behaviour: `docs/CONTROL-API.md`, `docs/AUTOMATION.md` and
   `docs/ARCHITECTURE.md` in the `JRpersonal/streborn` repository.
 
+## Support
+
+The app is free, with no ads and no data collection. If it is useful to you, a coffee helps
+it keep improving: <https://ko-fi.com/bnoitdev>. Nothing is unlocked in return.
+
 ## Licence
 
 MIT — see [LICENSE](LICENSE).
@@ -390,7 +394,7 @@ aucun service intermédiaire.
 - Écoute d'une station sur le téléphone ou la tablette avant de la diffuser sur l'enceinte : une ligne de résultat ouverte propose « 📱 ▶ Écouter sur ce téléphone » et « 🔊 Diffuser sur <enceinte> », impossibles à confondre.
 - Affectation d'une station à l'une des douze touches.
 - Renommer ou effacer une touche.
-- Présélections *Local* gardées dans le téléphone, en nombre libre : la radio qui joue, une station de la recherche ou une adresse collée ; lancées sur n'importe quelle enceinte STR.
+- Présélections *Local* gardées dans le téléphone, en nombre libre et dans l'ordre choisi (glisser-déposer ou flèches) : la radio qui joue, une station de la recherche ou une adresse collée ; lancées sur n'importe quelle enceinte STR.
 - Copie de toutes les touches vers une autre enceinte STR, ou vers toutes (agent STR 1.6.5 ou plus récent).
 - Favoris STR (bouton *★ STR* à côté de *Local*, aussi dans l'onglet Lecture), les stations étoilées de l'application STR sur ordinateur, partagés par toutes les enceintes STR : en lancer un, le mettre sur une touche ou dans *Local*, ajouter une station de la recherche ou ce qui joue, en retirer un (agent STR récent).
 
@@ -408,8 +412,7 @@ aucun service intermédiaire.
 - Réveils de chaque enceinte : heure sur le cadran du téléphone, jours (raccourcis Lun → Ven, Week-end, Tous les jours), touche, volume, arrêt automatique, répétition. Les modifications faites dans les autres applications STR sont conservées.
 - Touche de répétition : la touche de la télécommande (AUX, pouce levé, pouce baissé) qui répète un réveil qui sonne ; les actions réglées ailleurs sur les autres touches sont gardées.
 - Volume de départ : le niveau que prend l'enceinte quand on l'allume.
-- Sauvegarde de l'enceinte : touches 1 à 12, réveils, volume de départ et touche de répétition d'une enceinte dans un fichier, restaurés sur la même enceinte ou recopiés sur une autre, après confirmation.
-- Sauvegarde des favoris : export des présélections *Local* et des textes gardés dans un fichier, et import.
+- Une seule sauvegarde : les présélections *Local*, les textes gardés et les réglages de l'application (langue, thème, vérification des mises à jour, volume des messages, enceintes connues), plus, pour l'enceinte sélectionnée, les touches 1 à 12, les réveils, les volumes de départ et maximum, la touche de répétition et les réglages de l'écran ; restaurée après une seule confirmation, sur la même enceinte ou sur une autre.
 - Mise à jour depuis GitHub : au plus une fois par jour, l'application cherche une version plus récente (désactivable) ; *Installer* télécharge l'APK, vérifie sa taille et son empreinte SHA-256 auprès de GitHub, puis ouvre l'installateur d'Android. Absent de la version Google Play.
 - Découverte des enceintes (mDNS, puis balayage du réseau) ou adresse manuelle ; signale les enceintes sans agent STR ou avec un agent antérieur à 1.8.0, et celles dont l'agent est plus ancien que la dernière version de STR sur GitHub (lue au plus une fois par jour).
 - Interface en français, anglais, allemand, néerlandais, espagnol et italien ; thème clair ou foncé ; diagnostic.
@@ -477,7 +480,7 @@ jointes à la dernière release : [Français](https://github.com/ben240374/Sound
 | Réveils de l'enceinte sélectionnée (heure, jours, touche, volume, arrêt, répétition) | onglet Réglages | `GET/PUT :8888/api/alarms` avec `rev` ; sur un `409`, la modification de l'utilisateur est refaite sur le document actuel |
 | Volume de départ | onglet Réglages | `GET/POST :8888/api/box/start-volume` |
 | Touche de répétition (AUX, pouce levé, pouce baissé) | onglet Réglages | `GET/PUT :8888/api/keyactions` — le document est relu juste avant l'enregistrement et seules les touches changées par l'utilisateur sont écrites |
-| Sauvegarde et restauration d'une enceinte (touches, réveils, volume de départ, touche de répétition) | onglet Réglages | `GET :8888/api/presets`, `/api/alarms`, `/api/box/start-volume`, `/api/keyactions` ; restauration par `PUT :8888/api/presets` (jeu entier), `PUT /api/alarms` avec la `rev` de la cible, puis le reste |
+| Sauvegarde et restauration d'une enceinte (touches, réveils, volumes de départ et maximum, touche de répétition, écran) | onglet Réglages | `GET :8888/api/presets`, `/api/alarms`, `/api/box/start-volume`, `/api/box/max-volume`, `/api/keyactions`, `/api/box/display-*` ; restauration par `PUT :8888/api/presets` (jeu entier), `PUT /api/alarms` avec la `rev` de la cible, puis le reste |
 | Raccourcis de l'icône (*Tout en veille*, touches 1 à 3) | lanceur d'Android | `POST :8888/api/box/power` `{"on":false}` sur chaque enceinte avec agent ; `POST :8888/api/play/<slot>` |
 | Titre en cours, pochette, source | partout | WebSocket `:8080` (sous-protocole `gabbo`), repli sur `GET /now_playing` |
 | Sources, Bluetooth, AUX | onglet Sources | `GET :8090/sources`, `POST :8090/select`, `PUT :8888/api/box/source` |
@@ -727,6 +730,12 @@ noms publics, les modèles et ce document sont en anglais.
   points de terminaison maintenu par la communauté.
 - API de l'agent, ports, comportements du firmware : `docs/CONTROL-API.md`,
   `docs/AUTOMATION.md` et `docs/ARCHITECTURE.md` du dépôt `JRpersonal/streborn`.
+
+## Soutenir
+
+L'application est gratuite, sans publicité ni collecte de données. Si elle te rend service,
+un café aide à la faire évoluer : <https://ko-fi.com/bnoitdev>. Rien n'est débloqué en
+échange.
 
 ## Licence
 

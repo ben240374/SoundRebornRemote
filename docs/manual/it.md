@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manuale d'uso
 
-Versione 1.9.2 · Android 7 e successivi
+Versione 1.9.3 · Android 7 e successivi
 
 > Lingue: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · [Español](es.md) · **Italiano**
 
@@ -110,6 +110,11 @@ secondo o due a comparire.
 La copertina, il titolo e la sorgente di ciò che suona. Per una radio, il suo logo e il
 suo nome; per Spotify, la copertina dell'album.
 
+Quando il diffusore conosce la durata del brano (la voce Spotify del diffusore stesso, un
+brano della libreria), sotto il titolo compare una barra di avanzamento con il tempo
+trascorso e la durata. Nessuna barra per una radio o per un tasto Spotify di STR: l'agente
+non fornisce ancora la durata dei suoi brani.
+
 Quando suona Spotify e l'agente STR è alla versione 1.8.1 o successiva, sotto il titolo
 compaiono due pulsanti: **Mi piace** aggiunge il brano in corso ai Brani che ti piacciono,
 **Non mi piace** lo toglie, come i tasti con il pollice del telecomando. Il brano va
@@ -143,7 +148,11 @@ l'agente conosce il timer.
 
 ### Volume
 
-Muto, livello, meno, cursore, più. La percentuale è indicata a destra.
+Muto, livello, meno, cursore, più. La percentuale è indicata a destra. In un gruppo, il muto silenzia tutti i diffusori
+del gruppo e li riattiva tutti: il diffusore principale con il proprio muto, gli altri
+portando il loro volume a 0 e restituendo poi il livello di prima (anche se l'app è stata
+chiusa nel frattempo; un volume alzato nel frattempo resta). Un diffusore che non ha
+seguito viene indicato.
 
 Quando il diffusore fa parte di un gruppo, questo cursore diventa **il volume di tutto il
 gruppo**: spostarlo sposta ogni diffusore della stessa quantità, e così l'equilibrio che hai
@@ -187,7 +196,8 @@ hanno una stazione.
 
 **Salva su un tasto ciò che suona**, sotto i riquadri, memorizza sul tasto che scegli ciò
 che il diffusore riproduce in questo momento — stazione, album o brano della libreria.
-Spotify, AUX e Bluetooth non si possono salvare in questo modo.
+Si salva anche una playlist o un album Spotify o Deezer (i tasti Spotify richiedono
+Spotify Premium); AUX e Bluetooth non si possono salvare in questo modo.
 
 ### Messaggio vocale
 
@@ -284,6 +294,11 @@ del diffusore e in numero libero (100 al massimo). Tocca una riga per avviare la
 diffusore scelto; **✎** la rinomina, **✕** la rimuove dopo conferma. La riga della radio in
 riproduzione è verde.
 
+Per cambiare l'ordine, tieni premuta una stazione e trascinala su un'altra: ne prende il
+posto. **Riordina l'elenco** (sotto l'elenco, da due stazioni) sostituisce **✎** e **✕** con **▲**
+e **▼**: ogni tocco sposta la stazione di un posto in su o in giù. **Fatto** chiude il
+riordino. L'ordine resta nel telefono e nel backup.
+
 Per aggiungerne:
 
 - **Aggiungi ciò che suona** salva la radio che il diffusore riproduce in questo momento,
@@ -293,7 +308,7 @@ Per aggiungerne:
 
 Queste preselezioni restano in questo telefono: i tasti del diffusore non le conoscono, e
 un altro telefono non le vede. Una playlist Spotify non può esservi salvata: l'agente STR
-avvia una playlist solo da uno dei suoi tasti. Per conservarle in caso di reinstallazione, esportale dalla scheda Impostazioni (**Backup dei preferiti**).
+avvia una playlist solo da uno dei suoi tasti. Per conservarle in caso di reinstallazione, esportale dalla scheda Impostazioni (**Backup**).
 
 ### Rinominare e cancellare un tasto
 
@@ -331,6 +346,7 @@ qui lo è anche, pochi secondi dopo, sugli altri diffusori e sul computer. **Una
 - **★ Aggiungi ciò che suona** salva la radio che il diffusore sta suonando; nella ricerca,
   **⋯ Tasti, Local…** propone **★ Aggiungi ai preferiti STR**.
 - Una stazione Pandora compare nell'elenco, ma si avvia dall'app STR.
+- Il badge del pulsante **★ STR** indica il numero di preferiti.
 
 ### Trovare una stazione
 
@@ -504,6 +520,24 @@ riga elimina la sveglia, dopo conferma.
 suonare. Spunta la casella, scegli il livello, poi **Salva il volume di avvio**. Un volume
 regolato durante l'ascolto non viene mai modificato.
 
+**Display del diffusore**: su un diffusore sul cui display STR sa disegnare (SoundTouch
+20, 30, Portable), le stesse impostazioni dell'app STR per computer: **Brano in corso**
+(con **Artista**, **Titolo** o **Entrambi**), **Ora durante la riproduzione, in Bluetooth
+e AUX**, **Avviso quando un tasto non può suonare**, **Notifiche (tasto salvato, tasto
+vuoto)** e **Logo STR all'avvio**. Compaiono solo le righe che il diffusore sa fare, e un
+diffusore senza display non mostra la scheda. Ogni casella si salva appena la tocchi.
+**Saluta** mostra HELLO e il nome del diffusore sul suo display per qualche secondo: utile
+per capire quale diffusore è quale.
+
+**Spotify e Deezer**: **Apri** mostra una pagina per il diffusore che riceve i comandi.
+Nell'app non serve accedere: l'account Spotify arriva sul diffusore quando lo scegli in
+Spotify (la voce che termina con «(STR)»), e un nuovo accesso a Deezer non è possibile
+senza il cloud Bose. La pagina dice quale account Spotify c'è sul diffusore (e se Spotify
+lo rifiuta), apre Spotify, mostra lo stato di Deezer (**Verifica di nuovo**,
+**Disconnetti** dopo conferma), riproduce un link Deezer — incollato, o condiviso dall'app
+Deezer con **Condividi → SoundReborn Remote** — e salva su un tasto ciò che suona, playlist
+Spotify o Deezer comprese. Deezer richiede STR 1.9.0 o successivo; in STR è ancora in beta.
+
 **Tasto posticipa** (nella scheda delle sveglie): spunta il tasto del telecomando che
 posticipa una sveglia che suona — **AUX**, **Pollice su** o **Pollice giù** — poi **Salva il
 tasto posticipa**. Fuori da una sveglia, un tasto pollice non fa nulla e AUX passa come
@@ -547,22 +581,28 @@ conosciuto dichiara sulla zona attuale. Sono le informazioni da allegare a una
 segnalazione. *Svuota la cache dei loghi* obbliga a scaricare di nuovo le immagini delle
 stazioni.
 
-**Backup dei preferiti**: le preselezioni «Locale» e i testi salvati del messaggio vocale
-vivono solo nel telefono. Un aggiornamento li conserva; una disinstallazione li cancella,
-compresa quella che Android impone prima di installare un APK firmato con un'altra chiave.
-**Esporta** crea un file e apre la condivisione (Drive, e-mail, File…); **Importa** rilegge
-un tale file e aggiunge ciò che manca, senza sostituire né eliminare nulla.
+**Backup**: un solo file con tutto ciò che si può perdere. Prima ciò che vive solo nel
+telefono — le preselezioni «Locale», i testi salvati del messaggio vocale e le impostazioni
+dell'app (lingua, tema, **Controlla automaticamente**, volume dei messaggi, diffusori
+conosciuti); un aggiornamento li conserva, una disinstallazione li cancella, compresa quella
+che Android impone prima di installare un APK firmato con un'altra chiave. Poi ciò che
+l'agente STR conserva per il diffusore selezionato — i tasti da 1 a 12 (un tasto Spotify con
+la sua playlist), le sveglie, il volume di avvio e massimo, il tasto posticipa e le
+impostazioni del display. La scheda indica il diffusore incluso; senza diffusore con
+l'agente STR, viene salvata solo l'app.
 
-**Backup del diffusore**: **Salva in un file** conserva ciò che l'agente STR tiene per il
-diffusore selezionato — i tasti da 1 a 12 (un tasto Spotify con la sua playlist), le
-sveglie, il volume di avvio e il tasto posticipa. **Ripristina da un file…** li rimette,
-dopo una domanda che nomina il diffusore di destinazione e quello da cui viene il file: il
-file serve anche a copiare queste impostazioni su un altro diffusore. I tasti del file
-sostituiscono quelli del diffusore, gli altri restano; le sue sveglie vengono sostituite.
-Senza seconda fila sul diffusore di destinazione, i tasti da 7 a 12 vengono saltati. Il
-resoconto dice cosa è stato ripristinato e cosa ha rifiutato il diffusore. Il gruppo
-permanente non viene salvato. Un tasto Spotify suona solo se il diffusore è collegato allo
-stesso account Spotify. Serve l'agente STR.
+**Salva in un file** crea il file e apre la condivisione (Drive, e-mail, File…).
+**Ripristina da un file…** dice prima cosa farà e, dopo conferma: le preselezioni e i testi
+del file che mancano vengono aggiunti, senza sostituire né eliminare nulla; le sue
+impostazioni sostituiscono quelle dell'app e i suoi diffusori si aggiungono all'elenco; la
+parte del diffusore va sul diffusore selezionato — il che serve anche a copiare un
+diffusore su un altro. I tasti del file sostituiscono quelli del diffusore, gli altri
+restano; le sue sveglie vengono sostituite; senza seconda fila sulla destinazione, i tasti
+da 7 a 12 vengono saltati; volume massimo e display vengono scritti solo se il diffusore di
+destinazione li gestisce. Il resoconto dice cosa è stato ripristinato e cosa il diffusore
+ha rifiutato. Il gruppo permanente non viene salvato. Un tasto Spotify suona solo se il
+diffusore è collegato allo stesso account Spotify. Anche i file delle versioni precedenti
+(solo preferiti o solo diffusore) si ripristinano.
 
 **Aggiornamento** (versione installata da GitHub): al massimo una volta al giorno
 l'app chiede a GitHub se è uscita una versione più recente; la casella **Controlla
@@ -574,8 +614,14 @@ Android chiede di consentire a SoundReborn Remote di installare app. Android rif
 installare sopra un APK firmato con un'altra chiave: una versione di prova avviata da
 Visual Studio non si aggiorna così.
 
-**Informazioni**: la versione, il ringraziamento al progetto STR con un collegamento al suo
-sito, e le note legali.
+**Sostieni SoundReborn Remote**: **Offri un caffè su Ko-fi** apre la pagina
+[ko-fi.com/bnoitdev](https://ko-fi.com/bnoitdev) nel browser. La donazione si fa sul sito
+di Ko-fi; in cambio non si sblocca nulla, l'app resta uguale per tutti. Questa scheda non
+esiste nella versione Google Play.
+
+**Informazioni**: il logo e la versione dell'app, lo sviluppatore (nome e indirizzo di
+contatto, che si apre nella posta), il ringraziamento al progetto STR con un
+collegamento al suo sito, e le note legali.
 
 ---
 
@@ -644,7 +690,7 @@ senza registrarlo di nuovo.
 Un aggiornamento normale le conserva. Spariscono quando l'app è stata disinstallata —
 Android lo impone per passare a una versione firmata con un'altra chiave, per esempio da una
 versione di prova avviata da Visual Studio alla versione pubblicata. Esportale prima in
-Impostazioni → **Backup dei preferiti**, poi importa il file.
+Impostazioni → **Backup**, poi importa il file.
 
 ---
 
@@ -672,6 +718,9 @@ Impostazioni → **Backup dei preferiti**, poi importa il file.
   l'agente STR. Il testo letto passa dalla voce di Google: esce dalla tua rete, e il
   diffusore deve avere accesso a internet.
 - **Preselezioni «Locale»: solo radio**, salvate in questo telefono.
+- **Spotify: niente spostamenti nel brano.** La barra di avanzamento si legge, ma né
+  l'agente STR né il firmware Bose permettono di andare avanti o indietro in un brano
+  Spotify. Precedente e successivo restano sotto **Comandi**.
 
 ---
 
@@ -694,3 +743,5 @@ esso, questa app non avrebbe nulla da comandare.
 L'elenco delle stazioni è fornito da [radio-browser.info](https://www.radio-browser.info).
 
 Il codice è stato scritto con Claude (Anthropic).
+
+Per sostenere l'app: <https://ko-fi.com/bnoitdev>.

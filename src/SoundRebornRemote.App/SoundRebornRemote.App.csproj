@@ -18,8 +18,8 @@
          code de version Android, qui doit rester un entier croissant. L'identifiant
          de paquet a changé avec le nom : Android voit une nouvelle application, donc
          le code de version repart à 1. -->
-    <ApplicationDisplayVersion>1.9.2</ApplicationDisplayVersion>
-    <ApplicationVersion>32</ApplicationVersion>
+    <ApplicationDisplayVersion>1.9.3</ApplicationDisplayVersion>
+    <ApplicationVersion>33</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
   </PropertyGroup>
@@ -53,6 +53,8 @@
     <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#101418" BaseSize="128,128" />
 
     <MauiImage Include="Resources\Images\*" />
+    <!-- Le badge du développeur (À propos) : une photo de profil en 192 px, affichée en 64 dp au plus. -->
+    <MauiImage Update="Resources\Images\developer_badge.png" BaseSize="64,64" />
 
     <!-- Pas de <MauiXaml Include="..."> ici : le SDK MAUI récupère déjà tous les
          fichiers .xaml du projet. Les déclarer une seconde fois provoque un

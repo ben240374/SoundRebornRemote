@@ -1,6 +1,6 @@
 # SoundReborn Remote — Manual de uso
 
-Versión 1.9.2 · Android 7 y posteriores
+Versión 1.9.3 · Android 7 y posteriores
 
 > Idiomas: [Français](fr.md) · [English](en.md) · [Deutsch](de.md) · [Nederlands](nl.md) · **Español** · [Italiano](it.md)
 
@@ -109,6 +109,11 @@ modo sondeo, un cambio hecho desde otro mando tarda uno o dos segundos en aparec
 La carátula, el título y la fuente de lo que suena. Para una emisora, su logotipo y su
 nombre; para Spotify, la portada del álbum.
 
+Cuando el altavoz conoce la duración de la canción (la entrada de Spotify del propio
+altavoz, una pista de la biblioteca), aparece bajo el título una barra de progreso con el
+tiempo transcurrido y la duración. No hay barra para una emisora ni para una tecla de
+Spotify de STR: el agente aún no da la duración de sus canciones.
+
 Cuando suena Spotify y el agente STR es la versión 1.8.1 o posterior, aparecen dos botones
 bajo el título: **Me gusta** añade la canción actual a Tus me gusta, **No me gusta** la
 quita, como las teclas de pulgar del mando. La canción va a la cuenta de Spotify con la que
@@ -142,7 +147,11 @@ solo aparece si el agente conoce el temporizador.
 
 ### Volumen
 
-Silencio, igualar, menos, control deslizante, más. El porcentaje aparece a la derecha.
+Silencio, igualar, menos, control deslizante, más. El porcentaje aparece a la derecha. En un grupo, el silencio
+calla todos los altavoces del grupo y los devuelve todos: el altavoz principal con su propio
+silencio, los demás poniendo su volumen a 0 y devolviéndoles después su nivel anterior
+(aunque la aplicación se haya cerrado entretanto; un volumen subido entretanto se
+conserva). Se nombra el que no haya seguido.
 
 Cuando el altavoz forma parte de un grupo, este control pasa a ser **el volumen de todo
 el grupo**: moverlo desplaza todos los altavoces en la misma medida, lo que conserva el
@@ -185,7 +194,8 @@ tienen una emisora.
 
 **Guardar lo que suena en una tecla**, bajo las tarjetas, guarda en la tecla que elijas
 lo que el altavoz reproduce en este momento — emisora, álbum o pista de la biblioteca.
-Spotify, AUX y Bluetooth no se pueden guardar así.
+También se guarda una lista o un álbum de Spotify o Deezer (las teclas de Spotify
+necesitan Spotify Premium); AUX y Bluetooth no se pueden guardar así.
 
 ### Mensaje de voz
 
@@ -280,6 +290,11 @@ las teclas del altavoz y en número libre (100 como máximo). Pulsa una línea p
 la radio en el altavoz elegido; **✎** la renombra, **✕** la quita tras confirmar. La línea
 de la radio que suena aparece en verde.
 
+Para cambiar el orden, mantén pulsada una emisora y arrástrala sobre otra: ocupa su
+lugar. **Ordenar la lista** (debajo de la lista, a partir de dos emisoras) sustituye **✎** y **✕**
+por **▲** y **▼**: cada pulsación sube o baja la emisora un puesto. **Hecho** termina la
+ordenación. El orden se conserva en el teléfono y en la copia.
+
 Para añadir:
 
 - **Añadir lo que suena** guarda la radio que el altavoz reproduce en este momento, con la
@@ -289,7 +304,7 @@ Para añadir:
 
 Estas presintonías se quedan en este teléfono: las teclas del altavoz no las conocen, y
 otro teléfono no las ve. Una lista de Spotify no se puede guardar ahí: el agente STR solo
-inicia una lista desde una de sus teclas. Para conservarlas en una reinstalación, expórtalas desde la pestaña Ajustes (**Copia de los favoritos**).
+inicia una lista desde una de sus teclas. Para conservarlas en una reinstalación, expórtalas desde la pestaña Ajustes (**Copia de seguridad**).
 
 ### Renombrar y borrar una tecla
 
@@ -327,6 +342,7 @@ el ordenador. **Una vez** o **Dos veces** devuelve las teclas.
 - **★ Añadir lo que suena** guarda la radio que suena en el altavoz; en la búsqueda,
   **⋯ Teclas, Local…** ofrece **★ Añadir a favoritos STR**.
 - Una emisora de Pandora aparece en la lista, pero se pone desde la aplicación STR.
+- La insignia del botón **★ STR** indica el número de favoritos.
 
 ### Encontrar una emisora
 
@@ -498,6 +514,25 @@ lo que usted cambió. Requiere el agente STR. La hora se ajusta en el reloj del 
 Marque la casilla, elija el nivel y pulse **Guardar el volumen de inicio**. Un volumen
 ajustado durante la escucha nunca se modifica.
 
+**Pantalla del altavoz**: en un altavoz cuya pantalla STR sabe dibujar (SoundTouch 20,
+30, Portable), los mismos ajustes que en la aplicación de escritorio de STR: **Canción
+actual** (con **Artista**, **Título** o **Ambos**), **Hora durante la reproducción, en
+Bluetooth y AUX**, **Aviso cuando una tecla no puede sonar**, **Avisos (tecla guardada,
+tecla vacía)** y **Logo de STR al arrancar**. Solo aparecen las filas que el altavoz sabe
+hacer, y un altavoz sin pantalla no muestra la tarjeta. Cada casilla se guarda en cuanto
+la tocas. **Saludar** muestra HELLO y el nombre del altavoz en su pantalla durante unos
+segundos: práctico para saber cuál es cuál.
+
+**Spotify y Deezer**: **Abrir** muestra una página para el altavoz que recibe las
+órdenes. En la aplicación no hay que iniciar sesión: la cuenta de Spotify llega al altavoz
+cuando lo eliges en Spotify (la entrada que termina en «(STR)»), y no es posible iniciar
+una nueva sesión en Deezer sin la nube de Bose. La página dice qué cuenta de Spotify hay
+en el altavoz (y si Spotify la rechaza), abre Spotify, muestra el estado de Deezer
+(**Comprobar de nuevo**, **Desconectar** tras confirmar), reproduce un enlace de Deezer —
+pegado, o compartido desde la app de Deezer con **Compartir → SoundReborn Remote** — y
+guarda lo que suena en una tecla, listas de Spotify o Deezer incluidas. Deezer necesita
+STR 1.9.0 o posterior; en STR aún está en beta.
+
 **Tecla de repetición** (en la tarjeta de alarmas): marca la tecla del mando que repite una
 alarma que suena — **AUX**, **Pulgar arriba** o **Pulgar abajo** — y luego **Guardar la
 tecla de repetición**. Fuera de una alarma, un pulgar no hace nada y AUX cambia como siempre
@@ -540,22 +575,27 @@ lista de puntos de API reconocidos, y lo que cada altavoz conocido declara sobre
 en curso. Esta es la información que debe adjuntarse a un informe de problema. *Vaciar
 la caché de logotipos* fuerza la nueva descarga de las imágenes de emisoras.
 
-**Copia de los favoritos**: las presintonías «Local» y los textos guardados del mensaje de
-voz solo viven en el teléfono. Una actualización los conserva; una desinstalación los borra,
-incluida la que Android exige antes de instalar un APK firmado con otra clave. **Exportar**
-crea un archivo y abre el menú de compartir (Drive, correo, Archivos…); **Importar** vuelve a
-leer ese archivo y añade lo que falta, sin reemplazar ni borrar nada.
+**Copia de seguridad**: un solo archivo con todo lo que se puede perder. Primero lo que
+solo vive en el teléfono — las presintonías «Local», los textos guardados del mensaje de voz
+y los ajustes de la aplicación (idioma, tema, **Comprobar automáticamente**, volumen de los
+mensajes, altavoces conocidos); una actualización los conserva, una desinstalación los borra,
+incluida la que Android exige antes de instalar un APK firmado con otra clave. Después lo que
+el agente STR guarda para el altavoz seleccionado — las teclas 1 a 12 (una tecla de Spotify
+con su lista), las alarmas, los volúmenes de inicio y máximo, la tecla de repetición y los
+ajustes de la pantalla. La tarjeta nombra el altavoz incluido; sin altavoz con el agente
+STR, solo se guarda la aplicación.
 
-**Copia del altavoz**: **Guardar en un archivo** conserva lo que el agente STR guarda para
-el altavoz seleccionado: las teclas 1 a 12 (una tecla de Spotify con su lista), las
-alarmas, el volumen de inicio y la tecla de repetición. **Restaurar desde un archivo…** los
-devuelve, tras una pregunta que nombra el altavoz de destino y el de origen del archivo: el
-archivo también sirve para copiar estos ajustes a otro altavoz. Las teclas del archivo
-sustituyen a las del altavoz, las demás se quedan; sus alarmas se sustituyen. Sin segunda
-fila en el altavoz de destino, se omiten las teclas 7 a 12. El informe dice qué se
-restauró y qué rechazó el altavoz. El grupo permanente no se guarda. Una tecla de Spotify
-solo suena si el altavoz está conectado a la misma cuenta de Spotify. Requiere el agente
-STR.
+**Guardar en un archivo** crea el archivo y abre el menú de compartir (Drive, correo,
+Archivos…). **Restaurar desde un archivo…** dice primero lo que va a hacer y, tras
+confirmar: se añaden las presintonías y textos del archivo que faltan, sin reemplazar ni
+borrar nada; sus ajustes sustituyen a los de la aplicación y sus altavoces se añaden a la
+lista; la parte del altavoz va al altavoz seleccionado — lo que también sirve para copiar un
+altavoz a otro. Las teclas del archivo sustituyen a las del altavoz, las demás se quedan;
+sus alarmas se sustituyen; sin segunda fila en el destino, se omiten las teclas 7 a 12;
+volumen máximo y pantalla solo se escriben si el altavoz de destino los admite. El informe
+dice qué se restauró y qué rechazó el altavoz. El grupo permanente no se guarda. Una tecla
+de Spotify solo suena si el altavoz está conectado a la misma cuenta de Spotify. Los
+archivos de versiones anteriores (solo favoritos o solo altavoz) también se restauran.
 
 **Actualización** (versión instalada desde GitHub): como mucho una vez al día, la
 aplicación pregunta a GitHub si hay una versión más reciente; la casilla **Comprobar
@@ -567,8 +607,14 @@ Android pide permitir que SoundReborn Remote instale aplicaciones. Android se ni
 instalar encima un APK firmado con otra clave: una versión de prueba lanzada desde Visual
 Studio no se actualiza así.
 
-**Acerca de**: la versión, el crédito al proyecto STR con un enlace a su sitio en el
-idioma elegido, y los avisos legales.
+**Apoyar SoundReborn Remote**: **Invitar a un café en Ko-fi** abre la página
+[ko-fi.com/bnoitdev](https://ko-fi.com/bnoitdev) en el navegador. La donación se hace en la
+web de Ko-fi; no se desbloquea nada a cambio, la aplicación sigue igual para todos. Esta
+tarjeta no existe en la versión de Google Play.
+
+**Acerca de**: el logotipo y la versión de la aplicación, el desarrollador (nombre y
+dirección de contacto, que se abre en el correo), el crédito al proyecto STR con un
+enlace a su sitio en el idioma elegido, y los avisos legales.
 
 ---
 
@@ -638,7 +684,7 @@ grabarlo de nuevo.
 Una actualización normal las conserva. Desaparecen cuando la aplicación se ha desinstalado —
 Android lo exige para pasar a una versión firmada con otra clave, por ejemplo de una versión
 de prueba lanzada desde Visual Studio a la versión publicada. Expórtalas antes en Ajustes →
-**Copia de los favoritos** y luego importa el archivo.
+**Copia de seguridad** y luego importa el archivo.
 
 ---
 
@@ -666,6 +712,9 @@ de prueba lanzada desde Visual Studio a la versión publicada. Expórtalas antes
   agente STR. El texto leído pasa por la voz de Google: sale de tu red, y el altavoz
   necesita acceso a internet.
 - **Presintonías «Local»: solo radios**, guardadas en este teléfono.
+- **Spotify: no se puede avanzar dentro de la canción.** La barra de progreso se puede
+  leer, pero ni el agente STR ni el firmware de Bose permiten avanzar o retroceder dentro de
+  una canción de Spotify. Anterior y siguiente siguen en **Controles**.
 
 ---
 
@@ -689,3 +738,5 @@ El directorio de emisoras lo proporciona
 [radio-browser.info](https://www.radio-browser.info).
 
 El código se escribió con Claude (Anthropic).
+
+Para apoyar la aplicación: <https://ko-fi.com/bnoitdev>.

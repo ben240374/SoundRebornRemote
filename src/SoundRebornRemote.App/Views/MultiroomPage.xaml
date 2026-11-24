@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:views="clr-namespace:SoundRebornRemote.App.Views"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:SoundRebornRemote.App.ViewModels"
              xmlns:models="clr-namespace:SoundReborn.Core.Models;assembly=SoundReborn.Core"
              x:Class="SoundRebornRemote.App.Views.MultiroomPage"
              x:DataType="vm:MultiroomViewModel"
              Title="{DynamicResource L_TabMultiroom}">
+
+    <!-- Titre de la page et nom de l'application (AppTitleBar). -->
+    <Shell.TitleView>
+        <views:AppTitleBar TitleKey="L_TabMultiroom" />
+    </Shell.TitleView>
 
     <!--
         Les listes sont posées par un BindableLayout : une CollectionView à hauteur

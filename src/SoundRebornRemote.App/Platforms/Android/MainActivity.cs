@@ -50,6 +50,14 @@ public class MainActivity : MauiAppCompatActivity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+
+        // Lancée par un partage (ShareReceiverActivity). Une activité recréée par
+        // le système rapporte l'intention d'origine : on ne la traite qu'au premier
+        // démarrage, sinon le même lien rouvrirait la page.
+        if (savedInstanceState is null)
+        {
+            TakeSharedText(Intent);
+        }
     }
 
     // ---------------------------------------------------------- Raccourcis de l'icône
@@ -68,6 +76,35 @@ public class MainActivity : MauiAppCompatActivity
     {
         base.OnNewIntent(intent);
         Microsoft.Maui.ApplicationModel.Platform.OnNewIntent(intent);
+        TakeSharedText(intent);
+    }
+
+    // ---------------------------------------------------------- Texte partagé
+    //
+    // Relayé par ShareReceiverActivity sous une action propre à l'application :
+    // ni MAUI ni les raccourcis ne la connaissent, et l'intention ne sert qu'une fois.
+
+    private static void TakeSharedText(global::Android.Content.Intent? intent)
+    {
+        try
+        {
+            if (intent?.Action != ShareReceiverActivity.SharedTextAction)
+            {
+                return;
+            }
+
+            var text = intent.GetStringExtra(ShareReceiverActivity.SharedTextExtra);
+
+            // Consommée : un retour à l'activité ne doit pas la rejouer.
+            intent.SetAction(null);
+            intent.RemoveExtra(ShareReceiverActivity.SharedTextExtra);
+
+            App.HandleSharedText(text);
+        }
+        catch (Exception)
+        {
+            // Un partage ne doit jamais empêcher l'application de s'ouvrir.
+        }
     }
 
     public override bool DispatchTouchEvent(MotionEvent? e)

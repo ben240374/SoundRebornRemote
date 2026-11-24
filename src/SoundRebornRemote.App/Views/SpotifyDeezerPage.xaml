@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    « Spotify & Deezer », ouverte depuis Réglages, par-dessus les onglets (page
+    modale : le bouton retour d'Android la referme). Même contenu que la vue
+    Spotify & Deezer de l'application de bureau de STR, pour l'enceinte qui reçoit
+    les commandes. Aucun logo de marque : les noms suffisent.
+-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SoundRebornRemote.App.ViewModels"
+             x:Class="SoundRebornRemote.App.Views.SpotifyDeezerPage"
+             x:DataType="vm:SpotifyDeezerViewModel"
+             Title="{DynamicResource L_StreamingTitle}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12,16,24" Spacing="14">
+
+            <!-- ================================================= En-tête -->
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                <Border Grid.Column="0" Style="{StaticResource IconCircle}" VerticalOptions="Center"
+                        WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20"
+                        SemanticProperties.Description="{DynamicResource L_Back}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBack" />
+                    </Border.GestureRecognizers>
+                    <!-- Flèche vers la gauche. -->
+                    <Path Style="{StaticResource IconPathSmall}" Data="M15.5,4 L17.6,6.1 L11.7,12 L17.6,17.9 L15.5,20 L7.5,12 Z" />
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                    <Label Text="{DynamicResource L_StreamingTitle}" Style="{StaticResource TitleLabel}" />
+                    <Label Text="{Binding SpeakerName}" Style="{StaticResource CaptionLabel}"
+                           IsVisible="{Binding SpeakerName, Converter={StaticResource StringNotEmpty}}" />
+                </VerticalStackLayout>
+
+                <Grid Grid.Column="2" VerticalOptions="Center">
+                    <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}"
+                                       WidthRequest="24" HeightRequest="24" />
+                    <Button Text="{DynamicResource L_Refresh}" Style="{StaticResource QuietButton}"
+                            Command="{Binding RefreshCommand}"
+                            IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBool}}" />
+                </Grid>
+            </Grid>
+
+            <!-- Pas d'enceinte, ou pas d'agent STR : rien de cette page ne fonctionne. -->
+            <Border Style="{StaticResource Card}" IsVisible="{Binding HasAgent, Converter={StaticResource InvertedBool}}">
+                <Label Text="{Binding NoAgentNote}" Style="{StaticResource SubtitleLabel}" LineBreakMode="WordWrap" />
+            </Border>
+
+            <VerticalStackLayout Spacing="14" IsVisible="{Binding HasAgent}">
+
+                <!-- ================================================= Spotify -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Spotify" Style="{StaticResource SectionLabel}" />
+
+                        <Label Text="{Binding SpotifyState}" Style="{StaticResource SubtitleLabel}" LineBreakMode="WordWrap"
+                               IsVisible="{Binding SpotifyState, Converter={StaticResource StringNotEmpty}}" />
+
+                        <!-- Spotify refuse ce compte sur le Spotify de STR : pourquoi, et quoi essayer. -->
+                        <Border Padding="12,10" StrokeThickness="1" Stroke="{StaticResource Warning}"
+                                StrokeShape="RoundRectangle 10" BackgroundColor="Transparent"
+                                IsVisible="{Binding HasSpotifyRefusal}">
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="{Binding SpotifyRefusal}" TextColor="{StaticResource Warning}"
+                                       FontAttributes="Bold" FontSize="14" LineBreakMode="WordWrap" />
+                                <Label Text="{Binding SpotifyRefusalHelp}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Label Text="{DynamicResource L_SpotifyHowTo}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+                        <Label Text="{DynamicResource L_SpotifyPremiumNote}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+
+                        <Button Text="{DynamicResource L_SpotifyOpen}" Style="{StaticResource AccentButton}"
+                                Command="{Binding OpenSpotifyCommand}" />
+
+                        <Label Text="{Binding SpotifyMessage}"
+                               TextColor="{Binding SpotifyMessageIsError, Converter={StaticResource ErrorColor}}"
+                               FontSize="13" LineBreakMode="WordWrap"
+                               IsVisible="{Binding SpotifyMessage, Converter={StaticResource StringNotEmpty}}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ================================================= Deezer -->
+                <Border Style="{StaticResource Card}" IsVisible="{Binding DeezerSupported}">
+                    <VerticalStackLayout Spacing="8">
+                        <HorizontalStackLayout Spacing="8">
+                            <Label Text="Deezer" Style="{StaticResource SectionLabel}" VerticalOptions="Center" />
+                            <!-- Bêta : Deezer sur STR est récent, pas encore confirmé sur toutes les enceintes. -->
+                            <Border Padding="7,1" StrokeThickness="1" Stroke="{StaticResource Warning}"
+                                    StrokeShape="RoundRectangle 8" BackgroundColor="Transparent" VerticalOptions="Center">
+                                <Label Text="{DynamicResource L_Beta}" TextColor="{StaticResource Warning}" FontSize="11" FontAttributes="Bold" />
+                            </Border>
+                        </HorizontalStackLayout>
+
+                        <Label Text="{DynamicResource L_DeezerNote}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+
+                        <Label Text="{Binding DeezerState}" Style="{StaticResource SubtitleLabel}" LineBreakMode="WordWrap"
+                               IsVisible="{Binding DeezerState, Converter={StaticResource StringNotEmpty}}" />
+
+                        <Label Text="{DynamicResource L_DeezerStuck}" TextColor="{StaticResource Danger}" FontSize="13"
+                               LineBreakMode="WordWrap" IsVisible="{Binding DeezerStuck}" />
+                        <Label Text="{DynamicResource L_DeezerRejected}" TextColor="{StaticResource Danger}" FontSize="13"
+                               LineBreakMode="WordWrap" IsVisible="{Binding DeezerRejected}" />
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Button Grid.Column="0" Text="{DynamicResource L_DeezerRecheck}" FontSize="13"
+                                    Command="{Binding RecheckDeezerCommand}"
+                                    IsEnabled="{Binding IsDeezerBusy, Converter={StaticResource InvertedBool}}" />
+                            <Button Grid.Column="1" Text="{DynamicResource L_DeezerDisconnect}" FontSize="13"
+                                    Style="{StaticResource QuietButton}" TextColor="{StaticResource Danger}"
+                                    Command="{Binding DisconnectDeezerCommand}"
+                                    IsVisible="{Binding CanDisconnectDeezer}"
+                                    IsEnabled="{Binding IsDeezerBusy, Converter={StaticResource InvertedBool}}" />
+                        </Grid>
+
+                        <ActivityIndicator IsRunning="{Binding IsDeezerBusy}" IsVisible="{Binding IsDeezerBusy}" />
+
+                        <Label Text="{Binding DeezerMessage}"
+                               TextColor="{Binding DeezerMessageIsError, Converter={StaticResource ErrorColor}}"
+                               FontSize="13" LineBreakMode="WordWrap"
+                               IsVisible="{Binding DeezerMessage, Converter={StaticResource StringNotEmpty}}" />
+
+                        <BoxView HeightRequest="1" Margin="0,4"
+                                 Color="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}" />
+
+                        <!-- Un lien Deezer : collé ici, ou partagé depuis l'application Deezer. -->
+                        <Label Text="{DynamicResource L_DeezerLinkTitle}" FontAttributes="Bold" FontSize="14" />
+                        <Label Text="{DynamicResource L_DeezerLinkHint}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+
+                        <Entry Text="{Binding LinkText, Mode=TwoWay}" Placeholder="https://www.deezer.com/…"
+                               Keyboard="Url" ClearButtonVisibility="WhileEditing"
+                               ReturnType="Go" ReturnCommand="{Binding PlayLinkCommand}" />
+
+                        <Label Text="{Binding LinkKind}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap"
+                               IsVisible="{Binding HasLinkKind}" />
+
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                            <Button Grid.Column="0" Text="{DynamicResource L_Paste}" FontSize="13"
+                                    Command="{Binding PasteLinkCommand}" />
+                            <Button Grid.Column="1" Text="{DynamicResource L_DeezerPlayLink}" Style="{StaticResource AccentButton}"
+                                    FontSize="13" Command="{Binding PlayLinkCommand}" IsEnabled="{Binding CanPlayLink}" />
+                        </Grid>
+
+                        <ActivityIndicator IsRunning="{Binding IsLinkBusy}" IsVisible="{Binding IsLinkBusy}" />
+
+                        <Label Text="{Binding LinkMessage}"
+                               TextColor="{Binding LinkMessageIsError, Converter={StaticResource ErrorColor}}"
+                               FontSize="13" LineBreakMode="WordWrap"
+                               IsVisible="{Binding LinkMessage, Converter={StaticResource StringNotEmpty}}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Agent antérieur à Deezer : on le dit plutôt qu'une carte vide. -->
+                <Border Style="{StaticResource Card}" IsVisible="{Binding DeezerUnsupported}">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Deezer" Style="{StaticResource SectionLabel}" />
+                        <Label Text="{DynamicResource L_DeezerNeedsAgent}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ================================================= Sur une touche -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{DynamicResource L_StreamingKeepTitle}" Style="{StaticResource SectionLabel}" />
+                        <Label Text="{DynamicResource L_StreamingKeepNote}" Style="{StaticResource CaptionLabel}" LineBreakMode="WordWrap" />
+
+                        <Button Text="{DynamicResource L_KeepPlaying}" Style="{StaticResource AccentButton}"
+                                Command="{Binding KeepPlayingCommand}"
+                                IsEnabled="{Binding IsKeepBusy, Converter={StaticResource InvertedBool}}" />
+
+                        <Label Text="{Binding StatusMessage}"
+                               TextColor="{Binding IsError, Converter={StaticResource ErrorColor}}"
+                               FontSize="13" LineBreakMode="WordWrap"
+                               IsVisible="{Binding StatusMessage, Converter={StaticResource StringNotEmpty}}" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

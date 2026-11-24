@@ -13,30 +13,49 @@ public partial class SettingsPage : ContentPage
     {
         InitializeComponent();
 
-        // La carte « Sauvegarde des favoris » a sa propre vue-modèle. Posée AVANT celle
-        // de la page : un BindingContext déjà fixé n'hérite pas de celui de la page.
-        BackupCard.BindingContext = ServiceHelper.Get<BackupViewModel>();
-        UpdateCard.BindingContext = ServiceHelper.Get<UpdateViewModel>();
+        // La carte « Sauvegarde » a sa propre vue-modèle. Posée AVANT celle de la
+        // page : un BindingContext déjà fixé n'hérite pas de celui de la page.
+        var backup = ServiceHelper.Get<BackupViewModel>();
+        BackupCard.BindingContext = backup;
+        var update = ServiceHelper.Get<UpdateViewModel>();
+        UpdateCard.BindingContext = update;
         _agentUpdate = ServiceHelper.Get<AgentUpdateViewModel>();
         AgentUpdateCard.BindingContext = _agentUpdate;
-        var speakerBackup = ServiceHelper.Get<SpeakerBackupViewModel>();
-        SpeakerBackupCard.BindingContext = speakerBackup;
 
         _viewModel = ServiceHelper.Get<SettingsViewModel>();
         BindingContext = _viewModel;
 
-        // Après une restauration, la carte des réveils relit l'enceinte.
-        speakerBackup.Restored += async (_, _) =>
+        // Après une restauration : langue, thème et vérification affichés, puis les
+        // cartes des réveils et de l'écran relisent l'enceinte.
+        backup.Restored += async (_, _) =>
         {
+            _viewModel.SyncAppSettings();
+            update.ReloadAutoCheck();
+
             try
             {
                 await _viewModel.Alarms.LoadAsync();
+                await _viewModel.Display.LoadAsync();
             }
             catch (Exception)
             {
-                // La carte des réveils garde ce qu'elle affichait.
+                // Les cartes gardent ce qu'elles affichaient.
             }
         };
+    }
+
+    /// <summary>Ouvre la page « Spotify &amp; Deezer » (une seule fois, même après un double appui).</summary>
+    private async void OnOpenStreaming(object? sender, EventArgs e)
+    {
+        // « async void » : une exception ici fermerait l'application.
+        try
+        {
+            await SpotifyDeezerPage.ShowAsync(Navigation);
+        }
+        catch (Exception)
+        {
+            // La page n'a pas pu s'ouvrir : Réglages reste affiché.
+        }
     }
 
     protected override async void OnAppearing()
@@ -57,6 +76,16 @@ public partial class SettingsPage : ContentPage
             catch (Exception)
             {
                 // La carte des réveils garde ce qu'elle affichait.
+            }
+
+            // Les réglages d'écran aussi (application de bureau, page téléphone).
+            try
+            {
+                await _viewModel.Display.LoadAsync();
+            }
+            catch (Exception)
+            {
+                // La carte de l'écran garde ce qu'elle affichait.
             }
 
             return;

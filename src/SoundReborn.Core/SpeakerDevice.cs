@@ -199,8 +199,12 @@ public sealed class SpeakerDevice : IAsyncDisposable
         await Bose.SetVolumeAsync(volume, ct).ConfigureAwait(false);
     }
 
-    /// <summary>La coupure du son n'a pas d'équivalent STR : c'est la touche MUTE du firmware.</summary>
+    /// <summary>La touche MUTE du firmware : une bascule.</summary>
     public Task ToggleMuteAsync(CancellationToken ct = default) => Bose.PressKeyAsync(RemoteKey.Mute, ct);
+
+    /// <summary>Coupe ou rend le son dans l'état demandé (<see cref="MuteControl"/>).</summary>
+    public Task<bool> SetMuteAsync(bool muted, CancellationToken ct = default)
+        => MuteControl.SetAsync(Str, Bose, muted, ct);
 
     public async Task PlayPauseAsync(bool isPlaying, CancellationToken ct = default)
     {

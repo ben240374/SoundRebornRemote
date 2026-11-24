@@ -120,6 +120,49 @@ public abstract partial class BaseViewModel : ObservableObject
         }
     }
 
+    /// <summary>Un refus de l'agent que <see cref="ShowError"/> sait dire en clair (déjà sur une touche…).</summary>
+    protected static bool IsKnownRefusal(Exception ex) => DescribeRefusal(ex) is not null;
+
+    /// <summary>
+    /// La phrase de l'agent quand il en donne une (« error » de son corps de
+    /// réponse), sinon le message habituel. Jamais vide.
+    /// </summary>
+    protected static string AgentMessage(Exception ex)
+    {
+        if (ex is SpeakerException { ResponseBody: { } body } && !string.IsNullOrWhiteSpace(body))
+        {
+            try
+            {
+                using var document = System.Text.Json.JsonDocument.Parse(body);
+
+                if (document.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object &&
+                    document.RootElement.TryGetProperty("error", out var error) &&
+                    error.ValueKind == System.Text.Json.JsonValueKind.String &&
+                    !string.IsNullOrWhiteSpace(error.GetString()))
+                {
+                    return error.GetString()!.Trim();
+                }
+            }
+            catch (System.Text.Json.JsonException)
+            {
+                // Corps en texte simple : on le prend tel quel s'il est court.
+                var text = body.Trim();
+
+                if (text.Length is > 0 and <= 200)
+                {
+                    return text;
+                }
+            }
+        }
+
+        return ex switch
+        {
+            TaskCanceledException => Localization.Get("S_Timeout"),
+            HttpRequestException => Localization.Get("S_Unreachable"),
+            _ => ex.Message,
+        };
+    }
+
     /// <summary>Force l'exécution sur le fil de l'interface (les événements WebSocket arrivent d'un fil de fond).</summary>
     protected static void OnMainThread(Action action)
     {

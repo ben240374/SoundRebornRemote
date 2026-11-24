@@ -31,6 +31,18 @@ public sealed partial class LocalPresetItem : ObservableObject
     /// <summary>Vrai pour la station que l'enceinte joue en ce moment.</summary>
     [ObservableProperty]
     private bool _isActive;
+
+    /// <summary>En tête de liste : pas de flèche « monter ».</summary>
+    [ObservableProperty]
+    private bool _isFirst;
+
+    /// <summary>En fin de liste : pas de flèche « descendre ».</summary>
+    [ObservableProperty]
+    private bool _isLast;
+
+    /// <summary>La ligne qu'on fait glisser : estompée le temps du geste.</summary>
+    [ObservableProperty]
+    private bool _isDragged;
 }
 
 /// <summary>
@@ -66,6 +78,10 @@ public sealed partial class LocalPresetsViewModel : BaseViewModel
             Items.Add(NewItem(preset));
         }
 
+        // Les flèches du rangement suivent chaque ajout, retrait ou déplacement.
+        Items.CollectionChanged += (_, _) => MarkEdges();
+        MarkEdges();
+
         Count = Items.Count;
 
         foreach (var item in Items)
@@ -77,8 +93,17 @@ public sealed partial class LocalPresetsViewModel : BaseViewModel
     public ObservableCollection<LocalPresetItem> Items { get; } = new();
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsEmpty), nameof(ShowCount))]
+    [NotifyPropertyChangedFor(nameof(IsEmpty), nameof(ShowCount), nameof(CanReorder), nameof(ShowReorder))]
     private int _count;
+
+    partial void OnCountChanged(int value)
+    {
+        // Moins de deux stations : plus rien à ranger.
+        if (value < 2)
+        {
+            IsReordering = false;
+        }
+    }
 
     public bool IsEmpty => Count == 0;
 
@@ -362,6 +387,112 @@ public sealed partial class LocalPresetsViewModel : BaseViewModel
         Count = Items.Count;
         Save();
         ShowInfo(Localization.Get("S_LocalRemoved", item.Name));
+    }
+
+    // ================================================================ Ranger
+
+    /// <summary>
+    /// Mode « ranger » : chaque ligne montre ▲ et ▼ à la place de ✎ et ✕. L'ordre
+    /// choisi est gardé tel quel, dans le téléphone et dans la sauvegarde.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowReorder))]
+    private bool _isReordering;
+
+    /// <summary>Au moins deux stations : il y a de quoi ranger.</summary>
+    public bool CanReorder => Count > 1;
+
+    /// <summary>Le bouton « Ranger la liste » (hors mode rangement).</summary>
+    public bool ShowReorder => CanReorder && !IsReordering;
+
+    [RelayCommand]
+    private void ToggleReorder() => IsReordering = !IsReordering && CanReorder;
+
+    [RelayCommand]
+    private void MoveUp(LocalPresetItem? item) => Move(item, -1);
+
+    [RelayCommand]
+    private void MoveDown(LocalPresetItem? item) => Move(item, +1);
+
+    /// <summary>Déplace une station d'un cran ; l'ordre affiché devient celui enregistré.</summary>
+    private void Move(LocalPresetItem? item, int step)
+    {
+        if (item is null)
+        {
+            return;
+        }
+
+        var from = Items.IndexOf(item);
+        MoveFrom(from, from + step);
+    }
+
+    // ---------------------------------------------------------------- Glisser-déposer
+
+    /// <summary>
+    /// La ligne en cours de glissement. Sur Android, le geste part d'un appui long
+    /// sur une ligne ; un appui court lance toujours la station.
+    /// </summary>
+    private LocalPresetItem? _dragged;
+
+    [RelayCommand]
+    private void DragStart(LocalPresetItem? item)
+    {
+        EndDrag();
+        _dragged = item;
+
+        if (item is not null)
+        {
+            item.IsDragged = true;
+        }
+    }
+
+    /// <summary>Déposée sur une autre ligne : la station glissée prend sa place.</summary>
+    [RelayCommand]
+    private void DropOn(LocalPresetItem? target)
+    {
+        var dragged = _dragged;
+        EndDrag();
+
+        if (dragged is null || target is null || ReferenceEquals(dragged, target))
+        {
+            return;
+        }
+
+        MoveFrom(Items.IndexOf(dragged), Items.IndexOf(target));
+    }
+
+    /// <summary>Geste fini, déposé ou non : plus rien d'estompé.</summary>
+    [RelayCommand]
+    private void EndDrag()
+    {
+        if (_dragged is not null)
+        {
+            _dragged.IsDragged = false;
+            _dragged = null;
+        }
+    }
+
+    private void MoveFrom(int from, int to)
+    {
+        if (from < 0 || to < 0 || from >= Items.Count || to >= Items.Count || from == to)
+        {
+            return;
+        }
+
+        Items.Move(from, to);
+
+        _presets.Clear();
+        _presets.AddRange(Items.Select(i => i.Preset));
+        Save();
+    }
+
+    private void MarkEdges()
+    {
+        for (var i = 0; i < Items.Count; i++)
+        {
+            Items[i].IsFirst = i == 0;
+            Items[i].IsLast = i == Items.Count - 1;
+        }
     }
 
     // ================================================================ Sauvegarde

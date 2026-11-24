@@ -107,7 +107,7 @@ footer a { color: var(--muted); }
 </div></header>
 <div class="wrap">
 <h1 id="soundreborn-remote--manuel-dutilisation">SoundReborn Remote — Manuel d'utilisation</h1>
-<p>Version 1.9.2 · Android 7 et suivants</p>
+<p>Version 1.9.3 · Android 7 et suivants</p>
 <ul class="langbar"><li><a href="fr.html" aria-current="page">Français</a></li><li><a href="en.html">English</a></li><li><a href="de.html">Deutsch</a></li><li><a href="nl.html">Nederlands</a></li><li><a href="es.html">Español</a></li><li><a href="it.html">Italiano</a></li></ul><hr />
 <h2 id="sommaire">Sommaire</h2>
 <ol>
@@ -192,6 +192,10 @@ seconde ou deux à apparaître.</p>
 <h3 id="en-ce-moment">En ce moment</h3>
 <p>La pochette, le titre et la source de ce qui joue. Pour une radio, le logo de la station
 et son nom ; pour Spotify, la pochette de l'album.</p>
+<p>Quand l'enceinte connaît la durée du morceau (l'entrée Spotify de l'enceinte elle-même,
+un morceau de la bibliothèque), une barre d'avancement apparaît sous le titre, avec le
+temps écoulé et la durée. Pas de barre pour une radio, ni pour une touche Spotify de STR :
+l'agent ne donne pas encore la durée de ses morceaux.</p>
 <p>Quand Spotify joue et que l'agent STR est en version 1.8.1 ou plus récente, deux boutons
 apparaissent sous le titre : <strong>J'aime</strong> ajoute le morceau en cours aux Titres likés,
 <strong>Je n'aime pas</strong> l'en retire, comme les touches pouce de la télécommande. Le morceau va
@@ -217,7 +221,11 @@ ou seulement l'enceinte sélectionnée. La minuterie vit dans l'agent STR de l'e
 elle continue si tu fermes l'application, mais un redémarrage de l'enceinte l'annule. Le
 lien n'apparaît que si l'agent connaît la minuterie.</p>
 <h3 id="volume">Volume</h3>
-<p>Sourdine, égaliser, moins, curseur, plus. Le pourcentage s'affiche à droite.</p>
+<p>Sourdine, égaliser, moins, curseur, plus. Le pourcentage s'affiche à droite. Dans un groupe, la sourdine coupe toutes les
+enceintes du groupe, et la rend à toutes : l'enceinte principale par sa propre sourdine,
+les autres en mettant leur volume à 0, puis en leur rendant leur niveau d'avant (même si
+l'application a été fermée entre-temps ; un volume remonté entre-temps est gardé). Une
+enceinte qui n'a pas suivi est nommée.</p>
 <p>Quand l'enceinte fait partie d'un groupe, ce curseur devient <strong>le volume de l'ensemble
 du groupe</strong> : le déplacer décale toutes les enceintes du même écart, ce qui préserve
 l'équilibre que tu as réglé entre elles. Cuisine à 60 et salon à 30, monter le groupe de
@@ -250,7 +258,8 @@ pour <strong>Local</strong>, une étoile pour <strong>★ STR</strong>. Un appui
 première rangée portent une station.</p>
 <p><strong>Garder ce qui joue sur une touche</strong>, sous les tuiles, range sur la touche de ton choix
 ce que l'enceinte joue en ce moment — station, album ou piste de la bibliothèque.
-Spotify, l'AUX et le Bluetooth ne se gardent pas ainsi.</p>
+Une playlist ou un album Spotify ou Deezer se garde aussi (les touches Spotify demandent Spotify
+Premium) ; l'AUX et le Bluetooth ne se gardent pas ainsi.</p>
 <h3 id="message-vocal">Message vocal</h3>
 <p>La carte <strong>Message vocal</strong> fait parler l'enceinte, puis la laisse reprendre ce qu'elle
 jouait.</p>
@@ -322,6 +331,10 @@ STR 1.6.3 et suivants).</p>
 plus des touches de l'enceinte, et en nombre libre (100 au plus). Touche une ligne pour
 lancer la radio sur l'enceinte sélectionnée ; <strong>✎</strong> la renomme, <strong>✕</strong> la retire après
 confirmation. La ligne de la radio qui joue est en vert.</p>
+<p>Pour changer l'ordre, fais un appui long sur une station, puis glisse-la sur une autre :
+elle prend sa place. <strong>Ranger la liste</strong> (sous la liste, dès deux stations) remplace <strong>✎</strong> et <strong>✕</strong> par <strong>▲</strong>
+et <strong>▼</strong> : chaque appui monte ou descend la station d'un cran. <strong>Terminé</strong> quitte le
+rangement. L'ordre est gardé dans le téléphone et dans la sauvegarde.</p>
 <p>Pour en ajouter :</p>
 <ul>
 <li><strong>Ajouter ce qui joue</strong> garde la radio que l'enceinte joue en ce moment, avec l'adresse
@@ -331,7 +344,7 @@ confirmation. La ligne de la radio qui joue est en vert.</p>
 </ul>
 <p>Ces présélections restent dans ce téléphone : les touches de l'enceinte ne les
 connaissent pas, et un autre téléphone ne les voit pas. Une playlist Spotify ne peut pas
-y être rangée : l'agent STR ne lance une playlist que depuis l'une de ses touches. Pour les garder en cas de réinstallation, exporte-les depuis l'onglet Réglages (<strong>Sauvegarde des favoris</strong>).</p>
+y être rangée : l'agent STR ne lance une playlist que depuis l'une de ses touches. Pour les garder en cas de réinstallation, exporte-les depuis l'onglet Réglages (<strong>Sauvegarde</strong>).</p>
 <h3 id="renommer-et-effacer-une-touche">Renommer et effacer une touche</h3>
 <p>Chaque tuile porte en haut le nom de sa touche. Sur une touche rangée par l'agent STR, deux
 petits boutons l'accompagnent : <strong>✎</strong> renomme la touche et <strong>✕</strong> l'efface, après
@@ -361,6 +374,7 @@ plus tard. <strong>Une fois</strong> ou <strong>Deux fois</strong> ramène les t
 <li><strong>★ Ajouter ce qui joue</strong> garde la radio que l'enceinte joue ; dans la recherche,
   <strong>⋯ Touches, Local…</strong> propose <strong>★ Ajouter aux favoris STR</strong>.</li>
 <li>Une station Pandora s'affiche, mais se lance depuis l'application STR.</li>
+<li>La pastille du bouton <strong>★ STR</strong> indique le nombre de favoris.</li>
 </ul>
 <h3 id="trouver-une-station">Trouver une station</h3>
 <p>Le champ de recherche interroge <strong>radio-browser.info</strong>, un annuaire ouvert tenu par des
@@ -502,6 +516,24 @@ n'enregistre que ce que tu as changé. Agent STR requis. L'heure se règle sur l
 <p><strong>Volume de départ</strong> : le niveau que prend l'enceinte quand on l'allume et qu'elle se met
 à jouer. Coche la case, choisis le niveau, puis <strong>Enregistrer le volume de départ</strong>. Un
 volume réglé pendant l'écoute n'est jamais modifié.</p>
+<p><strong>Écran de l'enceinte</strong> : sur une enceinte dont STR sait dessiner l'écran (SoundTouch 20,
+30, Portable), les mêmes réglages que dans l'application STR sur ordinateur : <strong>Titre en
+cours</strong> (avec <strong>Artiste</strong>, <strong>Titre</strong> ou <strong>Les deux</strong>), <strong>Heure pendant la lecture, en
+Bluetooth et AUX</strong>, <strong>Message quand une touche ne peut pas jouer</strong>, <strong>Notifications
+(touche enregistrée, touche vide)</strong> et <strong>Logo STR au démarrage</strong>. Seules les lignes que
+l'enceinte sait faire apparaissent, et une enceinte sans écran ne montre pas la carte.
+Chaque case s'enregistre dès qu'on la touche. <strong>Dire bonjour</strong> affiche HELLO et le nom de
+l'enceinte sur son écran pendant quelques secondes : pratique pour savoir laquelle est
+laquelle.</p>
+<p><strong>Spotify &amp; Deezer</strong> : <strong>Ouvrir</strong> affiche une page pour l'enceinte qui reçoit les
+commandes. Il n'y a pas de connexion à faire dans l'application : le compte Spotify arrive
+sur l'enceinte quand on la choisit dans Spotify (l'entrée qui se termine par « (STR) »), et
+une nouvelle connexion Deezer n'est pas possible sans le cloud Bose. La page dit quel
+compte Spotify est sur l'enceinte (et si Spotify le refuse), ouvre Spotify, montre l'état
+de Deezer (<strong>Vérifier à nouveau</strong>, <strong>Déconnecter</strong>, après confirmation), fait jouer un lien
+Deezer — collé, ou partagé depuis l'application Deezer avec <strong>Partager → SoundReborn
+Remote</strong> — et garde ce qui joue sur une touche, playlist Spotify ou Deezer comprise. Deezer
+demande STR 1.9.0 ou plus récent ; il est encore en bêta chez STR.</p>
 <p><strong>Touche de répétition</strong> (dans la carte des réveils) : coche la touche de la télécommande
 qui répète un réveil qui sonne — <strong>AUX</strong>, <strong>Pouce levé</strong> ou <strong>Pouce baissé</strong> — puis
 <strong>Enregistrer la touche de répétition</strong>. Hors réveil, un pouce ne fait rien et AUX passe
@@ -537,21 +569,27 @@ direct sur 17008 et 8888, l'état des notifications, la plage de graves, la list
 points d'API reconnus, et ce que chaque enceinte connue déclare de la zone en cours.
 C'est l'information à joindre à un signalement de problème. <em>Vider le cache des logos</em>
 force le retéléchargement des images de stations.</p>
-<p><strong>Sauvegarde des favoris</strong> : les présélections « Local » et les textes gardés du message
-vocal ne vivent que dans le téléphone. Une mise à jour les garde ; une désinstallation les
-efface, y compris celle qu'Android impose avant d'installer un APK signé d'une autre clé.
-<strong>Exporter</strong> crée un fichier et ouvre le partage (Drive, e-mail, Fichiers…) ; <strong>Importer</strong>
-relit un tel fichier et ajoute ce qui manque, sans rien remplacer ni supprimer.</p>
-<p><strong>Sauvegarde de l'enceinte</strong> : <strong>Sauvegarder dans un fichier</strong> garde ce que l'agent STR
-conserve pour l'enceinte sélectionnée — les touches 1 à 12 (une touche Spotify avec sa
-playlist), les réveils, le volume de départ et la touche de répétition. <strong>Restaurer depuis
-un fichier…</strong> les remet, après une question qui nomme l'enceinte visée et celle d'où vient
-le fichier : il sert aussi à recopier ces réglages sur une autre enceinte. Les touches du
-fichier remplacent celles de l'enceinte, les autres restent ; ses réveils sont remplacés.
-Sans seconde rangée sur l'enceinte visée, les touches 7 à 12 sont passées. Le compte rendu
-dit ce qui a été restauré et ce que l'enceinte a refusé. Le groupe permanent n'est pas
-sauvegardé. Une touche Spotify ne joue que si l'enceinte est connectée au même compte
-Spotify. Agent STR requis.</p>
+<p><strong>Sauvegarde</strong> : un seul fichier avec tout ce qui peut se perdre. D'abord ce qui ne vit
+que dans le téléphone — les présélections « Local », les textes gardés du message vocal
+et les réglages de l'application (langue, thème, <strong>Vérifier automatiquement</strong>, volume des
+messages, enceintes connues) ; une mise à jour les garde, une désinstallation les efface,
+y compris celle qu'Android impose avant d'installer un APK signé d'une autre clé. Ensuite
+ce que l'agent STR garde pour l'enceinte sélectionnée — les touches 1 à 12 (une touche
+Spotify avec sa playlist), les réveils, les volumes de départ et maximum, la touche de
+répétition et les réglages de l'écran. La carte nomme l'enceinte comprise ; sans enceinte
+avec l'agent STR, seule l'application est sauvegardée.</p>
+<p><strong>Sauvegarder dans un fichier</strong> crée le fichier et ouvre le partage (Drive, e-mail,
+Fichiers…). <strong>Restaurer depuis un fichier…</strong> dit d'abord ce qui va être fait, puis, après
+confirmation : les présélections et textes du fichier qui manquent sont ajoutés, sans rien
+remplacer ni supprimer ; ses réglages remplacent ceux de l'application, et ses enceintes
+s'ajoutent à la liste ; la partie enceinte va sur l'enceinte sélectionnée — ce qui sert
+aussi à recopier une enceinte sur une autre. Les touches du fichier remplacent celles de
+l'enceinte, les autres restent ; ses réveils sont remplacés ; sans seconde rangée sur
+l'enceinte visée, les touches 7 à 12 sont passées ; volume maximum et écran ne sont écrits
+que si l'enceinte visée les gère. Le compte rendu dit ce qui a été restauré et ce que
+l'enceinte a refusé. Le groupe permanent n'est pas sauvegardé. Une touche Spotify ne joue
+que si l'enceinte est connectée au même compte Spotify. Les fichiers des versions
+précédentes (favoris seuls ou enceinte seule) se restaurent aussi.</p>
 <p><strong>Mise à jour</strong> (version installée depuis GitHub) : l'application regarde au plus une
 fois par jour, auprès de GitHub, si une version plus récente est publiée ; la case
 <strong>Vérifier automatiquement</strong> le coupe. <strong>Vérifier maintenant</strong> le fait à la demande. Quand
@@ -561,8 +599,13 @@ la taille et l'empreinte SHA-256 publiées sur GitHub, puis ouvre l'installateur
 où tu confirmes. La première fois, Android demande d'autoriser SoundReborn Remote à
 installer des applications. Android refuse d'installer par-dessus un APK signé d'une
 autre clé : une version de test lancée depuis Visual Studio ne se met pas à jour ainsi.</p>
-<p><strong>À propos</strong> : la version, le crédit au projet STR avec un lien vers son site dans la
-langue choisie, et les mentions légales.</p>
+<p><strong>Soutenir SoundReborn Remote</strong> : <strong>Offrir un café sur Ko-fi</strong> ouvre la page
+<a href="https://ko-fi.com/bnoitdev">ko-fi.com/bnoitdev</a> dans le navigateur. Le don se fait sur le
+site de Ko-fi ; rien n'est débloqué en échange, l'application reste la même pour tout le
+monde. Cette carte n'existe pas dans la version Google Play.</p>
+<p><strong>À propos</strong> : le logo et la version de l'application, le développeur (son nom et son
+adresse de contact, qui s'ouvre dans la messagerie), le crédit au projet STR avec un
+lien vers son site dans la langue choisie, et les mentions légales.</p>
 <hr />
 <h2 id="9-gestes">9. Gestes</h2>
 <p><strong>Balayer horizontalement</strong> fait passer d'un onglet au suivant ou au précédent :
@@ -613,7 +656,7 @@ sans le réenregistrer.</p>
 Une mise à jour normale les garde. Elles disparaissent quand l'application a été
 désinstallée — Android l'exige pour passer d'une version signée d'une autre clé, par
 exemple d'une version de test lancée depuis Visual Studio à la version publiée. Exporte-les
-dans Réglages → <strong>Sauvegarde des favoris</strong> avant, puis importe le fichier.</p>
+dans Réglages → <strong>Sauvegarde</strong> avant, puis importe le fichier.</p>
 <hr />
 <h2 id="11-limites-connues">11. Limites connues</h2>
 <ul>
@@ -639,6 +682,9 @@ dans Réglages → <strong>Sauvegarde des favoris</strong> avant, puis importe l
   attend l'agent STR. Le texte lu passe par la voix de Google : il quitte ton réseau, et
   l'enceinte doit avoir accès à internet.</li>
 <li><strong>Présélections « Local » : radios seulement</strong>, gardées dans ce téléphone.</li>
+<li><strong>Spotify : pas de déplacement dans le morceau.</strong> La barre d'avancement se lit, mais ni
+  l'agent STR ni le firmware Bose ne permettent d'avancer ou de reculer dans un titre
+  Spotify. Précédent et suivant restent sous <strong>Commandes</strong>.</li>
 </ul>
 <hr />
 <h2 id="12-mentions">12. Mentions</h2>
@@ -654,6 +700,7 @@ STR.</p>
 lui, cette application n'aurait rien à piloter.</p>
 <p>L'annuaire de stations est fourni par <a href="https://www.radio-browser.info">radio-browser.info</a>.</p>
 <p>Le code a été écrit avec Claude (Anthropic).</p>
+<p>Pour soutenir l'application : <a href="https://ko-fi.com/bnoitdev">https://ko-fi.com/bnoitdev</a>.</p>
 <footer>
   <p>SoundReborn Remote — licence MIT. Projet personnel, sans lien avec Bose Corporation. « Bose » et « SoundTouch » sont des marques de Bose Corporation, citées pour indiquer la compatibilité. Indépendant du projet <a href="https://st-reborn.de">STR</a>, qui n'en assure pas le support.</p>
 </footer>
